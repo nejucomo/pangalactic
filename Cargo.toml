@@ -1,8 +1,5 @@
-[package]
-name = "pangalactic"
-description = "Pangalactic deterministic computation on the universal directed acyclic graph."
-version = "0.1.0"
-authors = ["Pangloss <pangloss@utopia>"]
-
-[dependencies]
-wasmi = "0.8.*"
+[workspace]
+members = [
+  "pangalactic",
+  "guest_add",
+]
