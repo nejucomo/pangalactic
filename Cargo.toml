@@ -2,5 +2,5 @@
 members = [
   "pg",
   "pangalactic",
-  "guest_add",
+  "guest_basic",
 ]

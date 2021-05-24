@@ -1,7 +1,7 @@
 cargo-features = ["per-package-target"]
 
 [package]
-name = "guest_add"
+name = "guest_basic"
 version = "0.1.0"
 authors = ["Pangloss <pangloss@utopia>"]
 edition = "2018"
