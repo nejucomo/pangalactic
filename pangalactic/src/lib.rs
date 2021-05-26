@@ -1,6 +1,8 @@
+#![deny(warnings)]
+
 extern crate wasmi;
 
-mod hostexternals;
+mod wasmhost;
 
 use std::path::Path;
 use std::convert::AsRef;
@@ -12,13 +14,13 @@ pub fn execute_path<P: AsRef<Path>>(guest: P) {
 }
 
 fn execute_module_bytes(bytes: &[u8]) {
-    use ::wasmi::{Module, ModuleInstance, ImportsBuilder};
+    use ::wasmi::{Module, ModuleInstance, NopExternals};
 
     let module = Module::from_buffer(bytes).unwrap();
     let instance =
         ModuleInstance::new(
             &module,
-            &ImportsBuilder::default(),
+            &wasmhost::Resolver::new(),
         )
         .unwrap()
         .assert_no_start();
@@ -27,7 +29,7 @@ fn execute_module_bytes(bytes: &[u8]) {
         instance.invoke_export(
             "main",
             &[],
-            &mut (hostexternals::HostExternals {}),
+            &mut NopExternals,
         )
         .unwrap();
 
