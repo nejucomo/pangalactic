@@ -1,4 +1,4 @@
-#[link(wasm_import_module = "what_mod_name_should_be_here")]
+#[link(wasm_import_module = "")]
 extern {
     fn get_bytes(buf: *mut u8, len: usize);
 }

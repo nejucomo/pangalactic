@@ -1,5 +1,7 @@
 extern crate wasmi;
 
+mod hostexternals;
+
 use std::path::Path;
 use std::convert::AsRef;
 
@@ -10,7 +12,7 @@ pub fn execute_path<P: AsRef<Path>>(guest: P) {
 }
 
 fn execute_module_bytes(bytes: &[u8]) {
-    use ::wasmi::{Module, ModuleInstance, ImportsBuilder, NopExternals};
+    use ::wasmi::{Module, ModuleInstance, ImportsBuilder};
 
     let module = Module::from_buffer(bytes).unwrap();
     let instance =
@@ -25,7 +27,7 @@ fn execute_module_bytes(bytes: &[u8]) {
         instance.invoke_export(
             "main",
             &[],
-            &mut NopExternals,
+            &mut (hostexternals::HostExternals {}),
         )
         .unwrap();
 
