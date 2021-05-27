@@ -18,6 +18,13 @@ impl HostExternals {
 
         let mut s = HostExternals { funcs: vec![] };
         s.register_func(
+            "phone_home", &[], None,
+            Box::new(|args| {
+                println!("host impl get_bytes({:?})", args);
+                None
+            }),
+        );
+        s.register_func(
             "get_bytes", &[I32, I32], None,
             Box::new(|args| {
                 println!("host impl get_bytes({:?})", args);
