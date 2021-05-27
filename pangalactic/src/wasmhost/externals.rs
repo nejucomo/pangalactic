@@ -17,7 +17,12 @@ impl HostExternals {
         use wasmi::ValueType::I32;
 
         let mut s = HostExternals { funcs: vec![] };
-        s.register_func("get_bytes", &[I32, I32], None);
+        s.register_func(
+            "get_bytes", &[I32, I32], None,
+            Box::new(|args| {
+                unimplemented!("host get_bytes impl");
+            }),
+        );
         s
     }
 
@@ -34,9 +39,9 @@ impl HostExternals {
         return Err(format!("No host function {:?} resolvable.", field_name))
     }
 
-    fn register_func(&mut self, name: &'static str, args: &'static [ValueType], ret: Option<ValueType>) {
+    fn register_func(&mut self, name: &'static str, args: &'static [ValueType], ret: Option<ValueType>, hostfunc: self::func::HostFuncBox) {
         let index = self.funcs.len();
-        self.funcs.push(ExtFunc::new(index, name, args, ret));
+        self.funcs.push(ExtFunc::new(index, name, args, ret, hostfunc));
     }
 }
 

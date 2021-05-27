@@ -23,7 +23,7 @@ impl Instance {
         Ok(Instance { modref })
     }
 
-    pub fn invoke_export(&self, name: &str,  args: &[RuntimeValue]) -> Result<Option<RuntimeValue>, Error> {
-        unimplemented!("invoke_export({:?}, {:?})", name, args);
+    pub fn invoke_export(&mut self, name: &str,  args: &[RuntimeValue]) -> Result<Option<RuntimeValue>, Error> {
+        self.modref.invoke_export(name, args, &mut wasmi::NopExternals)
     }
 }
