@@ -1,10 +1,22 @@
 use wasmi::{ImportResolver, Error, FuncRef, Signature, GlobalDescriptor, GlobalRef, MemoryDescriptor, MemoryRef, TableDescriptor, TableRef};
 
-pub struct Resolver {}
+use super::externals::HostExternals;
+
+pub struct Resolver {
+    ext: HostExternals,
+}
 
 impl Resolver {
     pub fn new() -> Resolver {
-        Resolver {}
+        Resolver {
+            ext: HostExternals::new(),
+        }
+    }
+}
+
+macro_rules! error {
+    ( $fmt:expr, $( $arg:expr ),* ) => {
+        Err(Error::Instantiation(format!($fmt, $( $arg ),* )))
     }
 }
 
@@ -15,7 +27,13 @@ impl ImportResolver for Resolver {
         field_name: &str, 
         signature: &Signature
     ) -> Result<FuncRef, Error> {
-        unimplemented!("resolve_func({:?}, {:?}, {:#?})", module_name, field_name, signature);
+        match module_name {
+            env!("CARGO_PKG_NAME") =>
+                self.ext.resolve_func(field_name, signature)
+                .map_err(Error::Instantiation),
+            _ =>
+                error!("Unresolved WASM module {:?}", module_name)
+        }
     }
 
     fn resolve_global(

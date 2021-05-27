@@ -14,22 +14,12 @@ pub fn execute_path<P: AsRef<Path>>(guest: P) {
 }
 
 fn execute_module_bytes(bytes: &[u8]) {
-    use ::wasmi::{Module, ModuleInstance, NopExternals};
-
-    let module = Module::from_buffer(bytes).unwrap();
-    let instance =
-        ModuleInstance::new(
-            &module,
-            &wasmhost::Resolver::new(),
-        )
-        .unwrap()
-        .assert_no_start();
+    let host = wasmhost::load_module(bytes).unwrap();
 
     let guestresult =
-        instance.invoke_export(
+        host.invoke_export(
             "main",
             &[],
-            &mut NopExternals,
         )
         .unwrap();
 

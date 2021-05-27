@@ -1,4 +1,4 @@
-#[link(wasm_import_module = "")]
+#[link(wasm_import_module = "pangalactic")]
 extern {
     fn get_bytes(buf: *mut u8, len: usize);
 }

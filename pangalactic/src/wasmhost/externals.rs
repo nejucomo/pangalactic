@@ -1,11 +1,45 @@
+mod func;
+
 use wasmi::{
-    Externals, RuntimeValue, RuntimeArgs, Error, ModuleImportResolver,
-    FuncRef, ValueType, Signature, FuncInstance, Trap,
+    Externals, RuntimeValue, RuntimeArgs,
+    FuncRef, ValueType, Signature, Trap,
 };
+use self::func::ExtFunc;
 
-pub struct HostExternals {}
 
-const INDEX_GET_BYTES: usize = 0;
+pub struct HostExternals {
+    funcs: Vec<ExtFunc>,
+}
+
+
+impl HostExternals {
+    pub fn new() -> HostExternals {
+        use wasmi::ValueType::I32;
+
+        let mut s = HostExternals { funcs: vec![] };
+        s.register_func("get_bytes", &[I32, I32], None);
+        s
+    }
+
+    pub fn resolve_func(
+        &self, 
+        field_name: &str, 
+        signature: &Signature
+    ) -> Result<FuncRef, String> {
+        for extfunc in self.funcs.iter() {
+            if let Some(funcref) = extfunc.resolve(field_name, signature)? {
+                return Ok(funcref)
+            }
+        }
+        return Err(format!("No host function {:?} resolvable.", field_name))
+    }
+
+    fn register_func(&mut self, name: &'static str, args: &'static [ValueType], ret: Option<ValueType>) {
+        let index = self.funcs.len();
+        self.funcs.push(ExtFunc::new(index, name, args, ret));
+    }
+}
+
 
 impl Externals for HostExternals {
     fn invoke_index(
@@ -13,57 +47,12 @@ impl Externals for HostExternals {
         index: usize,
         args: RuntimeArgs,
     ) -> Result<Option<RuntimeValue>, Trap> {
-        match index {
-            INDEX_GET_BYTES => {
-                let a: u32 = args.nth_checked(0)?;
-                let b: u32 = args.nth_checked(1)?;
-                println!("XXX GET_BYTES({:x}, {:x})", a, b);
+        use wasmi::TrapKind::TableAccessOutOfBounds;
 
-                Ok(None)
-            }
-            _ => panic!("Unimplemented function at {}", index),
-        }
-    }
-}
-
-impl HostExternals {
-    fn check_signature(
-        &self,
-        index: usize,
-        signature: &Signature
-    ) -> bool {
-        let (params, ret_ty): (&[ValueType], Option<ValueType>) = match index {
-            INDEX_GET_BYTES => (&[ValueType::I32, ValueType::I32], None),
-            _ => return false,
-        };
-        signature.params() == params && signature.return_type() == ret_ty
-    }
-}
-
-impl ModuleImportResolver for HostExternals {
-    fn resolve_func(
-        &self,
-        field_name: &str,
-        signature: &Signature
-    ) -> Result<FuncRef, Error> {
-        let index = match field_name {
-            "get_bytes" => INDEX_GET_BYTES,
-            _ => {
-                return Err(Error::Instantiation(
-                    format!("Export {} not found", field_name),
-                ))
-            }
-        };
-
-        if !self.check_signature(index, signature) {
-            return Err(Error::Instantiation(
-                format!("Export {} has a bad signature", field_name)
-            ));
-        }
-
-        Ok(FuncInstance::alloc_host(
-            Signature::new(&[ValueType::I32, ValueType::I32][..], None),
-            index,
-        ))
+        self
+            .funcs
+            .get(index)
+            .ok_or(TableAccessOutOfBounds)?
+            .invoke(args)
     }
 }
