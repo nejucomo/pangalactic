@@ -1,5 +1,6 @@
 # todo
 
-- Use logging macro framework to debug print WASM host infrastructure. Goal is to diagnose the "unreachable trap".
+- Implement host func `log` to get info out of guests.
+- Switch from `println!` to `debug!` w/ appropriate libraries.
 - Use `#[derive(derive_more::From)]` on `pangalactic::Error`.
 - Implement a byte stream reader host external facility as proof-of-concept.

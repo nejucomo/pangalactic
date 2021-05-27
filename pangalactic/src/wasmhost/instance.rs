@@ -21,7 +21,10 @@ impl Instance {
             )?
             .assert_no_start();
 
-        println!("Loaded module...");
+        println!("Loaded module:");
+        for glob in modref.globals().iter() {
+            println!("  global {:?} {:?}", glob.value_type(), glob.get());
+        }
         Ok(Instance { res, modref })
     }
 

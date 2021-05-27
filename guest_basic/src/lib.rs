@@ -2,6 +2,8 @@
 extern {
     fn phone_home();
 
+    fn log(buf: *const u8, len: usize);
+
     // fn get_bytes(buf: *mut u8, len: usize);
 }
 
@@ -9,6 +11,11 @@ extern {
 pub extern fn main() {
     unsafe {
         phone_home();
+    }
+
+    let logbytes = "Hello World!".as_bytes();
+    unsafe {
+        log(logbytes.as_ptr(), logbytes.len());
     }
 
     /*
