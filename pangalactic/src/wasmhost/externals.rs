@@ -20,7 +20,8 @@ impl HostExternals {
         s.register_func(
             "get_bytes", &[I32, I32], None,
             Box::new(|args| {
-                unimplemented!("host get_bytes impl");
+                println!("host impl get_bytes({:?})", args);
+                unimplemented!("host impl get_bytes({:?})", args);
             }),
         );
         s
@@ -56,7 +57,7 @@ impl Externals for HostExternals {
 
         self
             .funcs
-            .get(index)
+            .get_mut(index)
             .ok_or(TableAccessOutOfBounds)?
             .invoke(args)
     }

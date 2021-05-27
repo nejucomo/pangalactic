@@ -29,7 +29,7 @@ impl ExtFunc {
         }
     }
 
-    pub fn invoke(&self, args: RuntimeArgs) -> Result<Option<RuntimeValue>, Trap> {
+    pub fn invoke(&mut self, args: RuntimeArgs) -> Result<Option<RuntimeValue>, Trap> {
         Ok(self.hostfunc.call_mut((args,)))
     }
 }
