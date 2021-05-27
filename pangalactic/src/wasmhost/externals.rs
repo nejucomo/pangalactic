@@ -20,7 +20,7 @@ impl HostExternals {
         s.register_func(
             "phone_home", &[], None,
             Box::new(|args| {
-                println!("host impl get_bytes({:?})", args);
+                println!("host impl phone_home({:?})", args);
                 None
             }),
         );
@@ -35,15 +35,20 @@ impl HostExternals {
     }
 
     pub fn resolve_func(
-        &self, 
-        field_name: &str, 
+        &self,
+        field_name: &str,
         signature: &Signature
     ) -> Result<FuncRef, String> {
+        println!("Externals::resolve_func({:?}, {:?})", field_name, signature);
         for extfunc in self.funcs.iter() {
+            println!("... checking {:?}", extfunc);
             if let Some(funcref) = extfunc.resolve(field_name, signature)? {
+                println!("    yep!");
                 return Ok(funcref)
             }
+            println!("    nope.");
         }
+        println!("  Failed.");
         return Err(format!("No host function {:?} resolvable.", field_name))
     }
 
@@ -62,6 +67,7 @@ impl Externals for HostExternals {
     ) -> Result<Option<RuntimeValue>, Trap> {
         use wasmi::TrapKind::TableAccessOutOfBounds;
 
+        println!("HostExternals::invoke_index({:?}, {:?})", index, args);
         self
             .funcs
             .get_mut(index)

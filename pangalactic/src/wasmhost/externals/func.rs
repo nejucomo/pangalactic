@@ -2,10 +2,17 @@ use wasmi::{FuncRef, FuncInstance, RuntimeArgs, RuntimeValue, Trap, Signature, V
 
 
 pub type HostFuncBox = Box<dyn FnMut(RuntimeArgs) -> Option<RuntimeValue>>;
+
 pub struct ExtFunc {
     name: &'static str,
     funcref: FuncRef,
     hostfunc: HostFuncBox,
+}
+
+impl std::fmt::Debug for ExtFunc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ExtFunc<{}>", self.name)
+    }
 }
 
 
@@ -30,6 +37,9 @@ impl ExtFunc {
     }
 
     pub fn invoke(&mut self, args: RuntimeArgs) -> Result<Option<RuntimeValue>, Trap> {
-        Ok(self.hostfunc.call_mut((args,)))
+        println!("{:?}.invoke({:?}) ...", self, args);
+        let ret = self.hostfunc.call_mut((args,));
+        println!("{:?}.invoke(...) -> {:?}", self, ret);
+        Ok(ret)
     }
 }
