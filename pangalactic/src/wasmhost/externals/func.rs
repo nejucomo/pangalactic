@@ -1,3 +1,5 @@
+use log::debug;
+
 use wasmi::{Error, FuncInstance, FuncRef, RuntimeArgs, RuntimeValue, Signature, Trap, ValueType};
 
 pub type HostFuncBox = Box<dyn FnMut(RuntimeArgs) -> Option<RuntimeValue>>;
@@ -47,9 +49,9 @@ impl ExtFunc {
     }
 
     pub fn invoke(&mut self, args: RuntimeArgs) -> Result<Option<RuntimeValue>, Trap> {
-        println!("{:?}.invoke({:?}) ...", self, args);
+        debug!("{:?}.invoke({:?}) ...", self, args);
         let ret = self.hostfunc.call_mut((args,));
-        println!("{:?}.invoke(...) -> {:?}", self, ret);
+        debug!("{:?}.invoke(...) -> {:?}", self, ret);
         Ok(ret)
     }
 }

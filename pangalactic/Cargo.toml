@@ -2,7 +2,9 @@
 name = "pangalactic"
 description = "Pangalactic deterministic computation on the universal directed acyclic graph."
 version = "0.1.0"
+edition = "2018"
 authors = ["Pangloss <pangloss@utopia>"]
 
 [dependencies]
+log = "0.4.14"
 wasmi = "0.8.*"

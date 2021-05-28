@@ -1,5 +1,6 @@
 mod func;
 
+use log::debug;
 use self::func::ExtFunc;
 use wasmi::{
     Error, Externals, FuncRef, GlobalDescriptor, GlobalRef, MemoryDescriptor, MemoryRef,
@@ -21,7 +22,7 @@ impl HostExternals {
             &[I32, I32],
             None,
             Box::new(|args| {
-                println!("host impl log({:?})", args);
+                debug!("host impl log({:?})", args);
                 let ptr: u32 = args.nth(0);
                 let len: u32 = args.nth(1);
                 unimplemented!("host impl log({:?}, {:?})", ptr, len);
@@ -32,7 +33,7 @@ impl HostExternals {
             &[],
             None,
             Box::new(|args| {
-                println!("host impl phone_home({:?})", args);
+                debug!("host impl phone_home({:?})", args);
                 None
             }),
         );
@@ -41,7 +42,7 @@ impl HostExternals {
             &[I32, I32],
             None,
             Box::new(|args| {
-                println!("host impl get_bytes({:?})", args);
+                debug!("host impl get_bytes({:?})", args);
                 unimplemented!("host impl get_bytes({:?})", args);
             }),
         );
@@ -75,16 +76,16 @@ macro_rules! not_found {
 
 impl ModuleImportResolver for HostExternals {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
-        println!("Externals::resolve_func({:?}, {:?})", field_name, signature);
+        debug!("Externals::resolve_func({:?}, {:?})", field_name, signature);
         for extfunc in self.funcs.iter() {
-            println!("... checking {:?}", extfunc);
+            debug!("... checking {:?}", extfunc);
             if let Some(funcref) = extfunc.resolve(field_name, signature)? {
-                println!("    yep!");
+                debug!("    yep!");
                 return Ok(funcref);
             }
-            println!("    nope.");
+            debug!("    nope.");
         }
-        println!("  Failed.");
+        debug!("  Failed.");
         return not_found!(Function, field_name);
     }
 
@@ -121,7 +122,7 @@ impl Externals for HostExternals {
     ) -> Result<Option<RuntimeValue>, Trap> {
         use wasmi::TrapKind::TableAccessOutOfBounds;
 
-        println!("HostExternals::invoke_index({:?}, {:?})", index, args);
+        debug!("HostExternals::invoke_index({:?}, {:?})", index, args);
         self.funcs
             .get_mut(index)
             .ok_or(TableAccessOutOfBounds)?

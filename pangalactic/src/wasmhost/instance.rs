@@ -1,3 +1,5 @@
+use log::debug;
+
 use super::externals::HostExternals;
 use wasmi::{Error, ModuleRef, RuntimeValue};
 
@@ -15,9 +17,9 @@ impl Instance {
         let imports = ImportsBuilder::new().with_resolver(env!("CARGO_PKG_NAME"), &hext);
         let modref = ModuleInstance::new(&module, &imports)?.assert_no_start();
 
-        println!("Loaded module:");
+        debug!("Loaded module:");
         for glob in modref.globals().iter() {
-            println!("  global {:?} {:?}", glob.value_type(), glob.get());
+            debug!("  global {:?} {:?}", glob.value_type(), glob.get());
         }
         Ok(Instance { hext, modref })
     }
@@ -27,7 +29,7 @@ impl Instance {
         name: &str,
         args: &[RuntimeValue],
     ) -> Result<Option<RuntimeValue>, Error> {
-        println!("Instance::invoke_export({:?}, {:?})", name, args);
+        debug!("Instance::invoke_export({:?}, {:?})", name, args);
         self.modref.invoke_export(name, args, &mut self.hext)
     }
 }
