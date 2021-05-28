@@ -1,13 +1,11 @@
 mod externals;
 mod hostfuncs;
-mod hostresolver;
 
 use self::hostfuncs::HostFuncs;
 use wasmi::{Error, ModuleRef};
 
 pub fn load_and_execute_module(bytes: &[u8]) -> Result<(), Error> {
     use log::debug;
-    use wasmi::{ImportsBuilder, Module, ModuleInstance};
 
     let funcs = HostFuncs::init();
 
@@ -25,8 +23,9 @@ pub fn load_and_execute_module(bytes: &[u8]) -> Result<(), Error> {
 }
 
 fn load_modref(funcs: &HostFuncs, bytes: &[u8]) -> Result<ModuleRef, Error> {
+    use wasmi::{ImportsBuilder, Module, ModuleInstance};
+
     let module = Module::from_buffer(bytes)?;
-    let hres = self::hostresolver::HostResolver::new();
     let imports = ImportsBuilder::new().with_resolver(env!("CARGO_PKG_NAME"), funcs);
     let modref = ModuleInstance::new(&module, &imports)?.assert_no_start();
     Ok(modref)

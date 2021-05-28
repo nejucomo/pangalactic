@@ -1,11 +1,5 @@
-use self::func::ExtFunc;
 use super::hostfuncs::HostFuncs;
-use log::{debug, info};
-use wasmi::{
-    Error, Externals, FuncRef, GlobalDescriptor, GlobalRef, MemoryDescriptor, MemoryRef,
-    ModuleImportResolver, ModuleRef, RuntimeArgs, RuntimeValue, Signature, TableDescriptor,
-    TableRef, Trap, ValueType,
-};
+use wasmi::{Error, Externals, MemoryRef, ModuleRef, RuntimeArgs, RuntimeValue, Trap};
 
 pub struct HostExternals {
     mem: MemoryRef,
@@ -14,14 +8,15 @@ pub struct HostExternals {
 
 impl HostExternals {
     pub fn load(modref: &ModuleRef, funcs: HostFuncs) -> Result<HostExternals, Error> {
+        use wasmi::Error::Instantiation;
         use wasmi::ExternVal::Memory;
 
         let export = modref
             .export_by_name("memory")
-            .ok_or(Error::Instantiation("Could not find 'memory' export.'"))?;
+            .ok_or(Instantiation(format!("Could not find 'memory' export.'")))?;
         let mem = match export {
             Memory(m) => Ok(m),
-            other => Err(Error::Instantiation(format!(
+            other => Err(Instantiation(format!(
                 "Invalid 'memory' export type: {:?}",
                 other
             ))),
@@ -37,8 +32,6 @@ impl Externals for HostExternals {
         index: usize,
         args: RuntimeArgs,
     ) -> Result<Option<RuntimeValue>, Trap> {
-        use wasmi::TrapKind::TableAccessOutOfBounds;
-
-        self.funcs.invoke_index(&self.memref, index, args)
+        self.funcs.invoke_index(&self.mem, index, args)
     }
 }

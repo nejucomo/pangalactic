@@ -13,7 +13,8 @@ pub use self::error::Error;
 
 pub fn execute_path<P: AsRef<Path>>(guest: P) -> Result<(), Error> {
     let bytes = &(read_path(guest)?)[..];
-    self::wasmhost::load_and_execute_module(bytes)
+    self::wasmhost::load_and_execute_module(bytes)?;
+    Ok(())
 }
 
 fn read_path<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, Error> {
