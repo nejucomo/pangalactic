@@ -1,11 +1,10 @@
 use log::debug;
 
 use super::externals::HostExternals;
-use wasmi::{Error, ModuleRef, RuntimeValue};
+use wasmi::{Error, RuntimeValue};
 
 pub struct Instance {
     hext: HostExternals,
-    modref: ModuleRef,
 }
 
 impl Instance {
@@ -13,12 +12,14 @@ impl Instance {
         use wasmi::{ImportsBuilder, Module, ModuleInstance};
 
         let module = Module::from_buffer(bytes)?;
-        let hext = HostExternals::new();
+        let mut hext = HostExternals::new();
         let imports = ImportsBuilder::new().with_resolver(env!("CARGO_PKG_NAME"), &hext);
         let modref = ModuleInstance::new(&module, &imports)?.assert_no_start();
 
+        hext.register_mod(modref);
+
         debug!("Loaded module.");
-        Ok(Instance { hext, modref })
+        Ok(Instance { hext })
     }
 
     pub fn invoke_export(
@@ -27,6 +28,6 @@ impl Instance {
         args: &[RuntimeValue],
     ) -> Result<Option<RuntimeValue>, Error> {
         debug!("invoke_export({:?}, {:?})", name, args);
-        self.modref.invoke_export(name, args, &mut self.hext)
+        self.hext.invoke_export(name, args)
     }
 }

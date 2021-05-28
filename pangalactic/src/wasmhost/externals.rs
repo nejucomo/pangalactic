@@ -1,22 +1,23 @@
 mod func;
 
-use log::debug;
+use log::{debug, info};
 use self::func::ExtFunc;
 use wasmi::{
     Error, Externals, FuncRef, GlobalDescriptor, GlobalRef, MemoryDescriptor, MemoryRef,
     ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, TableDescriptor, TableRef, Trap,
-    ValueType,
+    ValueType, ModuleRef,
 };
 
 pub struct HostExternals {
     funcs: Vec<ExtFunc>,
+    modref: Option<ModuleRef>,
 }
 
 impl HostExternals {
     pub fn new() -> HostExternals {
         use wasmi::ValueType::I32;
 
-        let mut s = HostExternals { funcs: vec![] };
+        let mut s = HostExternals { funcs: vec![], modref: None };
         s.register_func(
             "log",
             &[I32, I32],
@@ -24,26 +25,34 @@ impl HostExternals {
             Box::new(|args| {
                 let ptr: u32 = args.nth(0);
                 let len: u32 = args.nth(1);
-                unimplemented!("host impl log({:?}, {:?})", ptr, len);
-            }),
-        );
-        s.register_func(
-            "phone_home",
-            &[],
-            None,
-            Box::new(|_args| {
+                let modref = s.modref.expect("modref not initialized");
+                let memexp = modref.export_by_name("memory")
+                    .expect("could not access guest 'memory' export");
+                let memref = match memexp {
+                    wasmi::ExternVal::Memory(memref) => memref,
+                    other => panic!("Guest 'memory' export wrong type: {:?}", other),
+                };
+                let guestvec = memref.get(ptr, len as usize).unwrap();
+                let guestbytes = &guestvec[..];
+                match std::str::from_utf8(guestbytes) {
+                    Ok(gueststr) => info!("[guest log] {}", gueststr),
+                    Err(_) => info!("[guest log - malformed utf8] {:?}", guestbytes),
+                };
                 None
             }),
         );
-        s.register_func(
-            "get_bytes",
-            &[I32, I32],
-            None,
-            Box::new(|args| {
-                unimplemented!("host impl get_bytes({:?})", args);
-            }),
-        );
         s
+    }
+
+    pub fn register_mod(&mut self, modref: ModuleRef) {
+        assert!(self.modref.is_none());
+        self.modref = Some(modref);
+    }
+
+    pub fn invoke_export(&mut self, name: &str, args: &[RuntimeValue]) -> Result<Option<RuntimeValue>, Error> {
+        let modref = self.modref.as_mut()
+            .expect("modref not initialized");
+        modref.invoke_export(name, args, self)
     }
 
     fn register_func(
