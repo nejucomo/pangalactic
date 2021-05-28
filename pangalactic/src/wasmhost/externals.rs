@@ -1,8 +1,7 @@
 mod func;
 
 use wasmi::{
-    Externals, RuntimeValue, RuntimeArgs,
-    FuncRef, ValueType, Signature, Trap,
+    Externals, RuntimeValue, RuntimeArgs, ModuleImportResolver, MemoryDescriptor, MemoryRef, FuncRef, GlobalDescriptor, GlobalRef, ValueType, Signature, Trap, Error, TableRef, TableDescriptor,
 };
 use self::func::ExtFunc;
 
@@ -43,11 +42,29 @@ impl HostExternals {
         s
     }
 
-    pub fn resolve_func(
+    fn register_func(&mut self, name: &'static str, args: &'static [ValueType], ret: Option<ValueType>, hostfunc: self::func::HostFuncBox) {
+        let index = self.funcs.len();
+        self.funcs.push(ExtFunc::new(index, name, args, ret, hostfunc));
+    }
+}
+
+
+macro_rules! not_found {
+    ( $errCtr:ident, $name:expr ) => {
+        {
+            use wasmi::Error::$errCtr;
+
+            Err($errCtr(format!("Host {} not found: {:?}", stringify!($errCtr), $name)))
+        }
+    }
+}
+
+impl ModuleImportResolver for HostExternals {
+    fn resolve_func(
         &self,
         field_name: &str,
         signature: &Signature
-    ) -> Result<FuncRef, String> {
+    ) -> Result<FuncRef, Error> {
         println!("Externals::resolve_func({:?}, {:?})", field_name, signature);
         for extfunc in self.funcs.iter() {
             println!("... checking {:?}", extfunc);
@@ -58,12 +75,31 @@ impl HostExternals {
             println!("    nope.");
         }
         println!("  Failed.");
-        return Err(format!("No host function {:?} resolvable.", field_name))
+        return not_found!(Function, field_name);
     }
 
-    fn register_func(&mut self, name: &'static str, args: &'static [ValueType], ret: Option<ValueType>, hostfunc: self::func::HostFuncBox) {
-        let index = self.funcs.len();
-        self.funcs.push(ExtFunc::new(index, name, args, ret, hostfunc));
+    fn resolve_global(
+        &self,
+        field_name: &str,
+        _global_type: &GlobalDescriptor
+    ) -> Result<GlobalRef, Error> {
+        not_found!(Global, field_name)
+    }
+
+    fn resolve_memory(
+        &self,
+        field_name: &str,
+        _memory_type: &MemoryDescriptor
+    ) -> Result<MemoryRef, Error> {
+        not_found!(Memory, field_name)
+    }
+
+    fn resolve_table(
+        &self,
+        field_name: &str,
+        _table_type: &TableDescriptor
+    ) -> Result<TableRef, Error> {
+        not_found!(Table, field_name)
     }
 }
 

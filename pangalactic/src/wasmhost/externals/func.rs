@@ -1,4 +1,4 @@
-use wasmi::{FuncRef, FuncInstance, RuntimeArgs, RuntimeValue, Trap, Signature, ValueType};
+use wasmi::{FuncRef, FuncInstance, RuntimeArgs, RuntimeValue, Trap, Signature, ValueType, Error};
 
 
 pub type HostFuncBox = Box<dyn FnMut(RuntimeArgs) -> Option<RuntimeValue>>;
@@ -24,12 +24,12 @@ impl ExtFunc {
         ExtFunc { name, funcref, hostfunc }
     }
 
-    pub fn resolve(&self, reqname: &str, reqsig: &Signature) -> Result<Option<FuncRef>, String> {
+    pub fn resolve(&self, reqname: &str, reqsig: &Signature) -> Result<Option<FuncRef>, Error> {
         if reqname == self.name {
             if reqsig == self.funcref.signature() {
                 Ok(Some(self.funcref.clone()))
             } else {
-                Err(format!("Mismatched signature for host function {:?}", reqname))
+                Err(Error::Function(format!("Mismatched signature for host function {:?}", reqname)))
             }
         } else {
             Ok(None)
