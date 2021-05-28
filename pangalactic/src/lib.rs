@@ -12,18 +12,8 @@ use std::path::Path;
 pub use self::error::Error;
 
 pub fn execute_path<P: AsRef<Path>>(guest: P) -> Result<(), Error> {
-    let bytes = read_path(guest)?;
-    execute_module_bytes(&bytes)?;
-    Ok(())
-}
-
-fn execute_module_bytes(bytes: &[u8]) -> Result<(), Error> {
-    let mut host = wasmhost::load_module(bytes).unwrap();
-
-    let guestresult = host.invoke_export("main", &[])?;
-
-    assert_eq!(guestresult, None);
-    Ok(())
+    let bytes = &(read_path(guest)?)[..];
+    self::wasmhost::load_and_execute_module(bytes)
 }
 
 fn read_path<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, Error> {
