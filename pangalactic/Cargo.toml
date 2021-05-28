@@ -6,5 +6,6 @@ edition = "2018"
 authors = ["Pangloss <pangloss@utopia>"]
 
 [dependencies]
+derive_more = "0.99.14"
 log = "0.4.14"
 wasmi = "0.8.*"
