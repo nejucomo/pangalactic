@@ -22,7 +22,6 @@ impl HostExternals {
             &[I32, I32],
             None,
             Box::new(|args| {
-                debug!("host impl log({:?})", args);
                 let ptr: u32 = args.nth(0);
                 let len: u32 = args.nth(1);
                 unimplemented!("host impl log({:?}, {:?})", ptr, len);
@@ -32,8 +31,7 @@ impl HostExternals {
             "phone_home",
             &[],
             None,
-            Box::new(|args| {
-                debug!("host impl phone_home({:?})", args);
+            Box::new(|_args| {
                 None
             }),
         );
@@ -42,7 +40,6 @@ impl HostExternals {
             &[I32, I32],
             None,
             Box::new(|args| {
-                debug!("host impl get_bytes({:?})", args);
                 unimplemented!("host impl get_bytes({:?})", args);
             }),
         );
@@ -78,14 +75,10 @@ impl ModuleImportResolver for HostExternals {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
         debug!("Externals::resolve_func({:?}, {:?})", field_name, signature);
         for extfunc in self.funcs.iter() {
-            debug!("... checking {:?}", extfunc);
             if let Some(funcref) = extfunc.resolve(field_name, signature)? {
-                debug!("    yep!");
                 return Ok(funcref);
             }
-            debug!("    nope.");
         }
-        debug!("  Failed.");
         return not_found!(Function, field_name);
     }
 
@@ -122,7 +115,6 @@ impl Externals for HostExternals {
     ) -> Result<Option<RuntimeValue>, Trap> {
         use wasmi::TrapKind::TableAccessOutOfBounds;
 
-        debug!("HostExternals::invoke_index({:?}, {:?})", index, args);
         self.funcs
             .get_mut(index)
             .ok_or(TableAccessOutOfBounds)?
