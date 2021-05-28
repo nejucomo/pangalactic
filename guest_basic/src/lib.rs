@@ -1,5 +1,5 @@
 #[link(wasm_import_module = "pangalactic")]
-extern {
+extern "C" {
     fn phone_home();
 
     fn log(buf: *const u8, len: usize);
@@ -8,7 +8,7 @@ extern {
 }
 
 #[no_mangle]
-pub extern fn main() {
+pub extern "C" fn main() {
     unsafe {
         phone_home();
     }

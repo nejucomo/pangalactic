@@ -6,18 +6,16 @@ extern crate wasmi;
 mod error;
 mod wasmhost;
 
-use std::path::Path;
 use std::convert::AsRef;
+use std::path::Path;
 
 pub use self::error::Error;
-
 
 pub fn execute_path<P: AsRef<Path>>(guest: P) -> Result<(), Error> {
     let bytes = read_path(guest)?;
     execute_module_bytes(&bytes)?;
     Ok(())
 }
-
 
 fn execute_module_bytes(bytes: &[u8]) -> Result<(), Error> {
     let mut host = wasmhost::load_module(bytes).unwrap();
@@ -27,7 +25,6 @@ fn execute_module_bytes(bytes: &[u8]) -> Result<(), Error> {
     assert_eq!(guestresult, None);
     Ok(())
 }
-
 
 fn read_path<P: AsRef<Path>>(path: P) -> Result<Vec<u8>, Error> {
     use std::io::Read;

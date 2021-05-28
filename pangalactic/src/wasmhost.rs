@@ -1,5 +1,5 @@
-mod instance;
 mod externals;
+mod instance;
 
 use wasmi::Error;
 
