@@ -1,5 +1,6 @@
 use log;
 use pangalactic;
+use tokio;
 
 #[derive(Debug, derive_more::From)]
 enum Error {
@@ -7,7 +8,8 @@ enum Error {
     Logger(log::SetLoggerError),
 }
 
-fn main() -> Result<(), Error> {
+#[tokio::main]
+async fn main() -> Result<(), Error> {
     simple_logger::SimpleLogger::new().init()?;
 
     println!("=== {} ===", env!("CARGO_PKG_NAME"));

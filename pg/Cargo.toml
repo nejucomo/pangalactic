@@ -12,3 +12,7 @@ simple_logger = "1.11.0"
 
 [dependencies.pangalactic]
 path = "../pangalactic"
+
+[dependencies.tokio]
+version = "1.6.1"
+features = ["macros", "rt-multi-thread"]
