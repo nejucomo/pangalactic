@@ -11,18 +11,26 @@ pub enum Error {
     CommandMissing,
     CommandUnknown(String),
     ArgumentMissing,
+    ArgumentUnexpected(String),
 }
 
 impl Command {
-    pub fn parse_args<I>(args: I) -> Result<Command, Error>
+    pub fn parse_args<I>(mut args: I) -> Result<Command, Error>
     where
         I: Iterator<Item = String>,
     {
-        parse_subcommand(args, |subargs, arg| match arg {
+        parse_subcommand(&mut args, |subargs, arg| match arg {
             "test" => parse_test_args(subargs),
             _ => None,
         })
         .expect("parse_subcommand always returns Some(result...)")
+        .and_then(|cmd| {
+            if let Some(unexpected) = args.next() {
+                Err(Error::ArgumentUnexpected(unexpected))
+            } else {
+                Ok(cmd)
+            }
+        })
     }
 }
 
