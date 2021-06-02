@@ -4,6 +4,7 @@ mod cli;
 
 use log::{debug, info};
 use pangalactic;
+use std::path::PathBuf;
 use tokio;
 
 #[derive(Debug, derive_more::From)]
@@ -15,18 +16,24 @@ enum Error {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    use cli::Command;
+
     simple_logger::SimpleLogger::new().init()?;
 
-    let cmd = cli::Command::parse_args(std::env::args().skip(1))?;
-    debug!("Parsed command: {:?}", cmd);
+    let cmd = Command::parse_args(std::env::args().skip(1))?;
+    debug!("cli: {:?}", &cmd);
+    match cmd {
+        Command::TestWasm(path) => test_wasm_path(path),
+        Command::TestIpfs => test_ipfs().await,
+    }
+}
 
-    // FIXME: test wasm:
-    info!("=== test wasm {} ===", env!("CARGO_PKG_NAME"));
-    let mut args = std::env::args().skip(1);
-    let guestpath = args.next().unwrap();
-    assert_eq!(None, args.next());
-
+fn test_wasm_path(guestpath: PathBuf) -> Result<(), Error> {
+    info!("=== {} test wasm ===", env!("CARGO_PKG_NAME"));
     pangalactic::execute_path(guestpath)?;
-
     Ok(())
+}
+
+async fn test_ipfs() -> Result<(), Error> {
+    unimplemented!("test ipfs")
 }
