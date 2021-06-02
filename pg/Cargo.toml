@@ -16,3 +16,11 @@ path = "../pangalactic"
 [dependencies.tokio]
 version = "1.6.1"
 features = ["macros", "rt-multi-thread"]
+
+[dependencies.ipfs-api]
+version = "0.11.0"
+features = [
+    "with-hyper-rustls",
+    "with-builder",
+]
+default-features = false

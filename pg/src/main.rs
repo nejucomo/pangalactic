@@ -11,6 +11,7 @@ use tokio;
 enum Error {
     Cli(cli::Error),
     Logger(log::SetLoggerError),
+    IpfsResponse(ipfs_api::response::Error),
     Pangalactic(pangalactic::Error),
 }
 
@@ -35,5 +36,12 @@ fn test_wasm_path(guestpath: PathBuf) -> Result<(), Error> {
 }
 
 async fn test_ipfs() -> Result<(), Error> {
-    unimplemented!("test ipfs")
+    use ipfs_api::IpfsClient;
+
+    let client = IpfsClient::default();
+    let data = std::io::Cursor::new("Hello World!");
+
+    let res = client.add(data).await?;
+    info!("{:?}", res.hash);
+    Ok(())
 }
