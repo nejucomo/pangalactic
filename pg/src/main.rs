@@ -40,23 +40,10 @@ async fn test_ipfs() -> Result<(), Error> {
 
     let client = IpfsClient::default();
 
-    macro_rules! debug_onr {
-        ( $get_onr:expr ) => {
-            debug!("{}", stringify!($get_onr));
-            let onr = $get_onr;
-            debug!(
-                "ObjectNewResponse: hash={:?}, links:{:?}",
-                onr.hash, onr.links
-            );
-        };
-    }
-
-    debug_onr!(
+    dbg!(
         client
-            .object_new(Some(ipfs_api::ObjectTemplate::UnixFsDir))
+            .dag_put(std::io::Cursor::new(r#"{ "Hello": "World" }"#))
             .await?
     );
-    debug_onr!(client.object_new(None).await?);
-
     Ok(())
 }
