@@ -1,5 +1,8 @@
 #![deny(warnings)]
 
+#[macro_use]
+mod trace;
+
 mod cli;
 
 use log::{debug, info};
@@ -40,7 +43,7 @@ async fn test_ipfs() -> Result<(), Error> {
 
     let client = IpfsClient::default();
 
-    dbg!(
+    trace!(
         client
             .dag_put(std::io::Cursor::new(r#"{ "Hello": "World" }"#))
             .await?
