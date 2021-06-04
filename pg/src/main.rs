@@ -38,15 +38,32 @@ fn test_wasm_path(guestpath: PathBuf) -> Result<(), Error> {
     Ok(())
 }
 
+use ipfs_api::IpfsClient;
+
 async fn test_ipfs() -> Result<(), Error> {
-    use ipfs_api::IpfsClient;
-
     let client = IpfsClient::default();
+    let cid = ipfs_put_then_get(&client, r#"{ "Hello": "World" }"#).await?;
+    let dag2 = trace!(format!(r#"{{ "wut": "{}" }}"#, &cid));
+    ipfs_put_then_get(&client, &dag2).await?;
 
-    trace!(
-        client
-            .dag_put(std::io::Cursor::new(r#"{ "Hello": "World" }"#))
-            .await?
-    );
     Ok(())
+}
+
+async fn ipfs_put_then_get(client: &IpfsClient, s: &str) -> Result<String, Error> {
+    use futures::TryStreamExt;
+    let mys = String::from(s);
+    let cid = trace!(client.dag_put(std::io::Cursor::new(mys)).await)?
+        .cid
+        .cid_string;
+
+    let v = trace!(
+        client
+            .dag_get(&cid)
+            .map_ok(|chunk| chunk.to_vec())
+            .try_concat()
+            .await
+    )?;
+
+    trace!(String::from_utf8_lossy(&v[..]));
+    Ok(cid)
 }
