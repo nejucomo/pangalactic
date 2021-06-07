@@ -2,24 +2,33 @@ mod externals;
 mod hostfuncs;
 
 use self::hostfuncs::HostFuncs;
-use wasmi::{Error, ModuleRef};
+use crate::error::Error;
+use wasmi::ModuleRef;
 
-pub fn load_and_execute_module(bytes: &[u8]) -> Result<(), Error> {
-    use log::debug;
+pub async fn load_and_execute_module(bytes: &[u8]) -> Result<(), Error> {
+    // Copy input for move across task boundary:
+    let modbuf = Vec::from(bytes);
 
-    let funcs = HostFuncs::init();
+    tokio::task::spawn_blocking(move || {
+        use log::debug;
 
-    let modref = load_modref(&funcs, bytes)?;
-    debug!("Loaded module.");
+        let funcs = HostFuncs::init();
 
-    let mut ext = self::externals::HostExternals::load(&modref, funcs)?;
+        let modref = load_modref(&funcs, &modbuf[..])?;
+        debug!("Loaded module.");
 
-    debug!("Executing: main()");
-    let ret = modref.invoke_export("main", &[], &mut ext)?;
-    debug!("Completed: main()");
-    assert!(ret.is_none());
+        use self::externals::HostExternals;
 
-    Ok(())
+        let mut ext = HostExternals::load(&modref, funcs)?;
+
+        debug!("Executing: main()");
+        let ret = modref.invoke_export("main", &[], &mut ext)?;
+        debug!("Completed: main()");
+        assert!(ret.is_none());
+
+        Ok(())
+    })
+    .await?
 }
 
 fn load_modref(funcs: &HostFuncs, bytes: &[u8]) -> Result<ModuleRef, Error> {

@@ -27,14 +27,14 @@ async fn main() -> Result<(), Error> {
     let cmd = Command::parse_args(std::env::args().skip(1))?;
     debug!("cli: {:?}", &cmd);
     match cmd {
-        Command::TestWasm(path) => test_wasm_path(path),
+        Command::TestWasm(path) => test_wasm_path(path).await,
         Command::TestIpfs => test_ipfs().await,
     }
 }
 
-fn test_wasm_path(guestpath: PathBuf) -> Result<(), Error> {
+async fn test_wasm_path(guestpath: PathBuf) -> Result<(), Error> {
     info!("=== {} test wasm ===", env!("CARGO_PKG_NAME"));
-    pangalactic::execute_path(guestpath)?;
+    pangalactic::execute_path(guestpath).await?;
     Ok(())
 }
 
