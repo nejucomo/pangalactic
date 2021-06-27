@@ -4,7 +4,7 @@ extern "C" {
 }
 
 #[no_mangle]
-pub extern "C" fn main() {
+pub extern "C" fn pangalactic_main() {
     let logbytes = "Hello World!".as_bytes();
     unsafe {
         log(logbytes.as_ptr(), logbytes.len());

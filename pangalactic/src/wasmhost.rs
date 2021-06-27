@@ -21,9 +21,9 @@ pub async fn load_and_execute_module(bytes: &[u8]) -> Result<(), Error> {
 
         let mut ext = HostExternals::load(&modref, funcs)?;
 
-        debug!("Executing: main()");
-        let ret = modref.invoke_export("main", &[], &mut ext)?;
-        debug!("Completed: main()");
+        debug!("Executing: pangalactic_main()");
+        let ret = modref.invoke_export("pangalactic_main", &[], &mut ext)?;
+        debug!("Completed: pangalactic_main()");
         assert!(ret.is_none());
 
         Ok(())
