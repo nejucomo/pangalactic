@@ -1,4 +1,4 @@
-use crate::{b64, randtoken};
+use crate::{key::Key, randtoken};
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -23,14 +23,13 @@ impl<'a> Writer<'a> {
         })
     }
 
-    pub fn commit(self) -> std::io::Result<String> {
+    pub fn commit(self) -> std::io::Result<Key> {
         // Induce a file closure.
         // TODO: Verify this induces file to close:
         std::mem::drop(self.spool);
 
-        let hash = self.hasher.finalize();
-        let hashkey = b64::encode(hash.as_bytes());
-        let entrypath = self.dir.join(&hashkey);
+        let key = Key::from(self.hasher.finalize());
+        let entrypath = self.dir.join(&key.b64());
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
         // the operation succeeds; if the destination does exist, the operation fails in a specific
@@ -44,7 +43,7 @@ impl<'a> Writer<'a> {
         // TODO: detect the case that the entry already (correctly) exists, and return Ok.
         std::fs::rename(self.spoolpath, entrypath)?;
 
-        Ok(hashkey)
+        Ok(key)
     }
 }
 

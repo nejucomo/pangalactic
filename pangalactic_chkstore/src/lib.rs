@@ -1,4 +1,5 @@
 mod b64;
+mod key;
 mod randtoken;
 mod store;
 mod writer;
