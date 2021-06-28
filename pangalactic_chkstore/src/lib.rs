@@ -1,3 +1,5 @@
+mod b64;
+mod randtoken;
 mod store;
 mod writer;
 

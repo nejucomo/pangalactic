@@ -9,7 +9,7 @@ impl CHKStore {
         Ok(CHKStore(datadir))
     }
 
-    pub fn open_writer(&self) -> Writer {
-        Writer::new(&self.0)
+    pub fn open_writer(&self) -> std::io::Result<Writer> {
+        Writer::open(&self.0)
     }
 }
