@@ -12,7 +12,7 @@ pub struct Reader {
 
 impl Reader {
     pub fn open(dir: &Path, key: &Key) -> IOResult<Reader> {
-        use crate::StoreKey;
+        use pangalactic_store::StoreKey;
 
         let entrypath = dir.join(key.b64_encode());
         let f = File::open(entrypath)?;
@@ -33,7 +33,7 @@ impl Read for Reader {
     }
 }
 
-impl crate::ReadVerify for Reader {
+impl pangalactic_store::ReadVerify for Reader {
     fn verify(self) -> IOResult<()> {
         let actual = Key::from(self.hasher.finalize());
         if actual == self.key {

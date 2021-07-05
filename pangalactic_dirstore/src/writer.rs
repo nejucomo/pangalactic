@@ -37,11 +37,11 @@ impl Write for Writer {
     }
 }
 
-impl crate::WriteCommit for Writer {
+impl pangalactic_store::WriteCommit for Writer {
     type Key = super::key::Key;
 
     fn commit(self) -> IOResult<Self::Key> {
-        use crate::StoreKey;
+        use pangalactic_store::StoreKey;
 
         // Induce a file closure.
         // TODO: Verify this induces file to close:

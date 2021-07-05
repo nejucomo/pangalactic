@@ -21,7 +21,7 @@ pub trait Store: Sized {
 
 pub trait StoreKey: Eq + serde::Serialize + serde::de::DeserializeOwned {
     fn b64_encode(&self) -> String {
-        crate::b64::encode(&serde_cbor::ser::to_vec_packed(&self).unwrap())
+        pangalactic_b64::encode(&serde_cbor::ser::to_vec_packed(&self).unwrap())
     }
 }
 

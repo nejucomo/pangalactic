@@ -1,8 +1,9 @@
 mod key;
+mod randtoken;
 mod reader;
 mod writer;
 
-use crate::Store;
+use pangalactic_store::Store;
 use std::io::Result as IOResult;
 use std::path::PathBuf;
 
@@ -26,4 +27,10 @@ impl Store for DirStore {
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         Self::Reader::open(&self.0, key)
     }
+}
+
+#[test]
+fn test_roundtrip() -> std::io::Result<()> {
+    use testdir::testdir;
+    pangalactic_store::test_store_then_read_then_store(DirStore::init(testdir!()))
 }

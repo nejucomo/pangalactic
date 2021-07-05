@@ -3,7 +3,7 @@ use std::fmt;
 #[derive(Copy, Clone, Debug, derive_more::From)]
 pub struct Key(blake3::Hash);
 
-impl crate::StoreKey for Key {}
+impl pangalactic_store::StoreKey for Key {}
 
 impl PartialEq for Key {
     fn eq(&self, other: &Key) -> bool {

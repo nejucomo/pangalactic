@@ -1,8 +1,9 @@
 [workspace]
 members = [
-  "pg",
-  "pangalactic",
-  "pangalactic_store",
-  "pangalactic_dirs",
   "guest_basic",
+  "pangalactic",
+  "pangalactic_b64",
+  "pangalactic_dirstore",
+  "pangalactic_store",
+  "pg",
 ]
