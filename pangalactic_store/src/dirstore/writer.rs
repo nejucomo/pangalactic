@@ -46,7 +46,8 @@ impl crate::WriteCommit for Writer {
         std::mem::drop(self.spool);
 
         let key = Self::Key::from(self.hasher.finalize());
-        let entrypath = self.dir.join(&key.b64());
+        let kb64 = crate::b64::encode(&key);
+        let entrypath = self.dir.join(kb64);
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
         // the operation succeeds; if the destination does exist, the operation fails in a specific
