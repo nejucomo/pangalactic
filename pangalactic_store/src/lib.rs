@@ -1,11 +1,11 @@
 mod b64;
+mod dirstore;
 mod key;
 mod randtoken;
 mod reader;
-mod store;
 mod writer;
 
-pub use store::CHKStore;
+pub use dirstore::DirStore;
 
 #[cfg(test)]
 mod tests {
@@ -17,7 +17,7 @@ mod tests {
         use std::io::{Read, Write};
         use testdir::testdir;
 
-        let store = crate::CHKStore::init(testdir!());
+        let store = crate::DirStore::init(testdir!());
 
         let mut w = store.open_writer()?;
         w.write_all(contents)?;

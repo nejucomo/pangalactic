@@ -3,11 +3,11 @@ use crate::reader::Reader;
 use crate::writer::Writer;
 use std::path::PathBuf;
 
-pub struct CHKStore(PathBuf);
+pub struct DirStore(PathBuf);
 
-impl CHKStore {
-    pub fn init(datadir: PathBuf) -> CHKStore {
-        CHKStore(datadir)
+impl DirStore {
+    pub fn init(datadir: PathBuf) -> DirStore {
+        DirStore(datadir)
     }
 
     pub fn open_writer(&self) -> std::io::Result<Writer> {
