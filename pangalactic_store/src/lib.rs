@@ -23,7 +23,7 @@ mod tests {
         S: crate::Store,
     {
         let key = store.write(contents)?;
-        let bytes = store.read(key)?;
+        let bytes = store.read(&key)?;
         assert_eq!(bytes, contents);
         Ok(())
     }

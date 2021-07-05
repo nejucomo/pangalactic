@@ -6,14 +6,14 @@ pub trait Store: Sized {
     type Writer: WriteCommit<Key = Self::Key>;
 
     fn open_writer(&self) -> IOResult<Self::Writer>;
-    fn open_reader(&self, key: Self::Key) -> IOResult<Self::Reader>;
+    fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader>;
 
     fn write(&self, contents: &[u8]) -> IOResult<Self::Key> {
         let w = self.open_writer()?;
         w.write_all_and_commit(contents)
     }
 
-    fn read(&self, key: Self::Key) -> IOResult<Vec<u8>> {
+    fn read(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
         let r = self.open_reader(key)?;
         r.read_all_verified()
     }

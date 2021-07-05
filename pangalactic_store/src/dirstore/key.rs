@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, derive_more::From)]
+#[derive(Copy, Clone, Debug, derive_more::From)]
 pub struct Key(blake3::Hash);
 
 impl crate::StoreKey for Key {}

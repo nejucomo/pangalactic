@@ -23,7 +23,7 @@ impl Store for DirStore {
         Self::Writer::open(&self.0)
     }
 
-    fn open_reader(&self, key: Self::Key) -> IOResult<Self::Reader> {
+    fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         Self::Reader::open(&self.0, key)
     }
 }
