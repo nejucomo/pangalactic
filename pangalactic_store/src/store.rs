@@ -1,7 +1,7 @@
 use std::io::Result as IOResult;
 
 pub trait Store: Sized {
-    type Key;
+    type Key: serde::Serialize + serde::de::DeserializeOwned;
     type Reader: ReadVerify;
     type Writer: WriteCommit<Key = Self::Key>;
 
