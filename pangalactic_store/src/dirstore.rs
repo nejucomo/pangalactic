@@ -1,6 +1,9 @@
-use crate::reader::Reader;
-use crate::writer::Writer;
+mod key;
+mod reader;
+mod writer;
+
 use crate::Store;
+use std::io::Result as IOResult;
 use std::path::PathBuf;
 
 pub struct DirStore(PathBuf);
@@ -12,15 +15,15 @@ impl DirStore {
 }
 
 impl Store for DirStore {
-    type Key = crate::key::Key;
-    type Reader = crate::reader::Reader;
-    type Writer = crate::writer::Writer;
+    type Key = self::key::Key;
+    type Reader = self::reader::Reader;
+    type Writer = self::writer::Writer;
 
-    fn open_writer(&self) -> std::io::Result<Writer> {
-        Writer::open(&self.0)
+    fn open_writer(&self) -> IOResult<Self::Writer> {
+        Self::Writer::open(&self.0)
     }
 
-    fn open_reader(&self, key: Self::Key) -> std::io::Result<Reader> {
-        Reader::open(&self.0, key)
+    fn open_reader(&self, key: Self::Key) -> IOResult<Self::Reader> {
+        Self::Reader::open(&self.0, key)
     }
 }

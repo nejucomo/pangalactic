@@ -1,10 +1,7 @@
 mod b64;
 mod dirstore;
-mod key;
 mod randtoken;
-mod reader;
 mod store;
-mod writer;
 
 pub use dirstore::DirStore;
 pub use store::{ReadVerify, Store, WriteCommit};

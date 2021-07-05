@@ -1,6 +1,7 @@
-use crate::key::Key;
+use super::key::Key;
 use std::fs::File;
 use std::io::Read;
+use std::io::Result as IOResult;
 use std::path::Path;
 
 pub struct Reader {
@@ -10,7 +11,7 @@ pub struct Reader {
 }
 
 impl Reader {
-    pub fn open(dir: &Path, key: Key) -> std::io::Result<Reader> {
+    pub fn open(dir: &Path, key: Key) -> IOResult<Reader> {
         let entrypath = dir.join(key.b64());
         let f = File::open(entrypath)?;
         let hasher = blake3::Hasher::new();
@@ -19,7 +20,7 @@ impl Reader {
 }
 
 impl Read for Reader {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+    fn read(&mut self, buf: &mut [u8]) -> IOResult<usize> {
         let c = self.f.read(buf)?;
         self.hasher.update(&buf[..c]);
         Ok(c)
@@ -27,7 +28,7 @@ impl Read for Reader {
 }
 
 impl crate::ReadVerify for Reader {
-    fn verify(self) -> std::io::Result<()> {
+    fn verify(self) -> IOResult<()> {
         let actual = Key::from(self.hasher.finalize());
         if actual == self.key {
             Ok(())

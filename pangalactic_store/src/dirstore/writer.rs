@@ -1,5 +1,6 @@
 use crate::randtoken;
 use std::fs::File;
+use std::io::Result as IOResult;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
@@ -11,7 +12,7 @@ pub struct Writer {
 }
 
 impl Writer {
-    pub fn open(dir: &Path) -> std::io::Result<Writer> {
+    pub fn open(dir: &Path) -> IOResult<Writer> {
         let spoolpath = dir.join(format!("in.{}", randtoken::generate()));
         let spool = File::create(&spoolpath)?;
         let hasher = blake3::Hasher::new();
@@ -25,21 +26,21 @@ impl Writer {
 }
 
 impl Write for Writer {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+    fn write(&mut self, buf: &[u8]) -> IOResult<usize> {
         self.spool.write_all(buf)?;
         self.hasher.update(buf);
         Ok(buf.len())
     }
 
-    fn flush(&mut self) -> std::io::Result<()> {
+    fn flush(&mut self) -> IOResult<()> {
         self.spool.flush()
     }
 }
 
 impl crate::WriteCommit for Writer {
-    type Key = crate::key::Key;
+    type Key = super::key::Key;
 
-    fn commit(self) -> std::io::Result<Self::Key> {
+    fn commit(self) -> IOResult<Self::Key> {
         // Induce a file closure.
         // TODO: Verify this induces file to close:
         std::mem::drop(self.spool);
