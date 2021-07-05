@@ -2,7 +2,7 @@
 members = [
   "pg",
   "pangalactic",
-  "pangalactic_chkstore",
+  "pangalactic_store",
   "pangalactic_dirs",
   "guest_basic",
 ]
