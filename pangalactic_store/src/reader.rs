@@ -16,9 +16,18 @@ impl Reader {
         let hasher = blake3::Hasher::new();
         Ok(Reader { f, key, hasher })
     }
+}
 
-    /// Verify that the data read matches the entry's Key. This method fails unless called after the entire entry has been read. The user is responsible for calling this.
-    pub fn verify(self) -> std::io::Result<()> {
+impl Read for Reader {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let c = self.f.read(buf)?;
+        self.hasher.update(&buf[..c]);
+        Ok(c)
+    }
+}
+
+impl crate::ReadVerify for Reader {
+    fn verify(self) -> std::io::Result<()> {
         let actual = Key::from(self.hasher.finalize());
         if actual == self.key {
             Ok(())
@@ -30,13 +39,5 @@ impl Reader {
             );
             Err(Error::new(InvalidData, emsg))
         }
-    }
-}
-
-impl Read for Reader {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        let c = self.f.read(buf)?;
-        self.hasher.update(&buf[..c]);
-        Ok(c)
     }
 }

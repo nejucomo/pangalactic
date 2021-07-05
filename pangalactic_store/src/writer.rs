@@ -1,34 +1,50 @@
-use crate::{key::Key, randtoken};
+use crate::randtoken;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-pub struct Writer<'a> {
-    dir: &'a Path,
+pub struct Writer {
+    dir: PathBuf,
     spoolpath: PathBuf,
     spool: File,
     hasher: blake3::Hasher,
 }
 
-impl<'a> Writer<'a> {
-    pub fn open(dir: &'a Path) -> std::io::Result<Writer<'a>> {
+impl Writer {
+    pub fn open(dir: &Path) -> std::io::Result<Writer> {
         let spoolpath = dir.join(format!("in.{}", randtoken::generate()));
         let spool = File::create(&spoolpath)?;
         let hasher = blake3::Hasher::new();
         Ok(Writer {
-            dir,
+            dir: PathBuf::from(dir),
             spoolpath,
             spool,
             hasher,
         })
     }
+}
 
-    pub fn commit(self) -> std::io::Result<Key> {
+impl Write for Writer {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.spool.write_all(buf)?;
+        self.hasher.update(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.spool.flush()
+    }
+}
+
+impl crate::WriteCommit for Writer {
+    type Key = crate::key::Key;
+
+    fn commit(self) -> std::io::Result<Self::Key> {
         // Induce a file closure.
         // TODO: Verify this induces file to close:
         std::mem::drop(self.spool);
 
-        let key = Key::from(self.hasher.finalize());
+        let key = Self::Key::from(self.hasher.finalize());
         let entrypath = self.dir.join(&key.b64());
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
@@ -44,17 +60,5 @@ impl<'a> Writer<'a> {
         std::fs::rename(self.spoolpath, entrypath)?;
 
         Ok(key)
-    }
-}
-
-impl<'a> Write for Writer<'a> {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.spool.write_all(buf)?;
-        self.hasher.update(buf);
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> std::io::Result<()> {
-        self.spool.flush()
     }
 }

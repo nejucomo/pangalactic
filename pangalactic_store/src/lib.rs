@@ -3,31 +3,30 @@ mod dirstore;
 mod key;
 mod randtoken;
 mod reader;
+mod store;
 mod writer;
 
 pub use dirstore::DirStore;
+pub use store::{ReadVerify, Store, WriteCommit};
 
 #[cfg(test)]
 mod tests {
+    use crate::DirStore;
     use test_case::test_case;
 
-    #[test_case(b"")]
-    #[test_case(b"hello world")]
-    fn store_then_read(contents: &[u8]) -> std::io::Result<()> {
-        use std::io::{Read, Write};
+    fn make_dirstore() -> DirStore {
         use testdir::testdir;
+        crate::DirStore::init(testdir!())
+    }
 
-        let store = crate::DirStore::init(testdir!());
-
-        let mut w = store.open_writer()?;
-        w.write_all(contents)?;
-        let key = w.commit()?;
-
-        let mut r = store.open_reader(key)?;
-        let mut bytes = vec![];
-        r.read_to_end(&mut bytes)?;
-        r.verify()?;
-
+    #[test_case(make_dirstore(), b"")]
+    #[test_case(make_dirstore(), b"hello world")]
+    fn store_then_read<S>(store: S, contents: &[u8]) -> std::io::Result<()>
+    where
+        S: crate::Store,
+    {
+        let key = store.write(contents)?;
+        let bytes = store.read(key)?;
         assert_eq!(bytes, contents);
         Ok(())
     }
