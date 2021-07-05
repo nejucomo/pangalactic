@@ -41,13 +41,14 @@ impl crate::WriteCommit for Writer {
     type Key = super::key::Key;
 
     fn commit(self) -> IOResult<Self::Key> {
+        use crate::StoreKey;
+
         // Induce a file closure.
         // TODO: Verify this induces file to close:
         std::mem::drop(self.spool);
 
         let key = Self::Key::from(self.hasher.finalize());
-        let kb64 = crate::b64::encode(&key);
-        let entrypath = self.dir.join(kb64);
+        let entrypath = self.dir.join(key.b64_encode());
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
         // the operation succeeds; if the destination does exist, the operation fails in a specific

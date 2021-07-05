@@ -1,7 +1,7 @@
 use std::io::Result as IOResult;
 
 pub trait Store: Sized {
-    type Key: serde::Serialize + serde::de::DeserializeOwned;
+    type Key: StoreKey;
     type Reader: ReadVerify;
     type Writer: WriteCommit<Key = Self::Key>;
 
@@ -16,6 +16,12 @@ pub trait Store: Sized {
     fn read(&self, key: Self::Key) -> IOResult<Vec<u8>> {
         let r = self.open_reader(key)?;
         r.read_all_verified()
+    }
+}
+
+pub trait StoreKey: serde::Serialize + serde::de::DeserializeOwned {
+    fn b64_encode(&self) -> String {
+        crate::b64::encode(&serde_cbor::ser::to_vec_packed(&self).unwrap())
     }
 }
 

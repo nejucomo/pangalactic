@@ -4,7 +4,7 @@ mod randtoken;
 mod store;
 
 pub use dirstore::DirStore;
-pub use store::{ReadVerify, Store, WriteCommit};
+pub use store::{ReadVerify, Store, StoreKey, WriteCommit};
 
 #[cfg(test)]
 mod tests {

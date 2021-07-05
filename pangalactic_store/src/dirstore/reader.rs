@@ -12,8 +12,9 @@ pub struct Reader {
 
 impl Reader {
     pub fn open(dir: &Path, key: Key) -> IOResult<Reader> {
-        let kb64 = crate::b64::encode(&key);
-        let entrypath = dir.join(kb64);
+        use crate::StoreKey;
+
+        let entrypath = dir.join(key.b64_encode());
         let f = File::open(entrypath)?;
         let hasher = blake3::Hasher::new();
         Ok(Reader { f, key, hasher })

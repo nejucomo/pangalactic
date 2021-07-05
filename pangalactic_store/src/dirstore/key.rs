@@ -3,6 +3,8 @@ use std::fmt;
 #[derive(Debug, derive_more::From)]
 pub struct Key(blake3::Hash);
 
+impl crate::StoreKey for Key {}
+
 impl PartialEq for Key {
     fn eq(&self, other: &Key) -> bool {
         self.0.eq(&other.0)
