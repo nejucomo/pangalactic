@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic_dirstore"
+name = "pangalactic_cryptstore"
 version = "0.1.0"
 edition = "2018"
 
@@ -7,10 +7,8 @@ edition = "2018"
 
 [dependencies]
 derive_more = "0.99.14"
-rand = "0.8.3"
-
-[dependencies.pangalactic_b64]
-path = "../pangalactic_b64"
+rust_sodium = "0.10.2"
+static_assertions = "1.1.0"
 
 [dependencies.pangalactic_hashspool]
 path = "../pangalactic_hashspool"
@@ -21,6 +19,3 @@ path = "../pangalactic_store"
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
-
-[dev-dependencies]
-testdir = "*"

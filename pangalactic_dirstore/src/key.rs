@@ -1,7 +1,8 @@
+use pangalactic_hashspool::{Hash, HASH_LENGTH};
 use std::fmt;
 
 #[derive(Copy, Clone, Debug, derive_more::From)]
-pub struct Key(blake3::Hash);
+pub struct Key(Hash);
 
 impl pangalactic_store::StoreKey for Key {}
 
@@ -37,17 +38,17 @@ impl<'de> serde::de::Visitor<'de> for KeyVisitor {
     type Value = Key;
 
     fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "a byte array containing {} bytes", blake3::OUT_LEN)
+        write!(f, "a byte array containing {} bytes", HASH_LENGTH)
     }
 
     fn visit_bytes<E>(self, s: &[u8]) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        if s.len() == blake3::OUT_LEN {
-            let mut a: [u8; blake3::OUT_LEN] = [0u8; blake3::OUT_LEN];
+        if s.len() == HASH_LENGTH {
+            let mut a: [u8; HASH_LENGTH] = [0u8; HASH_LENGTH];
             a.clone_from_slice(s);
-            Ok(Key::from(blake3::Hash::from(a)))
+            Ok(Key::from(Hash::from(a)))
         } else {
             Err(serde::de::Error::invalid_length(s.len(), &self))
         }

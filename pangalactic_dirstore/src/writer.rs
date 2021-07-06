@@ -1,4 +1,5 @@
 use crate::randtoken;
+use pangalactic_hashspool::HashSpool;
 use std::fs::File;
 use std::io::Result as IOResult;
 use std::io::Write;
@@ -7,33 +8,30 @@ use std::path::{Path, PathBuf};
 pub struct Writer {
     dir: PathBuf,
     spoolpath: PathBuf,
-    spool: File,
-    hasher: blake3::Hasher,
+    hashspool: HashSpool<File>,
 }
 
 impl Writer {
     pub fn open(dir: &Path) -> IOResult<Writer> {
+        let dir = PathBuf::from(dir);
         let spoolpath = dir.join(format!("in.{}", randtoken::generate()));
-        let spool = File::create(&spoolpath)?;
-        let hasher = blake3::Hasher::new();
+        let hashspool = HashSpool::new(File::create(&spoolpath)?);
         Ok(Writer {
-            dir: PathBuf::from(dir),
+            dir,
             spoolpath,
-            spool,
-            hasher,
+            hashspool,
         })
     }
 }
 
 impl Write for Writer {
     fn write(&mut self, buf: &[u8]) -> IOResult<usize> {
-        self.spool.write_all(buf)?;
-        self.hasher.update(buf);
+        self.hashspool.write_all(buf)?;
         Ok(buf.len())
     }
 
     fn flush(&mut self) -> IOResult<()> {
-        self.spool.flush()
+        self.hashspool.flush()
     }
 }
 
@@ -43,11 +41,13 @@ impl pangalactic_store::WriteCommit for Writer {
     fn commit(self) -> IOResult<Self::Key> {
         use pangalactic_store::StoreKey;
 
+        let (hash, f) = self.hashspool.finish();
+
         // Induce a file closure.
         // TODO: Verify this induces file to close:
-        std::mem::drop(self.spool);
+        std::mem::drop(f);
 
-        let key = Self::Key::from(self.hasher.finalize());
+        let key = Self::Key::from(hash);
         let entrypath = self.dir.join(key.b64_encode());
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,

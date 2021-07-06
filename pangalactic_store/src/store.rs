@@ -2,7 +2,7 @@ use std::io::Result as IOResult;
 
 pub trait Store: Sized {
     type Key: StoreKey;
-    type Reader: ReadVerify;
+    type Reader: std::io::Read;
     type Writer: WriteCommit<Key = Self::Key>;
 
     fn open_writer(&self) -> IOResult<Self::Writer>;
@@ -14,36 +14,22 @@ pub trait Store: Sized {
     }
 
     fn read(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
-        let r = self.open_reader(key)?;
-        r.read_all_verified()
+        use std::io::Read;
+
+        let mut buf = vec![];
+        let mut r = self.open_reader(key)?;
+        r.read_to_end(&mut buf)?;
+        Ok(buf)
     }
 }
 
 pub trait StoreKey: Eq + serde::Serialize + serde::de::DeserializeOwned {
     fn b64_encode(&self) -> String {
-        pangalactic_b64::encode(&serde_cbor::ser::to_vec_packed(&self).unwrap())
+        pangalactic_b64::encode(&self.cbor_encode())
     }
-}
 
-pub trait ReadVerify: Sized + std::io::Read {
-    /// This consumes the reader and must verify that the data previously read correctly matched
-    /// the Key. If consumer code neglects to call this, the result may work so long as there are
-    /// no corruption issues. Using this method helps applications build resilience against faulty
-    /// or malicious Stores. This verification happens awkwardly *after* the entry has been read,
-    /// so applications must be ready to rollback any changes based on this data in the case that
-    /// verify fails. A helper method reads the entire entry into RAM, then verifies it, then only
-    /// returns the data when verify succeeds, allowing for simpler application logic flow at the
-    /// expense of RAM and perhaps duplicate reads/memcpys.
-    fn verify(self) -> IOResult<()>;
-
-    /// A convenience method which returns a newly allocated Vec with the entry contents only after
-    /// it has been verified. Using this method may be less efficient for many applications while
-    /// simplifying the case of a corrupted entry.
-    fn read_all_verified(mut self) -> IOResult<Vec<u8>> {
-        let mut buf = vec![];
-        self.read_to_end(&mut buf)?;
-        self.verify()?;
-        Ok(buf)
+    fn cbor_encode(&self) -> Vec<u8> {
+        serde_cbor::ser::to_vec_packed(&self).unwrap()
     }
 }
 

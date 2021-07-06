@@ -1,6 +1,6 @@
 mod store;
 
-pub use store::{ReadVerify, Store, StoreKey, WriteCommit};
+pub use store::{Store, StoreKey, WriteCommit};
 
 pub fn test_store_then_read_then_store<S>(store: S) -> std::io::Result<()>
 where
