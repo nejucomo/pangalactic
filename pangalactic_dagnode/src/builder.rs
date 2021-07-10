@@ -4,7 +4,7 @@ pub struct Builder<Key> {
 }
 
 impl<K> Builder<K> {
-    pub fn new() -> Builder<K> {
+    pub(crate) fn new() -> Builder<K> {
         Builder { links: vec![] }
     }
 
