@@ -7,6 +7,10 @@ pub struct DagNode<Key> {
 }
 
 impl<K> DagNode<K> {
+    pub fn builder() -> crate::builder::Builder<K> {
+        crate::builder::Builder::new()
+    }
+
     pub fn from_links(links: Vec<(String, K)>) -> DagNode<K> {
         DagNode {
             links,
