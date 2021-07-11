@@ -7,15 +7,15 @@ pub struct DagNode<Key> {
 }
 
 impl<K> DagNode<K> {
-    pub fn builder() -> crate::builder::Builder<K> {
-        crate::builder::Builder::new()
-    }
-
-    pub(crate) fn from_links(links: Vec<(String, K)>) -> DagNode<K> {
+    pub fn new() -> DagNode<K> {
         DagNode {
-            links,
+            links: vec![],
             body: vec![],
         }
+    }
+
+    pub fn append_link(&mut self, name: String, key: K) {
+        self.links.push((name, key));
     }
 }
 
