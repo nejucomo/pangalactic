@@ -1,4 +1,4 @@
-use crate::randtoken;
+use crate::{key::Key, randtoken};
 use pangalactic_hashspool::HashSpool;
 use std::fs::File;
 use std::io::Result as IOResult;
@@ -12,7 +12,7 @@ pub struct Writer {
 }
 
 impl Writer {
-    pub fn open(dir: &Path) -> IOResult<Writer> {
+    pub(crate) fn open(dir: &Path) -> IOResult<Writer> {
         let dir = PathBuf::from(dir);
         let spoolpath = dir.join(format!("in.{}", randtoken::generate()));
         let hashspool = HashSpool::new(File::create(&spoolpath)?);
@@ -22,23 +22,8 @@ impl Writer {
             hashspool,
         })
     }
-}
 
-impl Write for Writer {
-    fn write(&mut self, buf: &[u8]) -> IOResult<usize> {
-        self.hashspool.write_all(buf)?;
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> IOResult<()> {
-        self.hashspool.flush()
-    }
-}
-
-impl pangalactic_store::WriteCommit for Writer {
-    type Key = super::key::Key;
-
-    fn commit(self) -> IOResult<Self::Key> {
+    pub(crate) fn commit(self) -> IOResult<Key> {
         use pangalactic_store::StoreKey;
 
         let (hash, f) = self.hashspool.finish();
@@ -47,7 +32,7 @@ impl pangalactic_store::WriteCommit for Writer {
         // TODO: Verify this induces file to close:
         std::mem::drop(f);
 
-        let key = Self::Key::from(hash);
+        let key = Key::from(hash);
         let entrypath = self.dir.join(key.b64_encode());
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
@@ -63,5 +48,16 @@ impl pangalactic_store::WriteCommit for Writer {
         std::fs::rename(self.spoolpath, entrypath)?;
 
         Ok(key)
+    }
+}
+
+impl Write for Writer {
+    fn write(&mut self, buf: &[u8]) -> IOResult<usize> {
+        self.hashspool.write_all(buf)?;
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> IOResult<()> {
+        self.hashspool.flush()
     }
 }
