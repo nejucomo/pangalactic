@@ -1,6 +1,5 @@
-use crate::ReadCap;
+use crate::sekbox::SEKey;
 use pangalactic_hashspool::{HashSpool, HASH_LENGTH};
-use pangalactic_store::WriteCommit;
 use std::io::Result as IOResult;
 
 pub struct Writer<W> {
@@ -12,6 +11,19 @@ impl<W> Writer<W> {
     pub(crate) fn new(inner: W) -> Writer<W> {
         let hashspool = HashSpool::new(vec![]);
         Writer { inner, hashspool }
+    }
+
+    pub(crate) fn finish(self) -> (W, SEKey, Vec<u8>) {
+        use crate::sekbox::KEY_LENGTH;
+        use static_assertions::const_assert_eq;
+
+        const_assert_eq!(HASH_LENGTH, KEY_LENGTH);
+
+        let (hash, cleartext) = self.hashspool.finish();
+        // unwrap guaranteed by const_assert_eq:
+        let sekey = SEKey::from(hash.as_bytes());
+        let ciphertext = sekey.seal(&cleartext[..]);
+        (self.inner, sekey, ciphertext)
     }
 }
 
@@ -25,26 +37,5 @@ where
 
     fn flush(&mut self) -> IOResult<()> {
         Ok(())
-    }
-}
-
-impl<W> WriteCommit for Writer<W>
-where
-    W: WriteCommit,
-{
-    type Key = ReadCap<<W as WriteCommit>::Key>;
-
-    fn commit(self) -> IOResult<Self::Key> {
-        use crate::sekbox::{SEKey, KEY_LENGTH};
-        use static_assertions::const_assert_eq;
-
-        const_assert_eq!(HASH_LENGTH, KEY_LENGTH);
-
-        let (hash, cleartext) = self.hashspool.finish();
-        // unwrap guaranteed by const_assert_eq:
-        let sekey = SEKey::from(hash.as_bytes());
-        let ciphertext = sekey.seal(&cleartext[..]);
-        let basekey = self.inner.write_all_and_commit(&ciphertext[..])?;
-        Ok(ReadCap { basekey, sekey })
     }
 }

@@ -12,11 +12,6 @@ where
     type Reader = std::io::Cursor<Vec<u8>>;
     type Writer = crate::Writer<<S as Store>::Writer>;
 
-    fn open_writer(&self) -> IOResult<Self::Writer> {
-        let w = self.0.open_writer()?;
-        Ok(Self::Writer::new(w))
-    }
-
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         let plaintext = self.read(key)?;
         Ok(std::io::Cursor::new(plaintext))
@@ -33,5 +28,19 @@ where
             )
         })?;
         Ok(plaintext)
+    }
+
+    fn open_writer(&self) -> IOResult<Self::Writer> {
+        let w = self.0.open_writer()?;
+        Ok(Self::Writer::new(w))
+    }
+
+    fn commit_writer(&mut self, w: Self::Writer) -> IOResult<Self::Key> {
+        use std::io::Write;
+
+        let (mut inner, sekey, ciphertext) = w.finish();
+        inner.write_all(&ciphertext[..])?;
+        let basekey = self.0.commit_writer(inner)?;
+        Ok(crate::ReadCap { basekey, sekey })
     }
 }
