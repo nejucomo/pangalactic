@@ -3,14 +3,18 @@ use std::io::Result as IOResult;
 pub trait Store: Sized {
     type Key: StoreKey;
     type Reader: std::io::Read;
-    type Writer: WriteCommit<Key = Self::Key>;
+    type Writer: std::io::Write;
 
-    fn open_writer(&self) -> IOResult<Self::Writer>;
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader>;
+    fn open_writer(&self) -> IOResult<Self::Writer>;
+    fn commit_writer(&mut self, w: Self::Writer) -> IOResult<Self::Key>;
 
-    fn write(&self, contents: &[u8]) -> IOResult<Self::Key> {
-        let w = self.open_writer()?;
-        w.write_all_and_commit(contents)
+    fn write(&mut self, contents: &[u8]) -> IOResult<Self::Key> {
+        use std::io::Write;
+
+        let mut w = self.open_writer()?;
+        w.write_all(contents)?;
+        self.commit_writer(w)
     }
 
     fn read(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
@@ -30,18 +34,5 @@ pub trait StoreKey: Eq + serde::Serialize + serde::de::DeserializeOwned {
 
     fn cbor_encode(&self) -> Vec<u8> {
         serde_cbor::ser::to_vec_packed(&self).unwrap()
-    }
-}
-
-pub trait WriteCommit: Sized + std::io::Write {
-    type Key;
-
-    /// This consumes the writer, commits it to the store, and produces the Key for subsequent
-    /// reads.
-    fn commit(self) -> IOResult<Self::Key>;
-
-    fn write_all_and_commit(mut self, contents: &[u8]) -> IOResult<Self::Key> {
-        self.write_all(contents)?;
-        self.commit()
     }
 }

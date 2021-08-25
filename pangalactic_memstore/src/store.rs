@@ -1,37 +1,35 @@
-use crate::{reader::Reader, key::Key, writer::Writer};
+use crate::{key::Key, reader::Reader};
 use pangalactic_store::Store;
 use std::io::Result as IOResult;
 use std::rc::Rc;
 
 #[derive(Clone)]
-pub struct MemStore(Rc<Vec<Reader>>);
+pub struct MemStore(Vec<Rc<Vec<u8>>>);
 
 impl MemStore {
     pub fn new() -> MemStore {
-        MemStore(Rc::new(vec![]))
-    }
-
-    pub(crate) fn add_entry(&mut self, bytes: Vec<u8>) -> Key {
-        let entries = Rc::get_mut(&mut self.0).unwrap();
-        let key = Key::from(entries.len());
-        entries.push(Reader::from(bytes));
-        key
+        MemStore(vec![])
     }
 }
 
 impl Store for MemStore {
     type Key = Key;
     type Reader = Reader;
-    type Writer = Writer;
-
-    fn open_writer(&self) -> IOResult<Self::Writer> {
-        Ok(Self::Writer::new(self.clone()))
-    }
+    type Writer = Vec<u8>;
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         let ix = usize::from(*key);
-        let entries = self.0.as_ref();
-        let entry = &entries[ix];
-        Ok(entry.clone())
+        let byteref = &self.0[ix];
+        Ok(Reader::from(byteref))
+    }
+
+    fn open_writer(&self) -> IOResult<Self::Writer> {
+        Ok(vec![])
+    }
+
+    fn commit_writer(&mut self, w: Vec<u8>) -> IOResult<Key> {
+        let key = Key::from(self.0.len());
+        self.0.push(Rc::new(w));
+        Ok(key)
     }
 }

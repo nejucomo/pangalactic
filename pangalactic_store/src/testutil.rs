@@ -25,7 +25,7 @@ macro_rules! define_standard_store_then_read_then_store_test {
         fn $name() -> std::io::Result<()> {
             use pangalactic_store::{Store, StoreKey};
 
-            let store = $mkstore;
+            let mut store = $mkstore;
             let contents = $contents;
             let key = store.write(contents)?;
             let c2 = store.read(&key)?;

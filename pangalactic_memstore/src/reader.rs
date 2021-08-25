@@ -1,18 +1,27 @@
-use std::io::{Cursor, Read, Result};
+use std::io::{Read, Result};
 use std::rc::Rc;
 
 #[derive(Clone)]
-pub struct Reader(Rc<Cursor<Vec<u8>>>);
+pub struct Reader {
+    byteref: Rc<Vec<u8>>,
+    position: usize,
+}
 
-impl From<Vec<u8>> for Reader {
-    fn from(bytes: Vec<u8>) -> Reader {
-        Reader(Rc::new(Cursor::new(bytes)))
+impl<'a> From<&'a Rc<Vec<u8>>> for Reader {
+    fn from(byteref: &Rc<Vec<u8>>) -> Reader {
+        Reader {
+            byteref: byteref.clone(),
+            position: 0,
+        }
     }
 }
 
 impl Read for Reader {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        let cursor = Rc::get_mut(&mut self.0).unwrap();
-        cursor.read(buf)
+        let bytesleft = &self.byteref[self.position..];
+        let n = std::cmp::min(bytesleft.len(), buf.len());
+        buf[..n].copy_from_slice(&bytesleft[..n]);
+        self.position += n;
+        Ok(n)
     }
 }

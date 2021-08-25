@@ -1,4 +1,4 @@
 mod store;
 mod testutil;
 
-pub use store::{Store, StoreKey, WriteCommit};
+pub use store::{Store, StoreKey};
