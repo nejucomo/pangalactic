@@ -6,5 +6,6 @@ members = [
   "pangalactic_dagwasm",
   "pangalactic_dirstore",
   "pangalactic_hashspool",
+  "pangalactic_memstore",
   "pangalactic_store",
 ]
