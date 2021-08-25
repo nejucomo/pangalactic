@@ -1,9 +1,67 @@
-use derive_more::{From, Into};
-use serde::{Deserialize, Serialize};
+// FIXME: duplicated from pangalactic_dirstore; push into HashSpool.
 
-#[derive(Clone, Copy, Eq, PartialEq, From, Into, Serialize, Deserialize)]
-pub struct Key {
-    ix: usize,
-}
+use pangalactic_hashspool::{Hash, HASH_LENGTH};
+use std::fmt;
+
+#[derive(Copy, Clone, Debug, derive_more::From)]
+pub struct Key(Hash);
 
 impl pangalactic_store::StoreKey for Key {}
+
+impl std::hash::Hash for Key {
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: std::hash::Hasher,
+    {
+        self.0.hash(state)
+    }
+}
+
+impl PartialEq for Key {
+    fn eq(&self, other: &Key) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
+impl Eq for Key {}
+
+impl serde::Serialize for Key {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_bytes(self.0.as_bytes())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Key {
+    fn deserialize<D>(deserializer: D) -> Result<Key, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_bytes(KeyVisitor)
+    }
+}
+
+struct KeyVisitor;
+
+impl<'de> serde::de::Visitor<'de> for KeyVisitor {
+    type Value = Key;
+
+    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "a byte array containing {} bytes", HASH_LENGTH)
+    }
+
+    fn visit_bytes<E>(self, s: &[u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        if s.len() == HASH_LENGTH {
+            let mut a: [u8; HASH_LENGTH] = [0u8; HASH_LENGTH];
+            a.clone_from_slice(s);
+            Ok(Key::from(Hash::from(a)))
+        } else {
+            Err(serde::de::Error::invalid_length(s.len(), &self))
+        }
+    }
+}

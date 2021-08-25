@@ -15,3 +15,5 @@ features = ["derive"]
 [dependencies.pangalactic_store]
 path = "../pangalactic_store"
 
+[dependencies.pangalactic_hashspool]
+path = "../pangalactic_hashspool"

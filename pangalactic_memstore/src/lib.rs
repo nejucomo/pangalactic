@@ -1,6 +1,7 @@
 mod key;
 mod reader;
 mod store;
+mod writer;
 
 #[cfg(test)]
 mod tests;
