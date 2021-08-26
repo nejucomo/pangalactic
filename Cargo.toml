@@ -2,7 +2,7 @@
 members = [
   "pangalactic_b64",
   "pangalactic_cryptostore",
-  "pangalactic_dagnode",
+  "pangalactic_dirnode",
   "pangalactic_dirstore",
   "pangalactic_hashspool",
   "pangalactic_memstore",
