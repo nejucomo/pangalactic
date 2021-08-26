@@ -1,12 +1,17 @@
-// FIXME: duplicated from pangalactic_dirstore; push into HashSpool.
-
-use pangalactic_hashspool::{Hash, HASH_LENGTH};
+use blake3;
+pub use blake3::OUT_LEN as HASH_LENGTH;
 use std::fmt;
 
-#[derive(Copy, Clone, Debug, derive_more::From)]
-pub struct Key(Hash);
+#[derive(Copy, Eq, PartialEq, Clone, Debug, derive_more::From)]
+pub struct Hash(blake3::Hash);
 
-impl std::hash::Hash for Key {
+impl Hash {
+    pub fn as_bytes(&self) -> &[u8; HASH_LENGTH] {
+        self.0.as_bytes()
+    }
+}
+
+impl std::hash::Hash for Hash {
     fn hash<H>(&self, state: &mut H)
     where
         H: std::hash::Hasher,
@@ -15,15 +20,7 @@ impl std::hash::Hash for Key {
     }
 }
 
-impl PartialEq for Key {
-    fn eq(&self, other: &Key) -> bool {
-        self.0.eq(&other.0)
-    }
-}
-
-impl Eq for Key {}
-
-impl serde::Serialize for Key {
+impl serde::Serialize for Hash {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -32,19 +29,19 @@ impl serde::Serialize for Key {
     }
 }
 
-impl<'de> serde::Deserialize<'de> for Key {
-    fn deserialize<D>(deserializer: D) -> Result<Key, D::Error>
+impl<'de> serde::Deserialize<'de> for Hash {
+    fn deserialize<D>(deserializer: D) -> Result<Hash, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_bytes(KeyVisitor)
+        deserializer.deserialize_bytes(HashVisitor)
     }
 }
 
-struct KeyVisitor;
+struct HashVisitor;
 
-impl<'de> serde::de::Visitor<'de> for KeyVisitor {
-    type Value = Key;
+impl<'de> serde::de::Visitor<'de> for HashVisitor {
+    type Value = Hash;
 
     fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "a byte array containing {} bytes", HASH_LENGTH)
@@ -57,7 +54,7 @@ impl<'de> serde::de::Visitor<'de> for KeyVisitor {
         if s.len() == HASH_LENGTH {
             let mut a: [u8; HASH_LENGTH] = [0u8; HASH_LENGTH];
             a.clone_from_slice(s);
-            Ok(Key::from(Hash::from(a)))
+            Ok(Hash::from(blake3::Hash::from(a)))
         } else {
             Err(serde::de::Error::invalid_length(s.len(), &self))
         }

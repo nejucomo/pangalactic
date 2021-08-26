@@ -1,3 +1,4 @@
+use pangalactic_hashspool::Hash;
 use pangalactic_store::Store;
 use std::io::Result as IOResult;
 use std::path::PathBuf;
@@ -11,7 +12,7 @@ impl DirStore {
 }
 
 impl Store for DirStore {
-    type Key = crate::key::Key;
+    type Key = Hash;
     type Reader = std::fs::File;
     type Writer = crate::writer::Writer;
 

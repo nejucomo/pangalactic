@@ -1,11 +1,12 @@
-use crate::{key::Key, reader::Reader, writer::Writer};
+use crate::{reader::Reader, writer::Writer};
+use pangalactic_hashspool::Hash;
 use pangalactic_store::Store;
 use std::collections::HashMap;
 use std::io::Result as IOResult;
 use std::rc::Rc;
 
 #[derive(Clone)]
-pub struct MemStore(HashMap<Key, Rc<Vec<u8>>>);
+pub struct MemStore(HashMap<Hash, Rc<Vec<u8>>>);
 
 impl MemStore {
     pub fn new() -> MemStore {
@@ -14,7 +15,7 @@ impl MemStore {
 }
 
 impl Store for MemStore {
-    type Key = Key;
+    type Key = Hash;
     type Reader = Reader;
     type Writer = Writer;
 
@@ -31,7 +32,7 @@ impl Store for MemStore {
         Ok(Writer::new())
     }
 
-    fn commit_writer(&mut self, w: Writer) -> IOResult<Key> {
+    fn commit_writer(&mut self, w: Writer) -> IOResult<Self::Key> {
         let (key, bytes) = w.finish();
         self.0.insert(key, Rc::new(bytes));
         Ok(key)

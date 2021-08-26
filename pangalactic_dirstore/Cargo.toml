@@ -18,9 +18,5 @@ path = "../pangalactic_hashspool"
 [dependencies.pangalactic_store]
 path = "../pangalactic_store"
 
-[dependencies.serde]
-version = "1.0"
-features = ["derive"]
-
 [dev-dependencies]
 testdir = "*"

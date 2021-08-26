@@ -1,4 +1,3 @@
-mod key;
 mod reader;
 mod store;
 mod writer;

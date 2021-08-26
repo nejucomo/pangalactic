@@ -1,5 +1,5 @@
-use crate::{key::Key, randtoken};
-use pangalactic_hashspool::HashSpool;
+use crate::randtoken;
+use pangalactic_hashspool::{Hash, HashSpool};
 use std::fs::File;
 use std::io::Result as IOResult;
 use std::io::Write;
@@ -23,16 +23,15 @@ impl Writer {
         })
     }
 
-    pub(crate) fn commit(self) -> IOResult<Key> {
+    pub(crate) fn commit(self) -> IOResult<Hash> {
         use pangalactic_codec as codec;
 
-        let (hash, f) = self.hashspool.finish();
+        let (key, f) = self.hashspool.finish();
 
         // Induce a file closure.
         // TODO: Verify this induces file to close:
         std::mem::drop(f);
 
-        let key = Key::from(hash);
         let entrypath = self.dir.join(codec::encode_string(&key));
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,

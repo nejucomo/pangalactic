@@ -1,5 +1,4 @@
-use crate::key::Key;
-use pangalactic_hashspool::HashSpool;
+use pangalactic_hashspool::{Hash, HashSpool};
 use std::io::{Result, Write};
 
 pub struct Writer(HashSpool<Vec<u8>>);
@@ -9,9 +8,9 @@ impl Writer {
         Writer(HashSpool::new(vec![]))
     }
 
-    pub(crate) fn finish(self) -> (Key, Vec<u8>) {
+    pub(crate) fn finish(self) -> (Hash, Vec<u8>) {
         let (hash, bytes) = self.0.finish();
-        (Key::from(hash), bytes)
+        (hash, bytes)
     }
 }
 

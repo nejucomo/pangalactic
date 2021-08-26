@@ -1,4 +1,3 @@
-mod key;
 mod randtoken;
 mod store;
 mod writer;
