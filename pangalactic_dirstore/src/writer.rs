@@ -24,7 +24,7 @@ impl Writer {
     }
 
     pub(crate) fn commit(self) -> IOResult<Key> {
-        use pangalactic_store::StoreKey;
+        use pangalactic_codec as codec;
 
         let (hash, f) = self.hashspool.finish();
 
@@ -33,7 +33,7 @@ impl Writer {
         std::mem::drop(f);
 
         let key = Key::from(hash);
-        let entrypath = self.dir.join(key.b64_encode());
+        let entrypath = self.dir.join(codec::encode_string(&key));
 
         // BUG: The semantics we want for all platforms are that if the destination does not exist,
         // the operation succeeds; if the destination does exist, the operation fails in a specific

@@ -16,9 +16,9 @@ impl Store for DirStore {
     type Writer = crate::writer::Writer;
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
-        use pangalactic_store::StoreKey;
+        use pangalactic_codec as codec;
 
-        std::fs::File::open(self.0.join(key.b64_encode()))
+        std::fs::File::open(self.0.join(codec::encode_string(&key)))
     }
 
     fn open_writer(&self) -> IOResult<Self::Writer> {

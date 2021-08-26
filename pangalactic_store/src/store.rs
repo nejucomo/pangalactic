@@ -1,7 +1,8 @@
+use serde::{de::DeserializeOwned, Serialize};
 use std::io::Result as IOResult;
 
 pub trait Store: Sized {
-    type Key: StoreKey;
+    type Key: Eq + std::fmt::Debug + DeserializeOwned + Serialize;
     type Reader: std::io::Read;
     type Writer: std::io::Write;
 
@@ -24,15 +25,5 @@ pub trait Store: Sized {
         let mut r = self.open_reader(key)?;
         r.read_to_end(&mut buf)?;
         Ok(buf)
-    }
-}
-
-pub trait StoreKey: Eq + serde::Serialize + serde::de::DeserializeOwned {
-    fn b64_encode(&self) -> String {
-        pangalactic_b64::encode(&self.cbor_encode())
-    }
-
-    fn cbor_encode(&self) -> Vec<u8> {
-        serde_cbor::ser::to_vec_packed(&self).unwrap()
     }
 }

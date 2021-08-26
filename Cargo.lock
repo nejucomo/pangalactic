@@ -441,10 +441,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic_b64"
+name = "pangalactic_codec"
 version = "0.1.0"
 dependencies = [
  "base64",
+ "derive_more",
+ "serde",
+ "serde_cbor",
 ]
 
 [[package]]
@@ -452,6 +455,7 @@ name = "pangalactic_cryptostore"
 version = "0.1.0"
 dependencies = [
  "derive_more",
+ "pangalactic_codec",
  "pangalactic_dirstore",
  "pangalactic_hashspool",
  "pangalactic_store",
@@ -473,7 +477,7 @@ name = "pangalactic_dirstore"
 version = "0.1.0"
 dependencies = [
  "derive_more",
- "pangalactic_b64",
+ "pangalactic_codec",
  "pangalactic_hashspool",
  "pangalactic_store",
  "rand 0.8.4",
@@ -502,9 +506,7 @@ dependencies = [
 name = "pangalactic_store"
 version = "0.1.0"
 dependencies = [
- "pangalactic_b64",
  "serde",
- "serde_cbor",
 ]
 
 [[package]]

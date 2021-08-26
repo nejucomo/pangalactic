@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "pangalactic_b64",
+  "pangalactic_codec",
   "pangalactic_cryptostore",
   "pangalactic_dirstore",
   "pangalactic_hashspool",

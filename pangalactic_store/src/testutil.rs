@@ -23,7 +23,7 @@ macro_rules! define_standard_store_then_read_then_store_test {
     ( $mkstore:expr, $name:ident, $contents:expr ) => {
         #[test]
         fn $name() -> std::io::Result<()> {
-            use pangalactic_store::{Store, StoreKey};
+            use pangalactic_store::Store;
 
             let mut store = $mkstore;
             let contents = $contents;
@@ -31,7 +31,7 @@ macro_rules! define_standard_store_then_read_then_store_test {
             let c2 = store.read(&key)?;
             assert_eq!(&c2[..], contents);
             let k2 = store.write(contents)?;
-            assert!(k2 == key, "{:?} != {:?}", k2.b64_encode(), key.b64_encode());
+            assert_eq!(k2, key);
             Ok(())
         }
     };

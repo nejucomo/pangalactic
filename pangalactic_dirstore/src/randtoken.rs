@@ -5,5 +5,5 @@ pub fn generate() -> String {
 
     let mut bytes = [0u8; TOKEN_BYTE_LENGTH];
     rand::rngs::OsRng.fill_bytes(&mut bytes);
-    pangalactic_b64::encode(&bytes)
+    pangalactic_codec::b64::encode(&bytes)
 }

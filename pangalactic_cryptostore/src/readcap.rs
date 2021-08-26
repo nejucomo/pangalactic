@@ -1,5 +1,4 @@
 use crate::sekbox::SEKey;
-use pangalactic_store::StoreKey;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -8,8 +7,6 @@ pub struct ReadCap<K> {
     pub(crate) sekey: SEKey,
 }
 
-impl<K: StoreKey> StoreKey for ReadCap<K> {}
-
 impl<K: PartialEq> PartialEq for ReadCap<K> {
     fn eq(&self, other: &ReadCap<K>) -> bool {
         self.basekey == other.basekey && self.sekey == other.sekey
@@ -17,3 +14,14 @@ impl<K: PartialEq> PartialEq for ReadCap<K> {
 }
 
 impl<K: Eq> Eq for ReadCap<K> {}
+
+use std::fmt::{Debug, Formatter, Result};
+
+impl<K> Debug for ReadCap<K>
+where
+    K: Serialize,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "ReadCap<{}>", pangalactic_codec::encode_string(&self))
+    }
+}

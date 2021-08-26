@@ -4,8 +4,6 @@ use std::fmt;
 #[derive(Copy, Clone, Debug, derive_more::From)]
 pub struct Key(Hash);
 
-impl pangalactic_store::StoreKey for Key {}
-
 impl PartialEq for Key {
     fn eq(&self, other: &Key) -> bool {
         self.0.eq(&other.0)

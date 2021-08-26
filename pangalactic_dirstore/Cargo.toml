@@ -9,8 +9,8 @@ edition = "2018"
 derive_more = "0.99.14"
 rand = "0.8.3"
 
-[dependencies.pangalactic_b64]
-path = "../pangalactic_b64"
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
 
 [dependencies.pangalactic_hashspool]
 path = "../pangalactic_hashspool"

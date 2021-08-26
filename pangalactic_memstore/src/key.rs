@@ -6,8 +6,6 @@ use std::fmt;
 #[derive(Copy, Clone, Debug, derive_more::From)]
 pub struct Key(Hash);
 
-impl pangalactic_store::StoreKey for Key {}
-
 impl std::hash::Hash for Key {
     fn hash<H>(&self, state: &mut H)
     where

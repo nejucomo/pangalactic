@@ -10,6 +10,9 @@ derive_more = "0.99.14"
 rust_sodium = "0.10.2"
 static_assertions = "1.1.0"
 
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
+
 [dependencies.pangalactic_hashspool]
 path = "../pangalactic_hashspool"
 
