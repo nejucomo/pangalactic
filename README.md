@@ -2,7 +2,8 @@
 
 ## todo
 
-- DagStore.
+- Factor out common code for Hash keys.
+- Introduce `Store` read/write for codec types.
 - pgwasm host.
 - basic local revision control w/ pgwasm support.
 - signed global revision control w/ no distribution.
