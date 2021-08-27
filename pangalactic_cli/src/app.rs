@@ -1,7 +1,6 @@
-use crate::Command;
-use structopt::StructOpt;
+use crate::{cmdexec::Execute, opts::Command};
 
 pub fn app_main() {
-    let cmd = Command::from_args();
-    todo!("Not yet implemented: {:?}", cmd);
+    use structopt::StructOpt;
+    Command::from_args().execute();
 }
