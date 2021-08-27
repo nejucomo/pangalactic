@@ -615,7 +615,6 @@ dependencies = [
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
- "serde_json",
  "structopt",
 ]
 
@@ -699,6 +698,7 @@ name = "pangalactic_node"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "serde_json",
 ]
 
 [[package]]
