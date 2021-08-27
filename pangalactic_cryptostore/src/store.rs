@@ -13,12 +13,12 @@ where
     type Writer = crate::Writer<<S as Store>::Writer>;
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
-        let plaintext = self.read(key)?;
+        let plaintext = self.read_bytes(key)?;
         Ok(std::io::Cursor::new(plaintext))
     }
 
-    fn read(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
-        let ciphertext = self.0.read(&key.basekey)?;
+    fn read_bytes(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
+        let ciphertext = self.0.read_bytes(&key.basekey)?;
         let plaintext = key.sekey.unseal(&ciphertext).map_err(|()| {
             use std::io::{Error, ErrorKind};
 

@@ -10,7 +10,7 @@ pub trait Store: Sized {
     fn open_writer(&self) -> IOResult<Self::Writer>;
     fn commit_writer(&mut self, w: Self::Writer) -> IOResult<Self::Key>;
 
-    fn write(&mut self, contents: &[u8]) -> IOResult<Self::Key> {
+    fn write_bytes(&mut self, contents: &[u8]) -> IOResult<Self::Key> {
         use std::io::Write;
 
         let mut w = self.open_writer()?;
@@ -18,7 +18,7 @@ pub trait Store: Sized {
         self.commit_writer(w)
     }
 
-    fn read(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
+    fn read_bytes(&self, key: &Self::Key) -> IOResult<Vec<u8>> {
         use std::io::Read;
 
         let mut buf = vec![];

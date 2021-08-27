@@ -27,10 +27,10 @@ macro_rules! define_standard_store_then_read_then_store_test {
 
             let mut store = $mkstore;
             let contents = $contents;
-            let key = store.write(contents)?;
-            let c2 = store.read(&key)?;
+            let key = store.write_bytes(contents)?;
+            let c2 = store.read_bytes(&key)?;
             assert_eq!(&c2[..], contents);
-            let k2 = store.write(contents)?;
+            let k2 = store.write_bytes(contents)?;
             assert_eq!(k2, key);
             Ok(())
         }
