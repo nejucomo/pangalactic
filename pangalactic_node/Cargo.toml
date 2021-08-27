@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic_dagnode"
+name = "pangalactic_node"
 version = "0.1.0"
 edition = "2018"
 

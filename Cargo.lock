@@ -604,6 +604,7 @@ dependencies = [
  "pangalactic_dirstore",
  "pangalactic_fs",
  "pangalactic_logger",
+ "pangalactic_node",
  "pangalactic_store",
  "structopt",
 ]
@@ -631,13 +632,6 @@ dependencies = [
  "serde",
  "static_assertions",
  "testdir",
-]
-
-[[package]]
-name = "pangalactic_dagnode"
-version = "0.1.0"
-dependencies = [
- "serde",
 ]
 
 [[package]]
@@ -683,6 +677,13 @@ version = "0.1.0"
 dependencies = [
  "pangalactic_hashspool",
  "pangalactic_store",
+]
+
+[[package]]
+name = "pangalactic_node"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

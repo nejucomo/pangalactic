@@ -1,3 +1,5 @@
+mod import;
+
 use crate::store::PgStore;
 use pangalactic_appdirs::AppDirs;
 use pangalactic_fs::ensure_directory_exists;
@@ -6,8 +8,10 @@ use std::path::Path;
 
 pub fn fs_import(dirs: AppDirs, path: &Path) -> Result<()> {
     ensure_directory_exists(&dirs.data)?;
-    let _store = dbg!(PgStore::open(dirs.data))?;
-    todo!("fs_import({:?})", path);
+    let mut store = dbg!(PgStore::open(dirs.data))?;
+    let key = import::import_path(&mut store, path.to_path_buf())?;
+    dbg!(key);
+    todo!("print key");
 }
 
 pub fn fs_export(dirs: AppDirs, key: String, path: &Path) -> Result<()> {

@@ -3,6 +3,8 @@ use pangalactic_store::Store;
 use std::io::Result as IOResult;
 use std::path::PathBuf;
 
+pub type Key = Hash;
+
 #[derive(Debug, derive_more::From)]
 pub struct DirStore(PathBuf);
 
@@ -13,7 +15,7 @@ impl DirStore {
 }
 
 impl Store for DirStore {
-    type Key = Hash;
+    type Key = Key;
     type Reader = std::fs::File;
     type Writer = crate::writer::Writer;
 
