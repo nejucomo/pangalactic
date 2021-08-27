@@ -20,11 +20,15 @@ pub fn fs_export(dirs: AppDirs, link: PgLink, path: &Path) -> Result<()> {
 }
 
 pub fn fs_dump(dirs: AppDirs, link: PgLink) -> Result<()> {
+    use pangalactic_errorutil::io_error;
     use pangalactic_nodestore::ReadEntry::*;
+    use std::io::ErrorKind::InvalidData;
 
+    let mut out = std::io::stdout();
     let store = PgStore::open(dirs.data)?;
     match store.open_entry_reader(&link)? {
-        Dir(d) => todo!("fs_dump dir {:?}", d),
-        FileStream(mut s) => std::io::copy(&mut s, &mut std::io::stdout()).map(|_| ()),
+        Dir(d) => serde_json::to_writer_pretty(out, &d)
+            .map_err(|e| io_error!(InvalidData, "JSON serialization failure: {:#?}", e)),
+        FileStream(mut s) => std::io::copy(&mut s, &mut out).map(|_| ()),
     }
 }
