@@ -10,5 +10,6 @@ members = [
   "pangalactic_logger",
   "pangalactic_memstore",
   "pangalactic_node",
+  "pangalactic_nodestore",
   "pangalactic_store",
 ]

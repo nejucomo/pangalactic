@@ -687,6 +687,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_nodestore"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "pangalactic_codec",
+ "pangalactic_node",
+ "pangalactic_store",
+]
+
+[[package]]
 name = "pangalactic_store"
 version = "0.1.0"
 dependencies = [
