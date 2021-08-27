@@ -21,7 +21,7 @@ where
     serde_cbor::from_slice(slice)
 }
 
-#[derive(derive_more::From)]
+#[derive(Debug, derive_more::From)]
 pub enum DecodeStringError {
     Base64(base64::DecodeError),
     Cbor(serde_cbor::Error),

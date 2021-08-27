@@ -1,3 +1,6 @@
+mod linkarg;
+
+use self::linkarg::LinkArg;
 use crate::{cmd, cmdexec::Execute};
 use pangalactic_appdirs::AppDirs;
 use pangalactic_logger::LogOptions;
@@ -33,6 +36,7 @@ impl Execute for Command {
 pub enum Fs {
     Import(FsImport),
     Export(FsExport),
+    Dump(FsDump),
 }
 
 impl Execute for Fs {
@@ -40,6 +44,7 @@ impl Execute for Fs {
         match self {
             Fs::Import(x) => x.execute(dirs),
             Fs::Export(x) => x.execute(dirs),
+            Fs::Dump(x) => x.execute(dirs),
         }
     }
 }
@@ -58,10 +63,10 @@ impl Execute for FsImport {
 }
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Export from the store to a local path.")]
+#[structopt(about = "Export from the store to a local path")]
 pub struct FsExport {
-    #[structopt(help = "The key to export")]
-    key: String, // FIXME: Use correct type.
+    #[structopt(help = "The link to export")]
+    link: LinkArg,
 
     #[structopt(help = "The path to store results")]
     path: PathBuf,
@@ -69,6 +74,19 @@ pub struct FsExport {
 
 impl Execute for FsExport {
     fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs_export(dirs, self.key, &self.path)
+        cmd::fs_export(dirs, self.link.link, &self.path)
+    }
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(about = "Dump an entry to stdout: files as-is, directories as JSON")]
+pub struct FsDump {
+    #[structopt(help = "The link to export")]
+    link: LinkArg,
+}
+
+impl Execute for FsDump {
+    fn execute(self, dirs: AppDirs) -> Result<()> {
+        cmd::fs_dump(dirs, self.link.link)
     }
 }
