@@ -25,7 +25,7 @@ pub fn fs_dump(dirs: AppDirs, link: PgLink) -> Result<()> {
     let mut out = std::io::stdout();
     let store = PgStore::open(dirs.data)?;
     match store.open_entry_reader(&link)? {
-        Dir(mut d) => d.to_user_json(out),
+        Dir(d) => d.to_user_json(out),
         FileStream(mut s) => std::io::copy(&mut s, &mut out).map(|_| ()),
     }
 }

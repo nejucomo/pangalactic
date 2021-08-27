@@ -697,6 +697,8 @@ dependencies = [
 name = "pangalactic_node"
 version = "0.1.0"
 dependencies = [
+ "pangalactic_codec",
+ "pangalactic_errorutil",
  "serde",
  "serde_json",
 ]

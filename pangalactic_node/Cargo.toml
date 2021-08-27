@@ -11,3 +11,9 @@ serde_json = "1.0.66"
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
+
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
+
+[dependencies.pangalactic_errorutil]
+path = "../pangalactic_errorutil"
