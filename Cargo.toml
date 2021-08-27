@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "pangalactic_cli",
   "pangalactic_codec",
   "pangalactic_cryptostore",
   "pangalactic_dirstore",
