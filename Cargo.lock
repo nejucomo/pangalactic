@@ -524,6 +524,10 @@ dependencies = [
 name = "pangalactic_cli"
 version = "0.1.0"
 dependencies = [
+ "pangalactic_appdirs",
+ "pangalactic_cryptostore",
+ "pangalactic_dirstore",
+ "pangalactic_store",
  "structopt",
 ]
 

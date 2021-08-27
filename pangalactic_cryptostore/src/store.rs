@@ -1,7 +1,7 @@
 use pangalactic_store::Store;
 use std::io::Result as IOResult;
 
-#[derive(derive_more::From)]
+#[derive(Debug, derive_more::From)]
 pub struct CryptoStore<S>(S);
 
 impl<S> Store for CryptoStore<S>

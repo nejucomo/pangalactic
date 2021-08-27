@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! pangalactic_appdirs_init {
+macro_rules! appdirs_init {
     () => {
         $crate::AppDirs::init(env!("CARGO_PKG_NAME"))
     };

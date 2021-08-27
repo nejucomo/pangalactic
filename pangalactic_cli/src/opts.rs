@@ -1,4 +1,5 @@
 use crate::{cmd, cmdexec::Execute};
+use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -9,7 +10,7 @@ pub enum Command {
 }
 
 impl Execute for Command {
-    fn execute(self) {
+    fn execute(self) -> Result<()> {
         match self {
             Command::Fs(x) => x.execute(),
         }
@@ -24,7 +25,7 @@ pub enum Fs {
 }
 
 impl Execute for Fs {
-    fn execute(self) {
+    fn execute(self) -> Result<()> {
         match self {
             Fs::Import(x) => x.execute(),
             Fs::Export(x) => x.execute(),
@@ -40,7 +41,7 @@ pub struct FsImport {
 }
 
 impl Execute for FsImport {
-    fn execute(self) {
+    fn execute(self) -> Result<()> {
         cmd::fs_import(&self.path.unwrap_or(PathBuf::from(".")))
     }
 }
@@ -56,7 +57,7 @@ pub struct FsExport {
 }
 
 impl Execute for FsExport {
-    fn execute(self) {
+    fn execute(self) -> Result<()> {
         cmd::fs_export(self.key, &self.path)
     }
 }

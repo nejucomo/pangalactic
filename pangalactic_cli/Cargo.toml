@@ -7,3 +7,15 @@ edition = "2018"
 
 [dependencies]
 structopt = "0.3"
+
+[dependencies.pangalactic_appdirs]
+path = "../pangalactic_appdirs"
+
+[dependencies.pangalactic_store]
+path = "../pangalactic_store"
+
+[dependencies.pangalactic_cryptostore]
+path = "../pangalactic_cryptostore"
+
+[dependencies.pangalactic_dirstore]
+path = "../pangalactic_dirstore"

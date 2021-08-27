@@ -3,6 +3,7 @@ use pangalactic_store::Store;
 use std::io::Result as IOResult;
 use std::path::PathBuf;
 
+#[derive(Debug, derive_more::From)]
 pub struct DirStore(PathBuf);
 
 impl DirStore {
