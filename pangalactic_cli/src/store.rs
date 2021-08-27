@@ -8,7 +8,7 @@ pub struct PgStore(CryptoStore<DirStore>);
 
 impl PgStore {
     pub fn open() -> std::io::Result<PgStore> {
-        let dirs = dbg!(AppDirs::init(crate::APP_NAME)?);
+        let dirs = dbg!(AppDirs::new(crate::APP_NAME)?);
         Ok(PgStore(CryptoStore::from(DirStore::from(dirs.data))))
     }
 }

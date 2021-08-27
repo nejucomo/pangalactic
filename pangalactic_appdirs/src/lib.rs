@@ -13,13 +13,7 @@ pub struct AppDirs {
 }
 
 impl AppDirs {
-    pub fn init(appname: &str) -> std::io::Result<AppDirs> {
-        let ad = AppDirs::new_uncooked(appname)?;
-        std::fs::create_dir_all(&ad.data)?;
-        Ok(ad)
-    }
-
-    fn new_uncooked(appname: &str) -> std::io::Result<AppDirs> {
+    pub fn new(appname: &str) -> std::io::Result<AppDirs> {
         use std::io::{Error, ErrorKind::NotFound};
 
         let mut data = dirs::data_dir().ok_or(Error::new(
