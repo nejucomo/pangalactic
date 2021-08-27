@@ -15,7 +15,13 @@ impl LogOptions {
     pub fn init(&self) -> std::io::Result<()> {
         let optlevel = self.log_level()?;
         match optlevel {
-            None => simple_logger::init_with_env(),
+            None => {
+                if std::env::var("RUST_LOG").is_ok() {
+                    simple_logger::init_with_env()
+                } else {
+                    simple_logger::init_with_level(Level::Info)
+                }
+            }
             Some(lvl) => simple_logger::init_with_level(lvl),
         }
         .map_err(|e| {
