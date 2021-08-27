@@ -11,5 +11,5 @@ pub fn fs_import(dirs: AppDirs, path: &Path) -> Result<()> {
 }
 
 pub fn fs_export(dirs: AppDirs, key: String, path: &Path) -> Result<()> {
-    todo!("fs_export({:?}, {:?})", key, path);
+    todo!("fs_export({:?}, {:?}, {:?})", dirs, key, path);
 }

@@ -1,11 +1,21 @@
 use crate::{cmd, cmdexec::Execute};
 use pangalactic_appdirs::AppDirs;
+use pangalactic_logger::LogOptions;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "pg", about = "Pangalactic Revision Control")]
+pub struct Options {
+    #[structopt(flatten)]
+    pub logging: LogOptions,
+
+    #[structopt(subcommand)]
+    pub cmd: Command,
+}
+
+#[derive(Debug, StructOpt)]
 pub enum Command {
     Fs(Fs),
 }
