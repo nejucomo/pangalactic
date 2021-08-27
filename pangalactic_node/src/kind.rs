@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct NodeKind {
-    Dir,
+pub enum Kind {
     File,
+    Dir,
 }
-
