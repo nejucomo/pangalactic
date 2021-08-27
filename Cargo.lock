@@ -600,11 +600,13 @@ version = "0.1.0"
 dependencies = [
  "log",
  "pangalactic_appdirs",
+ "pangalactic_codec",
  "pangalactic_cryptostore",
  "pangalactic_dirstore",
  "pangalactic_fs",
  "pangalactic_logger",
  "pangalactic_node",
+ "pangalactic_nodestore",
  "pangalactic_store",
  "structopt",
 ]

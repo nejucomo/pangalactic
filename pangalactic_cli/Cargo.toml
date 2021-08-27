@@ -9,8 +9,14 @@ edition = "2018"
 structopt = "0.3"
 log = "0.4.14"
 
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
+
 [dependencies.pangalactic_node]
 path = "../pangalactic_node"
+
+[dependencies.pangalactic_nodestore]
+path = "../pangalactic_nodestore"
 
 [dependencies.pangalactic_logger]
 path = "../pangalactic_logger"
