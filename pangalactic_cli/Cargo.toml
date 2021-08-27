@@ -8,6 +8,9 @@ edition = "2018"
 [dependencies]
 structopt = "0.3"
 
+[dependencies.pangalactic_fs]
+path = "../pangalactic_fs"
+
 [dependencies.pangalactic_appdirs]
 path = "../pangalactic_appdirs"
 

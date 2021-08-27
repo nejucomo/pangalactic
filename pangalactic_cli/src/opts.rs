@@ -1,4 +1,5 @@
 use crate::{cmd, cmdexec::Execute};
+use pangalactic_appdirs::AppDirs;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -10,9 +11,9 @@ pub enum Command {
 }
 
 impl Execute for Command {
-    fn execute(self) -> Result<()> {
+    fn execute(self, dirs: AppDirs) -> Result<()> {
         match self {
-            Command::Fs(x) => x.execute(),
+            Command::Fs(x) => x.execute(dirs),
         }
     }
 }
@@ -25,10 +26,10 @@ pub enum Fs {
 }
 
 impl Execute for Fs {
-    fn execute(self) -> Result<()> {
+    fn execute(self, dirs: AppDirs) -> Result<()> {
         match self {
-            Fs::Import(x) => x.execute(),
-            Fs::Export(x) => x.execute(),
+            Fs::Import(x) => x.execute(dirs),
+            Fs::Export(x) => x.execute(dirs),
         }
     }
 }
@@ -41,8 +42,8 @@ pub struct FsImport {
 }
 
 impl Execute for FsImport {
-    fn execute(self) -> Result<()> {
-        cmd::fs_import(&self.path.unwrap_or(PathBuf::from(".")))
+    fn execute(self, dirs: AppDirs) -> Result<()> {
+        cmd::fs_import(dirs, &self.path.unwrap_or(PathBuf::from(".")))
     }
 }
 
@@ -57,7 +58,7 @@ pub struct FsExport {
 }
 
 impl Execute for FsExport {
-    fn execute(self) -> Result<()> {
-        cmd::fs_export(self.key, &self.path)
+    fn execute(self, dirs: AppDirs) -> Result<()> {
+        cmd::fs_export(dirs, self.key, &self.path)
     }
 }

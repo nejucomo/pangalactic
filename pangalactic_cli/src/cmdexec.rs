@@ -1,3 +1,5 @@
+use pangalactic_appdirs::AppDirs;
+
 pub trait Execute {
-    fn execute(self) -> std::io::Result<()>;
+    fn execute(self, dirs: AppDirs) -> std::io::Result<()>;
 }

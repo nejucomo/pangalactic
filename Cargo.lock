@@ -527,6 +527,7 @@ dependencies = [
  "pangalactic_appdirs",
  "pangalactic_cryptostore",
  "pangalactic_dirstore",
+ "pangalactic_fs",
  "pangalactic_store",
  "structopt",
 ]
