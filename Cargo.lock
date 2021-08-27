@@ -576,6 +576,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_fs"
+version = "0.1.0"
+dependencies = [
+ "log",
+]
+
+[[package]]
 name = "pangalactic_hashspool"
 version = "0.1.0"
 dependencies = [

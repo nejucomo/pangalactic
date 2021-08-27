@@ -5,6 +5,7 @@ members = [
   "pangalactic_codec",
   "pangalactic_cryptostore",
   "pangalactic_dirstore",
+  "pangalactic_fs",
   "pangalactic_hashspool",
   "pangalactic_memstore",
   "pangalactic_node",
