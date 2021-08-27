@@ -10,7 +10,7 @@ use std::path::Path;
 pub fn fs_import(dirs: AppDirs, path: &Path) -> Result<()> {
     ensure_directory_exists(&dirs.data)?;
     let mut store = PgStore::open(dirs.data)?;
-    let link = import::import_path(&mut store, path.to_path_buf())?;
+    let link = import::import_path(&mut store, path)?;
     println!("{}", encode_string(&link));
     Ok(())
 }
