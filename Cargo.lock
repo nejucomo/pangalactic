@@ -649,6 +649,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_errorutil"
+version = "0.1.0"
+
+[[package]]
 name = "pangalactic_fs"
 version = "0.1.0"
 dependencies = [
@@ -677,6 +681,7 @@ dependencies = [
 name = "pangalactic_memstore"
 version = "0.1.0"
 dependencies = [
+ "pangalactic_errorutil",
  "pangalactic_hashspool",
  "pangalactic_store",
 ]

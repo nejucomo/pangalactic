@@ -20,12 +20,10 @@ impl Store for MemStore {
     type Writer = Writer;
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
-        use std::io::{Error, ErrorKind::NotFound};
+        use pangalactic_errorutil::ok_or_io_error;
+        use std::io::ErrorKind::NotFound;
 
-        match self.0.get(key) {
-            Some(byteref) => Ok(Reader::from(byteref)),
-            None => Err(Error::new(NotFound, format!("Key {:?}", key))),
-        }
+        ok_or_io_error!(self.0.get(key), NotFound, "Key {:?}", key).map(Reader::from)
     }
 
     fn open_writer(&self) -> IOResult<Self::Writer> {
