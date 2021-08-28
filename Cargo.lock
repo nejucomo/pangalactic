@@ -628,7 +628,9 @@ dependencies = [
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
+ "simple_logger",
  "structopt",
+ "testdir",
 ]
 
 [[package]]

@@ -39,3 +39,7 @@ path = "../pangalactic_cryptostore"
 
 [dependencies.pangalactic_dirstore]
 path = "../pangalactic_dirstore"
+
+[dev-dependencies]
+testdir = "*"
+simple_logger = "1.13.0"

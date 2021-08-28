@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! appdirs_init {
     () => {
-        $crate::AppDirs::init(env!("CARGO_PKG_NAME"))
+        $crate::AppDirs::new(env!("CARGO_PKG_NAME"))
     };
 }
 
