@@ -18,13 +18,13 @@ pub enum Fs {
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Import a local path into the store and print the key")]
 pub struct FsImport {
-    #[structopt(help = "The path to import, default: ./")]
-    path: Option<PathBuf>,
+    #[structopt(help = "The path to import", default_value = ".")]
+    path: PathBuf,
 }
 
 impl Execute for FsImport {
     fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs::import(dirs, &self.path.unwrap_or(PathBuf::from(".")))
+        cmd::fs::import(dirs, &self.path)
     }
 }
 
