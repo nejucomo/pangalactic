@@ -1,4 +1,5 @@
 mod fs;
+mod init;
 mod linkarg;
 
 use crate::cmdexec::Execute;
@@ -20,5 +21,6 @@ pub struct Options {
 #[enum_dispatch(Execute)]
 #[derive(Debug, StructOpt)]
 pub enum Command {
+    Init(self::init::Init),
     Fs(self::fs::Fs),
 }

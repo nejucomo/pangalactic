@@ -1,0 +1,18 @@
+use crate::{cmd, cmdexec::Execute};
+use pangalactic_appdirs::AppDirs;
+use std::io::Result;
+use std::path::PathBuf;
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+#[structopt(about = "Initialize a repository")]
+pub struct Init {
+    #[structopt(help = "The path to import", default_value = ".")]
+    path: PathBuf,
+}
+
+impl Execute for Init {
+    fn execute(self, dirs: AppDirs) -> Result<()> {
+        cmd::init(dirs, &self.path)
+    }
+}
