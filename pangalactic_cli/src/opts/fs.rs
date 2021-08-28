@@ -24,7 +24,7 @@ pub struct FsImport {
 
 impl Execute for FsImport {
     fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs_import(dirs, &self.path.unwrap_or(PathBuf::from(".")))
+        cmd::fs::import(dirs, &self.path.unwrap_or(PathBuf::from(".")))
     }
 }
 
@@ -40,7 +40,7 @@ pub struct FsExport {
 
 impl Execute for FsExport {
     fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs_export(dirs, self.link.link, &self.path)
+        cmd::fs::export(dirs, self.link.link, &self.path)
     }
 }
 
@@ -53,6 +53,6 @@ pub struct FsDump {
 
 impl Execute for FsDump {
     fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs_dump(dirs, self.link.link)
+        cmd::fs::dump(dirs, self.link.link)
     }
 }
