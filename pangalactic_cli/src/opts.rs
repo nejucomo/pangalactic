@@ -2,6 +2,7 @@ mod linkarg;
 
 use self::linkarg::LinkArg;
 use crate::{cmd, cmdexec::Execute};
+use enum_dispatch::enum_dispatch;
 use pangalactic_appdirs::AppDirs;
 use pangalactic_logger::LogOptions;
 use std::io::Result;
@@ -18,35 +19,19 @@ pub struct Options {
     pub cmd: Command,
 }
 
+#[enum_dispatch(Execute)]
 #[derive(Debug, StructOpt)]
 pub enum Command {
     Fs(Fs),
 }
 
-impl Execute for Command {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        match self {
-            Command::Fs(x) => x.execute(dirs),
-        }
-    }
-}
-
+#[enum_dispatch(Execute)]
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Filesystem operations")]
 pub enum Fs {
     Import(FsImport),
     Export(FsExport),
     Dump(FsDump),
-}
-
-impl Execute for Fs {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        match self {
-            Fs::Import(x) => x.execute(dirs),
-            Fs::Export(x) => x.execute(dirs),
-            Fs::Dump(x) => x.execute(dirs),
-        }
-    }
 }
 
 #[derive(Debug, StructOpt)]
