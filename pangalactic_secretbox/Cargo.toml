@@ -1,0 +1,20 @@
+[package]
+name = "pangalactic_secretbox"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rust_sodium = "0.10.2"
+derive_more = "0.99.14"
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
+
+[dev-dependencies]
+test-case = "1.2.0"
