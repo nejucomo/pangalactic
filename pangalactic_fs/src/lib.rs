@@ -25,6 +25,14 @@ pub fn ensure_directory_exists<P: AsRef<Path>>(dir: P) -> Result<()> {
 }
 
 macro_rules! wrap_std_fs {
+    ( unary $name:ident -> $ret:ty ) => {
+        wrap_std_fs!( unary $name -> $ret : std::fs::$name);
+    };
+
+    ( binary $name:ident -> $ret:ty ) => {
+        wrap_std_fs!( binary $name -> $ret : std::fs::$name);
+    };
+
     ( unary $name:ident -> $ret:ty : $delegate:expr ) => {
         pub fn $name<P>(path: P) -> Result<$ret>
         where
@@ -47,18 +55,22 @@ macro_rules! wrap_std_fs {
     };
 }
 
-macro_rules! wrap_std_fs_canonical {
-    ( unary $name:ident -> $ret:ty ) => {
-        wrap_std_fs!( unary $name -> $ret : std::fs::$name);
-    };
-
-    ( binary $name:ident -> $ret:ty ) => {
-        wrap_std_fs!( binary $name -> $ret : std::fs::$name);
-    };
+wrap_std_fs! {
+    unary file_open -> std::fs::File : std::fs::File::open
 }
 
-wrap_std_fs!(unary file_open -> std::fs::File : std::fs::File::open);
-wrap_std_fs!(unary file_create -> std::fs::File : std::fs::File::create);
-wrap_std_fs_canonical!(unary create_dir -> ());
-wrap_std_fs_canonical!(unary read_dir -> std::fs::ReadDir);
-wrap_std_fs_canonical!(binary rename -> ());
+wrap_std_fs! {
+    unary file_create -> std::fs::File : std::fs::File::create
+}
+
+wrap_std_fs! {
+    unary create_dir -> ()
+}
+
+wrap_std_fs! {
+    unary read_dir -> std::fs::ReadDir
+}
+
+wrap_std_fs! {
+    binary rename -> ()
+}
