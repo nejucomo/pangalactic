@@ -1,6 +1,6 @@
 use rust_sodium::crypto::sign;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct SigningPair {
     pub(crate) public: sign::PublicKey,
     secret: sign::SecretKey,

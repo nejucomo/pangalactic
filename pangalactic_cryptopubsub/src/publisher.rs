@@ -1,7 +1,7 @@
 use crate::signingpair::SigningPair;
 use rust_sodium::crypto::secretbox;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Publisher {
     pub(crate) signpair: SigningPair,
     pub(crate) sboxkey: secretbox::Key,

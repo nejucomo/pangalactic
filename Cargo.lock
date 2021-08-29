@@ -644,6 +644,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_cryptopubsub"
+version = "0.1.0"
+dependencies = [
+ "rust_sodium",
+]
+
+[[package]]
 name = "pangalactic_cryptostore"
 version = "0.1.0"
 dependencies = [
@@ -728,13 +735,6 @@ dependencies = [
  "pangalactic_codec",
  "pangalactic_node",
  "pangalactic_store",
-]
-
-[[package]]
-name = "pangalactic_publisher"
-version = "0.1.0"
-dependencies = [
- "rust_sodium",
 ]
 
 [[package]]

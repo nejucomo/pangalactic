@@ -3,6 +3,7 @@ members = [
   "pangalactic_appdirs",
   "pangalactic_cli",
   "pangalactic_codec",
+  "pangalactic_cryptopubsub",
   "pangalactic_cryptostore",
   "pangalactic_dirstore",
   "pangalactic_errorutil",
@@ -12,6 +13,5 @@ members = [
   "pangalactic_memstore",
   "pangalactic_node",
   "pangalactic_nodestore",
-  "pangalactic_publisher",
   "pangalactic_store",
 ]

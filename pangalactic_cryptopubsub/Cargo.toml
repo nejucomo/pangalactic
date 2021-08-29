@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic_publisher"
+name = "pangalactic_cryptopubsub"
 version = "0.1.0"
 edition = "2018"
 
