@@ -731,6 +731,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_publisher"
+version = "0.1.0"
+dependencies = [
+ "rust_sodium",
+]
+
+[[package]]
 name = "pangalactic_store"
 version = "0.1.0"
 dependencies = [
