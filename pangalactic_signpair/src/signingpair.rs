@@ -23,8 +23,11 @@ impl SigningPair {
 }
 
 impl Signer {
-    pub fn sign(&self, msg: &[u8]) -> Vec<u8> {
-        sign::sign(msg, &self.0)
+    pub fn sign<T>(&self, msg: T) -> Vec<u8>
+    where
+        T: AsRef<[u8]>,
+    {
+        sign::sign(msg.as_ref(), &self.0)
     }
 }
 
@@ -32,7 +35,10 @@ impl Signer {
 pub struct InvalidSignature;
 
 impl Verifier {
-    pub fn verify(&self, signedmsg: &[u8]) -> Result<Vec<u8>, InvalidSignature> {
-        sign::verify(signedmsg, &self.0).map_err(|()| InvalidSignature)
+    pub fn verify<T>(&self, signedmsg: T) -> Result<Vec<u8>, InvalidSignature>
+    where
+        T: AsRef<[u8]>,
+    {
+        sign::verify(signedmsg.as_ref(), &self.0).map_err(|()| InvalidSignature)
     }
 }

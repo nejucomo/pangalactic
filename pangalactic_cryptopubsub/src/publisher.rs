@@ -31,7 +31,7 @@ impl Publisher {
             data: self.sboxkey.seal(msg),
         };
         let unsignedbytes = encode_bytes(&pstate);
-        let sigbytes = self.signpair.signer.sign(&unsignedbytes[..]);
+        let sigbytes = self.signpair.signer.sign(unsignedbytes);
         Publication::from(sigbytes)
     }
 }

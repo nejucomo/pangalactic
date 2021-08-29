@@ -10,7 +10,9 @@ fn seal_open(b: &[u8]) -> std::io::Result<()> {
     let k = SecretBoxKey::generate();
     let ciphertext = k.seal(b);
     let b2 = k.open(&ciphertext[..]).unwrap();
+    let b3 = k.open(ciphertext).unwrap();
     assert_eq!(b, &b2[..]);
+    assert_eq!(b2, b3);
 
     Ok(())
 }

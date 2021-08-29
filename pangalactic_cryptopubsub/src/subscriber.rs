@@ -23,7 +23,7 @@ impl Subscriber {
 
     pub fn unwrap(&self, p: &Publication) -> Result<PublicationContents, UnwrapError> {
         let pc = self.distributor.unwrap(p)?;
-        let plaintext = self.sboxkey.open(&pc.data[..])?;
+        let plaintext = self.sboxkey.open(pc.data)?;
         Ok(PublicationContents {
             sequence: pc.sequence,
             data: plaintext,

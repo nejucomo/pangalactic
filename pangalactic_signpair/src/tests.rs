@@ -10,7 +10,9 @@ fn pos_sign_verify(msg: &[u8]) -> std::io::Result<()> {
     let pair = SigningPair::generate();
     let signed = pair.signer.sign(msg);
     let msg2 = pair.verifier.verify(&signed[..]).unwrap();
+    let msg3 = pair.verifier.verify(signed).unwrap();
     assert_eq!(msg, &msg2[..]);
+    assert_eq!(msg2, msg3);
 
     Ok(())
 }

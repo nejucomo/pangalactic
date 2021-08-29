@@ -1,5 +1,6 @@
 /// Single-Encryption Key box: Symmetric encryption confidentiality which assumes any given key is
 /// used to encrypt exactly one message.
+/// TODO: Replace w/ pangalactic_secretbox;
 use rust_sodium::crypto::secretbox;
 use serde::{Deserialize, Serialize};
 
