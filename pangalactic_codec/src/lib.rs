@@ -1,4 +1,9 @@
 pub mod b64;
-mod codec;
+mod dec;
+mod enc;
 
-pub use codec::{decode_bytes, decode_string, encode_bytes, encode_string, DecodeStringError};
+#[cfg(test)]
+mod tests;
+
+pub use dec::{decode_bytes, decode_string, DecodeBytesError, DecodeStringError};
+pub use enc::{encode_bytes, encode_string};

@@ -13,7 +13,7 @@ impl std::str::FromStr for LinkArg {
 
         let link = decode_string(s).map_err(|e| match e {
             Base64(_) => String::from("Malformed base64 encoding."),
-            Cbor(_) => String::from("Malformed cbor encoding."),
+            Bytes(_) => String::from("Malformed byte encoding."),
         })?;
         Ok(LinkArg { link })
     }
