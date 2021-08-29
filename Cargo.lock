@@ -646,7 +646,8 @@ dependencies = [
 name = "pangalactic_cryptopubsub"
 version = "0.1.0"
 dependencies = [
- "rust_sodium",
+ "pangalactic_secretbox",
+ "pangalactic_signpair",
 ]
 
 [[package]]
@@ -747,6 +748,16 @@ dependencies = [
  "pangalactic_sodiuminit",
  "rust_sodium",
  "serde",
+ "test-case",
+]
+
+[[package]]
+name = "pangalactic_signpair"
+version = "0.1.0"
+dependencies = [
+ "pangalactic_logger",
+ "pangalactic_sodiuminit",
+ "rust_sodium",
  "test-case",
 ]
 

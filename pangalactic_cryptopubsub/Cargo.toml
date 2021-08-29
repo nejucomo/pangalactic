@@ -5,5 +5,8 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-rust_sodium = "0.10.2"
+[dependencies.pangalactic_secretbox]
+path = "../pangalactic_secretbox"
+
+[dependencies.pangalactic_signpair]
+path = "../pangalactic_signpair"

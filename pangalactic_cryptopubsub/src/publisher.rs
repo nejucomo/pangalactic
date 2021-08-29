@@ -1,16 +1,16 @@
-use crate::signingpair::SigningPair;
-use rust_sodium::crypto::secretbox;
+use pangalactic_secretbox::SecretBoxKey;
+use pangalactic_signpair::SigningPair;
 
 #[derive(Clone, Debug)]
 pub struct Publisher {
     pub(crate) signpair: SigningPair,
-    pub(crate) sboxkey: secretbox::Key,
+    pub(crate) sboxkey: SecretBoxKey,
 }
 
 impl Publisher {
     pub fn generate() -> Publisher {
         let signpair = SigningPair::generate();
-        let sboxkey = secretbox::gen_key();
+        let sboxkey = SecretBoxKey::generate();
         Publisher { signpair, sboxkey }
     }
 }

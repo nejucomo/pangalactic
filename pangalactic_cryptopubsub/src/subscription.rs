@@ -1,16 +1,17 @@
 use crate::Publisher;
-use rust_sodium::crypto::{secretbox, sign};
+use pangalactic_secretbox::SecretBoxKey;
+use pangalactic_signpair::Verifier;
 
 #[derive(Clone, Debug)]
 pub struct Subscription {
-    signpub: sign::PublicKey,
-    sboxkey: secretbox::Key,
+    verifier: Verifier,
+    sboxkey: SecretBoxKey,
 }
 
 impl From<Publisher> for Subscription {
     fn from(p: Publisher) -> Subscription {
         Subscription {
-            signpub: p.signpair.public,
+            verifier: p.signpair.verifier,
             sboxkey: p.sboxkey,
         }
     }
@@ -18,7 +19,7 @@ impl From<Publisher> for Subscription {
 
 #[cfg(test)]
 impl Subscription {
-    pub(crate) fn expose_innards(&self) -> (&sign::PublicKey, &secretbox::Key) {
-        (&self.signpub, &self.sboxkey)
+    pub(crate) fn expose_innards(&self) -> (&Verifier, &SecretBoxKey) {
+        (&self.verifier, &self.sboxkey)
     }
 }
