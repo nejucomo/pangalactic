@@ -14,5 +14,6 @@ members = [
   "pangalactic_node",
   "pangalactic_nodestore",
   "pangalactic_secretbox",
+  "pangalactic_sodiuminit",
   "pangalactic_store",
 ]

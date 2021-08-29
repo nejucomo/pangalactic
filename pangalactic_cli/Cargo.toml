@@ -42,4 +42,3 @@ path = "../pangalactic_dirstore"
 
 [dev-dependencies]
 testdir = "*"
-simple_logger = "1.13.0"

@@ -1,6 +1,10 @@
 use log::Level;
 use structopt::StructOpt;
 
+pub fn simple_init() -> std::io::Result<()> {
+    simple_logger::init().map_err(pangalactic_errorutil::debug_to_std_io_error)
+}
+
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Logging options")]
 pub struct LogOptions {

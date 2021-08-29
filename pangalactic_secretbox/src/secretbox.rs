@@ -12,12 +12,14 @@ pub enum OpenError {
 
 impl SecretBoxKey {
     pub fn generate() -> SecretBoxKey {
+        pangalactic_sodiuminit::init_if_necessary();
         SecretBoxKey(secretbox::gen_key())
     }
 
     pub fn seal(&self, plaintext: &[u8]) -> Vec<u8> {
         use pangalactic_codec::encode_bytes;
 
+        pangalactic_sodiuminit::init_if_necessary();
         let nonce = secretbox::gen_nonce();
         let ciphertext = secretbox::seal(&plaintext, &nonce, &self.0);
         let unsealed = NonceTracker { nonce, ciphertext };

@@ -628,7 +628,6 @@ dependencies = [
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
- "simple_logger",
  "structopt",
  "testdir",
 ]
@@ -704,6 +703,7 @@ name = "pangalactic_logger"
 version = "0.1.0"
 dependencies = [
  "log",
+ "pangalactic_errorutil",
  "simple_logger",
  "structopt",
 ]
@@ -743,9 +743,20 @@ version = "0.1.0"
 dependencies = [
  "derive_more",
  "pangalactic_codec",
+ "pangalactic_logger",
+ "pangalactic_sodiuminit",
  "rust_sodium",
  "serde",
  "test-case",
+]
+
+[[package]]
+name = "pangalactic_sodiuminit"
+version = "0.1.0"
+dependencies = [
+ "lazy_static",
+ "log",
+ "rust_sodium",
 ]
 
 [[package]]
