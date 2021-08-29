@@ -25,15 +25,24 @@ pub fn ensure_directory_exists<P: AsRef<Path>>(dir: P) -> Result<()> {
 }
 
 macro_rules! wrap_std_fs {
-    ( $name:ident ) => {
-        pub fn $name<P>(path: P) -> Result<()>
+    ( $name:ident -> $ret:ty : $delegate:expr ) => {
+        pub fn $name<P>(path: P) -> Result<$ret>
         where
             P: AsRef<Path> + std::fmt::Debug,
         {
             log::trace!("{}({:?})", stringify!($name), &path);
-            std::fs::$name(&path).map_err(PathError::wrap_std(path))
+            $delegate(&path).map_err(PathError::wrap_std(path))
         }
     };
 }
 
-wrap_std_fs!(create_dir);
+macro_rules! wrap_std_fs_canonical {
+    ( $name:ident -> $ret:ty ) => {
+        wrap_std_fs!($name -> $ret : std::fs::$name);
+    };
+}
+
+wrap_std_fs!(file_open -> std::fs::File : std::fs::File::open);
+wrap_std_fs!(file_create -> std::fs::File : std::fs::File::create);
+wrap_std_fs_canonical!(create_dir -> ());
+wrap_std_fs_canonical!(read_dir -> std::fs::ReadDir);

@@ -1,4 +1,5 @@
 use crate::randtoken;
+use pangalactic_fs::file_create;
 use pangalactic_hashspool::{Hash, HashSpool};
 use std::fs::File;
 use std::io::Result as IOResult;
@@ -15,7 +16,7 @@ impl Writer {
     pub(crate) fn open(dir: &Path) -> IOResult<Writer> {
         let dir = PathBuf::from(dir);
         let spoolpath = dir.join(format!("in.{}", randtoken::generate()));
-        let hashspool = HashSpool::new(File::create(&spoolpath)?);
+        let hashspool = HashSpool::new(file_create(&spoolpath)?);
         Ok(Writer {
             dir,
             spoolpath,

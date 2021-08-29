@@ -12,6 +12,9 @@ rand = "0.8.3"
 [dependencies.pangalactic_codec]
 path = "../pangalactic_codec"
 
+[dependencies.pangalactic_fs]
+path = "../pangalactic_fs"
+
 [dependencies.pangalactic_hashspool]
 path = "../pangalactic_hashspool"
 

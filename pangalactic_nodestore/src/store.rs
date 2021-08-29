@@ -24,7 +24,7 @@ where
         self.commit_writer_kind(w.unwrap(), Kind::File)
     }
 
-    pub fn write_dir(&mut self, d: &Dir<<S as Store>::Key>) -> IOResult<Link<<S as Store>::Key>> {
+    pub fn put_dir(&mut self, d: &Dir<<S as Store>::Key>) -> IOResult<Link<<S as Store>::Key>> {
         use std::io::Write;
 
         let bytes = codec::encode_bytes(d);
@@ -36,7 +36,7 @@ where
     pub fn open_entry_reader(&self, link: &Link<<S as Store>::Key>) -> IOResult<ReadEntry<S>> {
         let key = &link.key;
         match link.kind {
-            Kind::Dir => self.read_dir(key).map(ReadEntry::Dir),
+            Kind::Dir => self.get_dir(key).map(ReadEntry::Dir),
             Kind::File => self.0.open_reader(key).map(ReadEntry::FileStream),
         }
     }
@@ -50,7 +50,7 @@ where
         Ok(Link { kind, key })
     }
 
-    fn read_dir(&self, key: &<S as Store>::Key) -> IOResult<Dir<<S as Store>::Key>> {
+    fn get_dir(&self, key: &<S as Store>::Key) -> IOResult<Dir<<S as Store>::Key>> {
         let bytes = self.0.read_bytes(key)?;
         let dir = codec::decode_bytes(&bytes[..]).map_err(|e| {
             use std::io::{Error, ErrorKind::InvalidData};

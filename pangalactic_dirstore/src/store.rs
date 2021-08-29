@@ -21,8 +21,10 @@ impl Store for DirStore {
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         use pangalactic_codec as codec;
+        use pangalactic_fs::file_open;
 
-        std::fs::File::open(self.0.join(codec::encode_string(&key)))
+        let f = file_open(self.0.join(codec::encode_string(&key)))?;
+        Ok(f)
     }
 
     fn open_writer(&self) -> IOResult<Self::Writer> {
