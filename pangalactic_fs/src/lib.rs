@@ -25,7 +25,7 @@ pub fn ensure_directory_exists<P: AsRef<Path>>(dir: P) -> Result<()> {
 }
 
 macro_rules! wrap_std_fs {
-    ( $name:ident -> $ret:ty : $delegate:expr ) => {
+    ( unary $name:ident -> $ret:ty : $delegate:expr ) => {
         pub fn $name<P>(path: P) -> Result<$ret>
         where
             P: AsRef<Path> + std::fmt::Debug,
@@ -34,15 +34,31 @@ macro_rules! wrap_std_fs {
             $delegate(&path).map_err(PathError::wrap_std(path))
         }
     };
-}
 
-macro_rules! wrap_std_fs_canonical {
-    ( $name:ident -> $ret:ty ) => {
-        wrap_std_fs!($name -> $ret : std::fs::$name);
+    ( binary $name:ident -> $ret:ty : $delegate:expr ) => {
+        pub fn $name<P, Q>(p: P, q: Q) -> Result<$ret>
+        where
+            P: AsRef<Path> + std::fmt::Debug,
+            Q: AsRef<Path> + std::fmt::Debug,
+        {
+            log::trace!("{}{:?}", stringify!($name), (&p, &q));
+            $delegate(&p, &q).map_err(PathError::wrap_std2(p, q))
+        }
     };
 }
 
-wrap_std_fs!(file_open -> std::fs::File : std::fs::File::open);
-wrap_std_fs!(file_create -> std::fs::File : std::fs::File::create);
-wrap_std_fs_canonical!(create_dir -> ());
-wrap_std_fs_canonical!(read_dir -> std::fs::ReadDir);
+macro_rules! wrap_std_fs_canonical {
+    ( unary $name:ident -> $ret:ty ) => {
+        wrap_std_fs!( unary $name -> $ret : std::fs::$name);
+    };
+
+    ( binary $name:ident -> $ret:ty ) => {
+        wrap_std_fs!( binary $name -> $ret : std::fs::$name);
+    };
+}
+
+wrap_std_fs!(unary file_open -> std::fs::File : std::fs::File::open);
+wrap_std_fs!(unary file_create -> std::fs::File : std::fs::File::create);
+wrap_std_fs_canonical!(unary create_dir -> ());
+wrap_std_fs_canonical!(unary read_dir -> std::fs::ReadDir);
+wrap_std_fs_canonical!(binary rename -> ());

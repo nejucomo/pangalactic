@@ -26,6 +26,7 @@ impl Writer {
 
     pub(crate) fn commit(self) -> IOResult<Hash> {
         use pangalactic_codec as codec;
+        use pangalactic_fs::rename;
 
         let (key, f) = self.hashspool.finish();
 
@@ -45,7 +46,7 @@ impl Writer {
         // the entry. It sounds like `std::fs::rename` may not guarantee these semantics and also
         // it's functionality may change in the future.
         // TODO: detect the case that the entry already (correctly) exists, and return Ok.
-        std::fs::rename(self.spoolpath, entrypath)?;
+        rename(self.spoolpath, entrypath)?;
 
         Ok(key)
     }
