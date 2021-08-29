@@ -7,12 +7,14 @@ use std::path::Path;
 mod tests;
 
 pub fn init(dirs: AppDirs, path: &Path) -> Result<()> {
+    use pangalactic_fs::create_dir;
+
     if log::log_enabled!(log::Level::Debug) {
         log::debug!("init{:?}", (&dirs, path));
     } else {
         log::info!("Initializing {:?}", path);
     }
-    std::fs::create_dir(path)?;
-    std::fs::create_dir(path.join(crate::PG_REPO_ATTIC))?;
+    create_dir(path)?;
+    create_dir(path.join(crate::PG_REPO_ATTIC))?;
     Ok(())
 }

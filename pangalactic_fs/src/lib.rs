@@ -1,4 +1,6 @@
-use std::io::Result;
+mod error;
+
+use error::{PathError, Result};
 use std::path::Path;
 
 pub fn ensure_directory_exists<P: AsRef<Path>>(dir: P) -> Result<()> {
@@ -19,4 +21,9 @@ pub fn ensure_directory_exists<P: AsRef<Path>>(dir: P) -> Result<()> {
             _ => Err(e),
         },
     }
+    .map_err(PathError::wrap_std(dirpath))
+}
+
+pub fn create_dir<P: AsRef<Path>>(path: P) -> Result<()> {
+    std::fs::create_dir(&path).map_err(PathError::wrap_std(path))
 }
