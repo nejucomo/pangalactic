@@ -646,8 +646,12 @@ dependencies = [
 name = "pangalactic_cryptopubsub"
 version = "0.1.0"
 dependencies = [
+ "derive_more",
+ "pangalactic_codec",
  "pangalactic_secretbox",
  "pangalactic_signpair",
+ "serde",
+ "test-case",
 ]
 
 [[package]]

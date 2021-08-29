@@ -1,8 +1,12 @@
+mod distributor;
+mod publication;
 mod publisher;
-mod subscription;
+mod subscriber;
 
 #[cfg(test)]
 mod tests;
 
+pub use distributor::Distributor;
+pub use publication::{Publication, PublicationContents};
 pub use publisher::Publisher;
-pub use subscription::Subscription;
+pub use subscriber::Subscriber;

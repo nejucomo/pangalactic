@@ -3,4 +3,4 @@ mod signingpair;
 #[cfg(test)]
 mod tests;
 
-pub use signingpair::{Signer, SigningPair, Verifier};
+pub use signingpair::{InvalidSignature, Signer, SigningPair, Verifier};

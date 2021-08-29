@@ -9,7 +9,7 @@ pub struct SigningPair {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Signer(sign::SecretKey);
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Verifier(sign::PublicKey);
 
 impl SigningPair {
@@ -28,8 +28,11 @@ impl Signer {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct InvalidSignature;
+
 impl Verifier {
-    pub fn verify(&self, signedmsg: &[u8]) -> Result<Vec<u8>, ()> {
-        sign::verify(signedmsg, &self.0)
+    pub fn verify(&self, signedmsg: &[u8]) -> Result<Vec<u8>, InvalidSignature> {
+        sign::verify(signedmsg, &self.0).map_err(|()| InvalidSignature)
     }
 }
