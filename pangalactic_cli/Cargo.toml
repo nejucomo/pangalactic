@@ -16,6 +16,9 @@ path = "../pangalactic_errorutil"
 [dependencies.pangalactic_codec]
 path = "../pangalactic_codec"
 
+[dependencies.pangalactic_codecpath]
+path = "../pangalactic_codecpath"
+
 [dependencies.pangalactic_cryptopubsub]
 path = "../pangalactic_cryptopubsub"
 

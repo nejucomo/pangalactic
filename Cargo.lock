@@ -620,6 +620,7 @@ dependencies = [
  "log",
  "pangalactic_appdirs",
  "pangalactic_codec",
+ "pangalactic_codecpath",
  "pangalactic_cryptopubsub",
  "pangalactic_cryptostore",
  "pangalactic_dirstore",
@@ -642,6 +643,17 @@ dependencies = [
  "pangalactic_errorutil",
  "serde",
  "serde_cbor",
+]
+
+[[package]]
+name = "pangalactic_codecpath"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "pangalactic_codec",
+ "pangalactic_errorutil",
+ "pangalactic_fs",
+ "serde",
 ]
 
 [[package]]

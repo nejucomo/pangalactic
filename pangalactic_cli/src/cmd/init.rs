@@ -26,16 +26,11 @@ pub fn init(dirs: AppDirs, path: &Path) -> Result<()> {
 }
 
 fn init_publisher(secretdir: &Path) -> Result<()> {
-    use pangalactic_codec::encode_bytes;
+    use pangalactic_codecpath::CodecPath;
     use pangalactic_cryptopubsub::Publisher;
-    use pangalactic_fs::file_create;
-    use std::io::Write;
 
     let pubpath = secretdir.join("publisher");
     log::debug!("Generating {:?}", &pubpath);
-    let p = Publisher::generate();
-    let mut f = file_create(pubpath)?;
-    f.write_all(&encode_bytes(&p)[..])?;
-    f.flush()?;
+    pubpath.create_with(&Publisher::generate())?;
     Ok(())
 }

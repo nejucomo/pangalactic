@@ -3,6 +3,7 @@ members = [
   "pangalactic_appdirs",
   "pangalactic_cli",
   "pangalactic_codec",
+  "pangalactic_codecpath",
   "pangalactic_cryptopubsub",
   "pangalactic_cryptostore",
   "pangalactic_dirstore",
