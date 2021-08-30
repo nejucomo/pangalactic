@@ -620,6 +620,7 @@ dependencies = [
  "log",
  "pangalactic_appdirs",
  "pangalactic_codec",
+ "pangalactic_cryptopubsub",
  "pangalactic_cryptostore",
  "pangalactic_dirstore",
  "pangalactic_errorutil",
@@ -638,6 +639,7 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "derive_more",
+ "pangalactic_errorutil",
  "serde",
  "serde_cbor",
 ]
@@ -762,6 +764,7 @@ dependencies = [
  "pangalactic_logger",
  "pangalactic_sodiuminit",
  "rust_sodium",
+ "serde",
  "test-case",
 ]
 

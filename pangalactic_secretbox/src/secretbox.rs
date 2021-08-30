@@ -1,7 +1,7 @@
 use rust_sodium::crypto::secretbox;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct SecretBoxKey(secretbox::Key);
 
 #[derive(Debug, derive_more::From)]

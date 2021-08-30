@@ -10,3 +10,6 @@ base64 = "0.13.0"
 derive_more = "0.99"
 serde = "1.0"
 serde_cbor = "0.11.1"
+
+[dependencies.pangalactic_errorutil]
+path = "../pangalactic_errorutil"

@@ -15,6 +15,18 @@ macro_rules! ok_or_io_error {
     }
 }
 
+#[macro_export]
+macro_rules! into_std_error {
+    ( $apperr:ident, $stdkind:expr ) => {
+        impl From<$apperr> for std::io::Error {
+            fn from(e: $apperr) -> Self {
+                use $crate::io_error;
+                io_error!($stdkind, "{:?}", e)
+            }
+        }
+    };
+}
+
 use std::fmt::Debug;
 use std::io::Error;
 

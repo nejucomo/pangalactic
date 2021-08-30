@@ -1,8 +1,9 @@
 use crate::{Distributor, Publication, PublicationContents, Subscriber};
 use pangalactic_secretbox::SecretBoxKey;
 use pangalactic_signpair::SigningPair;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Publisher {
     pub(crate) signpair: SigningPair,
     pub(crate) sboxkey: SecretBoxKey,

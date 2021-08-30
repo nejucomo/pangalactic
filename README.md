@@ -2,9 +2,8 @@
 
 ## todo
 
-- Factor out common code for Hash keys.
-- Introduce `Store` read/write for codec types.
-- Replace `cryptostore` SEKey with `pangalactic_secretbox`.
+- basic revision control: commits
+- commit Publications (local fs).
 - pgwasm host.
 - basic local revision control w/ pgwasm support.
 - signed global revision control w/ no distribution.
