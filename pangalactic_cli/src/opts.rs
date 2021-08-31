@@ -5,7 +5,6 @@ mod linkarg;
 
 use crate::cmdexec::Execute;
 use enum_dispatch::enum_dispatch;
-use pangalactic_appdirs::AppDirs;
 use pangalactic_logger::LogOptions;
 use structopt::StructOpt;
 

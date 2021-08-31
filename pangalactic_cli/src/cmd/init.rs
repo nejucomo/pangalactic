@@ -1,19 +1,14 @@
 use log;
-use pangalactic_appdirs::AppDirs;
 use std::io::Result;
 use std::path::Path;
 
 #[cfg(test)]
 mod tests;
 
-pub fn init(dirs: AppDirs, path: &Path) -> Result<()> {
+pub fn init(path: &Path) -> Result<()> {
     use pangalactic_fs::create_dir;
 
-    if log::log_enabled!(log::Level::Debug) {
-        log::debug!("init{:?}", (&dirs, path));
-    } else {
-        log::info!("Initializing {:?}", path);
-    }
+    log::info!("Initializing {:?}", path);
     create_dir(path)?;
     let attic = path.join(crate::PG_REPO_CONTROL);
     let secretdir = attic.join("SECRET");

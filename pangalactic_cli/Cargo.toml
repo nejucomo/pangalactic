@@ -53,3 +53,4 @@ path = "../pangalactic_dirstore"
 
 [dev-dependencies]
 testdir = "*"
+test-case = "1.2.0"

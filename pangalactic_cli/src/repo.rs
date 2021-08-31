@@ -2,12 +2,25 @@ use serde::{Deserialize, Serialize};
 use std::io::Result;
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Repo {
     basedir: PathBuf,
 }
 
+impl<P> From<P> for Repo
+where
+    P: AsRef<Path>,
+{
+    fn from(p: P) -> Repo {
+        Repo::wrap(p.as_ref().to_path_buf())
+    }
+}
+
 impl Repo {
+    pub fn wrap(basedir: PathBuf) -> Repo {
+        Repo { basedir }
+    }
+
     pub fn find_from<P>(subpath: P) -> Result<Repo>
     where
         P: AsRef<Path>,

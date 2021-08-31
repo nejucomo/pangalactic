@@ -1,5 +1,4 @@
 use crate::{cmd, cmdexec::Execute};
-use pangalactic_appdirs::AppDirs;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -12,7 +11,7 @@ pub struct Init {
 }
 
 impl Execute for Init {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::init(dirs, &self.path)
+    fn execute(self) -> Result<()> {
+        cmd::init(&self.path)
     }
 }

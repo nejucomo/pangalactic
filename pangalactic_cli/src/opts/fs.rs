@@ -1,7 +1,6 @@
 use super::linkarg::LinkArg;
 use crate::{cmd, cmdexec::Execute};
 use enum_dispatch::enum_dispatch;
-use pangalactic_appdirs::AppDirs;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -23,8 +22,8 @@ pub struct FsImport {
 }
 
 impl Execute for FsImport {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs::import(dirs, &self.path)
+    fn execute(self) -> Result<()> {
+        cmd::fs::import(&self.path)
     }
 }
 
@@ -39,8 +38,8 @@ pub struct FsExport {
 }
 
 impl Execute for FsExport {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs::export(dirs, self.link.link, &self.path)
+    fn execute(self) -> Result<()> {
+        cmd::fs::export(self.link.link, &self.path)
     }
 }
 
@@ -52,7 +51,7 @@ pub struct FsDump {
 }
 
 impl Execute for FsDump {
-    fn execute(self, dirs: AppDirs) -> Result<()> {
-        cmd::fs::dump(dirs, self.link.link)
+    fn execute(self) -> Result<()> {
+        cmd::fs::dump(self.link.link)
     }
 }
