@@ -15,7 +15,7 @@ pub fn init(dirs: AppDirs, path: &Path) -> Result<()> {
         log::info!("Initializing {:?}", path);
     }
     create_dir(path)?;
-    let attic = path.join(crate::PG_REPO_ATTIC);
+    let attic = path.join(crate::PG_REPO_CONTROL);
     let secretdir = attic.join("SECRET");
 
     create_dir(&attic)?;

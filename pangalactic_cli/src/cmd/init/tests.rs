@@ -14,7 +14,7 @@ fn init_structure() -> std::io::Result<()> {
     init(dirs, &repodir)?;
 
     let pubpath = repodir
-        .join(crate::PG_REPO_ATTIC)
+        .join(crate::PG_REPO_CONTROL)
         .join("SECRET")
         .join("publisher");
 

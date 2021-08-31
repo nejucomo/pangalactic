@@ -12,13 +12,13 @@ impl Repo {
     where
         P: AsRef<Path>,
     {
-        use crate::PG_REPO_ATTIC;
+        use crate::PG_REPO_CONTROL;
         use pangalactic_errorutil::io_error;
 
         let spref = subpath.as_ref();
 
         for ancestor in spref.canonicalize()?.ancestors() {
-            if ancestor.join(PG_REPO_ATTIC).is_dir() {
+            if ancestor.join(PG_REPO_CONTROL).is_dir() {
                 return Ok(Repo {
                     basedir: ancestor.to_path_buf(),
                 });
