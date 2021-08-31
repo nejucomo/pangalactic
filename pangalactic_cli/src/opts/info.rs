@@ -12,6 +12,9 @@ pub struct Info {
 
 impl Execute for Info {
     fn execute(self) -> Result<()> {
-        cmd::info(std::io::stdout(), &self.path)
+        use crate::display::display_output;
+
+        let out = cmd::info(&self.path)?;
+        display_output(out)
     }
 }

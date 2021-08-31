@@ -1,18 +1,15 @@
 mod import;
 
 use crate::store::{PgLink, PgStore};
-use pangalactic_codec::encode_string;
 use pangalactic_fs::ensure_directory_exists;
 use std::io::Result;
 use std::path::Path;
 
-pub fn import(path: &Path) -> Result<()> {
+pub fn import(path: &Path) -> Result<PgLink> {
     let dirs = crate::get_appdirs()?;
     ensure_directory_exists(&dirs.data)?;
     let mut store = PgStore::open(dirs.data)?;
-    let link = import::import_path(&mut store, path)?;
-    println!("{}", encode_string(&link));
-    Ok(())
+    import::import_path(&mut store, path)
 }
 
 pub fn export(link: PgLink, path: &Path) -> Result<()> {

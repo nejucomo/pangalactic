@@ -23,7 +23,11 @@ pub struct FsImport {
 
 impl Execute for FsImport {
     fn execute(self) -> Result<()> {
-        cmd::fs::import(&self.path)
+        use crate::display::display_output;
+
+        let pglink = cmd::fs::import(&self.path)?;
+        let out = pangalactic_codec::encode_string(&pglink);
+        display_output(out)
     }
 }
 

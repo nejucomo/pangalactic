@@ -4,7 +4,6 @@ use test_case::test_case;
 fn info_for_path(pathbytes: &[u8]) -> std::io::Result<()> {
     use crate::cmd::{info, init};
     use crate::repo::Repo;
-    use std::io::Cursor;
     use std::path::Path;
     use testdir::testdir;
 
@@ -13,10 +12,8 @@ fn info_for_path(pathbytes: &[u8]) -> std::io::Result<()> {
     init(&repodir)?;
 
     let targetpath = repodir.join(path);
-    let mut v = vec![];
-    info(&mut v, &targetpath)?;
+    let repo = info(&targetpath)?;
 
-    let repo: Repo = serde_json::from_reader(Cursor::new(v)).unwrap();
     assert_eq!(repo, Repo::from(repodir));
     Ok(())
 }
