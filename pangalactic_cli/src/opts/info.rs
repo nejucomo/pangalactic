@@ -6,7 +6,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Display repository info")]
 pub struct Info {
-    #[structopt(short, long, help = "The path to query", default_value = ".")]
+    #[structopt(help = "The path to query", default_value = ".")]
     path: PathBuf,
 }
 
