@@ -1,4 +1,5 @@
 mod fs;
+mod info;
 mod init;
 mod linkarg;
 
@@ -21,6 +22,7 @@ pub struct Options {
 #[enum_dispatch(Execute)]
 #[derive(Debug, StructOpt)]
 pub enum Command {
+    Info(self::info::Info),
     Init(self::init::Init),
     Fs(self::fs::Fs),
 }

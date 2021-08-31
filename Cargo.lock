@@ -630,6 +630,8 @@ dependencies = [
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
+ "serde",
+ "serde_json",
  "structopt",
  "testdir",
 ]
