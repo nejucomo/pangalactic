@@ -23,5 +23,14 @@ pub struct Options {
 pub enum Command {
     Info(self::info::Info),
     Init(self::init::Init),
-    Fs(self::fs::Fs),
+    Fs(Fs),
+}
+
+#[enum_dispatch(Execute)]
+#[derive(Debug, StructOpt)]
+#[structopt(about = "Filesystem operations")]
+pub enum Fs {
+    Import(self::fs::Import),
+    Export(self::fs::Export),
+    Dump(self::fs::Dump),
 }

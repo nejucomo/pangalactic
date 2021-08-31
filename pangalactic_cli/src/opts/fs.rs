@@ -1,27 +1,17 @@
 use super::linkarg::LinkArg;
 use crate::{cmd, cmdexec::Execute};
-use enum_dispatch::enum_dispatch;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-#[enum_dispatch(Execute)]
-#[derive(Debug, StructOpt)]
-#[structopt(about = "Filesystem operations")]
-pub enum Fs {
-    Import(FsImport),
-    Export(FsExport),
-    Dump(FsDump),
-}
-
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Import a local path into the store and print the key")]
-pub struct FsImport {
+pub struct Import {
     #[structopt(help = "The path to import", default_value = ".")]
     path: PathBuf,
 }
 
-impl Execute for FsImport {
+impl Execute for Import {
     fn execute(self) -> Result<()> {
         use crate::display::display_output;
 
@@ -33,7 +23,7 @@ impl Execute for FsImport {
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Export from the store to a local path")]
-pub struct FsExport {
+pub struct Export {
     #[structopt(help = "The link to export")]
     link: LinkArg,
 
@@ -41,7 +31,7 @@ pub struct FsExport {
     path: PathBuf,
 }
 
-impl Execute for FsExport {
+impl Execute for Export {
     fn execute(self) -> Result<()> {
         cmd::fs::export(self.link.link, &self.path)
     }
@@ -49,12 +39,12 @@ impl Execute for FsExport {
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Dump an entry to stdout: files as-is, directories as JSON")]
-pub struct FsDump {
+pub struct Dump {
     #[structopt(help = "The link to export")]
     link: LinkArg,
 }
 
-impl Execute for FsDump {
+impl Execute for Dump {
     fn execute(self) -> Result<()> {
         cmd::fs::dump(self.link.link)
     }
