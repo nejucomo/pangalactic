@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub(crate) const KEY_LENGTH: usize = secretbox::KEYBYTES;
 pub(crate) type KeyBytes = [u8; KEY_LENGTH];
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct SEKey(secretbox::Key);
 
 impl SEKey {

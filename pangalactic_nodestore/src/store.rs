@@ -1,5 +1,6 @@
 use crate::FileWriter;
 use crate::ReadEntry;
+use crate::Traverse;
 
 use pangalactic_codec as codec;
 use pangalactic_node::{Dir, Kind, Link};
@@ -39,6 +40,12 @@ where
             Kind::Dir => self.get_dir(key).map(ReadEntry::Dir),
             Kind::File => self.0.open_reader(key).map(ReadEntry::FileStream),
         }
+    }
+
+    pub fn traverse<'a>(&'a self, link: &Link<<S as Store>::Key>) -> Traverse<'a, S> {
+        let mylink: Link<<S as Store>::Key> = link.clone();
+
+        Traverse::new(self, mylink)
     }
 
     fn commit_writer_kind(

@@ -15,6 +15,12 @@ impl<K> Dir<K> {
     }
 }
 
+impl<K> AsRef<[Entry<K>]> for Dir<K> {
+    fn as_ref(&self) -> &[Entry<K>] {
+        &self.0[..]
+    }
+}
+
 impl<K> Dir<K>
 where
     K: serde::Serialize,
