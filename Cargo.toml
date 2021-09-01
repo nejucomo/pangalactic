@@ -2,7 +2,6 @@
 members = [
   "pangalactic_appdirs",
   "pangalactic_cli",
-  "pangalactic_cli_pg",
   "pangalactic_codec",
   "pangalactic_codecpath",
   "pangalactic_cryptopubsub",
@@ -19,4 +18,5 @@ members = [
   "pangalactic_signpair",
   "pangalactic_sodiuminit",
   "pangalactic_store",
+  "pg",
 ]

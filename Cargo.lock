@@ -611,30 +611,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic_cli_pg"
-version = "0.1.0"
-dependencies = [
- "log",
- "pangalactic_appdirs",
- "pangalactic_cli",
- "pangalactic_codec",
- "pangalactic_codecpath",
- "pangalactic_cryptopubsub",
- "pangalactic_cryptostore",
- "pangalactic_dirstore",
- "pangalactic_errorutil",
- "pangalactic_fs",
- "pangalactic_logger",
- "pangalactic_node",
- "pangalactic_nodestore",
- "pangalactic_store",
- "serde",
- "structopt",
- "test-case",
- "testdir",
-]
-
-[[package]]
 name = "pangalactic_codec"
 version = "0.1.0"
 dependencies = [
@@ -803,6 +779,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "10f4872ae94d7b90ae48754df22fd42ad52ce740b8f370b03da4835417403e53"
 dependencies = [
  "ucd-trie",
+]
+
+[[package]]
+name = "pg"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "pangalactic_appdirs",
+ "pangalactic_cli",
+ "pangalactic_codec",
+ "pangalactic_codecpath",
+ "pangalactic_cryptopubsub",
+ "pangalactic_cryptostore",
+ "pangalactic_dirstore",
+ "pangalactic_errorutil",
+ "pangalactic_fs",
+ "pangalactic_logger",
+ "pangalactic_node",
+ "pangalactic_nodestore",
+ "pangalactic_store",
+ "serde",
+ "structopt",
+ "test-case",
+ "testdir",
 ]
 
 [[package]]
