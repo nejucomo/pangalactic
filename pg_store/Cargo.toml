@@ -1,0 +1,39 @@
+[package]
+name = "pg_store"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+structopt = "0.3"
+log = "0.4.14"
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.pangalactic_app]
+path = "../pangalactic_app"
+
+[dependencies.pangalactic_appdirs]
+path = "../pangalactic_appdirs"
+
+[dependencies.pangalactic_codec]
+path = "../pangalactic_codec"
+
+[dependencies.pangalactic_errorutil]
+path = "../pangalactic_errorutil"
+
+[dependencies.pangalactic_fs]
+path = "../pangalactic_fs"
+
+[dependencies.pangalactic_storage]
+path = "../pangalactic_storage"
+
+[dev-dependencies]
+testdir = "*"
+test-case = "1.2.0"
+
+[dev-dependencies.pangalactic_logger]
+path = "../pangalactic_logger"

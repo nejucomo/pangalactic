@@ -818,6 +818,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "pg_store"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "pangalactic_app",
+ "pangalactic_appdirs",
+ "pangalactic_codec",
+ "pangalactic_errorutil",
+ "pangalactic_fs",
+ "pangalactic_logger",
+ "pangalactic_storage",
+ "serde",
+ "structopt",
+ "test-case",
+ "testdir",
+]
+
+[[package]]
 name = "pkg-config"
 version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"

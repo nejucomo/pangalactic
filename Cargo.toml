@@ -20,4 +20,5 @@ members = [
   "pangalactic_storage",
   "pangalactic_store",
   "pg",
+  "pg_store",
 ]

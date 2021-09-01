@@ -1,9 +1,47 @@
-use super::linkarg::LinkArg;
-use crate::cmd;
+mod cmd;
+mod linkarg;
+
+use crate::linkarg::LinkArg;
 use pangalactic_app::{Command, OutputCommand};
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
+
+#[derive(Debug, StructOpt)]
+pub struct Options {
+    #[structopt(flatten)]
+    common: pangalactic_app::CommonOptions,
+
+    #[structopt(subcommand)]
+    cmd: Subcommand,
+}
+
+impl Command for Options {
+    fn execute(&self) -> Result<()> {
+        self.common.execute()?;
+        self.cmd.execute()
+    }
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "pg-store", about = "Pangalactic filesystem operations")]
+pub enum Subcommand {
+    Import(Import),
+    Export(Export),
+    Dump(Dump),
+}
+
+impl Command for Subcommand {
+    fn execute(&self) -> Result<()> {
+        use Subcommand::*;
+
+        match self {
+            Import(x) => x.execute(),
+            Export(x) => x.execute(),
+            Dump(x) => x.execute(),
+        }
+    }
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Import a local path into the store and print the key")]
@@ -16,9 +54,9 @@ impl OutputCommand for Import {
     type Output = String;
 
     fn execute_output(&self) -> Result<String> {
-        // TODO: Enable pglink to be directly displayed.
-        let pglink = cmd::fs::import(&self.path)?;
-        Ok(pangalactic_codec::encode_string(&pglink))
+        // TODO: Enable link to be directly displayed.
+        let link = cmd::import(&self.path)?;
+        Ok(pangalactic_codec::encode_string(&link))
     }
 }
 
@@ -34,7 +72,7 @@ pub struct Export {
 
 impl Command for Export {
     fn execute(&self) -> Result<()> {
-        cmd::fs::export(&self.link.link, &self.path)
+        cmd::export(&self.link.link, &self.path)
     }
 }
 
@@ -47,6 +85,6 @@ pub struct Dump {
 
 impl Command for Dump {
     fn execute(&self) -> Result<()> {
-        cmd::fs::dump(&self.link.link)
+        cmd::dump(&self.link.link)
     }
 }

@@ -1,4 +1,3 @@
-pub mod fs;
 mod info;
 mod init;
 
