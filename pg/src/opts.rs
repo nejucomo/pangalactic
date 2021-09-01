@@ -18,6 +18,13 @@ pub struct Options {
     pub cmd: Subcommand,
 }
 
+impl Command for Options {
+    fn execute(&self) -> Result<()> {
+        self.logging.init()?;
+        self.cmd.execute()
+    }
+}
+
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
     Info(self::info::Info),

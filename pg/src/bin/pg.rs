@@ -1,2 +1,5 @@
-#![feature(imported_main)]
-use pg::app_main as main;
+fn main() -> std::io::Result<()> {
+    use pangalactic_app::Command;
+
+    pg::opts::Options::execute_main()
+}
