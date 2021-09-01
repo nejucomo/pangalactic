@@ -1,3 +1,6 @@
 fn main() -> std::io::Result<()> {
-    pangalactic_app::run_main::<pg::opts::Subcommand>()
+    use pangalactic_app::Command;
+    use structopt::StructOpt;
+
+    pg::opts::Options::from_args().execute()
 }

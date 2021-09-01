@@ -6,7 +6,6 @@ pub fn simple_init() -> std::io::Result<()> {
 }
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Logging options")]
 pub struct LogOptions {
     #[structopt(long, short, help = "Debug logging")]
     debug: bool,
