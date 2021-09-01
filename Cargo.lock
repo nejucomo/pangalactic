@@ -598,6 +598,7 @@ name = "pangalactic_app"
 version = "0.1.0"
 dependencies = [
  "pangalactic_errorutil",
+ "pangalactic_logger",
  "serde",
  "serde_json",
  "structopt",

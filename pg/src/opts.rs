@@ -4,26 +4,8 @@ mod init;
 mod linkarg;
 
 use pangalactic_app::Command;
-use pangalactic_logger::LogOptions;
 use std::io::Result;
 use structopt::StructOpt;
-
-#[derive(Debug, StructOpt)]
-#[structopt(name = "pg", about = "Pangalactic Revision Control")]
-pub struct Options {
-    #[structopt(flatten)]
-    pub logging: LogOptions,
-
-    #[structopt(subcommand)]
-    pub cmd: Subcommand,
-}
-
-impl Command for Options {
-    fn execute(&self) -> Result<()> {
-        self.logging.init()?;
-        self.cmd.execute()
-    }
-}
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {

@@ -16,3 +16,5 @@ features = ["derive"]
 [dependencies.pangalactic_errorutil]
 path = "../pangalactic_errorutil"
 
+[dependencies.pangalactic_logger]
+path = "../pangalactic_logger"
