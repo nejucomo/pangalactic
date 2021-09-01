@@ -594,20 +594,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic_appdirs"
-version = "0.1.0"
-dependencies = [
- "dirs",
-]
-
-[[package]]
-name = "pangalactic_cli"
+name = "pangalactic_app"
 version = "0.1.0"
 dependencies = [
  "pangalactic_errorutil",
  "serde",
  "serde_json",
  "structopt",
+]
+
+[[package]]
+name = "pangalactic_appdirs"
+version = "0.1.0"
+dependencies = [
+ "dirs",
 ]
 
 [[package]]
@@ -786,8 +786,8 @@ name = "pg"
 version = "0.1.0"
 dependencies = [
  "log",
+ "pangalactic_app",
  "pangalactic_appdirs",
- "pangalactic_cli",
  "pangalactic_codec",
  "pangalactic_codecpath",
  "pangalactic_cryptopubsub",

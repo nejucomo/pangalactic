@@ -1,5 +1,5 @@
 use crate::cmd;
-use pangalactic_cli::OutputCommand;
+use pangalactic_app::OutputCommand;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;

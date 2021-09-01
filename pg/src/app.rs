@@ -3,7 +3,7 @@ use pangalactic_appdirs::AppDirs;
 use std::io::Result;
 
 pub fn app_main() -> Result<()> {
-    use pangalactic_cli::Command;
+    use pangalactic_app::Command;
     use structopt::StructOpt;
 
     let opts = Options::from_args(); // FIXME: handle Result;

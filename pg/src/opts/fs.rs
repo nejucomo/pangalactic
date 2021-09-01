@@ -1,6 +1,6 @@
 use super::linkarg::LinkArg;
 use crate::cmd;
-use pangalactic_cli::{Command, OutputCommand};
+use pangalactic_app::{Command, OutputCommand};
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;

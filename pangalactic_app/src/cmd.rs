@@ -9,7 +9,7 @@ pub trait Command: Sized + structopt::StructOpt {
     /// Example:
     /// ```
     /// use structopt::StructOpt;
-    /// use pangalactic_cli::Command;
+    /// use pangalactic_app::Command;
     ///
     /// #[derive(StructOpt)]
     /// struct App {

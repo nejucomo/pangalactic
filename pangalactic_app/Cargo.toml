@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic_cli"
+name = "pangalactic_app"
 version = "0.1.0"
 edition = "2018"
 

@@ -3,7 +3,7 @@ mod info;
 mod init;
 mod linkarg;
 
-use pangalactic_cli::Command;
+use pangalactic_app::Command;
 use pangalactic_logger::LogOptions;
 use std::io::Result;
 use structopt::StructOpt;
