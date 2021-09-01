@@ -1,3 +1,4 @@
+mod export;
 mod import;
 
 use crate::store::{PgLink, PgStore};
@@ -14,7 +15,8 @@ pub fn import(path: &Path) -> Result<PgLink> {
 
 pub fn export(link: PgLink, path: &Path) -> Result<()> {
     let dirs = crate::get_appdirs()?;
-    todo!("fs_export{:?} with {:?}", (link, path), dirs);
+    let store = PgStore::open(dirs.data)?;
+    export::export_path(&store, &link, path)
 }
 
 pub fn dump(link: PgLink) -> Result<()> {

@@ -11,7 +11,8 @@ type NodeStoreImpl = NodeStore<CryptoStore<DirStore>>;
 #[derive(Debug)]
 pub struct PgStore(NodeStoreImpl);
 
-pub type PgLink = Link<ReadCap<DirKey>>;
+pub type PgLink = Link<PgKey>;
+pub type PgKey = ReadCap<DirKey>;
 
 impl PgStore {
     pub fn open<P: AsRef<Path>>(datadir: P) -> std::io::Result<PgStore> {
