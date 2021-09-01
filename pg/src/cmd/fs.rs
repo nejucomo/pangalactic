@@ -1,6 +1,3 @@
-mod export;
-mod import;
-
 use pangalactic_fs::ensure_directory_exists;
 use pangalactic_storage::{Link, Storage};
 use std::io::Result;
@@ -10,13 +7,13 @@ pub fn import(path: &Path) -> Result<Link> {
     let dirs = crate::get_appdirs()?;
     ensure_directory_exists(&dirs.data)?;
     let mut store = Storage::open(dirs.data)?;
-    import::import_path(&mut store, path)
+    store.import_path(path)
 }
 
 pub fn export(link: &Link, path: &Path) -> Result<()> {
     let dirs = crate::get_appdirs()?;
     let store = Storage::open(dirs.data)?;
-    export::export_path(&store, &link, path)
+    store.export_path(&link, path)
 }
 
 pub fn dump(link: &Link) -> Result<()> {
