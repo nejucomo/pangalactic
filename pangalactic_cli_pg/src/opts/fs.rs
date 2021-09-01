@@ -1,5 +1,6 @@
 use super::linkarg::LinkArg;
-use crate::{cmd, cmdexec::Execute};
+use crate::cmd;
+use pangalactic_cli::{Command, OutputCommand};
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -11,13 +12,13 @@ pub struct Import {
     path: PathBuf,
 }
 
-impl Execute for Import {
-    fn execute(self) -> Result<()> {
-        use crate::display::display_output;
+impl OutputCommand for Import {
+    type Output = String;
 
+    fn execute_output(&self) -> Result<String> {
+        // TODO: Enable pglink to be directly displayed.
         let pglink = cmd::fs::import(&self.path)?;
-        let out = pangalactic_codec::encode_string(&pglink);
-        display_output(out)
+        Ok(pangalactic_codec::encode_string(&pglink))
     }
 }
 
@@ -31,9 +32,9 @@ pub struct Export {
     path: PathBuf,
 }
 
-impl Execute for Export {
-    fn execute(self) -> Result<()> {
-        cmd::fs::export(self.link.link, &self.path)
+impl Command for Export {
+    fn execute(&self) -> Result<()> {
+        cmd::fs::export(&self.link.link, &self.path)
     }
 }
 
@@ -44,8 +45,8 @@ pub struct Dump {
     link: LinkArg,
 }
 
-impl Execute for Dump {
-    fn execute(self) -> Result<()> {
-        cmd::fs::dump(self.link.link)
+impl Command for Dump {
+    fn execute(&self) -> Result<()> {
+        cmd::fs::dump(&self.link.link)
     }
 }

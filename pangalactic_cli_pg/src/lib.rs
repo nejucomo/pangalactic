@@ -1,7 +1,5 @@
 mod app;
 pub mod cmd;
-pub mod cmdexec;
-pub mod display;
 pub mod opts;
 pub mod repo;
 pub mod store;

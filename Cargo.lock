@@ -318,18 +318,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "enum_dispatch"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd53b3fde38a39a06b2e66dc282f3e86191e53bd04cc499929c15742beae3df8"
-dependencies = [
- "once_cell",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "fake-simd"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -613,12 +601,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_cli"
+version = "0.1.0"
+dependencies = [
+ "pangalactic_errorutil",
+ "serde",
+ "serde_json",
+ "structopt",
+]
+
+[[package]]
 name = "pangalactic_cli_pg"
 version = "0.1.0"
 dependencies = [
- "enum_dispatch",
  "log",
  "pangalactic_appdirs",
+ "pangalactic_cli",
  "pangalactic_codec",
  "pangalactic_codecpath",
  "pangalactic_cryptopubsub",
@@ -631,7 +629,6 @@ dependencies = [
  "pangalactic_nodestore",
  "pangalactic_store",
  "serde",
- "serde_json",
  "structopt",
  "test-case",
  "testdir",

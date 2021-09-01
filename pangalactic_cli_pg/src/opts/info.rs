@@ -1,4 +1,5 @@
-use crate::{cmd, cmdexec::Execute};
+use crate::cmd;
+use pangalactic_cli::OutputCommand;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -10,11 +11,10 @@ pub struct Info {
     path: PathBuf,
 }
 
-impl Execute for Info {
-    fn execute(self) -> Result<()> {
-        use crate::display::display_output;
+impl OutputCommand for Info {
+    type Output = crate::repo::Repo;
 
-        let out = cmd::info(&self.path)?;
-        display_output(out)
+    fn execute_output(&self) -> Result<Self::Output> {
+        cmd::info(&self.path)
     }
 }

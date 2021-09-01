@@ -1,4 +1,5 @@
-use crate::{cmd, cmdexec::Execute};
+use crate::cmd;
+use pangalactic_cli::Command;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -10,8 +11,8 @@ pub struct Init {
     path: PathBuf,
 }
 
-impl Execute for Init {
-    fn execute(self) -> Result<()> {
+impl Command for Init {
+    fn execute(&self) -> Result<()> {
         cmd::init(&self.path)
     }
 }

@@ -13,13 +13,13 @@ pub fn import(path: &Path) -> Result<PgLink> {
     import::import_path(&mut store, path)
 }
 
-pub fn export(link: PgLink, path: &Path) -> Result<()> {
+pub fn export(link: &PgLink, path: &Path) -> Result<()> {
     let dirs = crate::get_appdirs()?;
     let store = PgStore::open(dirs.data)?;
     export::export_path(&store, &link, path)
 }
 
-pub fn dump(link: PgLink) -> Result<()> {
+pub fn dump(link: &PgLink) -> Result<()> {
     let dirs = crate::get_appdirs()?;
 
     use pangalactic_nodestore::ReadEntry::*;
