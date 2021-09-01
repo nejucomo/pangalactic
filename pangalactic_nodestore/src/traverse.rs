@@ -33,7 +33,7 @@ where
             let io = self.store.open_entry_reader(&link);
             match &io {
                 Ok(ReadEntry::Dir(d)) => {
-                    for entry in d.as_ref() {
+                    for entry in d {
                         self.linkq.push(entry.link.clone());
                     }
                 }

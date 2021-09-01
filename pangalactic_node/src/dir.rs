@@ -15,9 +15,12 @@ impl<K> Dir<K> {
     }
 }
 
-impl<K> AsRef<[Entry<K>]> for Dir<K> {
-    fn as_ref(&self) -> &[Entry<K>] {
-        &self.0[..]
+impl<'a, K> IntoIterator for &'a Dir<K> {
+    type Item = &'a Entry<K>;
+    type IntoIter = std::slice::Iter<'a, Entry<K>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        (&self.0).into_iter()
     }
 }
 
