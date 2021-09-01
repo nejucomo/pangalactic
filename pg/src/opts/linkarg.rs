@@ -1,8 +1,8 @@
-use crate::store::PgLink;
+use pangalactic_storage::Link;
 
 #[derive(Debug)]
 pub struct LinkArg {
-    pub link: PgLink,
+    pub link: Link,
 }
 
 impl std::str::FromStr for LinkArg {

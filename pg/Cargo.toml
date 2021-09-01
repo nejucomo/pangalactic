@@ -28,26 +28,14 @@ path = "../pangalactic_cryptopubsub"
 [dependencies.pangalactic_errorutil]
 path = "../pangalactic_errorutil"
 
-[dependencies.pangalactic_node]
-path = "../pangalactic_node"
-
-[dependencies.pangalactic_nodestore]
-path = "../pangalactic_nodestore"
-
 [dependencies.pangalactic_fs]
 path = "../pangalactic_fs"
 
 [dependencies.pangalactic_appdirs]
 path = "../pangalactic_appdirs"
 
-[dependencies.pangalactic_store]
-path = "../pangalactic_store"
-
-[dependencies.pangalactic_cryptostore]
-path = "../pangalactic_cryptostore"
-
-[dependencies.pangalactic_dirstore]
-path = "../pangalactic_dirstore"
+[dependencies.pangalactic_storage]
+path = "../pangalactic_storage"
 
 [dev-dependencies]
 testdir = "*"

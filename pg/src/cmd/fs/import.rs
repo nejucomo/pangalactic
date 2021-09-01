@@ -1,8 +1,8 @@
-use crate::store::{PgLink, PgStore};
+use pangalactic_storage::{Link, Storage};
 use std::io::Result;
 use std::path::Path;
 
-pub fn import_path(store: &mut PgStore, path: &Path) -> Result<PgLink> {
+pub fn import_path(store: &mut Storage, path: &Path) -> Result<Link> {
     use pangalactic_codec::encode_string;
 
     let link = if path.is_dir() {
@@ -14,9 +14,9 @@ pub fn import_path(store: &mut PgStore, path: &Path) -> Result<PgLink> {
     Ok(link)
 }
 
-pub fn import_dir(store: &mut PgStore, path: &Path) -> Result<PgLink> {
+pub fn import_dir(store: &mut Storage, path: &Path) -> Result<Link> {
     use pangalactic_fs::read_dir;
-    use pangalactic_node::{Dir, Entry};
+    use pangalactic_storage::{Dir, Entry};
 
     log::debug!("import_dir{:?}", (&store, path));
     let mut dirnode = Dir::new();
@@ -29,7 +29,7 @@ pub fn import_dir(store: &mut PgStore, path: &Path) -> Result<PgLink> {
     store.put_dir(&dirnode)
 }
 
-pub fn import_file(store: &mut PgStore, path: &Path) -> Result<PgLink> {
+pub fn import_file(store: &mut Storage, path: &Path) -> Result<Link> {
     use pangalactic_fs::file_open;
 
     log::debug!("import_file{:?}", (&store, &path));

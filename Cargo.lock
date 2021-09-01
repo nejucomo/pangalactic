@@ -767,6 +767,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic_storage"
+version = "0.1.0"
+dependencies = [
+ "pangalactic_cryptostore",
+ "pangalactic_dirstore",
+ "pangalactic_fs",
+ "pangalactic_node",
+ "pangalactic_nodestore",
+ "pangalactic_store",
+]
+
+[[package]]
 name = "pangalactic_store"
 version = "0.1.0"
 dependencies = [
@@ -792,14 +804,10 @@ dependencies = [
  "pangalactic_codec",
  "pangalactic_codecpath",
  "pangalactic_cryptopubsub",
- "pangalactic_cryptostore",
- "pangalactic_dirstore",
  "pangalactic_errorutil",
  "pangalactic_fs",
  "pangalactic_logger",
- "pangalactic_node",
- "pangalactic_nodestore",
- "pangalactic_store",
+ "pangalactic_storage",
  "serde",
  "structopt",
  "test-case",

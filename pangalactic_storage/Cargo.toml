@@ -1,0 +1,26 @@
+[package]
+name = "pangalactic_storage"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dependencies.pangalactic_cryptostore]
+path = "../pangalactic_cryptostore"
+
+[dependencies.pangalactic_dirstore]
+path = "../pangalactic_dirstore"
+
+[dependencies.pangalactic_fs]
+path = "../pangalactic_fs"
+
+[dependencies.pangalactic_node]
+path = "../pangalactic_node"
+
+[dependencies.pangalactic_nodestore]
+path = "../pangalactic_nodestore"
+
+[dependencies.pangalactic_store]
+path = "../pangalactic_store"

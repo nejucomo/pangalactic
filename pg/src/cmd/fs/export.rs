@@ -1,20 +1,19 @@
-use crate::store::{PgKey, PgLink, PgStore};
-use pangalactic_node::Dir;
+use pangalactic_storage::{Dir, Link, Storage};
 use std::io::Result;
 use std::path::Path;
 
-pub fn export_path(store: &PgStore, link: &PgLink, path: &Path) -> Result<()> {
-    use pangalactic_nodestore::ReadEntry::*;
+pub fn export_path(store: &Storage, link: &Link, path: &Path) -> Result<()> {
+    use pangalactic_storage::ReadEntry;
 
     log::debug!("export_path{:?}", (store, link, path));
 
     match store.open_entry_reader(&link)? {
-        Dir(d) => export_dir(store, path, d),
-        FileStream(s) => export_file(path, s),
+        ReadEntry::Dir(d) => export_dir(store, path, d),
+        ReadEntry::FileStream(s) => export_file(path, s),
     }
 }
 
-fn export_dir(store: &PgStore, path: &Path, d: Dir<PgKey>) -> Result<()> {
+fn export_dir(store: &Storage, path: &Path, d: Dir) -> Result<()> {
     pangalactic_fs::create_dir(path)?;
 
     for entry in &d {
