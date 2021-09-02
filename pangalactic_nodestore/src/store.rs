@@ -1,6 +1,5 @@
 use crate::FileWriter;
 use crate::ReadEntry;
-use crate::Traverse;
 
 use pangalactic_codec as codec;
 use pangalactic_node::{Dir, Kind, Link};
@@ -33,12 +32,6 @@ where
         w: FileWriter<<S as Store>::Writer>,
     ) -> IOResult<Link<<S as Store>::Key>> {
         self.commit_writer_kind(w.unwrap(), Kind::File)
-    }
-
-    pub fn traverse<'a>(&'a self, link: &Link<<S as Store>::Key>) -> Traverse<'a, S> {
-        let mylink: Link<<S as Store>::Key> = link.clone();
-
-        Traverse::new(self, mylink)
     }
 
     pub fn put_dir(&mut self, d: &Dir<<S as Store>::Key>) -> IOResult<Link<<S as Store>::Key>> {
