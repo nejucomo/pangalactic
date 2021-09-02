@@ -1,7 +1,7 @@
 use serde::{de::DeserializeOwned, Serialize};
 use std::io::Result as IOResult;
 
-pub trait Store: Sized {
+pub trait Store: Sized + std::fmt::Debug {
     type Key: Eq + Clone + std::fmt::Debug + DeserializeOwned + Serialize;
     type Reader: std::io::Read;
     type Writer: std::io::Write;

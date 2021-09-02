@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::io::Result as IOResult;
 use std::rc::Rc;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct MemStore(HashMap<Hash, Rc<Vec<u8>>>);
 
 impl MemStore {

@@ -23,3 +23,15 @@ path = "../pangalactic_node"
 
 [dependencies.pangalactic_store]
 path = "../pangalactic_store"
+
+[dev-dependencies]
+testdir = "0.2.0"
+
+[dev-dependencies.pangalactic_codecpath]
+path = "../pangalactic_codecpath"
+
+[dev-dependencies.pangalactic_logger]
+path = "../pangalactic_logger"
+
+[dev-dependencies.pangalactic_memstore]
+path = "../pangalactic_memstore"
