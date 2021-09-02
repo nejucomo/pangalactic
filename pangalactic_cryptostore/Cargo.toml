@@ -24,7 +24,7 @@ version = "1.0"
 features = ["derive"]
 
 [dev-dependencies]
-testdir = "*"
+testdir = "0.2.0"
 
 [dev-dependencies.pangalactic_dirstore]
 path = "../pangalactic_dirstore"

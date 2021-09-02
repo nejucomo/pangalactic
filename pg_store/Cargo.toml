@@ -32,7 +32,7 @@ path = "../pangalactic_fs"
 path = "../pangalactic_storage"
 
 [dev-dependencies]
-testdir = "*"
+testdir = "0.2.0"
 test-case = "1.2.0"
 
 [dev-dependencies.pangalactic_logger]
