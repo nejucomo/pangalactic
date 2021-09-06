@@ -34,6 +34,21 @@ where
         self.commit_writer_kind(w.unwrap(), Kind::File)
     }
 
+    pub fn put_file<B>(&mut self, buf: B) -> IOResult<Link<<S as Store>::Key>>
+    where
+        B: AsRef<[u8]>,
+    {
+        use std::io::Write;
+
+        let mut f = self.open_file_writer()?;
+        f.write_all(buf.as_ref())?;
+        self.commit_file_writer(f)
+    }
+
+    pub fn get_file(&self, key: &<S as Store>::Key) -> IOResult<Vec<u8>> {
+        self.0.read_bytes(key)
+    }
+
     pub fn put_dir(&mut self, d: &Dir<<S as Store>::Key>) -> IOResult<Link<<S as Store>::Key>> {
         use std::io::Write;
 
