@@ -17,3 +17,6 @@ path = "../pangalactic_codec"
 
 [dependencies.pangalactic_errorutil]
 path = "../pangalactic_errorutil"
+
+[dev-dependencies]
+test-case = "1.2.0"
