@@ -644,6 +644,7 @@ name = "pangalactic_appdirs"
 version = "0.1.0"
 dependencies = [
  "dirs",
+ "pangalactic_fs",
 ]
 
 [[package]]
@@ -701,6 +702,7 @@ version = "0.1.0"
 dependencies = [
  "derive_more",
  "log",
+ "pangalactic_errorutil",
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
@@ -825,6 +827,7 @@ dependencies = [
 name = "pangalactic_storage"
 version = "0.1.0"
 dependencies = [
+ "pangalactic_appdirs",
  "pangalactic_cryptostore",
  "pangalactic_dirstore",
  "pangalactic_fs",
@@ -873,6 +876,18 @@ dependencies = [
  "structopt",
  "test-case",
  "testdir",
+]
+
+[[package]]
+name = "pg-derive"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "pangalactic_app",
+ "pangalactic_appdirs",
+ "pangalactic_derive",
+ "pangalactic_storage",
+ "structopt",
 ]
 
 [[package]]

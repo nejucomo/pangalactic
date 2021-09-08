@@ -13,15 +13,25 @@ pub struct AppDirs {
 }
 
 impl AppDirs {
-    pub fn new(appname: &str) -> std::io::Result<AppDirs> {
+    pub fn new(pkgname: &str) -> std::io::Result<AppDirs> {
         use std::io::{Error, ErrorKind::NotFound};
 
-        let mut data = dirs::data_dir().ok_or(Error::new(
-            NotFound,
-            "Application data dir not defined on this platform.",
-        ))?;
-        data.push(appname);
+        if let Some(subname) = pkgname.strip_prefix("pangalactic_") {
+            let mut data = dirs::data_dir().ok_or(Error::new(
+                NotFound,
+                "Application data dir not defined on this platform.",
+            ))?;
+            data.push("pangalactic");
+            pangalactic_fs::ensure_directory_exists(&data)?;
 
-        Ok(AppDirs { data })
+            data.push(subname);
+
+            Ok(AppDirs { data })
+        } else {
+            panic!(
+                "AppDirs::new({:?}) must be provided with a `pangalactic_*` package name.",
+                pkgname
+            );
+        }
     }
 }

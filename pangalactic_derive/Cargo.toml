@@ -10,6 +10,9 @@ log = "0.4.14"
 wasmi = "0.8.0"
 derive_more = "0.99.14"
 
+[dependencies.pangalactic_errorutil]
+path = "../pangalactic_errorutil"
+
 [dependencies.pangalactic_node]
 path = "../pangalactic_node"
 

@@ -1,8 +1,7 @@
 mod cmd;
-mod linkarg;
 
-use crate::linkarg::LinkArg;
 use pangalactic_app::{Command, OutputCommand};
+use pangalactic_storage::Link;
 use std::io::Result;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -64,7 +63,7 @@ impl OutputCommand for Import {
 #[structopt(about = "Export from the store to a local path")]
 pub struct Export {
     #[structopt(help = "The link to export")]
-    link: LinkArg,
+    link: Link,
 
     #[structopt(help = "The path to store results")]
     path: PathBuf,
@@ -72,7 +71,7 @@ pub struct Export {
 
 impl Command for Export {
     fn execute(&self) -> Result<()> {
-        cmd::export(&self.link.link, &self.path)
+        cmd::export(&self.link, &self.path)
     }
 }
 
@@ -80,11 +79,11 @@ impl Command for Export {
 #[structopt(about = "Dump an entry to stdout: files as-is, directories as JSON")]
 pub struct Dump {
     #[structopt(help = "The link to export")]
-    link: LinkArg,
+    link: Link,
 }
 
 impl Command for Dump {
     fn execute(&self) -> Result<()> {
-        cmd::dump(&self.link.link)
+        cmd::dump(&self.link)
     }
 }

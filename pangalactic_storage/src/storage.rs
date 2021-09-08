@@ -14,8 +14,13 @@ type NodeStoreImpl = NodeStore<NodeStoreInner>;
 type NodeStoreInner = CryptoStore<DirStore>;
 
 impl Storage {
+    pub fn open_default() -> std::io::Result<Storage> {
+        let appdirs = pangalactic_appdirs::appdirs_init!()?;
+        Storage::open(appdirs.data)
+    }
+
     pub fn open<P: AsRef<Path>>(datadir: P) -> std::io::Result<Storage> {
-        let storedir = datadir.as_ref().join("storage");
+        let storedir = datadir.as_ref().to_path_buf();
         ensure_directory_exists(&storedir)?;
         Ok(Storage(NodeStore::from(CryptoStore::from(DirStore::from(
             storedir,

@@ -11,3 +11,21 @@ pub enum DecodeStringError {
 
 into_std_error!(DecodeBytesError, std::io::ErrorKind::InvalidData);
 into_std_error!(DecodeStringError, std::io::ErrorKind::InvalidData);
+
+use std::fmt;
+
+impl fmt::Display for DecodeBytesError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl fmt::Display for DecodeStringError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use DecodeStringError::*;
+        match self {
+            Base64(e) => write!(f, "malformed base64: {:?}", e),
+            Bytes(e) => write!(f, "malformed binary encoding: {}", e),
+        }
+    }
+}

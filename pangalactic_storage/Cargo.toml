@@ -7,6 +7,9 @@ edition = "2018"
 
 [dependencies]
 
+[dependencies.pangalactic_appdirs]
+path = "../pangalactic_appdirs"
+
 [dependencies.pangalactic_cryptostore]
 path = "../pangalactic_cryptostore"
 
