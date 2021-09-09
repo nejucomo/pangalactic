@@ -8,6 +8,6 @@ extern "C" {
 */
 
 #[wasm_bindgen]
-pub fn pangalactic_derive() {
-    //log("Hello, world!");
+pub fn pangalactic_derive(input: u64) -> u64 {
+    input
 }
