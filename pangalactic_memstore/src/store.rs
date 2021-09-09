@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::io::Result as IOResult;
 use std::rc::Rc;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct MemStore(HashMap<Hash, Rc<Vec<u8>>>);
 
 impl MemStore {
@@ -34,5 +34,13 @@ impl Store for MemStore {
         let (key, bytes) = w.finish();
         self.0.insert(key, Rc::new(bytes));
         Ok(key)
+    }
+}
+
+use std::fmt;
+
+impl fmt::Debug for MemStore {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "MemStore<{} entries>", self.0.len())
     }
 }

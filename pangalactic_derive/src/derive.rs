@@ -21,7 +21,11 @@ where
 
     let execkey = exec.get_file_key()?;
     let wasmbytes = store.get_file(execkey)?;
-    log::trace!("loading wasmbytes: {:?}", &wasmbytes);
+    log::trace!(
+        "loading wasmbytes from {:?}, {} bytes",
+        &execkey,
+        wasmbytes.len()
+    );
 
     let vm = VirtualMachine::load(wasmbytes)?;
 
