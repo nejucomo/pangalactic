@@ -27,3 +27,7 @@ pub trait Store: Sized + std::fmt::Debug {
         Ok(buf)
     }
 }
+
+pub type KeyOf<S> = <S as Store>::Key;
+pub type ReaderOf<S> = <S as Store>::Reader;
+pub type WriterOf<S> = <S as Store>::Writer;

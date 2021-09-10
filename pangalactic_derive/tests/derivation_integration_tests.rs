@@ -1,18 +1,13 @@
 use pangalactic_derive::derive;
 use pangalactic_memstore::MemStore;
-use pangalactic_node::Link;
-use pangalactic_nodestore::NodeStore;
-use pangalactic_store::Store;
+use pangalactic_nodestore::{LinkFor, NodeStore};
 use std::io::Result;
 use std::path::PathBuf;
 
-type MemNodeStore = NodeStore<MemStore>;
-type MemNodeLink = Link<<MemStore as Store>::Key>;
-
 struct TestSetup {
-    nodestore: MemNodeStore,
-    wasmlink: MemNodeLink,
-    inputlink: MemNodeLink,
+    nodestore: NodeStore<MemStore>,
+    wasmlink: LinkFor<MemStore>,
+    inputlink: LinkFor<MemStore>,
 }
 
 impl TestSetup {
@@ -31,7 +26,7 @@ impl TestSetup {
         })
     }
 
-    fn derive(&mut self) -> Result<MemNodeLink> {
+    fn derive(&mut self) -> Result<LinkFor<MemStore>> {
         let link = derive(&mut self.nodestore, &self.wasmlink, &self.inputlink)?;
         Ok(link)
     }

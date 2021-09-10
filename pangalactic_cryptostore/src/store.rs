@@ -1,4 +1,4 @@
-use pangalactic_store::Store;
+use pangalactic_store::{KeyOf, Store, WriterOf};
 use std::io::Result as IOResult;
 
 #[derive(Debug, derive_more::From)]
@@ -8,9 +8,9 @@ impl<S> Store for CryptoStore<S>
 where
     S: Store,
 {
-    type Key = crate::ReadCap<<S as Store>::Key>;
+    type Key = crate::ReadCap<KeyOf<S>>;
     type Reader = std::io::Cursor<Vec<u8>>;
-    type Writer = crate::Writer<<S as Store>::Writer>;
+    type Writer = crate::Writer<WriterOf<S>>;
 
     fn open_reader(&self, key: &Self::Key) -> IOResult<Self::Reader> {
         let plaintext = self.read_bytes(key)?;

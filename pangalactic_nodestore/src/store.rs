@@ -1,9 +1,8 @@
-use crate::FileWriter;
-use crate::ReadEntry;
+use crate::{DirFor, LinkFor, ReadEntry};
 
 use pangalactic_codec as codec;
 use pangalactic_node::{Dir, Kind, Link};
-use pangalactic_store::Store;
+use pangalactic_store::{KeyOf, Store, WriterOf};
 use std::io::Result as IOResult;
 use std::path::Path;
 
@@ -15,7 +14,7 @@ impl<S> NodeStore<S>
 where
     S: Store,
 {
-    pub fn open_entry_reader(&self, link: &Link<<S as Store>::Key>) -> IOResult<ReadEntry<S>> {
+    pub fn open_entry_reader(&self, link: &LinkFor<S>) -> IOResult<ReadEntry<S>> {
         let key = &link.key;
         match link.kind {
             Kind::Dir => self.get_dir(key).map(ReadEntry::Dir),
@@ -23,18 +22,15 @@ where
         }
     }
 
-    pub fn open_file_writer(&self) -> IOResult<FileWriter<<S as Store>::Writer>> {
-        self.0.open_writer().map(FileWriter::from)
+    pub fn open_file_writer(&self) -> IOResult<WriterOf<S>> {
+        self.0.open_writer()
     }
 
-    pub fn commit_file_writer(
-        &mut self,
-        w: FileWriter<<S as Store>::Writer>,
-    ) -> IOResult<Link<<S as Store>::Key>> {
-        self.commit_writer_kind(w.unwrap(), Kind::File)
+    pub fn commit_file_writer(&mut self, w: WriterOf<S>) -> IOResult<LinkFor<S>> {
+        self.commit_writer_kind(w, Kind::File)
     }
 
-    pub fn put_file<B>(&mut self, buf: B) -> IOResult<Link<<S as Store>::Key>>
+    pub fn put_file<B>(&mut self, buf: B) -> IOResult<LinkFor<S>>
     where
         B: AsRef<[u8]>,
     {
@@ -45,11 +41,11 @@ where
         self.commit_file_writer(f)
     }
 
-    pub fn get_file(&self, key: &<S as Store>::Key) -> IOResult<Vec<u8>> {
+    pub fn get_file(&self, key: &KeyOf<S>) -> IOResult<Vec<u8>> {
         self.0.read_bytes(key)
     }
 
-    pub fn put_dir(&mut self, d: &Dir<<S as Store>::Key>) -> IOResult<Link<<S as Store>::Key>> {
+    pub fn put_dir(&mut self, d: &DirFor<S>) -> IOResult<LinkFor<S>> {
         use std::io::Write;
 
         let bytes = codec::encode_bytes(d);
@@ -58,7 +54,7 @@ where
         self.commit_writer_kind(w, Kind::Dir)
     }
 
-    pub fn get_dir(&self, key: &<S as Store>::Key) -> IOResult<Dir<<S as Store>::Key>> {
+    pub fn get_dir(&self, key: &KeyOf<S>) -> IOResult<DirFor<S>> {
         let bytes = self.0.read_bytes(key)?;
         let dir = codec::decode_bytes(&bytes[..]).map_err(|e| {
             use std::io::{Error, ErrorKind::InvalidData};
@@ -68,11 +64,7 @@ where
         Ok(dir)
     }
 
-    fn commit_writer_kind(
-        &mut self,
-        w: <S as Store>::Writer,
-        kind: Kind,
-    ) -> IOResult<Link<<S as Store>::Key>> {
+    fn commit_writer_kind(&mut self, w: WriterOf<S>, kind: Kind) -> IOResult<LinkFor<S>> {
         let key = self.0.commit_writer(w)?;
         Ok(Link { kind, key })
     }
@@ -83,7 +75,7 @@ impl<S> NodeStore<S>
 where
     S: Store + std::fmt::Debug,
 {
-    pub fn import_path(&mut self, path: &Path) -> IOResult<Link<<S as Store>::Key>> {
+    pub fn import_path(&mut self, path: &Path) -> IOResult<LinkFor<S>> {
         let link = if path.is_dir() {
             self.import_dir(path)
         } else {
@@ -93,7 +85,7 @@ where
         Ok(link)
     }
 
-    pub fn export_path(&self, link: &Link<<S as Store>::Key>, path: &Path) -> IOResult<()> {
+    pub fn export_path(&self, link: &LinkFor<S>, path: &Path) -> IOResult<()> {
         log::debug!("{:?}.export_path{:?}", self, (link, path));
 
         match self.open_entry_reader(&link)? {
@@ -102,7 +94,7 @@ where
         }
     }
 
-    fn import_dir(&mut self, path: &Path) -> IOResult<Link<<S as Store>::Key>> {
+    fn import_dir(&mut self, path: &Path) -> IOResult<LinkFor<S>> {
         use pangalactic_fs::read_dir;
         use pangalactic_node::Entry;
 
@@ -117,7 +109,7 @@ where
         self.put_dir(&dirnode)
     }
 
-    fn import_file(&mut self, path: &Path) -> IOResult<Link<<S as Store>::Key>> {
+    fn import_file(&mut self, path: &Path) -> IOResult<LinkFor<S>> {
         use pangalactic_fs::file_open;
 
         log::debug!("{:?}.import_file({:?})", self, &path);
@@ -127,7 +119,7 @@ where
         self.commit_file_writer(fw)
     }
 
-    fn export_dir(&self, path: &Path, d: Dir<<S as Store>::Key>) -> IOResult<()> {
+    fn export_dir(&self, path: &Path, d: DirFor<S>) -> IOResult<()> {
         pangalactic_fs::create_dir(path)?;
 
         for entry in &d {

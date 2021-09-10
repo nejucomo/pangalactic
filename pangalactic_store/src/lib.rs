@@ -1,4 +1,4 @@
 mod store;
 mod testutil;
 
-pub use store::Store;
+pub use store::{KeyOf, ReaderOf, Store, WriterOf};
