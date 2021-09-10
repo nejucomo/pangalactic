@@ -1,8 +1,10 @@
-use crate::mir::MIR;
+mod mir;
+
+use self::mir::ModuleImportResolver;
 use wasmi::{Error, MemoryRef, ModuleRef};
 
 pub struct VirtualMachine {
-    mir: MIR,
+    mir: ModuleImportResolver,
     module: ModuleRef,
 
     #[allow(dead_code)]
@@ -14,7 +16,7 @@ impl VirtualMachine {
     where
         B: AsRef<[u8]>,
     {
-        let mir = MIR::new();
+        let mir = ModuleImportResolver::new();
         let module = load_modref(&mir, modbytes)?;
         log::debug!("Loaded module.");
         let memory = resolve_memory(&module)?;
@@ -57,7 +59,7 @@ impl wasmi::Externals for VirtualMachine {
 }
 
 // Private helper funcs:
-fn load_modref<B>(mir: &MIR, bytes: B) -> Result<ModuleRef, Error>
+fn load_modref<B>(mir: &ModuleImportResolver, bytes: B) -> Result<ModuleRef, Error>
 where
     B: AsRef<[u8]>,
 {

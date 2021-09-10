@@ -1,13 +1,16 @@
-use wasm_bindgen::prelude::*;
-
 /*
-#[wasm_bindgen]
+#[link(wasm_import_module = "pangalactic")]
 extern "C" {
-    fn log(s: &str);
+    fn log(buf: *const u8, len: usize);
 }
 */
 
-#[wasm_bindgen]
-pub fn pangalactic_derive(input: u64) -> u64 {
-    input
+#[no_mangle]
+pub extern "C" fn pangalactic_derive() {
+    /*
+    let logbytes = "Hello World!".as_bytes();
+    unsafe {
+        log(logbytes.as_ptr(), logbytes.len());
+    }
+    */
 }

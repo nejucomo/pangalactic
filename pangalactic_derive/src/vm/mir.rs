@@ -1,15 +1,17 @@
 /// mir - ModuleImportResolver for the dagwasm vm.
 use wasmi::ValueType::I32;
-use wasmi::{Error, FuncInstance, FuncRef, ModuleImportResolver, Signature, Trap, ValueType};
+use wasmi::{Error, FuncInstance, FuncRef, Signature, Trap, ValueType};
 
-pub struct MIR(Vec<(&'static str, FuncRef)>);
+#[derive(Debug)]
+pub struct ModuleImportResolver(Vec<(&'static str, FuncRef)>);
 
-impl MIR {
-    pub fn new() -> MIR {
-        let mut me = MIR(vec![]);
+impl ModuleImportResolver {
+    pub fn new() -> ModuleImportResolver {
+        let mut me = ModuleImportResolver(vec![]);
 
         me.register("log", &[I32, I32], None);
 
+        log::trace!("Module Import Resolver {:#?}", &me);
         me
     }
 
@@ -31,7 +33,7 @@ impl MIR {
     }
 }
 
-impl ModuleImportResolver for MIR {
+impl wasmi::ModuleImportResolver for ModuleImportResolver {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
         for (name, fi) in self.0.iter() {
             if field_name == *name && signature == fi.signature() {
