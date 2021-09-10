@@ -18,17 +18,10 @@ where
         (&store, &exec, &input)
     );
 
-    let execkey = exec.get_file_key()?;
-    let wasmbytes = store.get_file(execkey)?;
-    log::trace!(
-        "loading wasmbytes from {:?}, {} bytes",
-        &execkey,
-        wasmbytes.len()
-    );
+    let vm = VirtualMachine::load(store, exec)?;
 
-    let vm = VirtualMachine::load(wasmbytes)?;
-
-    log::debug!("execute");
-    vm.execute()?;
-    todo!("Get output link.");
+    log::debug!("execute({:?})", input);
+    let output = vm.execute(input)?;
+    log::debug!("execute -> {:?}", &output);
+    Ok(output)
 }

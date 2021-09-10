@@ -1,9 +1,16 @@
 mod mir;
 
 use self::mir::ModuleImportResolver;
+use pangalactic_nodestore::{LinkFor, NodeStore};
+use pangalactic_store::Store;
 use wasmi::{Error, MemoryRef, ModuleRef};
 
-pub struct VirtualMachine {
+pub struct VirtualMachine<'a, S>
+where
+    S: Store,
+{
+    nodestore: &'a mut NodeStore<S>,
+    exec: LinkFor<S>,
     mir: ModuleImportResolver,
     module: ModuleRef,
 
@@ -11,41 +18,49 @@ pub struct VirtualMachine {
     memory: MemoryRef,
 }
 
-impl VirtualMachine {
-    pub fn load<B>(modbytes: B) -> Result<VirtualMachine, Error>
-    where
-        B: AsRef<[u8]>,
-    {
+impl<'a, S> VirtualMachine<'a, S>
+where
+    S: Store,
+{
+    pub fn load(nodestore: &'a mut NodeStore<S>, exec: &LinkFor<S>) -> crate::error::Result<Self> {
+        let exec = exec.clone();
+        let execkey = exec.get_file_key()?;
+        let wasmbytes = nodestore.get_file(execkey)?;
         let mir = ModuleImportResolver::new();
-        let module = load_modref(&mir, modbytes)?;
-        log::debug!("Loaded module.");
+        let module = load_modref(&mir, &wasmbytes)?;
+        log::debug!("Loaded module from {:?} ({} bytes)", exec, wasmbytes.len());
         let memory = resolve_memory(&module)?;
         log::trace!("Resolved memory.");
 
         Ok(VirtualMachine {
+            nodestore,
+            exec,
             mir,
             module,
             memory,
         })
     }
 
-    pub fn execute(mut self) -> Result<(), Error> {
+    pub fn execute(mut self, input: &LinkFor<S>) -> Result<LinkFor<S>, Error> {
         log::debug!("Executing: VirtualMachine::execute()");
         let modref = self.module.clone();
-        let ret = modref.invoke_export("pangalactic_derive", &[], &mut self)?;
+        let ret =
+            modref.invoke_export("pangalactic_derive", &[self.exec, input.clone()], &mut self)?;
         log::debug!("Completed: VirtualMachine::execute()");
 
-        if let Some(noise) = ret {
-            use wasmi::{Trap, TrapKind};
-            log::warn!("Unexpected return value: {:?}", noise);
-            Err(Error::Trap(Trap::new(TrapKind::UnexpectedSignature)))
-        } else {
-            Ok(())
-        }
+        let retval = ret.ok_or({
+            use wasmi::{Trap, TrapKind::UnexpectedSignature};
+            Trap::new(UnexpectedSignature)
+        })?;
+
+        Ok(retval)
     }
 }
 
-impl wasmi::Externals for VirtualMachine {
+impl<'a, S> wasmi::Externals for VirtualMachine<'a, S>
+where
+    S: Store,
+{
     fn invoke_index(
         &mut self,
         index: usize,
