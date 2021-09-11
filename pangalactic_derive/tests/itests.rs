@@ -4,18 +4,32 @@ use pangalactic_nodestore::{LinkFor, NodeStore};
 use std::io::Result;
 use std::path::PathBuf;
 
-#[test]
-fn test_ident() -> Result<()> {
-    let (setup, outlink) = derive_test("ident")?;
-    assert_eq!(&outlink, &setup.inputlink);
-    Ok(())
+macro_rules! def_test {
+    ( $name:ident : $closure:expr ) => {
+        #[test]
+        fn $name() -> Result<()> {
+            let (setup, outlink) = derive_test(stringify!($name))?;
+            $closure(setup, outlink)
+        }
+    };
 }
 
-#[test]
-fn test_get_exec() -> Result<()> {
-    let (setup, outlink) = derive_test("get_exec")?;
-    assert_eq!(&outlink, &setup.wasmlink);
-    Ok(())
+def_test! {
+    ident: |setup: TestSetup, outlink: LinkFor<MemStore>| {
+        assert_eq!(&outlink, &setup.inputlink);
+        Ok(())
+    }
+}
+
+def_test! {
+    get_exec: |setup: TestSetup, outlink: LinkFor<MemStore>| {
+        assert_eq!(&outlink, &setup.wasmlink);
+        Ok(())
+    }
+}
+
+def_test! {
+    link_type_is_file: |_, _| Ok(())
 }
 
 fn derive_test(itestname: &str) -> Result<(TestSetup, LinkFor<MemStore>)> {

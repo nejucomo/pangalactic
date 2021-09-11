@@ -1,5 +1,5 @@
-/// mir - ModuleImportResolver for the dagwasm vm.
-use wasmi::ValueType::I32;
+/// mir - ModuleImportResolver for the pangalactic vm.
+use wasmi::ValueType::I64;
 use wasmi::{Error, FuncInstance, FuncRef, Signature, Trap, ValueType};
 
 #[derive(Debug)]
@@ -9,7 +9,7 @@ impl ModuleImportResolver {
     pub fn new() -> ModuleImportResolver {
         let mut me = ModuleImportResolver(vec![]);
 
-        me.register("log", &[I32, I32], None);
+        me.register("link_type", &[I64], Some(I64));
 
         log::trace!("Module Import Resolver {:#?}", &me);
         me
@@ -41,8 +41,8 @@ impl wasmi::ModuleImportResolver for ModuleImportResolver {
             }
         }
         return Err(Error::Instantiation(format!(
-            "Export {} not found",
-            field_name
+            "Export {} {:?} not found",
+            field_name, signature,
         )));
     }
 }

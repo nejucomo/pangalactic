@@ -9,3 +9,7 @@ version = "0.1.0"
 [[package]]
 name = "ident"
 version = "0.1.0"
+
+[[package]]
+name = "link_type_is_file"
+version = "0.1.0"
