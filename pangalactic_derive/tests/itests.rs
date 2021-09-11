@@ -56,7 +56,7 @@ fn build_itest_derivations(itestname: &str) -> Result<PathBuf> {
     use std::process::Command;
 
     const WASM_TARGET: &str = "wasm32-unknown-unknown";
-    const TEST_DERIVATIONS: &str = "test-derivations";
+    const TEST_DERIVATIONS: &str = "tests/derivations";
 
     let mut cmd = Command::new("cargo");
     cmd.args(&["build", "--target", WASM_TARGET, "--package", itestname]);
