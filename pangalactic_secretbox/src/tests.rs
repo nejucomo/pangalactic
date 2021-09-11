@@ -5,7 +5,7 @@ use test_case::test_case;
 #[test_case(b"hello world")]
 #[test_case(b"\x00")]
 fn seal_open(b: &[u8]) -> std::io::Result<()> {
-    pangalactic_logger::simple_init()?;
+    pangalactic_logger::test_init();
 
     let k = SecretBoxKey::generate();
     let ciphertext = k.seal(b);

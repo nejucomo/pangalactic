@@ -12,7 +12,7 @@ struct TestSetup {
 
 impl TestSetup {
     fn init(itestname: &str) -> Result<TestSetup> {
-        pangalactic_logger::simple_init()?;
+        pangalactic_logger::test_init();
         log::debug!("{:?}", std::env::current_dir());
 
         let mut nodestore = NodeStore::from(MemStore::new());

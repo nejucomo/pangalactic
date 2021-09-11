@@ -6,7 +6,7 @@ fn init_structure() -> std::io::Result<()> {
     use pangalactic_codecpath::CodecPath;
     use pangalactic_cryptopubsub::Publisher;
 
-    pangalactic_logger::simple_init()?;
+    pangalactic_logger::test_init();
 
     let repodir = testdir!().join("repo");
     init(&repodir)?;

@@ -1,8 +1,16 @@
 use log::Level;
+use std::sync::Once;
 use structopt::StructOpt;
 
-pub fn simple_init() -> std::io::Result<()> {
-    simple_logger::init().map_err(pangalactic_errorutil::debug_to_std_io_error)
+static INIT: Once = Once::new();
+
+/// Initialize logging for tests. Full applications should use `LogOptions::init`.
+pub fn test_init() {
+    INIT.call_once(|| {
+        simple_logger::init()
+            .map_err(pangalactic_errorutil::debug_to_std_io_error)
+            .unwrap()
+    });
 }
 
 #[derive(Debug, StructOpt)]

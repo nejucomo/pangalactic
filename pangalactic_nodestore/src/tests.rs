@@ -7,7 +7,7 @@ fn import_export() -> std::io::Result<()> {
     use pangalactic_codecpath::CodecPath;
     use testdir::testdir;
 
-    pangalactic_logger::simple_init()?;
+    pangalactic_logger::test_init();
 
     let td = testdir!();
     let indir = td.join("input");

@@ -5,7 +5,7 @@ use test_case::test_case;
 #[test_case(b"\x00")]
 #[test_case(b"hello world")]
 fn pos_sign_verify(msg: &[u8]) -> std::io::Result<()> {
-    pangalactic_logger::simple_init()?;
+    pangalactic_logger::test_init();
 
     let pair = SigningPair::generate();
     let signed = pair.signer.sign(msg);
