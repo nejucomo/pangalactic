@@ -4,6 +4,26 @@ use pangalactic_nodestore::{LinkFor, NodeStore};
 use std::io::Result;
 use std::path::PathBuf;
 
+#[test]
+fn test_ident() -> Result<()> {
+    let (setup, outlink) = derive_test("ident")?;
+    assert_eq!(&outlink, &setup.inputlink);
+    Ok(())
+}
+
+#[test]
+fn test_get_exec() -> Result<()> {
+    let (setup, outlink) = derive_test("get_exec")?;
+    assert_eq!(&outlink, &setup.wasmlink);
+    Ok(())
+}
+
+fn derive_test(itestname: &str) -> Result<(TestSetup, LinkFor<MemStore>)> {
+    let mut setup = TestSetup::init(itestname)?;
+    let outlink = setup.derive()?;
+    Ok((setup, outlink))
+}
+
 struct TestSetup {
     nodestore: NodeStore<MemStore>,
     wasmlink: LinkFor<MemStore>,
@@ -30,14 +50,6 @@ impl TestSetup {
         let link = derive(&mut self.nodestore, &self.wasmlink, &self.inputlink)?;
         Ok(link)
     }
-}
-
-#[test]
-fn test_ident() -> Result<()> {
-    let mut setup = TestSetup::init("ident")?;
-    let outlink = setup.derive()?;
-    assert_eq!(&outlink, &setup.inputlink);
-    Ok(())
 }
 
 fn build_itest_derivations(itestname: &str) -> Result<PathBuf> {
