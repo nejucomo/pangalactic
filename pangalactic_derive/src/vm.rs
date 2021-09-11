@@ -8,7 +8,7 @@ use pangalactic_nodestore::{LinkFor, NodeStore};
 use pangalactic_store::Store;
 use wasmi::{MemoryRef, ModuleRef};
 
-pub const WASM_ENTRYPOINT: &str = "pangalactic_derive";
+pub const WASM_ENTRYPOINT: &str = "derive";
 
 pub struct VirtualMachine<'a, S>
 where
