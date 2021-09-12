@@ -10,6 +10,11 @@ macro_rules! def_test {
     ( $name:ident : $closure:expr ) => {
         #[test]
         fn $name() -> std::io::Result<()> {
+            pangalactic_logger::test_init();
+            log::info!(
+                "Running derivation integration test {:?}",
+                stringify!($name)
+            );
             let (setup, outlink) = $crate::utils::derive_test(stringify!($name))?;
             $closure(setup, outlink)
         }

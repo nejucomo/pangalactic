@@ -1,20 +1,35 @@
-/// mir - ModuleImportResolver for the pangalactic vm.
-use wasmi::ValueType::I64;
-use wasmi::{Error, FuncInstance, FuncRef, ImportsBuilder, Signature, Trap, ValueType};
+use crate::vm::hostfunc::HostFunc;
+use crate::vm::VirtualMachine;
+use pangalactic_store::Store;
+use wasmi::{
+    Error, FuncInstance, FuncRef, ImportsBuilder, RuntimeArgs, RuntimeValue, Signature, Trap,
+};
 
 pub const PANGALACTIC_BINDINGS: &str = "pangalactic_bindings";
 
 #[derive(Debug)]
-pub struct ModuleImportResolver(Vec<(&'static str, FuncRef)>);
+pub struct ModuleImportResolver(Vec<Entry>);
+
+#[derive(Debug)]
+struct Entry {
+    name: &'static str,
+    funcref: FuncRef,
+}
 
 impl ModuleImportResolver {
     pub fn new() -> ModuleImportResolver {
-        let mut me = ModuleImportResolver(vec![]);
+        use enum_iterator::IntoEnumIterator;
 
-        me.register("link_type", &[I64], Some(I64));
+        let mut hfs = vec![];
 
-        log::trace!("Module Import Resolver {:#?}", &me);
-        me
+        for (idx, hf) in HostFunc::into_enum_iter().enumerate() {
+            hfs.push(Entry {
+                name: hf.name(),
+                funcref: FuncInstance::alloc_host(hf.signature(), idx),
+            });
+        }
+
+        ModuleImportResolver(hfs)
     }
 
     pub fn make_imports_builder(&self) -> ImportsBuilder {
@@ -22,29 +37,28 @@ impl ModuleImportResolver {
         ImportsBuilder::new().with_resolver(PANGALACTIC_BINDINGS, self)
     }
 
-    fn register(
-        &mut self,
-        name: &'static str,
-        argtypes: &'static [ValueType],
-        ret: Option<ValueType>,
-    ) {
-        let idx = self.0.len();
-        let fi = FuncInstance::alloc_host(Signature::new(argtypes, ret), idx);
-        self.0.push((name, fi));
-    }
-
-    pub fn get_index(&self, idx: usize) -> Result<&FuncRef, Trap> {
+    pub fn invoke_index<'a, S>(
+        vm: &mut VirtualMachine<'a, S>,
+        index: usize,
+        args: RuntimeArgs<'_>,
+    ) -> Result<Option<RuntimeValue>, Trap>
+    where
+        S: Store,
+    {
+        use num_traits::cast::FromPrimitive;
         use wasmi::TrapKind::TableAccessOutOfBounds;
-        let (_, fr) = self.0.get(idx).ok_or(Trap::new(TableAccessOutOfBounds))?;
-        Ok(fr)
+
+        let hf = HostFunc::from_usize(index).ok_or(Trap::new(TableAccessOutOfBounds))?;
+
+        hf.invoke(vm, args)
     }
 }
 
 impl wasmi::ModuleImportResolver for ModuleImportResolver {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
-        for (name, fi) in self.0.iter() {
-            if field_name == *name && signature == fi.signature() {
-                return Ok(fi.clone());
+        for entry in self.0.iter() {
+            if field_name == entry.name && signature == entry.funcref.signature() {
+                return Ok(entry.funcref.clone());
             }
         }
         return Err(Error::Instantiation(format!(

@@ -1,3 +1,4 @@
+mod hostfunc;
 mod mir;
 mod table;
 
@@ -18,7 +19,6 @@ where
     nodestore: &'a mut NodeStore<S>,
     links: LinkTable<S>,
     exec: LinkHandle<S>,
-    mir: ModuleImportResolver,
     module: ModuleRef,
     #[allow(dead_code)]
     memory: MemoryRef,
@@ -35,7 +35,7 @@ where
 {
     pub fn load(nodestore: &'a mut NodeStore<S>, exec: &LinkFor<S>) -> DeriveResult<Self> {
         let wasmbytes = load_exec_wasm(nodestore, exec)?;
-        let (mir, module, memory) = init_mod::<S>(exec, &wasmbytes)?;
+        let (module, memory) = init_mod::<S>(exec, &wasmbytes)?;
         let mut links = Table::new();
         let exec = links.append(exec.clone());
 
@@ -43,7 +43,6 @@ where
             nodestore,
             links,
             exec,
-            mir,
             module,
             memory,
         })
@@ -83,10 +82,7 @@ where
         index: usize,
         args: wasmi::RuntimeArgs<'_>,
     ) -> Result<Option<wasmi::RuntimeValue>, wasmi::Trap> {
-        use wasmi::FuncInstance;
-
-        let func = self.mir.get_index(index)?.clone();
-        FuncInstance::invoke(&func, args.as_ref(), self)
+        ModuleImportResolver::invoke_index(self, index, args)
     }
 }
 
@@ -100,22 +96,18 @@ where
     Ok(wasmbytes)
 }
 
-fn init_mod<S>(
-    exec: &LinkFor<S>,
-    execbytes: &[u8],
-) -> DeriveResult<(ModuleImportResolver, ModuleRef, MemoryRef)>
+fn init_mod<S>(exec: &LinkFor<S>, execbytes: &[u8]) -> DeriveResult<(ModuleRef, MemoryRef)>
 where
     S: Store,
 {
-    let mir = ModuleImportResolver::new();
-    let module = load_modref(&mir, execbytes)?;
+    let module = load_modref(execbytes)?;
     log::debug!("Loaded module from {:?} ({} bytes)", exec, execbytes.len());
     let memory = resolve_memory(&module)?;
     log::trace!("Resolved memory.");
-    Ok((mir, module, memory))
+    Ok((module, memory))
 }
 
-fn load_modref<B>(mir: &ModuleImportResolver, bytes: B) -> WasmiResult<ModuleRef>
+fn load_modref<B>(bytes: B) -> WasmiResult<ModuleRef>
 where
     B: AsRef<[u8]>,
 {
@@ -126,6 +118,7 @@ where
         bytes.as_ref().len()
     );
     let module = Module::from_buffer(bytes)?;
+    let mir = ModuleImportResolver::new();
     let imports = mir.make_imports_builder();
 
     log::trace!("Instantiating Module...");
