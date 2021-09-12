@@ -119,16 +119,14 @@ fn load_modref<B>(mir: &ModuleImportResolver, bytes: B) -> WasmiResult<ModuleRef
 where
     B: AsRef<[u8]>,
 {
-    use wasmi::{ImportsBuilder, Module, ModuleInstance};
+    use wasmi::{Module, ModuleInstance};
 
     log::trace!(
         "Instantiating module from {} bytes...",
         bytes.as_ref().len()
     );
     let module = Module::from_buffer(bytes)?;
-
-    log::trace!("Resolving imports for {}...", env!("CARGO_PKG_NAME"));
-    let imports = ImportsBuilder::new().with_resolver(env!("CARGO_PKG_NAME"), mir);
+    let imports = mir.make_imports_builder();
 
     log::trace!("Instantiating Module...");
     let modref = ModuleInstance::new(&module, &imports)?.assert_no_start();

@@ -1,4 +1,7 @@
-#[no_mangle]
-pub extern "C" fn derive(exec: i64, _input: i64) -> i64 {
+use pangalactic_derivelib::{wrap_derive, LinkHandle, LinkPrim};
+
+wrap_derive!(derive_impl);
+
+fn derive_impl(exec: LinkHandle, _input: LinkHandle) -> LinkHandle {
     exec
 }

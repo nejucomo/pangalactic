@@ -1,47 +1,31 @@
 use pangalactic_derive::derive;
-use pangalactic_memstore::MemStore;
-use pangalactic_nodestore::{LinkFor, NodeStore};
+pub use pangalactic_memstore::MemStore;
+pub use pangalactic_nodestore::LinkFor;
+use pangalactic_nodestore::NodeStore;
 use std::io::Result;
 use std::path::PathBuf;
 
+#[macro_export]
 macro_rules! def_test {
     ( $name:ident : $closure:expr ) => {
         #[test]
-        fn $name() -> Result<()> {
-            let (setup, outlink) = derive_test(stringify!($name))?;
+        fn $name() -> std::io::Result<()> {
+            let (setup, outlink) = $crate::utils::derive_test(stringify!($name))?;
             $closure(setup, outlink)
         }
     };
 }
 
-def_test! {
-    ident: |setup: TestSetup, outlink: LinkFor<MemStore>| {
-        assert_eq!(&outlink, &setup.inputlink);
-        Ok(())
-    }
-}
-
-def_test! {
-    get_exec: |setup: TestSetup, outlink: LinkFor<MemStore>| {
-        assert_eq!(&outlink, &setup.wasmlink);
-        Ok(())
-    }
-}
-
-def_test! {
-    link_type_is_file: |_, _| Ok(())
-}
-
-fn derive_test(itestname: &str) -> Result<(TestSetup, LinkFor<MemStore>)> {
+pub fn derive_test(itestname: &str) -> Result<(TestSetup, LinkFor<MemStore>)> {
     let mut setup = TestSetup::init(itestname)?;
     let outlink = setup.derive()?;
     Ok((setup, outlink))
 }
 
-struct TestSetup {
-    nodestore: NodeStore<MemStore>,
-    wasmlink: LinkFor<MemStore>,
-    inputlink: LinkFor<MemStore>,
+pub struct TestSetup {
+    pub nodestore: NodeStore<MemStore>,
+    pub wasmlink: LinkFor<MemStore>,
+    pub inputlink: LinkFor<MemStore>,
 }
 
 impl TestSetup {

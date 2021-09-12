@@ -1,6 +1,8 @@
 /// mir - ModuleImportResolver for the pangalactic vm.
 use wasmi::ValueType::I64;
-use wasmi::{Error, FuncInstance, FuncRef, Signature, Trap, ValueType};
+use wasmi::{Error, FuncInstance, FuncRef, ImportsBuilder, Signature, Trap, ValueType};
+
+pub const PANGALACTIC_BINDINGS: &str = "pangalactic_bindings";
 
 #[derive(Debug)]
 pub struct ModuleImportResolver(Vec<(&'static str, FuncRef)>);
@@ -13,6 +15,11 @@ impl ModuleImportResolver {
 
         log::trace!("Module Import Resolver {:#?}", &me);
         me
+    }
+
+    pub fn make_imports_builder(&self) -> ImportsBuilder {
+        log::trace!("ImportsBuilder for {:?}", PANGALACTIC_BINDINGS);
+        ImportsBuilder::new().with_resolver(PANGALACTIC_BINDINGS, self)
     }
 
     fn register(

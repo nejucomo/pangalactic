@@ -541,6 +541,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-derive"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "876a53fff98e03a936a674b29568b0e605f06b29372c2489ff4de23f1949743d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "num-integer"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -709,6 +720,15 @@ dependencies = [
  "pangalactic_nodestore",
  "pangalactic_store",
  "wasmi",
+]
+
+[[package]]
+name = "pangalactic_derivelib"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "num-derive",
+ "num-traits 0.2.14",
 ]
 
 [[package]]

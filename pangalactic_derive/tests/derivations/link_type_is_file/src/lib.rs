@@ -1,10 +1,8 @@
-#[link(wasm_import_module = "pangalactic")]
-extern "C" {
-    fn link_type(handle: i64) -> i64;
-}
+use pangalactic_derivelib::{wrap_derive, LinkHandle, LinkPrim, LinkType};
 
-#[no_mangle]
-pub extern "C" fn derive(_exec: i64, input: i64) -> i64 {
-    assert_eq!(unsafe { link_type(input) }, 0);
+wrap_derive!(derive_impl);
+
+fn derive_impl(_exec: LinkHandle, input: LinkHandle) -> LinkHandle {
+    assert_eq!(input.link_type(), LinkType::File);
     input
 }
