@@ -21,6 +21,7 @@ members = [
   "pangalactic_sodiuminit",
   "pangalactic_storage",
   "pangalactic_store",
+  "pangalactic_wasmi",
   "pg",
   "pg-derive",
   "pg-store",
