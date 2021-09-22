@@ -1,38 +1,38 @@
-use crate::{FromRuntimeArgs, IntoRuntimeReturn};
+use crate::{FromGuestArgs, IntoGuestReturn};
 use wasmi::{RuntimeArgs, RuntimeValue, Signature, Trap};
 
-pub trait HostFunc {
-    type Args: FromRuntimeArgs;
-    type Return: IntoRuntimeReturn;
+pub trait HostFunc<V> {
+    type Args: FromGuestArgs<V>;
+    type Return: IntoGuestReturn<V>;
 
     fn name(&self) -> &'static str;
-    fn invoke(&self, args: Self::Args) -> Result<Self::Return, Trap>;
+    fn invoke(&self, vm: &mut V, args: Self::Args) -> Result<Self::Return, Trap>;
 }
 
-pub(crate) trait HostFuncAdapter {
+pub(crate) trait HostFuncAdapter<V> {
     fn name(&self) -> &'static str;
     fn signature(&self) -> Signature;
-    fn invoke(&self, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap>;
+    fn invoke(&self, vm: &mut V, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap>;
 }
 
-impl<T> HostFuncAdapter for T
+impl<V, T> HostFuncAdapter<V> for T
 where
-    T: HostFunc,
+    T: HostFunc<V>,
 {
     fn name(&self) -> &'static str {
-        <Self as HostFunc>::name(self)
+        <Self as HostFunc<V>>::name(self)
     }
 
     fn signature(&self) -> Signature {
         Signature::new(
-            <Self as HostFunc>::Args::valuetypes(),
-            <Self as HostFunc>::Return::returntype(),
+            <Self as HostFunc<V>>::Args::valuetypes(),
+            <Self as HostFunc<V>>::Return::returntype(),
         )
     }
 
-    fn invoke(&self, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap> {
-        let args = <Self as HostFunc>::Args::from_runtime_args(rta)?;
-        let ret = <Self as HostFunc>::invoke(self, args)?;
-        ret.into_runtime_return()
+    fn invoke(&self, vm: &mut V, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap> {
+        let args = <Self as HostFunc<V>>::Args::from_guest_args(vm, rta)?;
+        let ret = <Self as HostFunc<V>>::invoke(self, vm, args)?;
+        ret.into_guest_return(vm)
     }
 }

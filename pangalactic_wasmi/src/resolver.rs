@@ -1,23 +1,21 @@
 use crate::{HostFunc, HostFuncAdapter};
-use wasmi::{
-    Error, Externals, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap,
-};
+use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
-pub struct HostFuncResolver(Vec<Entry>);
+pub struct HostFuncResolver<V>(Vec<Entry<V>>);
 
-struct Entry {
-    hf: Box<dyn HostFuncAdapter>,
+struct Entry<V> {
+    hf: Box<dyn HostFuncAdapter<V>>,
     funcref: FuncRef,
 }
 
-impl HostFuncResolver {
-    pub fn new() -> HostFuncResolver {
+impl<V> HostFuncResolver<V> {
+    pub fn new() -> HostFuncResolver<V> {
         HostFuncResolver(vec![])
     }
 
     pub fn add_host_func<H>(&mut self, hostfunc: H)
     where
-        H: HostFunc + 'static,
+        H: HostFunc<V> + 'static,
     {
         // BUG? Why is 'static necessary since hostfunc moves into Entry?
         use wasmi::FuncInstance;
@@ -27,9 +25,21 @@ impl HostFuncResolver {
 
         self.0.push(Entry { hf, funcref });
     }
+
+    pub fn invoke_index(
+        &mut self,
+        vm: &mut V,
+        index: usize,
+        args: RuntimeArgs<'_>,
+    ) -> Result<Option<RuntimeValue>, Trap> {
+        use wasmi::TrapKind::TableAccessOutOfBounds;
+
+        let entry = self.0.get(index).ok_or(Trap::new(TableAccessOutOfBounds))?;
+        entry.hf.invoke(vm, args)
+    }
 }
 
-impl ModuleImportResolver for HostFuncResolver {
+impl<V> ModuleImportResolver for HostFuncResolver<V> {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
         for entry in self.0.iter() {
             if entry.hf.name() == field_name && entry.funcref.signature() == signature {
@@ -41,18 +51,5 @@ impl ModuleImportResolver for HostFuncResolver {
             "Export {} not found",
             field_name
         )));
-    }
-}
-
-impl Externals for HostFuncResolver {
-    fn invoke_index(
-        &mut self,
-        index: usize,
-        args: RuntimeArgs<'_>,
-    ) -> Result<Option<RuntimeValue>, Trap> {
-        use wasmi::TrapKind::TableAccessOutOfBounds;
-
-        let entry = self.0.get(index).ok_or(Trap::new(TableAccessOutOfBounds))?;
-        entry.hf.invoke(args)
     }
 }

@@ -2,6 +2,8 @@
 /// This design is only type safe against context confusion bugs if there is only one table for each type.
 mod handle;
 
+use wasmi::{Trap, TrapKind::TableAccessOutOfBounds};
+
 pub struct Table<T>(Vec<T>);
 
 pub use self::handle::Handle;
@@ -16,12 +18,13 @@ impl<T> Table<T> {
         self.0.push(item);
         h
     }
-}
 
-impl<T> std::ops::Index<Handle<T>> for Table<T> {
-    type Output = T;
-
-    fn index(&self, index: Handle<T>) -> &T {
-        self.0.index(usize::from(index))
+    pub(crate) fn get(&self, h: Handle<T>) -> Result<&T, Trap> {
+        let ix = usize::from(h);
+        if ix < self.0.len() {
+            Ok(&self.0[ix])
+        } else {
+            Err(Trap::new(TableAccessOutOfBounds))
+        }
     }
 }

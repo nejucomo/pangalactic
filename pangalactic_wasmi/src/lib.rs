@@ -4,9 +4,9 @@ mod hostfunc;
 mod resolver;
 mod ret;
 
-pub use self::arg::FromRuntimeValue;
-pub use self::args::FromRuntimeArgs;
+pub use self::arg::FromGuestValue;
+pub use self::args::FromGuestArgs;
 pub use self::hostfunc::HostFunc;
 pub(crate) use self::hostfunc::HostFuncAdapter;
 pub use self::resolver::HostFuncResolver;
-pub use self::ret::IntoRuntimeReturn;
+pub use self::ret::IntoGuestReturn;

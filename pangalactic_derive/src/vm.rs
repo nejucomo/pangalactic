@@ -15,10 +15,10 @@ pub struct VirtualMachine<'a, S>
 where
     S: Store,
 {
-    hfr: HostFuncResolver,
+    hfr: HostFuncResolver<Self>,
     #[allow(dead_code)]
     nodestore: &'a mut NodeStore<S>,
-    links: LinkTable<S>,
+    pub(crate) links: LinkTable<S>,
     exec: LinkHandle<S>,
     module: ModuleRef,
     #[allow(dead_code)]
@@ -32,10 +32,10 @@ pub type WasmiResult<T> = Result<T, wasmi::Error>;
 
 impl<'a, S> VirtualMachine<'a, S>
 where
-    S: Store,
+    S: Store + 'static,
 {
     pub fn load(nodestore: &'a mut NodeStore<S>, exec: &LinkFor<S>) -> DeriveResult<Self> {
-        let hfr = self::hostfuncs::new_hostfunc_resolver();
+        let hfr = self::hostfuncs::new_hostfunc_resolver::<S>();
         let wasmbytes = load_exec_wasm(nodestore, exec)?;
         let (module, memory) = init_mod::<S>(&hfr, exec, &wasmbytes)?;
         let mut links = Table::new();
@@ -71,7 +71,7 @@ where
         })?;
 
         let outputhandle = LinkHandle::<S>::try_from(outputval)?;
-        let outputlink = self.links[outputhandle].clone();
+        let outputlink = self.links.get(outputhandle)?.clone();
         Ok(outputlink)
     }
 }
@@ -85,7 +85,7 @@ where
         index: usize,
         args: wasmi::RuntimeArgs<'_>,
     ) -> Result<Option<wasmi::RuntimeValue>, wasmi::Trap> {
-        self.hfr.invoke_index(index, args)
+        self.hfr.invoke_index(self, index, args)
     }
 }
 
@@ -99,8 +99,8 @@ where
     Ok(wasmbytes)
 }
 
-fn init_mod<S>(
-    hfr: &HostFuncResolver,
+fn init_mod<'a, S>(
+    hfr: &HostFuncResolver<VirtualMachine<'a, S>>,
     exec: &LinkFor<S>,
     execbytes: &[u8],
 ) -> DeriveResult<(ModuleRef, MemoryRef)>
@@ -114,9 +114,13 @@ where
     Ok((module, memory))
 }
 
-fn load_modref<B>(hfr: &HostFuncResolver, bytes: B) -> WasmiResult<ModuleRef>
+fn load_modref<'a, S, B>(
+    hfr: &HostFuncResolver<VirtualMachine<'a, S>>,
+    bytes: B,
+) -> WasmiResult<ModuleRef>
 where
     B: AsRef<[u8]>,
+    S: Store,
 {
     use wasmi::{ImportsBuilder, Module, ModuleInstance};
 

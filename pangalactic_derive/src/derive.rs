@@ -8,7 +8,7 @@ pub fn derive<S>(
     input: &LinkFor<S>,
 ) -> Result<LinkFor<S>>
 where
-    S: Store,
+    S: Store + 'static,
 {
     use crate::vm::VirtualMachine;
 

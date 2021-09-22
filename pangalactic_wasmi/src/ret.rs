@@ -1,17 +1,17 @@
 use wasmi::{RuntimeValue, Trap, ValueType};
 
-pub trait IntoRuntimeReturn {
+pub trait IntoGuestReturn<V> {
     fn returntype() -> Option<ValueType>;
 
-    fn into_runtime_return(self) -> Result<Option<RuntimeValue>, Trap>;
+    fn into_guest_return(self, vm: &V) -> Result<Option<RuntimeValue>, Trap>;
 }
 
-impl IntoRuntimeReturn for () {
+impl<V> IntoGuestReturn<V> for () {
     fn returntype() -> Option<ValueType> {
         None
     }
 
-    fn into_runtime_return(self) -> Result<Option<RuntimeValue>, Trap> {
+    fn into_guest_return(self, _vm: &V) -> Result<Option<RuntimeValue>, Trap> {
         Ok(None)
     }
 }
