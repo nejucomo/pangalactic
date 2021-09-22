@@ -1,5 +1,7 @@
 use crate::{HostFunc, HostFuncAdapter};
-use wasmi::{Error, FuncRef, ModuleImportResolver, Signature};
+use wasmi::{
+    Error, Externals, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap,
+};
 
 pub struct HostFuncResolver(Vec<Entry>);
 
@@ -39,5 +41,18 @@ impl ModuleImportResolver for HostFuncResolver {
             "Export {} not found",
             field_name
         )));
+    }
+}
+
+impl Externals for HostFuncResolver {
+    fn invoke_index(
+        &mut self,
+        index: usize,
+        args: RuntimeArgs<'_>,
+    ) -> Result<Option<RuntimeValue>, Trap> {
+        use wasmi::TrapKind::TableAccessOutOfBounds;
+
+        let entry = self.0.get(index).ok_or(Trap::new(TableAccessOutOfBounds))?;
+        entry.hf.invoke(args)
     }
 }
