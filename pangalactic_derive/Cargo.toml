@@ -25,6 +25,9 @@ path = "../pangalactic_nodestore"
 [dependencies.pangalactic_store]
 path = "../pangalactic_store"
 
+[dependencies.pangalactic_wasmi]
+path = "../pangalactic_wasmi"
+
 [dev-dependencies.pangalactic_logger]
 path = "../pangalactic_logger"
 

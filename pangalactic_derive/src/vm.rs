@@ -1,20 +1,21 @@
-mod hostfunc;
-mod mir;
+mod hostfuncs;
 mod table;
 
-use self::mir::ModuleImportResolver;
 use self::table::{Handle, Table};
 use crate::error::Result as DeriveResult;
 use pangalactic_nodestore::{LinkFor, NodeStore};
 use pangalactic_store::Store;
-use wasmi::{MemoryRef, ModuleRef};
+use pangalactic_wasmi::HostFuncResolver;
+use wasmi::{Externals, MemoryRef, ModuleRef};
 
 pub const WASM_ENTRYPOINT: &str = "derive";
+pub const PANGALACTIC_BINDINGS: &str = "pangalactic_bindings";
 
 pub struct VirtualMachine<'a, S>
 where
     S: Store,
 {
+    hfr: HostFuncResolver,
     #[allow(dead_code)]
     nodestore: &'a mut NodeStore<S>,
     links: LinkTable<S>,
@@ -34,12 +35,14 @@ where
     S: Store,
 {
     pub fn load(nodestore: &'a mut NodeStore<S>, exec: &LinkFor<S>) -> DeriveResult<Self> {
+        let hfr = self::hostfuncs::new_hostfunc_resolver();
         let wasmbytes = load_exec_wasm(nodestore, exec)?;
-        let (module, memory) = init_mod::<S>(exec, &wasmbytes)?;
+        let (module, memory) = init_mod::<S>(&hfr, exec, &wasmbytes)?;
         let mut links = Table::new();
         let exec = links.append(exec.clone());
 
         Ok(VirtualMachine {
+            hfr,
             nodestore,
             links,
             exec,
@@ -73,7 +76,7 @@ where
     }
 }
 
-impl<'a, S> wasmi::Externals for VirtualMachine<'a, S>
+impl<'a, S> Externals for VirtualMachine<'a, S>
 where
     S: Store,
 {
@@ -82,7 +85,7 @@ where
         index: usize,
         args: wasmi::RuntimeArgs<'_>,
     ) -> Result<Option<wasmi::RuntimeValue>, wasmi::Trap> {
-        ModuleImportResolver::invoke_index(self, index, args)
+        self.hfr.invoke_index(index, args)
     }
 }
 
@@ -96,30 +99,33 @@ where
     Ok(wasmbytes)
 }
 
-fn init_mod<S>(exec: &LinkFor<S>, execbytes: &[u8]) -> DeriveResult<(ModuleRef, MemoryRef)>
+fn init_mod<S>(
+    hfr: &HostFuncResolver,
+    exec: &LinkFor<S>,
+    execbytes: &[u8],
+) -> DeriveResult<(ModuleRef, MemoryRef)>
 where
     S: Store,
 {
-    let module = load_modref(execbytes)?;
+    let module = load_modref(hfr, execbytes)?;
     log::debug!("Loaded module from {:?} ({} bytes)", exec, execbytes.len());
     let memory = resolve_memory(&module)?;
     log::trace!("Resolved memory.");
     Ok((module, memory))
 }
 
-fn load_modref<B>(bytes: B) -> WasmiResult<ModuleRef>
+fn load_modref<B>(hfr: &HostFuncResolver, bytes: B) -> WasmiResult<ModuleRef>
 where
     B: AsRef<[u8]>,
 {
-    use wasmi::{Module, ModuleInstance};
+    use wasmi::{ImportsBuilder, Module, ModuleInstance};
 
     log::trace!(
         "Instantiating module from {} bytes...",
         bytes.as_ref().len()
     );
     let module = Module::from_buffer(bytes)?;
-    let mir = ModuleImportResolver::new();
-    let imports = mir.make_imports_builder();
+    let imports = ImportsBuilder::new().with_resolver(PANGALACTIC_BINDINGS, hfr);
 
     log::trace!("Instantiating Module...");
     let modref = ModuleInstance::new(&module, &imports)?.assert_no_start();

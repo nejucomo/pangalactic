@@ -742,6 +742,7 @@ dependencies = [
  "pangalactic_node",
  "pangalactic_nodestore",
  "pangalactic_store",
+ "pangalactic_wasmi",
  "wasmi",
 ]
 
