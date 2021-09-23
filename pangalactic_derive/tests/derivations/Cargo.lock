@@ -42,7 +42,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "link_type_is_file"
+name = "link_kind_is_file"
 version = "0.1.0"
 dependencies = [
  "pangalactic_derivelib",

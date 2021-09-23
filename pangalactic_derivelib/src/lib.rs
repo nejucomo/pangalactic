@@ -2,7 +2,7 @@ pub(crate) mod bindings;
 mod link;
 mod prim;
 
-pub use self::link::{LinkHandle, LinkType};
+pub use self::link::{LinkHandle, LinkKind};
 pub use self::prim::LinkPrim;
 
 pub fn call_derive_impl<F>(exec: LinkPrim, input: LinkPrim, f: F) -> LinkPrim
