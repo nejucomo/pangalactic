@@ -6,6 +6,7 @@ use crate::error::Result as DeriveResult;
 use pangalactic_nodestore::{LinkFor, NodeStore};
 use pangalactic_store::Store;
 use pangalactic_wasmi::HostFuncResolver;
+use std::rc::Rc;
 use wasmi::{Externals, MemoryRef, ModuleRef};
 
 pub const WASM_ENTRYPOINT: &str = "derive";
@@ -15,7 +16,7 @@ pub struct VirtualMachine<'a, S>
 where
     S: Store,
 {
-    hfr: HostFuncResolver<Self>,
+    hfr: Rc<HostFuncResolver<Self>>,
     #[allow(dead_code)]
     nodestore: &'a mut NodeStore<S>,
     pub(crate) links: LinkTable<S>,
@@ -42,7 +43,7 @@ where
         let exec = links.append(exec.clone());
 
         Ok(VirtualMachine {
-            hfr,
+            hfr: Rc::new(hfr),
             nodestore,
             links,
             exec,
@@ -85,7 +86,12 @@ where
         index: usize,
         args: wasmi::RuntimeArgs<'_>,
     ) -> Result<Option<wasmi::RuntimeValue>, wasmi::Trap> {
-        self.hfr.invoke_index(self, index, args)
+        // Unfortunate design in terms of efficiency, since this happens
+        // on every host invocation. Look into alternate designs without
+        // modifying wasmi, or if necessary wasmi modifications:
+        let hfr = self.hfr.clone();
+
+        hfr.invoke_index(self, index, args)
     }
 }
 

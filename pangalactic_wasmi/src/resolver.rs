@@ -27,7 +27,7 @@ impl<V> HostFuncResolver<V> {
     }
 
     pub fn invoke_index(
-        &mut self,
+        &self,
         vm: &mut V,
         index: usize,
         args: RuntimeArgs<'_>,
