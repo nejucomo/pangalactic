@@ -751,8 +751,7 @@ name = "pangalactic_derivelib"
 version = "0.1.0"
 dependencies = [
  "derive_more",
- "num-derive",
- "num-traits 0.2.14",
+ "pangalactic_node",
 ]
 
 [[package]]

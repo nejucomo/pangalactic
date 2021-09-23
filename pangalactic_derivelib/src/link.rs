@@ -1,19 +1,17 @@
 use crate::LinkPrim;
+pub use pangalactic_node::Kind;
 
 #[derive(Debug, PartialEq, Eq, derive_more::From)]
 pub struct LinkHandle(LinkPrim);
 
-#[derive(Debug, PartialEq, Eq, num_derive::FromPrimitive)]
-pub enum LinkKind {
-    File = 0,
-    Dir = 1,
-}
-
 impl LinkHandle {
-    pub fn kind(&self) -> LinkKind {
-        use num_traits::FromPrimitive;
+    pub fn kind(&self) -> Kind {
         let kindprim = unsafe { crate::bindings::link_kind(self.0) };
-        LinkKind::from_i32(kindprim).unwrap()
+        match kindprim {
+            0 => Kind::File,
+            1 => Kind::Dir,
+            _ => panic!("Invalid kindprim: {}", kindprim),
+        }
     }
 
     pub(crate) fn unwrap_prim(self) -> LinkPrim {
