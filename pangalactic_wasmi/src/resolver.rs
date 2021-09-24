@@ -1,4 +1,7 @@
-use crate::{HostFunc, HostFuncAdapter};
+mod adapter;
+
+use self::adapter::HostFuncAdapter;
+use crate::HostFunc;
 use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
 pub struct HostFuncResolver<V>(Vec<Entry<V>>);
