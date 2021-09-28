@@ -1,4 +1,4 @@
-mod impls;
+mod linkkind;
 
 use crate::vm::VirtualMachine;
 use pangalactic_store::Store;
@@ -9,6 +9,6 @@ where
     S: Store + 'static,
 {
     let mut hfr = HostFuncResolver::new();
-    hfr.add_host_func(self::impls::LinkKind::<S>::new());
+    hfr.add_host_func(self::linkkind::LinkKind::<S>::new());
     hfr
 }
