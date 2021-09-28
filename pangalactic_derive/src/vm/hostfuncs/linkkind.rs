@@ -26,10 +26,6 @@ where
     type Args = LinkFor<S>;
     type Return = Kind;
 
-    fn name(&self) -> &'static str {
-        "link_kind"
-    }
-
     fn invoke(&self, _vm: &mut VirtualMachine<'a, S>, args: LinkFor<S>) -> Result<Kind, Trap> {
         Ok(args.kind)
     }

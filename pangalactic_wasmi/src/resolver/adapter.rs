@@ -2,7 +2,7 @@ use crate::{FromGuestArgs, HostFunc, IntoGuestReturn};
 use wasmi::{RuntimeArgs, RuntimeValue, Signature, Trap};
 
 pub(crate) trait HostFuncAdapter<V> {
-    fn name(&self) -> &'static str;
+    fn name(&self) -> String;
     fn signature(&self) -> Signature;
     fn invoke(&self, vm: &mut V, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap>;
 }
@@ -11,7 +11,7 @@ impl<V, T> HostFuncAdapter<V> for T
 where
     T: HostFunc<V>,
 {
-    fn name(&self) -> &'static str {
+    fn name(&self) -> String {
         <Self as HostFunc<V>>::name(self)
     }
 
