@@ -9,17 +9,17 @@ pub struct Table<T>(Vec<T>);
 pub use self::handle::Handle;
 
 impl<T> Table<T> {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Table(vec![])
     }
 
-    pub(crate) fn append(&mut self, item: T) -> Handle<T> {
+    pub fn append(&mut self, item: T) -> Handle<T> {
         let h = Handle::from(self.0.len());
         self.0.push(item);
         h
     }
 
-    pub(crate) fn get(&self, h: Handle<T>) -> Result<&T, Trap> {
+    pub fn get(&self, h: Handle<T>) -> Result<&T, Trap> {
         let ix = usize::from(h);
         if ix < self.0.len() {
             Ok(&self.0[ix])

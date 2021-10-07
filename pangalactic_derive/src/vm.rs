@@ -1,11 +1,9 @@
 mod hostfuncs;
-mod table;
 
-use self::table::{Handle, Table};
 use crate::error::Result as DeriveResult;
 use pangalactic_nodestore::{LinkFor, NodeStore};
 use pangalactic_store::Store;
-use pangalactic_wasmi::HostFuncResolver;
+use pangalactic_wasmi::{Handle, HostFuncResolver, Table};
 use std::rc::Rc;
 use wasmi::{Externals, MemoryRef, ModuleRef};
 
