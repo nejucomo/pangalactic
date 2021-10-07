@@ -1,7 +1,8 @@
+use crate::{FromGuestValue, HasGuestType};
 use std::convert::TryFrom;
 use std::fmt;
 use std::marker::PhantomData;
-use wasmi::RuntimeValue;
+use wasmi::{RuntimeValue, Trap, ValueType};
 
 pub struct Handle<T>(usize, PhantomData<T>);
 
@@ -28,6 +29,19 @@ impl<T> From<usize> for Handle<T> {
 impl<T> From<Handle<T>> for usize {
     fn from(h: Handle<T>) -> usize {
         h.0
+    }
+}
+
+impl<T> HasGuestType for Handle<T> {
+    fn valuetype() -> ValueType {
+        usize::valuetype()
+    }
+}
+
+impl<T> FromGuestValue for Handle<T> {
+    fn from_guest_value(rtv: RuntimeValue) -> Result<Self, Trap> {
+        let u = usize::from_guest_value(rtv)?;
+        Ok(Handle::from(u))
     }
 }
 

@@ -1,6 +1,5 @@
-use crate::vm::VirtualMachine;
+use crate::vm::{LinkHandle, VirtualMachine};
 use pangalactic_node::Kind;
-use pangalactic_nodestore::LinkFor;
 use pangalactic_store::Store;
 use pangalactic_wasmi::HostFunc;
 use std::marker::PhantomData;
@@ -23,10 +22,11 @@ impl<'a, S> HostFunc<VirtualMachine<'a, S>> for LinkKind<S>
 where
     S: Store,
 {
-    type Args = LinkFor<S>;
+    type Args = LinkHandle<S>;
     type Return = Kind;
 
-    fn invoke(&self, _vm: &mut VirtualMachine<'a, S>, args: LinkFor<S>) -> Result<Kind, Trap> {
-        Ok(args.kind)
+    fn invoke(&self, vm: &mut VirtualMachine<'a, S>, handle: LinkHandle<S>) -> Result<Kind, Trap> {
+        let link = vm.links.get(handle)?;
+        Ok(link.kind)
     }
 }

@@ -2,7 +2,7 @@ use crate::{FromGuestArgs, IntoGuestReturn};
 use wasmi::Trap;
 
 pub trait HostFunc<V>: Sized {
-    type Args: FromGuestArgs<V>;
+    type Args: FromGuestArgs;
     type Return: IntoGuestReturn<V>;
 
     fn name(&self) -> String {
