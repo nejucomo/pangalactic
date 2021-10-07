@@ -25,6 +25,6 @@ where
     fn invoke(&self, vm: &mut V, rta: RuntimeArgs<'_>) -> Result<Option<RuntimeValue>, Trap> {
         let args = <Self as HostFunc<V>>::Args::from_guest_args(rta)?;
         let ret = <Self as HostFunc<V>>::invoke(self, vm, args)?;
-        ret.into_guest_return(vm)
+        ret.into_guest_return()
     }
 }

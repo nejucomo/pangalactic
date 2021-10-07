@@ -1,4 +1,3 @@
-mod hostvals;
 mod linkkind;
 
 use crate::vm::VirtualMachine;

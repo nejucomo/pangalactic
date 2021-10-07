@@ -3,7 +3,7 @@ use wasmi::Trap;
 
 pub trait HostFunc<V>: Sized {
     type Args: FromGuestArgs;
-    type Return: IntoGuestReturn<V>;
+    type Return: IntoGuestReturn;
 
     fn name(&self) -> String {
         get_name::<Self>()
