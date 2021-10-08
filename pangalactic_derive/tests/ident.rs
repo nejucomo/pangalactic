@@ -1,9 +1,9 @@
 pub mod utils;
-use utils::{LinkFor, MemStore, TestSetup};
+use utils::{LinkFor, MemStore, SetupLinks};
 
 def_test! {
-    ident: |setup: TestSetup, outlink: LinkFor<MemStore>| {
-        assert_eq!(&outlink, &setup.inputlink);
+    ident: |slinks: SetupLinks, outlink: LinkFor<MemStore>| {
+        assert_eq!(&outlink, &slinks.inputlink);
         Ok(())
     }
 }

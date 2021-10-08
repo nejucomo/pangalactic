@@ -18,18 +18,14 @@ where
     }
 }
 
-impl<'a, S> HostFunc<VirtualMachine<'a, S>> for LinkKind<S>
+impl<S> HostFunc<VirtualMachine<S>> for LinkKind<S>
 where
     S: Store,
 {
     type Args = LinkHandle<S>;
     type Return = GuestKind;
 
-    fn invoke(
-        &self,
-        vm: &mut VirtualMachine<'a, S>,
-        handle: LinkHandle<S>,
-    ) -> Result<GuestKind, Trap> {
+    fn invoke(&self, vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<GuestKind, Trap> {
         let link = vm.links.get(handle)?;
         Ok(GuestKind(link.kind))
     }

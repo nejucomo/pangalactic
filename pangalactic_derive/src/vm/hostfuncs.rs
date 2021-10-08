@@ -4,7 +4,7 @@ use crate::vm::VirtualMachine;
 use pangalactic_store::Store;
 use pangalactic_wasmi::HostFuncResolver;
 
-pub fn new_hostfunc_resolver<'a, S>() -> HostFuncResolver<VirtualMachine<'a, S>>
+pub fn new_hostfunc_resolver<S>() -> HostFuncResolver<VirtualMachine<S>>
 where
     S: Store + 'static,
 {

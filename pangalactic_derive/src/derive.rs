@@ -2,11 +2,7 @@ use crate::error::Result;
 use pangalactic_nodestore::{LinkFor, NodeStore};
 use pangalactic_store::Store;
 
-pub fn derive<S>(
-    store: &mut NodeStore<S>,
-    exec: &LinkFor<S>,
-    input: &LinkFor<S>,
-) -> Result<LinkFor<S>>
+pub fn derive<S>(store: NodeStore<S>, exec: &LinkFor<S>, input: &LinkFor<S>) -> Result<LinkFor<S>>
 where
     S: Store + 'static,
 {

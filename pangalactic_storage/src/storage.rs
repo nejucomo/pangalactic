@@ -26,6 +26,10 @@ impl Storage {
             storedir,
         )))))
     }
+
+    pub fn unwrap(self) -> NodeStoreImpl {
+        self.0
+    }
 }
 
 impl Deref for Storage {

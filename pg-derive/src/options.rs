@@ -25,8 +25,8 @@ impl OutputCommand for Options {
 
         self.common.execute()?;
 
-        let mut store = Storage::open_default()?;
-        let link = derive(&mut store, &self.exec, &self.input)?;
+        let storage = Storage::open_default()?;
+        let link = derive(storage.unwrap(), &self.exec, &self.input)?;
         Ok(link)
     }
 }

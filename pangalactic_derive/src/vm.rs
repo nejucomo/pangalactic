@@ -10,13 +10,13 @@ use wasmi::{Externals, MemoryRef, ModuleRef};
 pub const WASM_ENTRYPOINT: &str = "derive";
 pub const PANGALACTIC_BINDINGS: &str = "pangalactic_bindings";
 
-pub struct VirtualMachine<'a, S>
+pub struct VirtualMachine<S>
 where
     S: Store,
 {
     hfr: Rc<HostFuncResolver<Self>>,
     #[allow(dead_code)]
-    nodestore: &'a mut NodeStore<S>,
+    nodestore: NodeStore<S>,
     pub(crate) links: LinkTable<S>,
     exec: LinkHandle<S>,
     module: ModuleRef,
@@ -29,13 +29,13 @@ pub type LinkHandle<S> = Handle<LinkFor<S>>;
 
 pub type WasmiResult<T> = Result<T, wasmi::Error>;
 
-impl<'a, S> VirtualMachine<'a, S>
+impl<S> VirtualMachine<S>
 where
     S: Store + 'static,
 {
-    pub fn load(nodestore: &'a mut NodeStore<S>, exec: &LinkFor<S>) -> DeriveResult<Self> {
+    pub fn load(mut nodestore: NodeStore<S>, exec: &LinkFor<S>) -> DeriveResult<Self> {
         let hfr = self::hostfuncs::new_hostfunc_resolver::<S>();
-        let wasmbytes = load_exec_wasm(nodestore, exec)?;
+        let wasmbytes = load_exec_wasm(&mut nodestore, exec)?;
         let (module, memory) = init_mod::<S>(&hfr, exec, &wasmbytes)?;
         let mut links = Table::new();
         let exec = links.append(exec.clone());
@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'a, S> Externals for VirtualMachine<'a, S>
+impl<S> Externals for VirtualMachine<S>
 where
     S: Store,
 {
@@ -103,8 +103,8 @@ where
     Ok(wasmbytes)
 }
 
-fn init_mod<'a, S>(
-    hfr: &HostFuncResolver<VirtualMachine<'a, S>>,
+fn init_mod<S>(
+    hfr: &HostFuncResolver<VirtualMachine<S>>,
     exec: &LinkFor<S>,
     execbytes: &[u8],
 ) -> DeriveResult<(ModuleRef, MemoryRef)>
@@ -118,10 +118,7 @@ where
     Ok((module, memory))
 }
 
-fn load_modref<'a, S, B>(
-    hfr: &HostFuncResolver<VirtualMachine<'a, S>>,
-    bytes: B,
-) -> WasmiResult<ModuleRef>
+fn load_modref<S, B>(hfr: &HostFuncResolver<VirtualMachine<S>>, bytes: B) -> WasmiResult<ModuleRef>
 where
     B: AsRef<[u8]>,
     S: Store,

@@ -15,20 +15,23 @@ macro_rules! def_test {
                 "Running derivation integration test {:?}",
                 stringify!($name)
             );
-            let (setup, outlink) = $crate::utils::derive_test(stringify!($name))?;
-            $closure(setup, outlink)
+            let (setuplinks, outlink) = $crate::utils::derive_test(stringify!($name))?;
+            $closure(setuplinks, outlink)
         }
     };
 }
 
-pub fn derive_test(itestname: &str) -> Result<(TestSetup, LinkFor<MemStore>)> {
-    let mut setup = TestSetup::init(itestname)?;
-    let outlink = setup.derive()?;
-    Ok((setup, outlink))
+pub fn derive_test(itestname: &str) -> Result<(SetupLinks, LinkFor<MemStore>)> {
+    let setup = TestSetup::init(itestname)?;
+    setup.derive()
 }
 
 pub struct TestSetup {
     pub nodestore: NodeStore<MemStore>,
+    pub links: SetupLinks,
+}
+
+pub struct SetupLinks {
     pub wasmlink: LinkFor<MemStore>,
     pub inputlink: LinkFor<MemStore>,
 }
@@ -44,14 +47,17 @@ impl TestSetup {
         let inputlink = nodestore.put_file(&"Hello world!")?;
         Ok(TestSetup {
             nodestore,
-            wasmlink,
-            inputlink,
+            links: SetupLinks {
+                wasmlink,
+                inputlink,
+            },
         })
     }
 
-    fn derive(&mut self) -> Result<LinkFor<MemStore>> {
-        let link = derive(&mut self.nodestore, &self.wasmlink, &self.inputlink)?;
-        Ok(link)
+    fn derive(self) -> Result<(SetupLinks, LinkFor<MemStore>)> {
+        let slinks = self.links;
+        let outlink = derive(self.nodestore, &slinks.wasmlink, &slinks.inputlink)?;
+        Ok((slinks, outlink))
     }
 }
 
