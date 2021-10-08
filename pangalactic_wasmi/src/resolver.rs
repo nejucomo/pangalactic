@@ -1,7 +1,8 @@
 mod adapter;
 
 use self::adapter::HostFuncAdapter;
-use crate::HostFunc;
+use crate::{FromGuestArgs, IntoGuestReturn};
+use crate::{HostFn1, HostFunc};
 use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
 pub struct HostFuncResolver<V>(Vec<Entry<V>>);
@@ -11,9 +12,21 @@ struct Entry<V> {
     funcref: FuncRef,
 }
 
-impl<V> HostFuncResolver<V> {
+impl<V> HostFuncResolver<V>
+where
+    V: 'static,
+{
     pub fn new() -> HostFuncResolver<V> {
         HostFuncResolver(vec![])
+    }
+
+    pub fn add_host_fn1<F, A, R>(&mut self, f: F)
+    where
+        F: Fn(&mut V, A) -> Result<R, Trap> + 'static,
+        A: FromGuestArgs + 'static,
+        R: IntoGuestReturn + 'static,
+    {
+        self.add_host_func(HostFn1::from(f))
     }
 
     pub fn add_host_func<H>(&mut self, hostfunc: H)

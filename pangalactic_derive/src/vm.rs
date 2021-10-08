@@ -77,7 +77,7 @@ where
 
 impl<S> Externals for VirtualMachine<S>
 where
-    S: Store,
+    S: Store + 'static,
 {
     fn invoke_index(
         &mut self,
