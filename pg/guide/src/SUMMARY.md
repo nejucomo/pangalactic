@@ -4,3 +4,4 @@
 - [Tutorial](./tutorial/index.md)
   + [A Little Roleplay](./tutorial/roleplay.md)
   + [Repository Basics](./tutorial/basics.md)
+  + [Branches](./tutorial/branches.md)
