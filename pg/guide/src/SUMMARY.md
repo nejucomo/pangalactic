@@ -4,6 +4,6 @@
 - [Tutorial](./tutorial/index.md)
   + [Basics](./tutorial/basics/index.md)
     - [A Little Roleplay](./tutorial/basics/roleplay.md)
-    - [Repository Basics](./tutorial/basics/basics.md)
+    - [Creating a Repository and Committing Changes](./tutorial/basics/creating-and-committing.md)
     - [Branches](./tutorial/basics/branches.md)
   + [Collaboration]()
