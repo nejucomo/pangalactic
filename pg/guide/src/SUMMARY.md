@@ -1,3 +1,6 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+- [Intro](./intro.md)
+- [Tutorial](./tutorial/index.md)
+  + [A Little Roleplay](./tutorial/roleplay.md)
+  + [Repository Basics](./tutorial/basics.md)
