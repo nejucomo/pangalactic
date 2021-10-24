@@ -1,6 +1,6 @@
 # Repository Basics
 
-First let's create a new repository. Recall from the previous section we're in a directory called `alice` which represent our heroic hacker Alice's perspective.
+First let's create a new repository. Recall from the previous chapter we're in a directory called `alice` which represent our heroic hacker Alice's perspective.
 
 ## Creating a Repository
 
@@ -17,10 +17,12 @@ $ echo '# My Project' > README.md
 ```
 
 ```bash
-$ pg info workspace
+$ pg info workspace changes
 ```
 
-The `info` command shows a lot of information about a repository. We've requested information about the workspace, which is the local directories and files on Alice's filesystem. We see that it shows `README.md` is a new file. Let's save our results into a new `revision` by committing them:
+The `info` command shows a lot of information about a repository. We've requested information about the workspace, which is the local directories and files on Alice's filesystem, and specifically the changes our edits have made compared to the prior revision history. Since this is a new project without any history, every file or directory present is a change from "nothing".
+
+We see that it shows `README.md` is a new file. Let's save our results into a new `revision` by committing them:
 
 ```bash
 $ pg commit --message 'Create a README.md for My Project.'
@@ -37,7 +39,7 @@ $ echo 'An example project for the pg tutorial.' >> README.md
 Let's check the workspace info again:
 
 ```bash
-$ pg info workspace
+$ pg info workspace changes
 ```
 
 This now shows that we've modified Alice's `README.md` compared to the previous `revision` which we created with `pg commit` above.
@@ -60,4 +62,4 @@ This shows the most fundamental operation of revision control with `pg`: creatin
 
 ## Next Steps
 
-Now that we've created a couple of revisions, in the next section we'll see how Alice can develop independent sequences of development using `branches`.
+Now that we've created a couple of revisions, in the next chapter we'll see how Alice can develop independent sequences of development using `branches`.
