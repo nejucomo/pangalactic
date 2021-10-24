@@ -7,3 +7,5 @@
     - [Creating a Repository and Committing Changes](./tutorial/basics/creating-and-committing.md)
     - [Branches](./tutorial/basics/branches.md)
   + [Collaboration]()
+  + [Linking and Embedding]()
+  + [Derivations]()
