@@ -1,7 +1,7 @@
 /// Single-Encryption Key box: Symmetric encryption confidentiality which assumes any given key is
 /// used to encrypt exactly one message.
 /// TODO: Replace w/ pangalactic_secretbox;
-use rust_sodium::crypto::secretbox;
+use sodiumoxide::crypto::secretbox;
 use serde::{Deserialize, Serialize};
 
 pub(crate) const KEY_LENGTH: usize = secretbox::KEYBYTES;

@@ -1,4 +1,4 @@
-use rust_sodium::crypto::secretbox;
+use sodiumoxide::crypto::secretbox;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]

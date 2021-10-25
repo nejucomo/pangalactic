@@ -11,8 +11,8 @@ struct SodiumInit;
 
 impl SodiumInit {
     fn init() -> SodiumInit {
-        log::debug!("Initializing rust_sodium.");
-        rust_sodium::init().expect("rust_sodium::init() failed.");
+        log::debug!("Initializing sodiumoxide.");
+        sodiumoxide::init().expect("sodiumoxide::init() failed.");
         SodiumInit
     }
 
