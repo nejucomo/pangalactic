@@ -11,12 +11,12 @@ pub enum Kind {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct UnknownKindEncoding(pub usize);
+pub struct UnknownKindEncoding(pub i64);
 
-impl TryFrom<usize> for Kind {
+impl TryFrom<i64> for Kind {
     type Error = UnknownKindEncoding;
 
-    fn try_from(u: usize) -> Result<Kind, UnknownKindEncoding> {
+    fn try_from(u: i64) -> Result<Kind, UnknownKindEncoding> {
         match u {
             0 => Ok(Kind::File),
             1 => Ok(Kind::Dir),
@@ -25,8 +25,8 @@ impl TryFrom<usize> for Kind {
     }
 }
 
-impl From<Kind> for usize {
-    fn from(k: Kind) -> usize {
+impl From<Kind> for i64 {
+    fn from(k: Kind) -> i64 {
         match k {
             Kind::File => 0,
             Kind::Dir => 1,

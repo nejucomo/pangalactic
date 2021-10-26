@@ -1,8 +1,8 @@
 use crate::vm::{LinkHandle, VirtualMachine};
 use pangalactic_node::Kind;
 use pangalactic_store::Store;
-use pangalactic_wasmi::{HostFuncResolver, IntoGuestValue};
-use wasmi::{RuntimeValue, Trap, ValueType};
+use pangalactic_wasmi::HostFuncResolver;
+use wasmi::Trap;
 
 pub fn new_hostfunc_resolver<S>() -> HostFuncResolver<VirtualMachine<S>>
 where
@@ -13,26 +13,10 @@ where
     hfr
 }
 
-fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<GuestKind, Trap>
+fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<Kind, Trap>
 where
     S: Store,
 {
     let link = vm.links.get(handle)?;
-    Ok(GuestKind(link.kind))
-}
-
-#[derive(Debug, Copy, Clone)]
-pub struct GuestKind(Kind);
-
-impl IntoGuestValue for GuestKind {
-    fn into_guest_type() -> ValueType {
-        ValueType::I32
-    }
-
-    fn into_guest_value(self) -> Result<RuntimeValue, Trap> {
-        Ok(RuntimeValue::I32(match self.0 {
-            Kind::File => 0,
-            Kind::Dir => 1,
-        }))
-    }
+    Ok(link.kind)
 }

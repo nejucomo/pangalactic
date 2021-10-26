@@ -5,10 +5,10 @@ use test_case::test_case;
 #[test_case(Kind::File)]
 #[test_case(Kind::Dir)]
 fn codec(k: Kind) {
-    let u = usize::from(k);
+    let u = i64::from(k);
     let k2 = Kind::try_from(u).unwrap();
     assert_eq!(k, k2);
-    let u2 = usize::from(k2);
+    let u2 = i64::from(k2);
     assert_eq!(u, u2);
 }
 
