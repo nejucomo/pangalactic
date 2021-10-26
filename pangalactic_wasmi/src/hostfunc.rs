@@ -57,14 +57,14 @@ where
 
 fn get_name<T: Sized>() -> String {
     use convert_case::{Case, Casing};
-    dbg!(std::any::type_name::<T>()
+    std::any::type_name::<T>()
         .split("<")
         .next()
         .unwrap()
         .split("::")
         .last()
         .unwrap()
-        .to_case(Case::Snake))
+        .to_case(Case::Snake)
 }
 
 #[test]
