@@ -1,8 +1,8 @@
+use serde::{Deserialize, Serialize};
 /// Single-Encryption Key box: Symmetric encryption confidentiality which assumes any given key is
 /// used to encrypt exactly one message.
 /// TODO: Replace w/ pangalactic_secretbox;
 use sodiumoxide::crypto::secretbox;
-use serde::{Deserialize, Serialize};
 
 pub(crate) const KEY_LENGTH: usize = secretbox::KEYBYTES;
 pub(crate) type KeyBytes = [u8; KEY_LENGTH];

@@ -1,5 +1,5 @@
-use sodiumoxide::crypto::secretbox;
 use serde::{Deserialize, Serialize};
+use sodiumoxide::crypto::secretbox;
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct SecretBoxKey(secretbox::Key);
