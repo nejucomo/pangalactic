@@ -1,5 +1,5 @@
-use sodiumoxide::crypto::sign;
 use serde::{Deserialize, Serialize};
+use sodiumoxide::crypto::sign;
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct SigningPair {
