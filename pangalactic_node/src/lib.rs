@@ -5,5 +5,5 @@ mod link;
 
 pub use dir::Dir;
 pub use entry::Entry;
-pub use kind::Kind;
+pub use kind::{Kind, UnknownKindEncoding};
 pub use link::Link;
