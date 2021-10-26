@@ -15,4 +15,4 @@ pub use self::hostfunc::HostFunc;
 pub use self::resolver::HostFuncResolver;
 pub use self::ret::IntoGuestReturn;
 pub use self::table::{Handle, Table};
-pub use self::value::FromGuestValue;
+pub use self::value::{FromGuestValue, IntoGuestValue};

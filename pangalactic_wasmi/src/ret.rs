@@ -1,3 +1,4 @@
+use crate::IntoGuestValue;
 use wasmi::{RuntimeValue, Trap, ValueType};
 
 pub trait IntoGuestReturn {
@@ -13,5 +14,18 @@ impl IntoGuestReturn for () {
 
     fn into_guest_return(self) -> Result<Option<RuntimeValue>, Trap> {
         Ok(None)
+    }
+}
+
+impl<T> IntoGuestReturn for T
+where
+    T: IntoGuestValue,
+{
+    fn returntype() -> Option<ValueType> {
+        Some(Self::valuetype())
+    }
+
+    fn into_guest_return(self) -> Result<Option<RuntimeValue>, Trap> {
+        self.into_guest_value().map(Some)
     }
 }
