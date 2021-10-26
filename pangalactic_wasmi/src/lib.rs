@@ -1,7 +1,6 @@
 #![feature(fn_traits)]
 
 mod args;
-mod gtype;
 mod hostfunc;
 mod resolver;
 mod ret;
@@ -9,7 +8,6 @@ mod table;
 mod value;
 
 pub use self::args::FromGuestArgs;
-pub use self::gtype::HasGuestType;
 pub(crate) use self::hostfunc::HostFn1;
 pub use self::hostfunc::HostFunc;
 pub use self::resolver::HostFuncResolver;

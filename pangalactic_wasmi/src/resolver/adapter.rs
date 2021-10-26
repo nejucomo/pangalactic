@@ -18,7 +18,7 @@ where
     fn signature(&self) -> Signature {
         Signature::new(
             <Self as HostFunc<V>>::Args::valuetypes(),
-            <Self as HostFunc<V>>::Return::returntype(),
+            <Self as HostFunc<V>>::Return::into_guest_return_type(),
         )
     }
 

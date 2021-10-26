@@ -1,4 +1,4 @@
-use crate::{FromGuestValue, HasGuestType};
+use crate::FromGuestValue;
 use std::convert::TryFrom;
 use std::fmt;
 use std::marker::PhantomData;
@@ -32,13 +32,11 @@ impl<T> From<Handle<T>> for usize {
     }
 }
 
-impl<T> HasGuestType for Handle<T> {
-    fn valuetype() -> ValueType {
-        usize::valuetype()
-    }
-}
-
 impl<T> FromGuestValue for Handle<T> {
+    fn from_guest_type() -> ValueType {
+        usize::from_guest_type()
+    }
+
     fn from_guest_value(rtv: RuntimeValue) -> Result<Self, Trap> {
         let u = usize::from_guest_value(rtv)?;
         Ok(Handle::from(u))

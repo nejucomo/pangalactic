@@ -11,7 +11,7 @@ where
     T: FromGuestValue,
 {
     fn valuetypes() -> Vec<ValueType> {
-        vec![Self::valuetype()]
+        vec![Self::from_guest_type()]
     }
 
     fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
