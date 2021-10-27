@@ -1,9 +1,11 @@
 pub(crate) mod bindings;
 mod link;
-mod prim;
+pub(crate) mod prim;
+mod read;
 
 pub use self::link::{Kind, LinkHandle};
-pub use self::prim::LinkPrim;
+pub use self::prim::Link as LinkPrim;
+pub use self::read::ReadHandle;
 
 pub fn call_derive_impl<F>(exec: LinkPrim, input: LinkPrim, f: F) -> LinkPrim
 where

@@ -10,7 +10,7 @@ where
 {
     let mut hfr = HostFuncResolver::new();
     hfr.add_host_fn1(link_kind);
-    hfr.add_host_fn1(open_file);
+    hfr.add_host_fn1(read_file);
     hfr
 }
 
@@ -22,7 +22,7 @@ where
     Ok(link.kind)
 }
 
-fn open_file<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<ReadHandle, Trap>
+fn read_file<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<ReadHandle, Trap>
 where
     S: Store,
 {
