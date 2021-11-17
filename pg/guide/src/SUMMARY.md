@@ -9,3 +9,6 @@
   + [Collaboration]()
   + [Linking and Embedding]()
   + [Derivations]()
+- [Design](./design/index.md)
+  + [The Pangalactic Derivation System](./design/derive/index.md)
+    - [Derivation Specification](./design/derive/dspec.md)
