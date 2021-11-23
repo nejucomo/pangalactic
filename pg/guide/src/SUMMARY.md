@@ -12,5 +12,6 @@
 - [Design](./design/index.md)
   + [Goals](./design/goals.md)
   + [Architecture](./design/architecture.md)
+  + [Principles](./design/principles.md)
   + [The Pangalactic Derivation System](./design/derive/index.md)
     - [Derivation Specification](./design/derive/dspec.md)
