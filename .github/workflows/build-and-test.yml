@@ -20,7 +20,7 @@ jobs:
 
       - run: cargo +nightly fmt -- --check
 
-      - run: cargo +nightly test --verbose
+      - run: cargo +nightly test
 
       - run: cargo +nightly build
 
