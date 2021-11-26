@@ -14,8 +14,8 @@ impl LinkHandle {
         }
     }
 
-    pub fn read_file(&self) -> ReadHandle {
-        let primread = unsafe { crate::bindings::read_file(self.0) };
+    pub fn load_file(&self) -> ReadHandle {
+        let primread = unsafe { crate::bindings::load_file(self.0) };
         ReadHandle::from(primread)
     }
 

@@ -10,7 +10,7 @@ where
 {
     let mut hfr = HostFuncResolver::new();
     hfr.add_host_fn1(link_kind);
-    hfr.add_host_fn1(read_file);
+    hfr.add_host_fn1(load_file);
     hfr
 }
 
@@ -37,7 +37,7 @@ impl From<ReadFileError> for Trap {
     }
 }
 
-fn read_file<S>(
+fn load_file<S>(
     vm: &mut VirtualMachine<S>,
     handle: LinkHandle<S>,
 ) -> Result<ReadHandle, ReadFileError>

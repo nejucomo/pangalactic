@@ -3,5 +3,5 @@ members = [
   "ident",
   "get_exec",
   "link_kind_is_file",
-  "read_file",
+  "load_file",
 ]

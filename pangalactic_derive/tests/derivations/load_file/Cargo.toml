@@ -1,5 +1,5 @@
 [package]
-name = "read_file"
+name = "load_file"
 version = "0.1.0"
 edition = "2018"
 
