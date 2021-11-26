@@ -20,11 +20,13 @@ where
         HostFuncResolver(vec![])
     }
 
-    pub fn add_host_fn1<F, A, R>(&mut self, f: F)
+    pub fn add_host_fn1<F, A, R, E>(&mut self, f: F)
     where
-        F: Fn(&mut V, A) -> Result<R, Trap> + 'static,
+        F: Fn(&mut V, A) -> Result<R, E> + 'static,
         A: FromGuestArgs + 'static,
         R: IntoGuestReturn + 'static,
+        E: 'static,
+        Trap: From<E>,
     {
         self.add_host_func(HostFn1::from(f))
     }
