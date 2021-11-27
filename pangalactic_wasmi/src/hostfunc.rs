@@ -13,6 +13,7 @@ pub trait HostFunc<V>: Sized {
 }
 
 // Wrap functions directly for dependent-crate ergonomics:
+// HostFn0
 pub(crate) struct HostFn0<V, F, R, E>
 where
     F: Fn(&mut V) -> Result<R, E>,
@@ -98,6 +99,58 @@ where
 
     fn invoke(&self, vm: &mut V, (a,): (A,)) -> Result<Self::Return, Trap> {
         self.f.call((vm, a)).map_err(|e: E| Trap::from(e))
+    }
+}
+
+// HostFn3
+pub(crate) struct HostFn3<V, F, A1, A2, A3, R, E>
+where
+    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
+    A1: FromGuestValue,
+    A2: FromGuestValue,
+    A3: FromGuestValue,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    f: F,
+    phantom: std::marker::PhantomData<(V, A1, A2, A3, R, E)>,
+}
+
+impl<V, F, A1, A2, A3, R, E> From<F> for HostFn3<V, F, A1, A2, A3, R, E>
+where
+    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
+    A1: FromGuestValue,
+    A2: FromGuestValue,
+    A3: FromGuestValue,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    fn from(f: F) -> Self {
+        HostFn3 {
+            f,
+            phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<V, F, A1, A2, A3, R, E> HostFunc<V> for HostFn3<V, F, A1, A2, A3, R, E>
+where
+    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
+    A1: FromGuestValue,
+    A2: FromGuestValue,
+    A3: FromGuestValue,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    type Args = (A1, A2, A3);
+    type Return = R;
+
+    fn name(&self) -> String {
+        get_name::<F>()
+    }
+
+    fn invoke(&self, vm: &mut V, (a1, a2, a3): (A1, A2, A3)) -> Result<Self::Return, Trap> {
+        self.f.call((vm, a1, a2, a3)).map_err(|e: E| Trap::from(e))
     }
 }
 

@@ -10,6 +10,7 @@ where
 {
     let mut hfr = HostFuncResolver::new();
     hfr.add_host_fn0(new_file);
+    hfr.add_host_fn3(buf_write);
     hfr.add_host_fn1(link_kind);
     hfr.add_host_fn1(load_file);
     hfr
@@ -20,6 +21,22 @@ where
     S: Store,
 {
     Ok(vm.bwtab.append(vec![]))
+}
+
+type HackyGuestReadPointer = i64;
+type HackyGuestReadSize = i64;
+
+fn buf_write<S>(
+    _vm: &mut VirtualMachine<S>,
+    bwh: BufWriterHandle,
+    dataptr: HackyGuestReadPointer,
+    datalen: HackyGuestReadSize,
+) -> Result<BufWriterHandle, Trap>
+where
+    S: Store,
+{
+    dbg!("{:?}", (bwh, dataptr, datalen));
+    todo!();
 }
 
 fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<Kind, Trap>
