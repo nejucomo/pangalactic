@@ -6,6 +6,23 @@ pub trait FromGuestArgs: Sized {
     fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap>;
 }
 
+impl FromGuestArgs for () {
+    fn valuetypes() -> Vec<ValueType> {
+        vec![]
+    }
+
+    fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
+        let rtar = rta.as_ref();
+        if rtar.len() == 0 {
+            Ok(())
+        } else {
+            use wasmi::TrapKind::UnexpectedSignature;
+
+            Err(Trap::new(UnexpectedSignature))
+        }
+    }
+}
+
 impl<T> FromGuestArgs for (T,)
 where
     T: FromGuestValue,

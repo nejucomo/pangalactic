@@ -13,6 +13,49 @@ pub trait HostFunc<V>: Sized {
 }
 
 // Wrap functions directly for dependent-crate ergonomics:
+pub(crate) struct HostFn0<V, F, R, E>
+where
+    F: Fn(&mut V) -> Result<R, E>,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    f: F,
+    phantom: std::marker::PhantomData<(V, R, E)>,
+}
+
+impl<V, F, R, E> From<F> for HostFn0<V, F, R, E>
+where
+    F: Fn(&mut V) -> Result<R, E>,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    fn from(f: F) -> Self {
+        HostFn0 {
+            f,
+            phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<V, F, R, E> HostFunc<V> for HostFn0<V, F, R, E>
+where
+    F: Fn(&mut V) -> Result<R, E>,
+    R: IntoGuestReturn,
+    Trap: From<E>,
+{
+    type Args = ();
+    type Return = R;
+
+    fn name(&self) -> String {
+        get_name::<F>()
+    }
+
+    fn invoke(&self, vm: &mut V, _args: ()) -> Result<Self::Return, Trap> {
+        self.f.call((vm,)).map_err(|e: E| Trap::from(e))
+    }
+}
+
+// HostFn1
 pub(crate) struct HostFn1<V, F, A, R, E>
 where
     F: Fn(&mut V, A) -> Result<R, E>,
