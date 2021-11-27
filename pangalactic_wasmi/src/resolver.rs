@@ -1,7 +1,7 @@
 mod adapter;
 
 use self::adapter::HostFuncAdapter;
-use crate::{FromGuestArgs, IntoGuestReturn};
+use crate::{FromGuestValue, IntoGuestReturn};
 use crate::{HostFn1, HostFunc};
 use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
@@ -23,7 +23,7 @@ where
     pub fn add_host_fn1<F, A, R, E>(&mut self, f: F)
     where
         F: Fn(&mut V, A) -> Result<R, E> + 'static,
-        A: FromGuestArgs + 'static,
+        A: FromGuestValue + 'static,
         R: IntoGuestReturn + 'static,
         E: 'static,
         Trap: From<E>,

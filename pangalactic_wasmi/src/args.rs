@@ -6,18 +6,19 @@ pub trait FromGuestArgs: Sized {
     fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap>;
 }
 
-impl<T> FromGuestArgs for T
+impl<T> FromGuestArgs for (T,)
 where
     T: FromGuestValue,
 {
     fn valuetypes() -> Vec<ValueType> {
-        vec![Self::from_guest_type()]
+        vec![T::from_guest_type()]
     }
 
     fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
         let rtar = rta.as_ref();
         if rtar.len() == 1 {
-            Self::from_guest_value(rtar[0])
+            let v = T::from_guest_value(rtar[0])?;
+            Ok((v,))
         } else {
             use wasmi::TrapKind::UnexpectedSignature;
 

@@ -1,4 +1,4 @@
-use crate::{FromGuestArgs, IntoGuestReturn};
+use crate::{FromGuestArgs, FromGuestValue, IntoGuestReturn};
 use wasmi::Trap;
 
 pub trait HostFunc<V>: Sized {
@@ -16,7 +16,7 @@ pub trait HostFunc<V>: Sized {
 pub(crate) struct HostFn1<V, F, A, R, E>
 where
     F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
+    A: FromGuestValue,
     R: IntoGuestReturn,
     Trap: From<E>,
 {
@@ -27,7 +27,7 @@ where
 impl<V, F, A, R, E> From<F> for HostFn1<V, F, A, R, E>
 where
     F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
+    A: FromGuestValue,
     R: IntoGuestReturn,
     Trap: From<E>,
 {
@@ -42,19 +42,19 @@ where
 impl<V, F, A, R, E> HostFunc<V> for HostFn1<V, F, A, R, E>
 where
     F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
+    A: FromGuestValue,
     R: IntoGuestReturn,
     Trap: From<E>,
 {
-    type Args = A;
+    type Args = (A,);
     type Return = R;
 
     fn name(&self) -> String {
         get_name::<F>()
     }
 
-    fn invoke(&self, vm: &mut V, args: Self::Args) -> Result<Self::Return, Trap> {
-        self.f.call((vm, args)).map_err(|e: E| Trap::from(e))
+    fn invoke(&self, vm: &mut V, (a,): (A,)) -> Result<Self::Return, Trap> {
+        self.f.call((vm, a)).map_err(|e: E| Trap::from(e))
     }
 }
 
