@@ -10,7 +10,7 @@ mod value;
 
 pub use self::args::FromGuestArgs;
 pub use self::hostfunc::HostFunc;
-pub(crate) use self::hostfunc::{HostFn0, HostFn1, HostFn3};
+pub(crate) use self::hostfunc::{HostFn0, HostFn1, HostFn2, HostFn3};
 pub use self::resolver::HostFuncResolver;
 pub use self::ret::IntoGuestReturn;
 pub use self::table::{Handle, Table};

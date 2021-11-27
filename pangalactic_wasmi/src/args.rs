@@ -23,19 +23,42 @@ impl FromGuestArgs for () {
     }
 }
 
-impl<T> FromGuestArgs for (T,)
+impl<A> FromGuestArgs for (A,)
 where
-    T: FromGuestValue,
+    A: FromGuestValue,
 {
     fn valuetypes() -> Vec<ValueType> {
-        vec![T::from_guest_type()]
+        vec![A::from_guest_type()]
     }
 
     fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
         let rtar = rta.as_ref();
         if rtar.len() == 1 {
-            let v = T::from_guest_value(rtar[0])?;
+            let v = A::from_guest_value(rtar[0])?;
             Ok((v,))
+        } else {
+            use wasmi::TrapKind::UnexpectedSignature;
+
+            Err(Trap::new(UnexpectedSignature))
+        }
+    }
+}
+
+impl<A, B> FromGuestArgs for (A, B)
+where
+    A: FromGuestValue,
+    B: FromGuestValue,
+{
+    fn valuetypes() -> Vec<ValueType> {
+        vec![A::from_guest_type(), B::from_guest_type()]
+    }
+
+    fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
+        let rtar = rta.as_ref();
+        if rtar.len() == 2 {
+            let a = A::from_guest_value(rtar[0])?;
+            let b = B::from_guest_value(rtar[1])?;
+            Ok((a, b))
         } else {
             use wasmi::TrapKind::UnexpectedSignature;
 

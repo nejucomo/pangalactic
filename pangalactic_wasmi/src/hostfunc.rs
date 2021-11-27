@@ -1,5 +1,9 @@
-use crate::{FromGuestArgs, FromGuestValue, IntoGuestReturn};
+mod fnwrappers;
+
+use crate::{FromGuestArgs, IntoGuestReturn};
 use wasmi::Trap;
+
+pub(crate) use self::fnwrappers::{HostFn0, HostFn1, HostFn2, HostFn3};
 
 pub trait HostFunc<V>: Sized {
     type Args: FromGuestArgs;
@@ -12,149 +16,7 @@ pub trait HostFunc<V>: Sized {
     fn invoke(&self, vm: &mut V, args: Self::Args) -> Result<Self::Return, Trap>;
 }
 
-// Wrap functions directly for dependent-crate ergonomics:
-// HostFn0
-pub(crate) struct HostFn0<V, F, R, E>
-where
-    F: Fn(&mut V) -> Result<R, E>,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    f: F,
-    phantom: std::marker::PhantomData<(V, R, E)>,
-}
-
-impl<V, F, R, E> From<F> for HostFn0<V, F, R, E>
-where
-    F: Fn(&mut V) -> Result<R, E>,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    fn from(f: F) -> Self {
-        HostFn0 {
-            f,
-            phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<V, F, R, E> HostFunc<V> for HostFn0<V, F, R, E>
-where
-    F: Fn(&mut V) -> Result<R, E>,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    type Args = ();
-    type Return = R;
-
-    fn name(&self) -> String {
-        get_name::<F>()
-    }
-
-    fn invoke(&self, vm: &mut V, _args: ()) -> Result<Self::Return, Trap> {
-        self.f.call((vm,)).map_err(|e: E| Trap::from(e))
-    }
-}
-
-// HostFn1
-pub(crate) struct HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    f: F,
-    phantom: std::marker::PhantomData<(V, A, R, E)>,
-}
-
-impl<V, F, A, R, E> From<F> for HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    fn from(f: F) -> Self {
-        HostFn1 {
-            f,
-            phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<V, F, A, R, E> HostFunc<V> for HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    type Args = (A,);
-    type Return = R;
-
-    fn name(&self) -> String {
-        get_name::<F>()
-    }
-
-    fn invoke(&self, vm: &mut V, (a,): (A,)) -> Result<Self::Return, Trap> {
-        self.f.call((vm, a)).map_err(|e: E| Trap::from(e))
-    }
-}
-
-// HostFn3
-pub(crate) struct HostFn3<V, F, A1, A2, A3, R, E>
-where
-    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
-    A1: FromGuestValue,
-    A2: FromGuestValue,
-    A3: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    f: F,
-    phantom: std::marker::PhantomData<(V, A1, A2, A3, R, E)>,
-}
-
-impl<V, F, A1, A2, A3, R, E> From<F> for HostFn3<V, F, A1, A2, A3, R, E>
-where
-    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
-    A1: FromGuestValue,
-    A2: FromGuestValue,
-    A3: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    fn from(f: F) -> Self {
-        HostFn3 {
-            f,
-            phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<V, F, A1, A2, A3, R, E> HostFunc<V> for HostFn3<V, F, A1, A2, A3, R, E>
-where
-    F: Fn(&mut V, A1, A2, A3) -> Result<R, E>,
-    A1: FromGuestValue,
-    A2: FromGuestValue,
-    A3: FromGuestValue,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    type Args = (A1, A2, A3);
-    type Return = R;
-
-    fn name(&self) -> String {
-        get_name::<F>()
-    }
-
-    fn invoke(&self, vm: &mut V, (a1, a2, a3): (A1, A2, A3)) -> Result<Self::Return, Trap> {
-        self.f.call((vm, a1, a2, a3)).map_err(|e: E| Trap::from(e))
-    }
-}
-
-fn get_name<T: Sized>() -> String {
+pub(crate) fn get_name<T: Sized>() -> String {
     use convert_case::{Case, Casing};
     std::any::type_name::<T>()
         .split("<")
