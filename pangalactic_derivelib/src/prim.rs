@@ -3,5 +3,5 @@
 /// wrappers. Ex: `prim::Link` != `Link` != `LinkHandle`.
 
 pub type LinkKind = i64;
-pub type Link = i64;
-pub type Read = i64;
+pub type LinkHandle = i64;
+pub type BufReaderHandle = i64;

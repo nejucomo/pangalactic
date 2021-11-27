@@ -1,4 +1,4 @@
-use pangalactic_derivelib::{wrap_derive, LinkHandle, LinkPrim};
+use pangalactic_derivelib::{wrap_derive, LinkHandle, PrimLinkHandle};
 
 wrap_derive!(derive_impl);
 
