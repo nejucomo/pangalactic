@@ -1,4 +1,4 @@
-use crate::vm::{LinkHandle, ReadHandle, VirtualMachine};
+use crate::vm::{BufWriterHandle, LinkHandle, ReadHandle, VirtualMachine};
 use pangalactic_node::Kind;
 use pangalactic_store::Store;
 use pangalactic_wasmi::HostFuncResolver;
@@ -9,9 +9,17 @@ where
     S: Store + 'static,
 {
     let mut hfr = HostFuncResolver::new();
+    hfr.add_host_fn0(new_file);
     hfr.add_host_fn1(link_kind);
     hfr.add_host_fn1(load_file);
     hfr
+}
+
+fn new_file<S>(vm: &mut VirtualMachine<S>) -> Result<BufWriterHandle, Trap>
+where
+    S: Store,
+{
+    Ok(vm.bwtab.append(vec![]))
 }
 
 fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<Kind, Trap>

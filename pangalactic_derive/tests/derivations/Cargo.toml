@@ -1,7 +1,8 @@
 [workspace]
 members = [
-  "ident",
   "get_exec",
+  "ident",
   "link_kind_is_file",
   "load_file",
+  "new_file",
 ]

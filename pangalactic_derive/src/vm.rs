@@ -18,7 +18,9 @@ where
     #[allow(dead_code)]
     pub(crate) nodestore: NodeStore<S>,
     pub(crate) links: LinkTable<S>,
+    // TODO: Rename `readtab` -> `brtab`:
     pub(crate) readtab: ReadTable,
+    pub(crate) bwtab: BufWriterTable,
     exec: LinkHandle<S>,
     module: ModuleRef,
     #[allow(dead_code)]
@@ -27,8 +29,11 @@ where
 
 pub type LinkTable<S> = Table<LinkFor<S>>;
 pub type LinkHandle<S> = Handle<LinkFor<S>>;
+// TODO: Rename `Read` -> `BufReader`:
 pub type ReadTable = Table<Vec<u8>>;
 pub type ReadHandle = Handle<Vec<u8>>;
+pub type BufWriterTable = Table<Vec<u8>>;
+pub type BufWriterHandle = Handle<Vec<u8>>;
 
 pub type WasmiResult<T> = Result<T, wasmi::Error>;
 
@@ -42,6 +47,7 @@ where
         let (module, memory) = init_mod::<S>(&hfr, exec, &wasmbytes)?;
         let mut links = Table::new();
         let readtab = Table::new();
+        let bwtab = Table::new();
         let exec = links.append(exec.clone());
 
         Ok(VirtualMachine {
@@ -49,6 +55,7 @@ where
             nodestore,
             links,
             readtab,
+            bwtab,
             exec,
             module,
             memory,

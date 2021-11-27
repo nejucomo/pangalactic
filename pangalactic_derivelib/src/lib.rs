@@ -1,9 +1,11 @@
 pub(crate) mod bindings;
 mod bufreader;
+mod bufwriter;
 mod link;
 pub(crate) mod prim;
 
 pub use self::bufreader::BufReaderHandle;
+pub use self::bufwriter::BufWriterHandle;
 pub use self::link::{Kind, LinkHandle};
 pub use self::prim::LinkHandle as PrimLinkHandle;
 
