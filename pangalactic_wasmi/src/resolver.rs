@@ -95,8 +95,16 @@ where
 impl<V> ModuleImportResolver for HostFuncResolver<V> {
     fn resolve_func(&self, field_name: &str, signature: &Signature) -> Result<FuncRef, Error> {
         for entry in self.0.iter() {
-            if entry.hf.name() == field_name && entry.funcref.signature() == signature {
-                return Ok(entry.funcref.clone());
+            if entry.hf.name() == field_name {
+                let providedsig = entry.funcref.signature();
+                if providedsig == signature {
+                    return Ok(entry.funcref.clone());
+                } else {
+                    return Err(Error::Instantiation(format!(
+                        "Export {} signature mismatch: requested {:?}; provided {:?}",
+                        field_name, signature, providedsig,
+                    )));
+                }
             }
         }
 
