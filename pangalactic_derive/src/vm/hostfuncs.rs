@@ -24,20 +24,22 @@ where
     Ok(vm.bwtab.append(vec![]))
 }
 
-type HackyGuestReadPointer = i64;
-type HackyGuestReadSize = i64;
-
 fn bufwriter_write<S>(
-    _vm: &mut VirtualMachine<S>,
+    vm: &mut VirtualMachine<S>,
     bwh: BufWriterHandle,
-    dataptr: HackyGuestReadPointer,
-    datalen: HackyGuestReadSize,
+    dataptr: usize,
+    datalen: usize,
 ) -> Result<Void, Trap>
 where
     S: Store,
 {
-    dbg!(bwh, dataptr, datalen);
-    todo!();
+    let hostbuf = vm.bwtab.get_mut(bwh)?;
+
+    vm.memory.with_direct_access(|mem| {
+        let guestbuf = &mem[dataptr..dataptr + datalen];
+        hostbuf.extend_from_slice(guestbuf);
+        Ok(Void)
+    })
 }
 
 fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<Kind, Trap>

@@ -27,4 +27,13 @@ impl<T> Table<T> {
             Err(Trap::new(TableAccessOutOfBounds))
         }
     }
+
+    pub fn get_mut(&mut self, h: Handle<T>) -> Result<&mut T, Trap> {
+        let ix = usize::from(h);
+        if ix < self.0.len() {
+            Ok(&mut self.0[ix])
+        } else {
+            Err(Trap::new(TableAccessOutOfBounds))
+        }
+    }
 }
