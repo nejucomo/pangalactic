@@ -1,4 +1,4 @@
-use crate::{bindings, prim};
+use crate::{bindings, prim, LinkHandle};
 
 #[derive(Debug, PartialEq, Eq, derive_more::From)]
 pub struct BufWriterHandle(prim::BufWriterHandle);
@@ -18,5 +18,9 @@ impl BufWriterHandle {
         unsafe {
             bindings::bufwriter_write(self.0, bufptr, buflen);
         }
+    }
+
+    pub fn commit(self) -> LinkHandle {
+        LinkHandle::from(unsafe { bindings::bufwriter_commit(self.0) })
     }
 }

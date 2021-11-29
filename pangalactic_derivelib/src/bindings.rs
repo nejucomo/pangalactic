@@ -8,6 +8,7 @@ extern "C" {
         dataptr: prim::ReadPtr,
         datalen: prim::MemLen,
     );
+    pub(crate) fn bufwriter_commit(handle: prim::BufWriterHandle) -> prim::LinkHandle;
 
     pub(crate) fn link_kind(handle: prim::LinkHandle) -> prim::LinkKind;
     pub(crate) fn load_file(handle: prim::LinkHandle) -> prim::BufReaderHandle;

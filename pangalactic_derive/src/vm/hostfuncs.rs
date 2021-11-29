@@ -1,3 +1,6 @@
+mod iotrap;
+
+use self::iotrap::IOTrap;
 use crate::vm::{BufWriterHandle, LinkHandle, ReadHandle, VirtualMachine};
 use pangalactic_node::Kind;
 use pangalactic_store::Store;
@@ -11,6 +14,7 @@ where
     let mut hfr = HostFuncResolver::new();
     hfr.add_host_fn0(new_file);
     hfr.add_host_fn3(bufwriter_write);
+    hfr.add_host_fn1(bufwriter_commit);
     hfr.add_host_fn1(link_kind);
     hfr.add_host_fn1(load_file);
     log::debug!("Instantiated derive resolver: {:#?}", &hfr);
@@ -42,6 +46,19 @@ where
     })
 }
 
+fn bufwriter_commit<S>(
+    vm: &mut VirtualMachine<S>,
+    bwh: BufWriterHandle,
+) -> Result<LinkHandle<S>, IOTrap>
+where
+    S: Store,
+{
+    let buf = vm.bwtab.remove(bwh)?;
+    let link = vm.nodestore.put_file(buf)?;
+    let linkhandle = vm.links.insert(link);
+    Ok(linkhandle)
+}
+
 fn link_kind<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<Kind, Trap>
 where
     S: Store,
@@ -50,25 +67,7 @@ where
     Ok(link.kind)
 }
 
-#[derive(derive_more::From)]
-enum ReadFileError {
-    Trap(Trap),
-    Stdio(std::io::Error),
-}
-
-impl From<ReadFileError> for Trap {
-    fn from(rfe: ReadFileError) -> Trap {
-        match rfe {
-            ReadFileError::Trap(t) => t,
-            ReadFileError::Stdio(e) => pangalactic_wasmi::into_trap(e),
-        }
-    }
-}
-
-fn load_file<S>(
-    vm: &mut VirtualMachine<S>,
-    handle: LinkHandle<S>,
-) -> Result<ReadHandle, ReadFileError>
+fn load_file<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<ReadHandle, IOTrap>
 where
     S: Store,
 {

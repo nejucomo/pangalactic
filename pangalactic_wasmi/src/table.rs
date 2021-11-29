@@ -2,10 +2,7 @@
 /// This design is only type safe against context confusion bugs if there is only one table for each type.
 mod handle;
 
-use wasmi::{
-    Trap,
-    TrapKind::{ElemUninitialized, TableAccessOutOfBounds},
-};
+use wasmi::{Trap, TrapKind::TableAccessOutOfBounds};
 
 pub struct Table<T>(Vec<Option<T>>);
 
@@ -30,14 +27,9 @@ impl<T> Table<T> {
         h
     }
 
-    pub fn release(&mut self, h: Handle<T>) -> Result<(), Trap> {
+    pub fn remove(&mut self, h: Handle<T>) -> Result<T, Trap> {
         let slot = self.get_slot_mut(h)?;
-        if slot.is_none() {
-            Err(Trap::new(ElemUninitialized))
-        } else {
-            *slot = None;
-            Ok(())
-        }
+        deref_slot(slot.take())
     }
 
     pub fn get(&self, h: Handle<T>) -> Result<&T, Trap> {
