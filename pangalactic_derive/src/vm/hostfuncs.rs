@@ -12,16 +12,16 @@ where
     S: Store + 'static,
 {
     let mut hfr = HostFuncResolver::new();
-    hfr.add_host_fn0(new_file);
+    hfr.add_host_fn0(bufwriter_new);
     hfr.add_host_fn3(bufwriter_write);
     hfr.add_host_fn1(bufwriter_commit);
     hfr.add_host_fn1(link_kind);
-    hfr.add_host_fn1(load_file);
+    hfr.add_host_fn1(link_load_file);
     log::debug!("Instantiated derive resolver: {:#?}", &hfr);
     hfr
 }
 
-fn new_file<S>(vm: &mut VirtualMachine<S>) -> Result<BufWriterHandle, Trap>
+fn bufwriter_new<S>(vm: &mut VirtualMachine<S>) -> Result<BufWriterHandle, Trap>
 where
     S: Store,
 {
@@ -67,7 +67,10 @@ where
     Ok(link.kind)
 }
 
-fn load_file<S>(vm: &mut VirtualMachine<S>, handle: LinkHandle<S>) -> Result<ReadHandle, IOTrap>
+fn link_load_file<S>(
+    vm: &mut VirtualMachine<S>,
+    handle: LinkHandle<S>,
+) -> Result<ReadHandle, IOTrap>
 where
     S: Store,
 {

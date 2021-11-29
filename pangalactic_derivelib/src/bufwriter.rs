@@ -5,7 +5,7 @@ pub struct BufWriterHandle(prim::BufWriterHandle);
 
 impl BufWriterHandle {
     pub fn new() -> Self {
-        let prim = unsafe { bindings::new_file() };
+        let prim = unsafe { bindings::bufwriter_new() };
         BufWriterHandle(prim)
     }
 
