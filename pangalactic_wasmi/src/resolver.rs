@@ -2,6 +2,7 @@ mod adapter;
 
 use self::adapter::HostFuncAdapter;
 use crate::{FromGuestValue, HostFn0, HostFn1, HostFn2, HostFn3, HostFunc, IntoGuestReturn};
+use std::fmt;
 use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
 pub struct HostFuncResolver<V>(Vec<Entry<V>>);
@@ -103,5 +104,18 @@ impl<V> ModuleImportResolver for HostFuncResolver<V> {
             "Export {} not found",
             field_name
         )));
+    }
+}
+
+impl<V> fmt::Debug for HostFuncResolver<V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut dbs = f.debug_struct("HostFuncResolver<...>");
+        for entry in self.0.iter() {
+            dbs.field(
+                &entry.hf.name(),
+                &format!("arity {}", entry.hf.signature().params().len()),
+            );
+        }
+        dbs.finish()
     }
 }

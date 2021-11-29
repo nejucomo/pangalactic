@@ -10,9 +10,10 @@ where
 {
     let mut hfr = HostFuncResolver::new();
     hfr.add_host_fn0(new_file);
-    hfr.add_host_fn3(buf_write);
+    hfr.add_host_fn3(bufwriter_write);
     hfr.add_host_fn1(link_kind);
     hfr.add_host_fn1(load_file);
+    log::debug!("Instantiated derive resolver: {:#?}", &hfr);
     hfr
 }
 
@@ -26,7 +27,7 @@ where
 type HackyGuestReadPointer = i64;
 type HackyGuestReadSize = i64;
 
-fn buf_write<S>(
+fn bufwriter_write<S>(
     _vm: &mut VirtualMachine<S>,
     bwh: BufWriterHandle,
     dataptr: HackyGuestReadPointer,

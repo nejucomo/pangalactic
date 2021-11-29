@@ -7,7 +7,8 @@ pub(crate) mod prim;
 pub use self::bufreader::BufReaderHandle;
 pub use self::bufwriter::BufWriterHandle;
 pub use self::link::{Kind, LinkHandle};
-pub use self::prim::LinkHandle as PrimLinkHandle;
+
+pub type PrimLinkHandle = prim::LinkHandle;
 
 pub fn call_derive_impl<F>(exec: PrimLinkHandle, input: PrimLinkHandle, f: F) -> PrimLinkHandle
 where
