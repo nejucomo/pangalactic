@@ -1,5 +1,5 @@
 [package]
-name = "new_file_then_write"
+name = "new_file_then_write_and_commit"
 version = "0.1.0"
 edition = "2018"
 

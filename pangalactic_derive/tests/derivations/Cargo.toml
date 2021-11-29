@@ -5,5 +5,5 @@ members = [
   "link_kind_is_file",
   "load_file",
   "new_file",
-  "new_file_then_write",
+  "new_file_then_write_and_commit",
 ]
