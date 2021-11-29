@@ -1,7 +1,7 @@
 use crate::vm::{BufWriterHandle, LinkHandle, ReadHandle, VirtualMachine};
 use pangalactic_node::Kind;
 use pangalactic_store::Store;
-use pangalactic_wasmi::HostFuncResolver;
+use pangalactic_wasmi::{HostFuncResolver, Void};
 use wasmi::Trap;
 
 pub fn new_hostfunc_resolver<S>() -> HostFuncResolver<VirtualMachine<S>>
@@ -32,11 +32,11 @@ fn bufwriter_write<S>(
     bwh: BufWriterHandle,
     dataptr: HackyGuestReadPointer,
     datalen: HackyGuestReadSize,
-) -> Result<BufWriterHandle, Trap>
+) -> Result<Void, Trap>
 where
     S: Store,
 {
-    dbg!("{:?}", (bwh, dataptr, datalen));
+    dbg!(bwh, dataptr, datalen);
     todo!();
 }
 
