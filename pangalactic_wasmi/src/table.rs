@@ -13,7 +13,7 @@ impl<T> Table<T> {
         Table(vec![])
     }
 
-    pub fn append(&mut self, item: T) -> Handle<T> {
+    pub fn insert(&mut self, item: T) -> Handle<T> {
         let h = Handle::from(self.0.len());
         self.0.push(item);
         h

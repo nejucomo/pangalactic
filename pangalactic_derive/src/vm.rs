@@ -48,7 +48,7 @@ where
         let mut links = Table::new();
         let readtab = Table::new();
         let bwtab = Table::new();
-        let exec = links.append(exec.clone());
+        let exec = links.insert(exec.clone());
 
         Ok(VirtualMachine {
             hfr: Rc::new(hfr),
@@ -67,7 +67,7 @@ where
         use wasmi::RuntimeValue;
 
         log::debug!("Executing: VirtualMachine::execute()");
-        let inputhandle = self.links.append(input.clone());
+        let inputhandle = self.links.insert(input.clone());
         let args = &[
             RuntimeValue::try_from(self.exec)?,
             RuntimeValue::try_from(inputhandle)?,

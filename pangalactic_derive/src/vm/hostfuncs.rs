@@ -21,7 +21,7 @@ fn new_file<S>(vm: &mut VirtualMachine<S>) -> Result<BufWriterHandle, Trap>
 where
     S: Store,
 {
-    Ok(vm.bwtab.append(vec![]))
+    Ok(vm.bwtab.insert(vec![]))
 }
 
 fn bufwriter_write<S>(
@@ -75,5 +75,5 @@ where
     let link = vm.links.get(handle)?;
     let fkey = link.get_file_key()?;
     let bytes = vm.nodestore.get_file(fkey)?;
-    Ok(vm.readtab.append(bytes))
+    Ok(vm.readtab.insert(bytes))
 }
