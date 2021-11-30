@@ -15,14 +15,12 @@ where
     S: Store,
 {
     hfr: Rc<HostFuncResolver<Self>>,
-    #[allow(dead_code)]
     pub(crate) nodestore: NodeStore<S>,
     pub(crate) links: LinkTable<S>,
     pub(crate) brtab: BufReaderTable,
     pub(crate) bwtab: BufWriterTable,
     exec: LinkHandle<S>,
     module: ModuleRef,
-    #[allow(dead_code)]
     memory: MemoryRef,
 }
 
