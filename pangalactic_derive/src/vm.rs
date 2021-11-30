@@ -15,20 +15,17 @@ where
     S: Store,
 {
     hfr: Rc<HostFuncResolver<Self>>,
-    #[allow(dead_code)]
     pub(crate) nodestore: NodeStore<S>,
     pub(crate) links: LinkTable<S>,
     pub(crate) brtab: BufReaderTable,
     pub(crate) bwtab: BufWriterTable,
     exec: LinkHandle<S>,
     module: ModuleRef,
-    #[allow(dead_code)]
     memory: MemoryRef,
 }
 
 pub type LinkTable<S> = Table<LinkFor<S>>;
 pub type LinkHandle<S> = Handle<LinkFor<S>>;
-// TODO: Rename `Read` -> `BufReader`:
 pub type BufReaderTable = Table<Vec<u8>>;
 pub type BufReaderHandle = Handle<Vec<u8>>;
 pub type BufWriterTable = Table<Vec<u8>>;
