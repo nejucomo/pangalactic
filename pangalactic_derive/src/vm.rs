@@ -1,7 +1,7 @@
 mod hostfuncs;
 
 use crate::error::Result as DeriveResult;
-use pangalactic_nodestore::{LinkFor, NodeStore};
+use pangalactic_nodestore::{DirFor, LinkFor, NodeStore};
 use pangalactic_store::Store;
 use pangalactic_wasmi::{Handle, HostFuncResolver, Table};
 use std::rc::Rc;
@@ -19,6 +19,7 @@ where
     pub(crate) links: LinkTable<S>,
     pub(crate) brtab: BufReaderTable,
     pub(crate) bwtab: BufWriterTable,
+    pub(crate) dwtab: DirWriterTable<S>,
     exec: LinkHandle<S>,
     module: ModuleRef,
     memory: MemoryRef,
@@ -30,6 +31,8 @@ pub type BufReaderTable = Table<Vec<u8>>;
 pub type BufReaderHandle = Handle<Vec<u8>>;
 pub type BufWriterTable = Table<Vec<u8>>;
 pub type BufWriterHandle = Handle<Vec<u8>>;
+pub type DirWriterTable<S> = Table<DirFor<S>>;
+pub type DirWriterHandle<S> = Handle<DirFor<S>>;
 
 pub type WasmiResult<T> = Result<T, wasmi::Error>;
 
@@ -44,6 +47,7 @@ where
         let mut links = Table::new();
         let brtab = Table::new();
         let bwtab = Table::new();
+        let dwtab = Table::new();
         let exec = links.insert(exec.clone());
 
         Ok(VirtualMachine {
@@ -52,6 +56,7 @@ where
             links,
             brtab,
             bwtab,
+            dwtab,
             exec,
             module,
             memory,

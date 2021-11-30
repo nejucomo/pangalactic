@@ -1,5 +1,6 @@
 mod bufreader;
 mod bufwriter;
+mod dirwriter;
 mod iotrap;
 mod link;
 
@@ -12,10 +13,14 @@ where
     S: Store + 'static,
 {
     let mut hfr = HostFuncResolver::new();
+
     // BufWriter:
     hfr.add_host_fn0(self::bufwriter::bufwriter_new);
     hfr.add_host_fn3(self::bufwriter::bufwriter_write);
     hfr.add_host_fn1(self::bufwriter::bufwriter_commit);
+
+    // DirWriter:
+    hfr.add_host_fn0(self::dirwriter::dirwriter_new);
 
     // Link:
     hfr.add_host_fn1(self::link::link_kind);
