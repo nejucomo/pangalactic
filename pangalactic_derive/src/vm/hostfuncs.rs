@@ -12,11 +12,16 @@ where
     S: Store + 'static,
 {
     let mut hfr = HostFuncResolver::new();
+    // BufWriter:
     hfr.add_host_fn0(bufwriter_new);
     hfr.add_host_fn3(bufwriter_write);
     hfr.add_host_fn1(bufwriter_commit);
+
+    // Link:
     hfr.add_host_fn1(link_kind);
+    hfr.add_host_fn2(link_eq);
     hfr.add_host_fn1(link_load_file);
+
     log::debug!("Instantiated derive resolver: {:#?}", &hfr);
     hfr
 }
@@ -65,6 +70,15 @@ where
 {
     let link = vm.links.get(handle)?;
     Ok(link.kind)
+}
+
+fn link_eq<S>(vm: &mut VirtualMachine<S>, a: LinkHandle<S>, b: LinkHandle<S>) -> Result<bool, Trap>
+where
+    S: Store,
+{
+    let linka = vm.links.get(a)?;
+    let linkb = vm.links.get(b)?;
+    Ok(linka == linkb)
 }
 
 fn link_load_file<S>(
