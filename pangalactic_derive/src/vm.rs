@@ -28,7 +28,6 @@ where
 
 pub type LinkTable<S> = Table<LinkFor<S>>;
 pub type LinkHandle<S> = Handle<LinkFor<S>>;
-// TODO: Rename `Read` -> `BufReader`:
 pub type BufReaderTable = Table<Vec<u8>>;
 pub type BufReaderHandle = Handle<Vec<u8>>;
 pub type BufWriterTable = Table<Vec<u8>>;
