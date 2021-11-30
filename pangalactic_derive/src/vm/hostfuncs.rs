@@ -1,7 +1,7 @@
 mod iotrap;
 
 use self::iotrap::IOTrap;
-use crate::vm::{BufWriterHandle, LinkHandle, ReadHandle, VirtualMachine};
+use crate::vm::{BufReaderHandle, BufWriterHandle, LinkHandle, VirtualMachine};
 use pangalactic_node::Kind;
 use pangalactic_store::Store;
 use pangalactic_wasmi::{HostFuncResolver, Void};
@@ -21,6 +21,9 @@ where
     hfr.add_host_fn1(link_kind);
     hfr.add_host_fn2(link_eq);
     hfr.add_host_fn1(link_load_file);
+
+    // BufReader:
+    hfr.add_host_fn3(bufreader_read);
 
     log::debug!("Instantiated derive resolver: {:#?}", &hfr);
     hfr
@@ -84,12 +87,31 @@ where
 fn link_load_file<S>(
     vm: &mut VirtualMachine<S>,
     handle: LinkHandle<S>,
-) -> Result<ReadHandle, IOTrap>
+) -> Result<BufReaderHandle, IOTrap>
 where
     S: Store,
 {
     let link = vm.links.get(handle)?;
     let fkey = link.get_file_key()?;
     let bytes = vm.nodestore.get_file(fkey)?;
-    Ok(vm.readtab.insert(bytes))
+    Ok(vm.brtab.insert(bytes))
+}
+
+fn bufreader_read<S>(
+    vm: &mut VirtualMachine<S>,
+    brh: BufReaderHandle,
+    dataptr: usize,
+    datalen: usize,
+) -> Result<usize, Trap>
+where
+    S: Store,
+{
+    let hostbuf = vm.brtab.get(brh)?;
+    let len = std::cmp::min(datalen, hostbuf.len());
+
+    vm.memory.with_direct_access_mut(|mem| {
+        let guestbuf = &mut mem[dataptr..dataptr + len];
+        guestbuf.clone_from_slice(&hostbuf[..len]);
+        Ok(len)
+    })
 }
