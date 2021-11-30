@@ -6,6 +6,7 @@ members = [
   "identical_writes_yield_equal_links",
   "link_kind_is_file",
   "load_file",
+  "new_dir",
   "new_file",
   "new_file_then_write_and_commit",
 ]
