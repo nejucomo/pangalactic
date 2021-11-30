@@ -18,7 +18,8 @@ where
     #[allow(dead_code)]
     pub(crate) nodestore: NodeStore<S>,
     pub(crate) links: LinkTable<S>,
-    pub(crate) readtab: ReadTable,
+    pub(crate) brtab: BufReaderTable,
+    pub(crate) bwtab: BufWriterTable,
     exec: LinkHandle<S>,
     module: ModuleRef,
     #[allow(dead_code)]
@@ -27,8 +28,11 @@ where
 
 pub type LinkTable<S> = Table<LinkFor<S>>;
 pub type LinkHandle<S> = Handle<LinkFor<S>>;
-pub type ReadTable = Table<Vec<u8>>;
-pub type ReadHandle = Handle<Vec<u8>>;
+// TODO: Rename `Read` -> `BufReader`:
+pub type BufReaderTable = Table<Vec<u8>>;
+pub type BufReaderHandle = Handle<Vec<u8>>;
+pub type BufWriterTable = Table<Vec<u8>>;
+pub type BufWriterHandle = Handle<Vec<u8>>;
 
 pub type WasmiResult<T> = Result<T, wasmi::Error>;
 
@@ -41,14 +45,16 @@ where
         let wasmbytes = load_exec_wasm(&mut nodestore, exec)?;
         let (module, memory) = init_mod::<S>(&hfr, exec, &wasmbytes)?;
         let mut links = Table::new();
-        let readtab = Table::new();
-        let exec = links.append(exec.clone());
+        let brtab = Table::new();
+        let bwtab = Table::new();
+        let exec = links.insert(exec.clone());
 
         Ok(VirtualMachine {
             hfr: Rc::new(hfr),
             nodestore,
             links,
-            readtab,
+            brtab,
+            bwtab,
             exec,
             module,
             memory,
@@ -60,7 +66,7 @@ where
         use wasmi::RuntimeValue;
 
         log::debug!("Executing: VirtualMachine::execute()");
-        let inputhandle = self.links.append(input.clone());
+        let inputhandle = self.links.insert(input.clone());
         let args = &[
             RuntimeValue::try_from(self.exec)?,
             RuntimeValue::try_from(inputhandle)?,

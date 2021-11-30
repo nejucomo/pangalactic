@@ -1,5 +1,9 @@
+mod fnwrappers;
+
 use crate::{FromGuestArgs, IntoGuestReturn};
 use wasmi::Trap;
+
+pub(crate) use self::fnwrappers::{HostFn0, HostFn1, HostFn2, HostFn3};
 
 pub trait HostFunc<V>: Sized {
     type Args: FromGuestArgs;
@@ -12,53 +16,7 @@ pub trait HostFunc<V>: Sized {
     fn invoke(&self, vm: &mut V, args: Self::Args) -> Result<Self::Return, Trap>;
 }
 
-// Wrap functions directly for dependent-crate ergonomics:
-pub(crate) struct HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    f: F,
-    phantom: std::marker::PhantomData<(V, A, R, E)>,
-}
-
-impl<V, F, A, R, E> From<F> for HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    fn from(f: F) -> Self {
-        HostFn1 {
-            f,
-            phantom: std::marker::PhantomData,
-        }
-    }
-}
-
-impl<V, F, A, R, E> HostFunc<V> for HostFn1<V, F, A, R, E>
-where
-    F: Fn(&mut V, A) -> Result<R, E>,
-    A: FromGuestArgs,
-    R: IntoGuestReturn,
-    Trap: From<E>,
-{
-    type Args = A;
-    type Return = R;
-
-    fn name(&self) -> String {
-        get_name::<F>()
-    }
-
-    fn invoke(&self, vm: &mut V, args: Self::Args) -> Result<Self::Return, Trap> {
-        self.f.call((vm, args)).map_err(|e: E| Trap::from(e))
-    }
-}
-
-fn get_name<T: Sized>() -> String {
+pub(crate) fn get_name<T: Sized>() -> String {
     use convert_case::{Case, Casing};
     std::any::type_name::<T>()
         .split("<")
