@@ -15,4 +15,11 @@ extern "C" {
     pub(crate) fn link_kind(handle: prim::LinkHandle) -> prim::LinkKind;
     pub(crate) fn link_eq(a: prim::LinkHandle, b: prim::LinkHandle) -> prim::Bool;
     pub(crate) fn link_load_file(handle: prim::LinkHandle) -> prim::BufReaderHandle;
+
+    // BufReader methods:
+    pub(crate) fn bufreader_read(
+        handle: prim::BufReaderHandle,
+        dataptr: prim::WritePtr,
+        datalen: prim::MemLen,
+    ) -> prim::MemLen;
 }

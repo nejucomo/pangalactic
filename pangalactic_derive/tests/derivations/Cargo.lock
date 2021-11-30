@@ -28,6 +28,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "file_write_then_read"
+version = "0.1.0"
+dependencies = [
+ "pangalactic_derivelib",
+]
+
+[[package]]
 name = "get_exec"
 version = "0.1.0"
 dependencies = [

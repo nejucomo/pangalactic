@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "file_write_then_read",
   "get_exec",
   "ident",
   "identical_writes_yield_equal_links",

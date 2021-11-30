@@ -9,6 +9,7 @@ pub(crate) type LinkHandle = i64;
 pub(crate) type LinkKind = i64;
 pub(crate) type MemLen = i64;
 pub(crate) type ReadPtr = i64;
+pub(crate) type WritePtr = i64;
 
 pub(crate) fn bool_host2guest(b: Bool) -> bool {
     match b {
