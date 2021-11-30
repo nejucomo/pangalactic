@@ -11,6 +11,9 @@ extern "C" {
     );
     pub(crate) fn bufwriter_commit(handle: prim::BufWriterHandle) -> prim::LinkHandle;
 
+    // DirWriter methods:
+    pub(crate) fn dirwriter_new() -> prim::DirWriterHandle;
+
     // Link methods:
     pub(crate) fn link_kind(handle: prim::LinkHandle) -> prim::LinkKind;
     pub(crate) fn link_eq(a: prim::LinkHandle, b: prim::LinkHandle) -> prim::Bool;

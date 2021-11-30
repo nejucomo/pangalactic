@@ -5,6 +5,7 @@
 pub(crate) type Bool = i64;
 pub(crate) type BufReaderHandle = i64;
 pub(crate) type BufWriterHandle = i64;
+pub(crate) type DirWriterHandle = i64;
 pub(crate) type LinkHandle = i64;
 pub(crate) type LinkKind = i64;
 pub(crate) type MemLen = i64;
