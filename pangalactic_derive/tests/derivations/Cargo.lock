@@ -89,6 +89,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "new_dir_with_exec_and_input"
+version = "0.1.0"
+dependencies = [
+ "pangalactic_derivelib",
+]
+
+[[package]]
 name = "new_file"
 version = "0.1.0"
 dependencies = [
