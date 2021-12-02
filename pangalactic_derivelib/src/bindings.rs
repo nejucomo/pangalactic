@@ -13,6 +13,13 @@ extern "C" {
 
     // DirWriter methods:
     pub(crate) fn dirwriter_new() -> prim::DirWriterHandle;
+    pub(crate) fn dirwriter_add_link(
+        handle: prim::DirWriterHandle,
+        strptr: prim::ReadPtr,
+        strlen: prim::MemLen,
+        referent: prim::LinkHandle,
+    );
+    pub(crate) fn dirwriter_commit(handle: prim::DirWriterHandle) -> prim::LinkHandle;
 
     // Link methods:
     pub(crate) fn link_kind(handle: prim::LinkHandle) -> prim::LinkKind;

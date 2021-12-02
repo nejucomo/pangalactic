@@ -19,3 +19,31 @@ pub(crate) fn bool_host2guest(b: Bool) -> bool {
         _ => unreachable!(),
     }
 }
+
+pub(crate) fn bytes_guest2host<B>(bytes: B) -> (ReadPtr, MemLen)
+where
+    B: AsRef<[u8]>,
+{
+    use std::convert::TryInto;
+
+    let buf = bytes.as_ref();
+    let bufptr = buf.as_ptr() as i64; // BUG: How to do this without overflow which would cause memory corruption?
+    let buflenu: usize = buf.len();
+    let buflen: MemLen = buflenu.try_into().unwrap();
+
+    (bufptr, buflen)
+}
+
+pub(crate) fn bytes_guest2host_mut<B>(mut bytes: B) -> (WritePtr, MemLen)
+where
+    B: AsMut<[u8]>,
+{
+    use std::convert::TryInto;
+
+    let buf = bytes.as_mut();
+    let bufptr = buf.as_mut_ptr() as i64; // BUG: How to do this without overflow which would cause memory corruption?
+    let buflenu: usize = buf.len();
+    let buflen: MemLen = buflenu.try_into().unwrap();
+
+    (bufptr, buflen)
+}

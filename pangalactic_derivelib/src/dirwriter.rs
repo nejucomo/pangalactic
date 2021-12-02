@@ -10,10 +10,14 @@ impl DirWriterHandle {
     }
 
     pub fn add_link(&self, name: &str, link: LinkHandle) {
-        todo!("{:?}.add_link{:?}", self, (name, link));
+        let (nameptr, namelen) = prim::bytes_guest2host(name);
+        let linkprim = link.unwrap_prim();
+        unsafe {
+            bindings::dirwriter_add_link(self.0, nameptr, namelen, linkprim);
+        }
     }
 
     pub fn commit(self) -> LinkHandle {
-        todo!("{:?}.commit()", self);
+        LinkHandle::from(unsafe { bindings::dirwriter_commit(self.0) })
     }
 }
