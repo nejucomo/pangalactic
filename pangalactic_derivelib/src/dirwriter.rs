@@ -9,9 +9,9 @@ impl DirWriterHandle {
         DirWriterHandle(prim)
     }
 
-    pub fn add_link(&self, name: &str, link: LinkHandle) {
+    pub fn add_link(&self, name: &str, referent: LinkHandle) {
+        let linkprim = referent.unwrap_prim();
         let (nameptr, namelen) = prim::bytes_guest2host(name);
-        let linkprim = link.unwrap_prim();
         unsafe {
             bindings::dirwriter_add_link(self.0, nameptr, namelen, linkprim);
         }

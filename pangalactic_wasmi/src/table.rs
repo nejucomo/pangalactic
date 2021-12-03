@@ -4,6 +4,7 @@ mod handle;
 
 use wasmi::{Trap, TrapKind::TableAccessOutOfBounds};
 
+#[derive(Debug)]
 pub struct Table<T>(Vec<Option<T>>);
 
 pub use self::handle::Handle;

@@ -58,3 +58,4 @@ def_hfwrapper!(HostFn0, (), ());
 def_hfwrapper!(HostFn1, (A1), (a1));
 def_hfwrapper!(HostFn2, (A1, A2), (a1, a2));
 def_hfwrapper!(HostFn3, (A1, A2, A3), (a1, a2, a3));
+def_hfwrapper!(HostFn4, (A1, A2, A3, A4), (a1, a2, a3, a4));

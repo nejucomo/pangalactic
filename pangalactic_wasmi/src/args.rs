@@ -95,3 +95,35 @@ where
         }
     }
 }
+
+impl<A, B, C, D> FromGuestArgs for (A, B, C, D)
+where
+    A: FromGuestValue,
+    B: FromGuestValue,
+    C: FromGuestValue,
+    D: FromGuestValue,
+{
+    fn valuetypes() -> Vec<ValueType> {
+        vec![
+            A::from_guest_type(),
+            B::from_guest_type(),
+            C::from_guest_type(),
+            D::from_guest_type(),
+        ]
+    }
+
+    fn from_guest_args(rta: RuntimeArgs<'_>) -> Result<Self, Trap> {
+        let rtar = rta.as_ref();
+        if rtar.len() == 4 {
+            let a = A::from_guest_value(rtar[0])?;
+            let b = B::from_guest_value(rtar[1])?;
+            let c = C::from_guest_value(rtar[2])?;
+            let d = D::from_guest_value(rtar[3])?;
+            Ok((a, b, c, d))
+        } else {
+            use wasmi::TrapKind::UnexpectedSignature;
+
+            Err(Trap::new(UnexpectedSignature))
+        }
+    }
+}

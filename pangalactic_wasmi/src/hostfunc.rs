@@ -3,7 +3,7 @@ mod fnwrappers;
 use crate::{FromGuestArgs, IntoGuestReturn};
 use wasmi::Trap;
 
-pub(crate) use self::fnwrappers::{HostFn0, HostFn1, HostFn2, HostFn3};
+pub(crate) use self::fnwrappers::{HostFn0, HostFn1, HostFn2, HostFn3, HostFn4};
 
 pub trait HostFunc<V>: Sized {
     type Args: FromGuestArgs;

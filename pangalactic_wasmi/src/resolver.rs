@@ -1,7 +1,9 @@
 mod adapter;
 
 use self::adapter::HostFuncAdapter;
-use crate::{FromGuestValue, HostFn0, HostFn1, HostFn2, HostFn3, HostFunc, IntoGuestReturn};
+use crate::{
+    FromGuestValue, HostFn0, HostFn1, HostFn2, HostFn3, HostFn4, HostFunc, IntoGuestReturn,
+};
 use std::fmt;
 use wasmi::{Error, FuncRef, ModuleImportResolver, RuntimeArgs, RuntimeValue, Signature, Trap};
 
@@ -64,6 +66,20 @@ where
         Trap: From<E>,
     {
         self.add_host_func(HostFn3::from(f))
+    }
+
+    pub fn add_host_fn4<F, A1, A2, A3, A4, R, E>(&mut self, f: F)
+    where
+        F: Fn(&mut V, A1, A2, A3, A4) -> Result<R, E> + 'static,
+        A1: FromGuestValue + 'static,
+        A2: FromGuestValue + 'static,
+        A3: FromGuestValue + 'static,
+        A4: FromGuestValue + 'static,
+        R: IntoGuestReturn + 'static,
+        E: 'static,
+        Trap: From<E>,
+    {
+        self.add_host_func(HostFn4::from(f))
     }
 
     pub fn add_host_func<H>(&mut self, hostfunc: H)

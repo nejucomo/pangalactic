@@ -1,6 +1,9 @@
-use crate::Entry;
+use crate::{Entry, Link};
 use serde::{Deserialize, Serialize};
 use std::io::{Result, Write};
+
+// BUG: duplicate names
+// BUG: canonicalization
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Dir<K>(Vec<Entry<K>>);
@@ -8,6 +11,14 @@ pub struct Dir<K>(Vec<Entry<K>>);
 impl<K> Dir<K> {
     pub fn new() -> Dir<K> {
         Dir(vec![])
+    }
+
+    pub fn add_link<S>(&mut self, name: S, link: Link<K>)
+    where
+        S: AsRef<str>,
+    {
+        let name = name.as_ref().to_string();
+        self.push_entry(Entry { name, link });
     }
 
     pub fn push_entry(&mut self, entry: Entry<K>) {

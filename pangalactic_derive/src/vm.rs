@@ -84,6 +84,7 @@ where
 
         let outputhandle = LinkHandle::<S>::try_from(outputval)?;
         let outputlink = self.links.get(outputhandle)?.clone();
+        log::debug!("Output: {:?}", &outputlink);
         Ok(outputlink)
     }
 }

@@ -21,6 +21,8 @@ where
 
     // DirWriter:
     hfr.add_host_fn0(self::dirwriter::dirwriter_new);
+    hfr.add_host_fn4(self::dirwriter::dirwriter_add_link);
+    hfr.add_host_fn1(self::dirwriter::dirwriter_commit);
 
     // Link:
     hfr.add_host_fn1(self::link::link_kind);
