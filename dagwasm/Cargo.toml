@@ -11,6 +11,9 @@ async-trait = "0.1.58"
 
 [dependencies.tokio]
 version = "1.21.2"
+features = [
+  "io-util",
+]
 
 [dependencies.wasmtime]
 version = "2.0.2"
