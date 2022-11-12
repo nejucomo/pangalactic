@@ -1,3 +1,5 @@
+// TODO: This design doesn't address GC / data availability.
+
 mod blobstore;
 mod writer;
 

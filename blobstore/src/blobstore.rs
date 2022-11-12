@@ -5,10 +5,10 @@ use tokio::io::AsyncRead;
 
 #[async_trait]
 pub trait BlobStore: Debug {
-    type Link: Debug;
+    type Key: Debug;
     type Reader: AsyncRead;
-    type Writer: Writer<Link = Self::Link>;
+    type Writer: Writer<Key = Self::Key>;
 
-    async fn open_reader(&mut self, link: Self::Link) -> anyhow::Result<Self::Reader>;
+    async fn open_reader(&mut self, link: Self::Key) -> anyhow::Result<Self::Reader>;
     async fn open_writer(&mut self) -> Self::Writer;
 }

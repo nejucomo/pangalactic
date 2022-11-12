@@ -1,14 +1,5 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+mod dagio;
+mod link;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use self::dagio::Dagio;
+pub use self::link::{Link, LinkKind};
