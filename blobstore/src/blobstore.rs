@@ -10,5 +10,5 @@ pub trait BlobStore: Debug {
     type Writer: Writer<Key = Self::Key>;
 
     async fn open_reader(&mut self, link: Self::Key) -> anyhow::Result<Self::Reader>;
-    async fn open_writer(&mut self) -> Self::Writer;
+    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer>;
 }

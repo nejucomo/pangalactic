@@ -8,7 +8,9 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+async-trait.workspace = true
 derive_more.workspace = true
+tokio.workspace = true
 
 [dependencies.dagwasm-blobstore]
 path = "../blobstore"
