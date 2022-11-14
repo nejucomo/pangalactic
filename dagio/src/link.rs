@@ -1,3 +1,4 @@
+use dagwasm_blobstore::BlobStore;
 use std::fmt::Debug;
 
 #[derive(Debug)]
@@ -11,6 +12,8 @@ pub enum Link<K> {
     File(K),
     Dir(K),
 }
+
+pub type LinkFor<BS> = Link<<BS as BlobStore>::Key>;
 
 impl<K> Link<K> {
     pub fn unwrap_key(self, kind: LinkKind) -> anyhow::Result<K>

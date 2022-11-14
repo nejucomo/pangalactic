@@ -1,8 +1,8 @@
 [workspace]
 members = [
-  "dagwasm",
-  "dagio",
   "blobstore",
+  "dagio",
+  "host",
 ]
 
 [workspace.package]

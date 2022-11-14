@@ -1,17 +1,18 @@
-use crate::dag;
+use dagwasm_blobstore::BlobStore;
+use dagwasm_dagio::{Dagio, LinkFor};
 use wasmtime::{Engine, Store};
 
 #[allow(dead_code)]
-pub struct Host<DS> {
+pub struct Host<BS> {
     engine: Engine,
-    store: Store<DS>,
+    store: Store<Dagio<BS>>,
 }
 
-impl<DS> Host<DS>
+impl<BS> Host<BS>
 where
-    DS: dag::Store,
+    BS: BlobStore,
 {
-    pub fn new(dagstore: DS) -> anyhow::Result<Self> {
+    pub fn new(blobstore: BS) -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();
 
         config
@@ -23,12 +24,12 @@ where
             .cranelift_nan_canonicalization(true);
 
         let engine = Engine::new(&config)?;
-        let store = Store::new(&engine, dagstore);
+        let store = Store::new(&engine, Dagio::from(blobstore));
 
         Ok(Host { engine, store })
     }
 
-    pub fn execute(&self, _modlink: <DS as dag::Store>::Link) -> anyhow::Result<()> {
+    pub fn execute(&self, _modlink: LinkFor<BS>) -> anyhow::Result<()> {
         todo!()
     }
 }
