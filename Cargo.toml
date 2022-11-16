@@ -2,6 +2,7 @@
 members = [
   "blobstore",
   "dagio",
+  "dir",
   "host",
 ]
 
@@ -14,6 +15,7 @@ license = "MIT"
 anyhow = "1.0.66"
 async-trait = "0.1.58"
 derive_more = "0.99.17"
+test-case = "2.2.2"
 
 [workspace.dependencies.tokio]
 version = "1.21.2"
