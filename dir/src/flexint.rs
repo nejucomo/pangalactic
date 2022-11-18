@@ -1,4 +1,33 @@
+use tokio::io::AsyncWrite;
+
 const MAX_SIZE: usize = 10;
+
+pub(crate) trait IntoU64 {
+    fn into_u64(self) -> u64;
+}
+
+impl IntoU64 for u64 {
+    fn into_u64(self) -> u64 {
+        self
+    }
+}
+
+impl IntoU64 for usize {
+    fn into_u64(self) -> u64 {
+        u64::try_from(self).expect("usize to u64 platform error")
+    }
+}
+
+pub(crate) async fn write_flexint<W, U>(w: &mut W, u: U) -> std::io::Result<()>
+where
+    W: AsyncWrite + Unpin,
+    U: IntoU64,
+{
+    use tokio::io::AsyncWriteExt;
+
+    let fie = FlexIntEncoding::from(u.into_u64());
+    w.write_all(fie.as_slice()).await
+}
 
 /// Provides encoding/decoding U64 in a flex-int format
 #[derive(Clone, Debug)]
@@ -16,23 +45,23 @@ impl FlexIntEncoding {
 
 impl From<u64> for FlexIntEncoding {
     fn from(mut u: u64) -> Self {
-        let mut fei = FlexIntEncoding {
+        let mut fie = FlexIntEncoding {
             buf: [0; MAX_SIZE],
             used: 0,
         };
 
         if u == 0 {
-            fei.used = 1;
+            fie.used = 1;
         } else {
             while u > 0 {
                 let flagbit: u8 = if (u >> 7) > 0 { 0x80 } else { 0x00 };
-                fei.buf[fei.used] = flagbit | ((u & 0x7f) as u8);
-                fei.used += 1;
+                fie.buf[fie.used] = flagbit | ((u & 0x7f) as u8);
+                fie.used += 1;
                 u >>= 7;
             }
         }
 
-        fei
+        fie
     }
 }
 
@@ -54,28 +83,28 @@ pub(crate) enum U64DecodeErrorReason {
 impl TryFrom<FlexIntEncoding> for u64 {
     type Error = U64DecodeError;
 
-    fn try_from(fei: FlexIntEncoding) -> Result<u64, Self::Error> {
-        u64::try_from(&fei)
+    fn try_from(fie: FlexIntEncoding) -> Result<u64, Self::Error> {
+        u64::try_from(&fie)
     }
 }
 
 impl<'a> TryFrom<&'a FlexIntEncoding> for u64 {
     type Error = U64DecodeError;
 
-    fn try_from(fei: &'a FlexIntEncoding) -> Result<u64, Self::Error> {
-        u64_try_from_fei(fei).map_err(|reason| U64DecodeError {
+    fn try_from(fie: &'a FlexIntEncoding) -> Result<u64, Self::Error> {
+        u64_try_from_fie(fie).map_err(|reason| U64DecodeError {
             reason,
-            input: fei.clone(),
+            input: fie.clone(),
         })
     }
 }
 
-fn u64_try_from_fei(fei: &FlexIntEncoding) -> Result<u64, U64DecodeErrorReason> {
+fn u64_try_from_fie(fie: &FlexIntEncoding) -> Result<u64, U64DecodeErrorReason> {
     let high_bit_set = |b| b & 0x80 == 0x80;
 
     let mut u: u64 = 0;
 
-    let slice = fei.as_slice();
+    let slice = fie.as_slice();
     for (i, &b) in slice.iter().enumerate() {
         use U64DecodeErrorReason::*;
 
@@ -110,10 +139,10 @@ impl TryFrom<&[u8]> for FlexIntEncoding {
         if used <= MAX_SIZE {
             let mut buf = [0; MAX_SIZE];
             buf[..used].copy_from_slice(slice);
-            let fei = FlexIntEncoding { buf, used };
+            let fie = FlexIntEncoding { buf, used };
             // Check for overflow:
-            let _ = u64::try_from(&fei)?;
-            Ok(fei)
+            let _ = u64::try_from(&fie)?;
+            Ok(fie)
         } else {
             Err(FromSliceError::SliceTooLong)
         }

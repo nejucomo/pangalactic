@@ -1,7 +1,8 @@
 use std::collections::BTreeMap;
-// use tokio::io::AsyncWrite;
+use std::marker::Unpin;
+use tokio::io::AsyncWrite;
 
-// const SERIALIZATION_VERSION: u8 = 0;
+const SERIALIZATION_VERSION: u64 = 0;
 
 #[derive(Debug, Default)]
 pub struct Directory<L>(BTreeMap<Name, L>);
@@ -22,14 +23,16 @@ impl<L> Directory<L> {
         }
     }
 
-    /*
-    pub async fn serialize_into<W>(self, w: W) -> anyhow::Result<()>
+    pub async fn serialize_into<W>(self, mut w: W) -> anyhow::Result<()>
     where
-        W: AsyncWrite,
+        W: AsyncWrite + Unpin,
     {
-        use tokio::io::AsyncWriteExt;
+        use crate::flexint::write_flexint;
+        // use tokio::io::AsyncWriteExt;
 
-        w.write_u8(SERIALIZATION_VERSION).await?;
+        write_flexint(&mut w, SERIALIZATION_VERSION).await?;
+        write_flexint(&mut w, self.0.len()).await?;
+
+        todo!();
     }
-    */
 }
