@@ -63,6 +63,15 @@ async fn test_empty_directory() {
     serialize_then_deserialize::<FLDirectory>(Directory::default()).await;
 }
 
+#[tokio::test]
+async fn test_directory() {
+    let mut d: FLDirectory = Directory::default();
+    d.insert("alpha".to_string(), FakeLink).unwrap();
+    d.insert("beta".to_string(), FakeLink).unwrap();
+
+    serialize_then_deserialize::<FLDirectory>(d).await;
+}
+
 async fn serialize_then_deserialize<T>(input: T)
 where
     T: AsyncSerialize + AsyncDeserialize + PartialEq + std::fmt::Debug,
