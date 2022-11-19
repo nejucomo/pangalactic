@@ -77,6 +77,16 @@ impl AsyncSerialize for [u8] {
 }
 
 #[async_trait]
+impl AsyncSerialize for Vec<u8> {
+    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
+    where
+        W: AsyncWrite + Unpin + Send,
+    {
+        self.as_slice().write_into(w).await
+    }
+}
+
+#[async_trait]
 impl AsyncDeserialize for Vec<u8> {
     async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
     where
@@ -99,6 +109,16 @@ impl AsyncSerialize for str {
         W: AsyncWrite + Unpin + Send,
     {
         self.as_bytes().write_into(w).await
+    }
+}
+
+#[async_trait]
+impl AsyncSerialize for String {
+    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
+    where
+        W: AsyncWrite + Unpin + Send,
+    {
+        self.as_str().write_into(w).await
     }
 }
 

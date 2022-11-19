@@ -20,6 +20,16 @@ async fn test_0x123456789usize() {
     serialize_then_deserialize(0x123456789usize).await;
 }
 
+#[tokio::test]
+async fn test_byte_vec() {
+    serialize_then_deserialize(vec![42u8, 17u8]).await;
+}
+
+#[tokio::test]
+async fn test_string() {
+    serialize_then_deserialize("Hello World!".to_string()).await;
+}
+
 async fn serialize_then_deserialize<T>(input: T)
 where
     T: AsyncSerialize + AsyncDeserialize + PartialEq + std::fmt::Debug,
