@@ -1,3 +1,4 @@
+pub mod codec;
 mod dir;
 mod flexint;
 

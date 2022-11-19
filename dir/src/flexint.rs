@@ -1,33 +1,9 @@
-use tokio::io::AsyncWrite;
+use crate::codec::{AsyncDeserialize, AsyncSerialize};
+use async_trait::async_trait;
+use std::marker::Unpin;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 const MAX_SIZE: usize = 10;
-
-pub(crate) trait IntoU64 {
-    fn into_u64(self) -> u64;
-}
-
-impl IntoU64 for u64 {
-    fn into_u64(self) -> u64 {
-        self
-    }
-}
-
-impl IntoU64 for usize {
-    fn into_u64(self) -> u64 {
-        u64::try_from(self).expect("usize to u64 platform error")
-    }
-}
-
-pub(crate) async fn write_flexint<W, U>(w: &mut W, u: U) -> std::io::Result<()>
-where
-    W: AsyncWrite + Unpin,
-    U: IntoU64,
-{
-    use tokio::io::AsyncWriteExt;
-
-    let fie = FlexIntEncoding::from(u.into_u64());
-    w.write_all(fie.as_slice()).await
-}
 
 /// Provides encoding/decoding U64 in a flex-int format
 #[derive(Clone, Debug)]
@@ -41,14 +17,52 @@ impl FlexIntEncoding {
         assert!(self.used <= MAX_SIZE);
         &self.buf[..self.used]
     }
+
+    fn empty() -> Self {
+        FlexIntEncoding {
+            buf: [0; MAX_SIZE],
+            used: 0,
+        }
+    }
+
+    fn check_overflow(&self) -> anyhow::Result<()> {
+        u64::try_from(self).map(|_| ())
+    }
+}
+
+#[async_trait]
+impl AsyncSerialize for FlexIntEncoding {
+    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
+    where
+        W: AsyncWrite + Unpin + Send,
+    {
+        self.as_slice().write_into(w).await
+    }
+}
+
+#[async_trait]
+impl AsyncDeserialize for FlexIntEncoding {
+    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
+    where
+        R: AsyncRead + Unpin + Send,
+    {
+        use tokio::io::AsyncReadExt;
+
+        let mut fie = FlexIntEncoding::empty();
+
+        while fie.used == 0 || fie.used < MAX_SIZE || high_bit_set(fie.buf[fie.used - 1]) {
+            fie.buf[fie.used] = r.read_u8().await?;
+            fie.used += 1;
+        }
+
+        fie.check_overflow()?;
+        Ok(fie)
+    }
 }
 
 impl From<u64> for FlexIntEncoding {
     fn from(mut u: u64) -> Self {
-        let mut fie = FlexIntEncoding {
-            buf: [0; MAX_SIZE],
-            used: 0,
-        };
+        let mut fie = FlexIntEncoding::empty();
 
         if u == 0 {
             fie.used = 1;
@@ -65,88 +79,68 @@ impl From<u64> for FlexIntEncoding {
     }
 }
 
-#[derive(Debug)]
-pub(crate) struct U64DecodeError {
-    #[allow(dead_code)] // Only used for Debug display:
-    input: FlexIntEncoding,
-    #[allow(dead_code)] // Only used for Debug display:
-    reason: U64DecodeErrorReason,
-}
-
-#[derive(Debug)]
-pub(crate) enum U64DecodeErrorReason {
-    Overflow,
-    MissingContinuationBit,
-    UnexpectedContinuationBit,
-}
-
 impl TryFrom<FlexIntEncoding> for u64 {
-    type Error = U64DecodeError;
+    type Error = anyhow::Error;
 
-    fn try_from(fie: FlexIntEncoding) -> Result<u64, Self::Error> {
+    fn try_from(fie: FlexIntEncoding) -> anyhow::Result<u64> {
         u64::try_from(&fie)
     }
 }
 
 impl<'a> TryFrom<&'a FlexIntEncoding> for u64 {
-    type Error = U64DecodeError;
+    type Error = anyhow::Error;
 
-    fn try_from(fie: &'a FlexIntEncoding) -> Result<u64, Self::Error> {
-        u64_try_from_fie(fie).map_err(|reason| U64DecodeError {
-            reason,
-            input: fie.clone(),
-        })
-    }
-}
+    fn try_from(fie: &'a FlexIntEncoding) -> anyhow::Result<u64> {
+        let mut u: u64 = 0;
 
-fn u64_try_from_fie(fie: &FlexIntEncoding) -> Result<u64, U64DecodeErrorReason> {
-    let high_bit_set = |b| b & 0x80 == 0x80;
-
-    let mut u: u64 = 0;
-
-    let slice = fie.as_slice();
-    for (i, &b) in slice.iter().enumerate() {
-        use U64DecodeErrorReason::*;
-
-        dbg!(i, slice.len(), b);
-        if i + 1 == MAX_SIZE && b > 0x01 {
-            return Err(Overflow);
-        } else if i + 1 == slice.len() {
-            if high_bit_set(b) {
-                return Err(UnexpectedContinuationBit);
+        let slice = fie.as_slice();
+        for (i, &b) in slice.iter().enumerate() {
+            if i + 1 == MAX_SIZE && b > 0x01 {
+                return Err(anyhow::Error::msg(format!("overflow @{} {:?}", i, slice)));
+            } else if i + 1 == slice.len() {
+                if high_bit_set(b) {
+                    return Err(anyhow::Error::msg(format!(
+                        "unexpected continuation bit @{} {:?}",
+                        i, slice
+                    )));
+                }
+            } else if !high_bit_set(b) {
+                return Err(anyhow::Error::msg(format!(
+                    "missing continuation bit @{} {:?}",
+                    i, slice
+                )));
             }
-        } else if !high_bit_set(b) {
-            return Err(MissingContinuationBit);
+
+            u |= ((b & 0x7f) as u64) << (i * 7);
         }
 
-        u |= ((b & 0x7f) as u64) << (i * 7);
+        Ok(u)
     }
-
-    Ok(u)
-}
-
-#[derive(Debug, derive_more::From)]
-pub(crate) enum FromSliceError {
-    SliceTooLong,
-    Overflow(U64DecodeError),
 }
 
 impl TryFrom<&[u8]> for FlexIntEncoding {
-    type Error = FromSliceError;
+    type Error = anyhow::Error;
 
-    fn try_from(slice: &[u8]) -> Result<FlexIntEncoding, Self::Error> {
+    fn try_from(slice: &[u8]) -> anyhow::Result<FlexIntEncoding> {
         let used = slice.len();
         if used <= MAX_SIZE {
             let mut buf = [0; MAX_SIZE];
             buf[..used].copy_from_slice(slice);
             let fie = FlexIntEncoding { buf, used };
-            // Check for overflow:
-            let _ = u64::try_from(&fie)?;
+            fie.check_overflow()?;
             Ok(fie)
         } else {
-            Err(FromSliceError::SliceTooLong)
+            Err(anyhow::Error::msg(format!(
+                "byte encoding too long {} vs max size {}",
+                slice.len(),
+                MAX_SIZE
+            )))
         }
     }
+}
+
+fn high_bit_set(b: u8) -> bool {
+    b & 0x80 == 0x80
 }
 
 #[cfg(test)]
