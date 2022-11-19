@@ -32,11 +32,14 @@ impl FlexIntEncoding {
 
 #[async_trait]
 impl AsyncSerialize for FlexIntEncoding {
-    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
+    async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
     where
         W: AsyncWrite + Unpin + Send,
     {
-        self.as_slice().write_into(w).await
+        use tokio::io::AsyncWriteExt;
+
+        w.write_all(self.as_slice()).await?;
+        Ok(())
     }
 }
 
@@ -50,7 +53,7 @@ impl AsyncDeserialize for FlexIntEncoding {
 
         let mut fie = FlexIntEncoding::empty();
 
-        while fie.used == 0 || fie.used < MAX_SIZE || high_bit_set(fie.buf[fie.used - 1]) {
+        while fie.used == 0 || (fie.used < MAX_SIZE && high_bit_set(fie.buf[fie.used - 1])) {
             fie.buf[fie.used] = r.read_u8().await?;
             fie.used += 1;
         }
