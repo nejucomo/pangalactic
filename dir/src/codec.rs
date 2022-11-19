@@ -113,3 +113,6 @@ impl AsyncDeserialize for String {
         Ok(s)
     }
 }
+
+#[cfg(test)]
+mod tests;
