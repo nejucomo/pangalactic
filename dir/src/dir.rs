@@ -6,7 +6,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 
 const SERIALIZATION_VERSION: u64 = 0;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Directory<L>(BTreeMap<Name, L>);
 
 // TODO: newtype String which excludes illegal names:

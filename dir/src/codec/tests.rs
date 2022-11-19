@@ -1,4 +1,8 @@
 use crate::codec::{AsyncDeserialize, AsyncSerialize};
+use crate::Directory;
+use async_trait::async_trait;
+use std::marker::Unpin;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 #[tokio::test]
 async fn test_0u64() {
@@ -28,6 +32,35 @@ async fn test_byte_vec() {
 #[tokio::test]
 async fn test_string() {
     serialize_then_deserialize("Hello World!".to_string()).await;
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct FakeLink;
+type FLDirectory = Directory<FakeLink>;
+
+#[async_trait]
+impl AsyncSerialize for FakeLink {
+    async fn write_into<W>(&self, _w: W) -> anyhow::Result<()>
+    where
+        W: AsyncWrite + Unpin + Send,
+    {
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl AsyncDeserialize for FakeLink {
+    async fn read_from<R>(_r: R) -> anyhow::Result<Self>
+    where
+        R: AsyncRead + Unpin + Send,
+    {
+        Ok(FakeLink)
+    }
+}
+
+#[tokio::test]
+async fn test_empty_directory() {
+    serialize_then_deserialize::<FLDirectory>(Directory::default()).await;
 }
 
 async fn serialize_then_deserialize<T>(input: T)
