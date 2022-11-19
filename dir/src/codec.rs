@@ -96,7 +96,7 @@ impl AsyncDeserialize for Vec<u8> {
 
         let bytelen = usize::read_from(&mut r).await?;
         // SECURITY BUG: we alloc on a size sent over the wire:
-        let mut bytes = Vec::with_capacity(bytelen);
+        let mut bytes = vec![0u8; bytelen];
         r.read_exact(bytes.as_mut_slice()).await?;
         Ok(bytes)
     }
