@@ -1,6 +1,3 @@
-use crate::Link;
-use async_trait::async_trait;
-use dagwasm_blobstore::Writer;
 use std::io::IoSlice;
 use std::pin::Pin;
 use std::task::{Context, Poll};
@@ -9,11 +6,11 @@ use tokio::io::AsyncWrite;
 #[derive(derive_more::From)]
 pub struct FileWriter<W>(W)
 where
-    W: Send + Writer + std::marker::Unpin;
+    W: Send + AsyncWrite + std::marker::Unpin;
 
 impl<W> AsyncWrite for FileWriter<W>
 where
-    W: Send + Writer + std::marker::Unpin + std::ops::Deref,
+    W: Send + AsyncWrite + std::marker::Unpin + std::ops::Deref,
     <W as std::ops::Deref>::Target: std::marker::Unpin,
 {
     fn poll_write(
@@ -50,19 +47,5 @@ where
         let subpin = Pin::new(&mut innerself.0);
 
         AsyncWrite::poll_write_vectored(subpin, cx, bufs)
-    }
-}
-
-#[async_trait]
-impl<W> Writer for FileWriter<W>
-where
-    W: Send + Writer + std::marker::Unpin + std::ops::Deref,
-    <W as std::ops::Deref>::Target: std::marker::Unpin,
-{
-    type Key = Link<<W as Writer>::Key>;
-
-    async fn commit(self) -> anyhow::Result<Self::Key> {
-        let inner = self.0.commit().await?;
-        Ok(Link::File(inner))
     }
 }
