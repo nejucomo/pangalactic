@@ -5,6 +5,7 @@ members = [
   "dir",
   "host",
   "memstore",
+  "serialization",
 ]
 
 [workspace.package]

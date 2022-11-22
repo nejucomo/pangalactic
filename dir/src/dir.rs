@@ -1,6 +1,6 @@
-use crate::codec::{AsyncDeserialize, AsyncSerialize};
 use crate::Link;
 use async_trait::async_trait;
+use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::collections::BTreeMap;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
