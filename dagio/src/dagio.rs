@@ -23,4 +23,11 @@ where
         let inner = self.0.open_writer().await?;
         Ok(FileWriter::from(inner))
     }
+
+    pub async fn commit_file_writer(
+        &mut self,
+        _w: FileWriter<<B as BlobStore>::Writer>,
+    ) -> anyhow::Result<Link<<B as BlobStore>::Key>> {
+        todo!()
+    }
 }
