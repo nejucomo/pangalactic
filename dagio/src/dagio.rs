@@ -1,5 +1,6 @@
-use crate::{FileWriter, Link, LinkKind};
+use crate::FileWriter;
 use dagwasm_blobstore::BlobStore;
+use dagwasm_dir::{Link, LinkKind};
 
 #[derive(Debug, derive_more::From)]
 pub struct Dagio<B>(B);

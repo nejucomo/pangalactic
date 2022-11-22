@@ -1,7 +1,7 @@
 mod dagio;
 mod filewriter;
-mod link;
+mod linkfor;
 
 pub use self::dagio::Dagio;
 pub use self::filewriter::FileWriter;
-pub use self::link::{Link, LinkFor, LinkKind};
+pub use self::linkfor::LinkFor;

@@ -1,5 +1,5 @@
 use crate::codec::{AsyncDeserialize, AsyncSerialize};
-use crate::Directory;
+use crate::{Directory, Link, LinkKind};
 use async_trait::async_trait;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -35,11 +35,11 @@ async fn test_string() {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct FakeLink;
-type FLDirectory = Directory<FakeLink>;
+struct FakeKey;
+type FLDirectory = Directory<FakeKey>;
 
 #[async_trait]
-impl AsyncSerialize for FakeLink {
+impl AsyncSerialize for FakeKey {
     async fn write_into<W>(&self, _w: W) -> anyhow::Result<()>
     where
         W: AsyncWrite + Unpin + Send,
@@ -49,12 +49,12 @@ impl AsyncSerialize for FakeLink {
 }
 
 #[async_trait]
-impl AsyncDeserialize for FakeLink {
+impl AsyncDeserialize for FakeKey {
     async fn read_from<R>(_r: R) -> anyhow::Result<Self>
     where
         R: AsyncRead + Unpin + Send,
     {
-        Ok(FakeLink)
+        Ok(FakeKey)
     }
 }
 
@@ -65,9 +65,13 @@ async fn test_empty_directory() {
 
 #[tokio::test]
 async fn test_directory() {
+    use LinkKind::*;
+
     let mut d: FLDirectory = Directory::default();
-    d.insert("alpha".to_string(), FakeLink).unwrap();
-    d.insert("beta".to_string(), FakeLink).unwrap();
+    d.insert("alpha".to_string(), Link::new(File, FakeKey))
+        .unwrap();
+    d.insert("beta".to_string(), Link::new(Dir, FakeKey))
+        .unwrap();
 
     serialize_then_deserialize::<FLDirectory>(d).await;
 }
