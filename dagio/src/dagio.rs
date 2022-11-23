@@ -1,6 +1,6 @@
 use crate::FileWriter;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dir::{Link, LinkKind};
+use dagwasm_dir::{Link, LinkKind::File};
 
 #[derive(Debug, derive_more::From)]
 pub struct Dagio<B>(B);
@@ -14,7 +14,7 @@ where
         &mut self,
         link: Link<<B as BlobStore>::Key>,
     ) -> anyhow::Result<<B as BlobStore>::Reader> {
-        let key = link.unwrap_key(LinkKind::File)?;
+        let key = link.unwrap_key(File)?;
         self.0.open_reader(key).await
     }
 
@@ -27,8 +27,11 @@ where
 
     pub async fn commit_file_writer(
         &mut self,
-        _w: FileWriter<<B as BlobStore>::Writer>,
+        w: FileWriter<<B as BlobStore>::Writer>,
     ) -> anyhow::Result<Link<<B as BlobStore>::Key>> {
-        todo!()
+        self.0
+            .commit_writer(w.unwrap())
+            .await
+            .map(|k| Link::new(File, k))
     }
 }
