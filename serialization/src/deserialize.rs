@@ -35,6 +35,20 @@ impl AsyncDeserialize for usize {
 }
 
 #[async_trait]
+impl<const K: usize> AsyncDeserialize for [u8; K] {
+    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
+    where
+        R: AsyncRead + Unpin + Send,
+    {
+        use tokio::io::AsyncReadExt;
+
+        let mut buf = [0; K];
+        r.read_exact(&mut buf[..]).await?;
+        Ok(buf)
+    }
+}
+
+#[async_trait]
 impl AsyncDeserialize for Vec<u8> {
     async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
     where

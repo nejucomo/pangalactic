@@ -46,6 +46,16 @@ impl AsyncSerialize for [u8] {
 }
 
 #[async_trait]
+impl<const K: usize> AsyncSerialize for [u8; K] {
+    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
+    where
+        W: AsyncWrite + Unpin + Send,
+    {
+        self[..].write_into(w).await
+    }
+}
+
+#[async_trait]
 impl AsyncSerialize for str {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
