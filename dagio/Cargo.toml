@@ -19,3 +19,7 @@ version = "^0.1.0"
 [dependencies.dagwasm-dir]
 path = "../dir"
 version = "^0.1.0"
+
+[dev-dependencies.dagwasm-memstore]
+path = "../memstore"
+version = "^0.1.0"
