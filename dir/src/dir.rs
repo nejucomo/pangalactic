@@ -50,6 +50,26 @@ impl<K> Directory<K> {
     pub fn get(&self, name: &NameRef) -> Option<&Link<K>> {
         self.0.get(name)
     }
+
+    pub fn remove(&mut self, name: &NameRef) -> Option<Link<K>> {
+        self.0.remove(name)
+    }
+
+    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<Link<K>> {
+        self.remove(name)
+            .ok_or_else(|| anyhow::Error::msg(format!("missing required name {:?}", name)))
+    }
+
+    pub fn require_empty(self) -> anyhow::Result<()> {
+        if self.0.is_empty() {
+            Ok(())
+        } else {
+            Err(anyhow::Error::msg(format!(
+                "unexpected entries {:?}",
+                self.0.into_keys().collect::<Vec<Name>>()
+            )))
+        }
+    }
 }
 
 #[async_trait]

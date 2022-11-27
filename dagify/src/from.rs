@@ -7,15 +7,16 @@ pub trait FromDag<B>: Sized
 where
     B: BlobStore,
 {
-    async fn from_dag(dagio: &mut Dagio<B>, link: LinkFor<B>) -> anyhow::Result<Self>;
+    async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self>;
 }
 
 #[async_trait]
 impl<B> FromDag<B> for LinkFor<B>
 where
     B: BlobStore,
+    LinkFor<B>: Clone,
 {
-    async fn from_dag(_: &mut Dagio<B>, link: LinkFor<B>) -> anyhow::Result<Self> {
-        Ok(link)
+    async fn from_dag(_: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
+        Ok(link.clone())
     }
 }
