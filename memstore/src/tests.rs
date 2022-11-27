@@ -22,7 +22,7 @@ async fn insert_and_read_result(input: &[u8]) -> anyhow::Result<()> {
     w.write_all(input).await?;
     let key = store.commit_writer(w).await?;
 
-    let mut r = store.open_reader(key).await?;
+    let mut r = store.open_reader(&key).await?;
     let mut output = vec![];
     r.read_to_end(&mut output).await?;
 

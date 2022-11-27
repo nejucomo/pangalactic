@@ -8,6 +8,15 @@ pub struct FileWriter<W>(W)
 where
     W: Send + AsyncWrite + std::marker::Unpin;
 
+impl<W> FileWriter<W>
+where
+    W: Send + AsyncWrite + std::marker::Unpin,
+{
+    pub(crate) fn unwrap(self) -> W {
+        self.0
+    }
+}
+
 impl<W> AsyncWrite for FileWriter<W>
 where
     W: Send + AsyncWrite + std::marker::Unpin + std::ops::Deref,

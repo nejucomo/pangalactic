@@ -5,3 +5,6 @@ mod linkfor;
 pub use self::dagio::Dagio;
 pub use self::filewriter::FileWriter;
 pub use self::linkfor::LinkFor;
+
+#[cfg(test)]
+mod tests;

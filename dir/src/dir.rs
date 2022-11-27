@@ -1,6 +1,6 @@
-use crate::codec::{AsyncDeserialize, AsyncSerialize};
 use crate::Link;
 use async_trait::async_trait;
+use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::collections::BTreeMap;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -12,10 +12,25 @@ pub struct Directory<K>(BTreeMap<Name, Link<K>>);
 
 // TODO: newtype String which excludes illegal names:
 pub type Name = String;
+pub type NameRef = str;
 
 impl<K> Default for Directory<K> {
     fn default() -> Self {
         Directory(BTreeMap::default())
+    }
+}
+
+impl<N, K> FromIterator<(N, Link<K>)> for Directory<K>
+where
+    Name: From<N>,
+{
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = (N, Link<K>)>,
+    {
+        Directory(BTreeMap::from_iter(
+            iter.into_iter().map(|(n, link)| (Name::from(n), link)),
+        ))
     }
 }
 
@@ -30,6 +45,10 @@ impl<K> Directory<K> {
                 errname
             )))
         }
+    }
+
+    pub fn get(&self, name: &NameRef) -> Option<&Link<K>> {
+        self.0.get(name)
     }
 }
 

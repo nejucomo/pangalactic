@@ -10,3 +10,7 @@ license.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
+
+[dependencies.dagwasm-serialization]
+path = "../serialization"
+version = "^0.1.0"

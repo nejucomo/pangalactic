@@ -12,5 +12,9 @@ async-trait.workspace = true
 derive_more.workspace = true
 tokio.workspace = true
 
+[dependencies.dagwasm-serialization]
+path = "../serialization"
+version = "^0.1.0"
+
 [dev-dependencies]
 test-case.workspace = true

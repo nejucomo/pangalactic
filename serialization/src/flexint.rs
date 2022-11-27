@@ -1,4 +1,4 @@
-use crate::codec::{AsyncDeserialize, AsyncSerialize};
+use crate::{AsyncDeserialize, AsyncSerialize};
 use async_trait::async_trait;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
