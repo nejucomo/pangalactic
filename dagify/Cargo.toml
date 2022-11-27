@@ -17,3 +17,7 @@ version = "^0.1.0"
 [dependencies.dagwasm-dagio]
 path = "../dagio"
 version = "^0.1.0"
+
+[dependencies.dagwasm-dir]
+path = "../dir"
+version = "^0.1.0"
