@@ -16,7 +16,7 @@ impl BlobStore for MemStore {
 
     async fn open_reader(&mut self, key: &Hash) -> anyhow::Result<Self::Reader> {
         self.0
-            .get(&key)
+            .get(key)
             .cloned()
             .map(Reader::new)
             .ok_or_else(|| anyhow::Error::msg(format!("missing entry {:?}", &key)))
