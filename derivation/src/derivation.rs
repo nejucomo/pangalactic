@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagify::FromDag;
+use dagwasm_dagify::{FromDag, ToDag};
 use dagwasm_dagio::{Dagio, LinkFor};
 
 #[derive(Debug)]
@@ -23,5 +23,23 @@ where
         let input = dir.remove_required("exec")?;
         dir.require_empty()?;
         Ok(Derivation { exec, input })
+    }
+}
+
+#[async_trait]
+impl<B> ToDag<B> for Derivation<B>
+where
+    B: BlobStore,
+    LinkFor<B>: Clone,
+{
+    async fn to_dag(&self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+        use dagwasm_dir::Directory;
+
+        dagio
+            .commit_directory(&Directory::from_iter([
+                ("exec", self.exec.clone()),
+                ("input", self.input.clone()),
+            ]))
+            .await
     }
 }
