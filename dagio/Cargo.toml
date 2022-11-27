@@ -20,6 +20,10 @@ version = "^0.1.0"
 path = "../dir"
 version = "^0.1.0"
 
+[dependencies.dagwasm-serialization]
+path = "../serialization"
+version = "^0.1.0"
+
 [dev-dependencies.dagwasm-memstore]
 path = "../memstore"
 version = "^0.1.0"
