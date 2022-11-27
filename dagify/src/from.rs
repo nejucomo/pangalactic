@@ -1,0 +1,21 @@
+use async_trait::async_trait;
+use dagwasm_blobstore::BlobStore;
+use dagwasm_dagio::{Dagio, LinkFor};
+
+#[async_trait]
+pub trait FromDag<B>: Sized
+where
+    B: BlobStore,
+{
+    async fn from_dag(dagio: &mut Dagio<B>, link: LinkFor<B>) -> anyhow::Result<Self>;
+}
+
+#[async_trait]
+impl<B> FromDag<B> for LinkFor<B>
+where
+    B: BlobStore,
+{
+    async fn from_dag(_: &mut Dagio<B>, link: LinkFor<B>) -> anyhow::Result<Self> {
+        Ok(link)
+    }
+}

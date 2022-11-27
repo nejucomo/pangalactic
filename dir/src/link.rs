@@ -5,7 +5,7 @@ use std::fmt::Debug;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Link<K> {
     kind: LinkKind,
     key: K,
