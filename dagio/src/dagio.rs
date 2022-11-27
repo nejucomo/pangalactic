@@ -38,6 +38,11 @@ where
             .map(|k| Link::new(File, k))
     }
 
+    pub async fn read_file(&mut self, link: &LinkFor<B>) -> anyhow::Result<Vec<u8>> {
+        let key = link.peek_key(File)?;
+        self.0.read(key).await
+    }
+
     pub async fn read_directory(
         &mut self,
         link: &LinkFor<B>,
@@ -48,6 +53,10 @@ where
         let r = self.0.open_reader(key).await?;
         let dir = Directory::read_from(r).await?;
         Ok(dir)
+    }
+
+    pub async fn write_fil(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<B>> {
+        self.0.write(contents).await.map(|k| Link::new(File, k))
     }
 
     pub async fn commit_directory(

@@ -12,4 +12,21 @@ pub trait BlobStore: Debug + Send {
     async fn open_reader(&mut self, key: &Self::Key) -> anyhow::Result<Self::Reader>;
     async fn open_writer(&mut self) -> anyhow::Result<Self::Writer>;
     async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::Key>;
+
+    async fn read(&mut self, key: &Self::Key) -> anyhow::Result<Vec<u8>> {
+        use tokio::io::AsyncReadExt;
+
+        let mut buf = vec![];
+        let mut r = self.open_reader(key).await?;
+        r.read_to_end(&mut buf).await?;
+        Ok(buf)
+    }
+
+    async fn write(&mut self, contents: &[u8]) -> anyhow::Result<Self::Key> {
+        use tokio::io::AsyncWriteExt;
+
+        let mut w = self.open_writer().await?;
+        w.write_all(contents).await?;
+        self.commit_writer(w).await
+    }
 }

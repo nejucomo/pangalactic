@@ -29,7 +29,18 @@ where
         Ok(Host { engine, store })
     }
 
-    pub fn execute(&self, _modlink: LinkFor<BS>) -> anyhow::Result<()> {
-        todo!()
+    pub async fn execute(&mut self, derivation: &LinkFor<BS>) -> anyhow::Result<()> {
+        use dagwasm_dagify::FromDag;
+        use dagwasm_derivation::Derivation;
+        use wasmtime::{Instance, Module};
+
+        let dagio = self.store.data_mut();
+        let deriv = Derivation::from_dag(dagio, derivation).await?;
+        let execbytes = dagio.read_file(&deriv.exec).await?;
+        let execmod = Module::new(&self.engine, execbytes)?;
+        let instance = Instance::new(&mut self.store, &execmod, &[])?;
+        let derivefunc = instance.get_typed_func::<(), (), _>(&mut self.store, "derive")?;
+        derivefunc.call(&mut self.store, ())?;
+        todo!("pass derivation and handle returned output link");
     }
 }
