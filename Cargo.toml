@@ -5,9 +5,11 @@ members = [
   "dagio",
   "derivation",
   "dir",
+  "handle",
   "host",
   "memstore",
   "serialization",
+  "table",
 ]
 
 [workspace.package]
