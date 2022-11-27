@@ -1,9 +1,10 @@
 use crate::Dagio;
+use dagwasm_dir::Directory;
 use dagwasm_memstore::MemStore;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]
-async fn insert_and_read_result() -> anyhow::Result<()> {
+async fn insert_file_and_read_result() -> anyhow::Result<()> {
     let input = b"Hello World!";
 
     let mut dagio = Dagio::from(MemStore::default());
@@ -12,10 +13,51 @@ async fn insert_and_read_result() -> anyhow::Result<()> {
     let link = dagio.commit_file_writer(w).await?;
     dbg!(&link);
 
-    let mut r = dagio.open_file_reader(link).await?;
+    let mut r = dagio.open_file_reader(&link).await?;
     let mut output = vec![];
     r.read_to_end(&mut output).await?;
 
     assert_eq!(input, output.as_slice());
+    Ok(())
+}
+
+#[tokio::test]
+async fn insert_empty_directory_and_read_result() -> anyhow::Result<()> {
+    let input = Directory::default();
+
+    let mut dagio = Dagio::from(MemStore::default());
+    let link = dagio.commit_directory(&input).await?;
+    dbg!(&link);
+
+    let output = dagio.read_directory(&link).await?;
+    dbg!(&input, &output);
+
+    assert_eq!(input, output);
+    Ok(())
+}
+
+#[tokio::test]
+async fn insert_singleton_directory_and_read_result() -> anyhow::Result<()> {
+    let input_hw = b"Hello World!";
+
+    let mut dagio = Dagio::from(MemStore::default());
+
+    let mut w = dagio.open_file_writer().await?;
+    w.write_all(input_hw).await?;
+    let link_hw = dagio.commit_file_writer(w).await?;
+    dbg!(&link_hw);
+
+    let input_dir = Directory::from_iter([("hello.txt", link_hw)]);
+    let link_dir = dagio.commit_directory(&input_dir).await?;
+
+    let output_dir = dagio.read_directory(&link_dir).await?;
+    assert_eq!(input_dir, output_dir);
+
+    let outlink_hw = output_dir.get("hello.txt").unwrap();
+    let mut r = dagio.open_file_reader(&outlink_hw).await?;
+    let mut output_hw = vec![];
+    r.read_to_end(&mut output_hw).await?;
+
+    assert_eq!(input_hw, output_hw.as_slice());
     Ok(())
 }

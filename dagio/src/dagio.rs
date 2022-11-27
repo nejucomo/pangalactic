@@ -15,9 +15,9 @@ where
 {
     pub async fn open_file_reader(
         &mut self,
-        link: LinkFor<B>,
+        link: &LinkFor<B>,
     ) -> anyhow::Result<<B as BlobStore>::Reader> {
-        let key = link.unwrap_key(File)?;
+        let key = link.peek_key(File)?;
         self.0.open_reader(key).await
     }
 
@@ -40,11 +40,11 @@ where
 
     pub async fn read_directory(
         &mut self,
-        link: LinkFor<B>,
+        link: &LinkFor<B>,
     ) -> anyhow::Result<Directory<<B as BlobStore>::Key>> {
         use dagwasm_serialization::AsyncDeserialize;
 
-        let key = link.unwrap_key(File)?;
+        let key = link.peek_key(Dir)?;
         let r = self.0.open_reader(key).await?;
         let dir = Directory::read_from(r).await?;
         Ok(dir)
@@ -52,7 +52,7 @@ where
 
     pub async fn commit_directory(
         &mut self,
-        dir: Directory<<B as BlobStore>::Key>,
+        dir: &Directory<<B as BlobStore>::Key>,
     ) -> anyhow::Result<LinkFor<B>> {
         use dagwasm_serialization::AsyncSerialize;
 

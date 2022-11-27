@@ -14,7 +14,7 @@ impl BlobStore for MemStore {
     type Reader = Reader;
     type Writer = Vec<u8>;
 
-    async fn open_reader(&mut self, key: Hash) -> anyhow::Result<Self::Reader> {
+    async fn open_reader(&mut self, key: &Hash) -> anyhow::Result<Self::Reader> {
         self.0
             .get(&key)
             .cloned()

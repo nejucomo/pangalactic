@@ -16,12 +16,12 @@ impl<K> Link<K> {
         Link { kind, key }
     }
 
-    pub fn unwrap_key(self, kind: LinkKind) -> anyhow::Result<K>
+    pub fn peek_key(&self, kind: LinkKind) -> anyhow::Result<&K>
     where
         K: Debug,
     {
         if self.kind == kind {
-            Ok(self.key)
+            Ok(&self.key)
         } else {
             Err(anyhow::Error::msg(format!(
                 "expected link kind {:?}, found {:?}",

@@ -9,7 +9,7 @@ pub trait BlobStore: Debug {
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;
 
-    async fn open_reader(&mut self, key: Self::Key) -> anyhow::Result<Self::Reader>;
+    async fn open_reader(&mut self, key: &Self::Key) -> anyhow::Result<Self::Reader>;
     async fn open_writer(&mut self) -> anyhow::Result<Self::Writer>;
     async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::Key>;
 }
