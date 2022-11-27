@@ -1,7 +1,9 @@
 [workspace]
 members = [
   "blobstore",
+  "dagify",
   "dagio",
+  "derivation",
   "dir",
   "host",
   "memstore",

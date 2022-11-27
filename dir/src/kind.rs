@@ -3,7 +3,7 @@ use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum LinkKind {
     File,
     Dir,
