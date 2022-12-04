@@ -1,18 +1,15 @@
+use crate::State;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagio::{Dagio, LinkFor};
-use wasmtime::{Engine, Store};
+use dagwasm_dagio::LinkFor;
+use wasmtime::{Engine, Module};
 
 #[allow(dead_code)]
-pub struct Host<BS> {
+pub struct Host {
     engine: Engine,
-    store: Store<Dagio<BS>>,
 }
 
-impl<BS> Host<BS>
-where
-    BS: BlobStore,
-{
-    pub fn new(blobstore: BS) -> anyhow::Result<Self> {
+impl Host {
+    pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();
 
         config
@@ -24,12 +21,41 @@ where
             .cranelift_nan_canonicalization(true);
 
         let engine = Engine::new(&config)?;
-        let store = Store::new(&engine, Dagio::from(blobstore));
-
-        Ok(Host { engine, store })
+        Ok(Host { engine })
     }
 
-    pub fn execute(&self, _modlink: LinkFor<BS>) -> anyhow::Result<()> {
-        todo!()
+    pub async fn execute<B>(
+        &mut self,
+        blobstore: B,
+        derivation: &LinkFor<B>,
+    ) -> anyhow::Result<LinkFor<B>>
+    where
+        B: BlobStore,
+    {
+        use crate::DeriveFunc;
+
+        let mut state = State::new(blobstore);
+        let execmod = load_exec_mod(&mut state, &self.engine, derivation).await?;
+        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod)?;
+
+        derivefunc.call_async(derivation).await
     }
+}
+
+async fn load_exec_mod<B>(
+    state: &mut State<B>,
+    engine: &Engine,
+    derivation: &LinkFor<B>,
+) -> anyhow::Result<Module>
+where
+    B: BlobStore,
+{
+    use dagwasm_dagify::FromDag;
+    use dagwasm_derivation::Derivation;
+
+    let dagio = state.dagio_mut();
+    let deriv = Derivation::from_dag(dagio, derivation).await?;
+    let execbytes = dagio.read_file(&deriv.exec).await?;
+    let execmod = Module::new(engine, execbytes)?;
+    Ok(execmod)
 }
