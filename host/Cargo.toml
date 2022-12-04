@@ -20,3 +20,9 @@ path = "../dagio"
 
 [dependencies.dagwasm-derivation]
 path = "../derivation"
+
+[dependencies.dagwasm-handle]
+path = "../handle"
+
+[dependencies.dagwasm-table]
+path = "../table"

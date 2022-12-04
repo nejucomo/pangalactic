@@ -1,18 +1,15 @@
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagio::{Dagio, LinkFor};
+use dagwasm_dagio::LinkFor;
+use dagwasm_handle::Handle;
 use wasmtime::{Engine, Store};
 
 #[allow(dead_code)]
-pub struct Host<BS> {
+pub struct Host {
     engine: Engine,
-    store: Store<Dagio<BS>>,
 }
 
-impl<BS> Host<BS>
-where
-    BS: BlobStore,
-{
-    pub fn new(blobstore: BS) -> anyhow::Result<Self> {
+impl Host {
+    pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();
 
         config
@@ -24,23 +21,38 @@ where
             .cranelift_nan_canonicalization(true);
 
         let engine = Engine::new(&config)?;
-        let store = Store::new(&engine, Dagio::from(blobstore));
-
-        Ok(Host { engine, store })
+        Ok(Host { engine })
     }
 
-    pub async fn execute(&mut self, derivation: &LinkFor<BS>) -> anyhow::Result<()> {
+    pub async fn execute<BS>(
+        &mut self,
+        blobstore: BS,
+        derivation: &LinkFor<BS>,
+    ) -> anyhow::Result<Handle<LinkFor<BS>>>
+    where
+        BS: BlobStore,
+    {
+        use crate::State;
         use dagwasm_dagify::FromDag;
         use dagwasm_derivation::Derivation;
         use wasmtime::{Instance, Module};
 
-        let dagio = self.store.data_mut();
+        let (state, handle) = State::new(blobstore, derivation);
+        let mut store = Store::new(&self.engine, state);
+        let state = store.data_mut();
+        let dagio = state.dagio_mut();
         let deriv = Derivation::from_dag(dagio, derivation).await?;
         let execbytes = dagio.read_file(&deriv.exec).await?;
         let execmod = Module::new(&self.engine, execbytes)?;
-        let instance = Instance::new(&mut self.store, &execmod, &[])?;
-        let derivefunc = instance.get_typed_func::<(), (), _>(&mut self.store, "derive")?;
-        derivefunc.call(&mut self.store, ())?;
-        todo!("pass derivation and handle returned output link");
+        let instance = Instance::new(&mut store, &execmod, &[])?;
+
+        type RawHandle = u64;
+        let derivefunc =
+            instance.get_typed_func::<(RawHandle,), (RawHandle,), _>(&mut store, "derive")?;
+
+        let raw_input = unsafe { handle.peek() };
+        let (raw_output,): (RawHandle,) = derivefunc.call_async(&mut store, (raw_input,)).await?;
+        let output = unsafe { Handle::wrap(raw_output) };
+        Ok(output)
     }
 }
