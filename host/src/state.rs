@@ -9,7 +9,6 @@ where
     B: BlobStore,
 {
     dagio: Dagio<B>,
-    #[allow(dead_code)]
     links: Table<LinkFor<B>>,
 }
 
@@ -36,5 +35,9 @@ where
 
     pub(crate) fn dagio_mut(&mut self) -> &mut Dagio<B> {
         &mut self.dagio
+    }
+
+    pub(crate) fn links(&self) -> &Table<LinkFor<B>> {
+        &self.links
     }
 }

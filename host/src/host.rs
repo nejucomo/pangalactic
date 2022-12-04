@@ -28,7 +28,7 @@ impl Host {
         &mut self,
         blobstore: BS,
         derivation: &LinkFor<BS>,
-    ) -> anyhow::Result<Handle<LinkFor<BS>>>
+    ) -> anyhow::Result<LinkFor<BS>>
     where
         BS: BlobStore,
     {
@@ -52,7 +52,8 @@ impl Host {
 
         let raw_input = unsafe { handle.peek() };
         let (raw_output,): (RawHandle,) = derivefunc.call_async(&mut store, (raw_input,)).await?;
-        let output = unsafe { Handle::wrap(raw_output) };
-        Ok(output)
+        let output_handle = unsafe { Handle::wrap(raw_output) };
+        let output_link = store.data().links().lookup(output_handle).cloned()?;
+        Ok(output_link)
     }
 }
