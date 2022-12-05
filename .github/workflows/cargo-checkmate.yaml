@@ -13,5 +13,6 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
+      - run: rustup target install wasm32-unknown-unknown
       - run: cargo install cargo-checkmate
       - run: cargo-checkmate
