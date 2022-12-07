@@ -11,7 +11,7 @@ pub fn get_wasm_bytes(name: &str) -> anyhow::Result<&'static [u8]> {
 }
 
 #[test]
-fn get_wasm_bytes_for_ident() -> anyhow::Result<()> {
-    get_wasm_bytes("ident")?;
+fn get_wasm_bytes_for_get_derivation() -> anyhow::Result<()> {
+    get_wasm_bytes("get_derivation")?;
     Ok(())
 }
