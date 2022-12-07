@@ -21,7 +21,7 @@ where
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
         let mut dir = Directory::from_dag(dagio, link).await?;
         let exec = dir.remove_required("exec")?;
-        let input = dir.remove_required("exec")?;
+        let input = dir.remove_required("input")?;
         dir.require_empty()?;
         Ok(Derivation { exec, input })
     }
