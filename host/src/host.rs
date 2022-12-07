@@ -43,7 +43,7 @@ impl Host {
 
         let mut state = State::new(blobstore);
         let execmod = load_exec_mod(&mut state, &self.engine, derivation).await?;
-        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod)?;
+        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod).await?;
 
         derivefunc.call_async(derivation).await
     }
