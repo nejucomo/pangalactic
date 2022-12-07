@@ -35,7 +35,7 @@ where
             .cranelift_nan_canonicalization(true);
 
         let engine = Engine::new(&config)?;
-        let linker = Linker::new(&engine);
+        let linker = instantiate_linker(&engine)?;
 
         Ok(Host { engine, linker })
     }
@@ -71,4 +71,22 @@ where
     let execbytes = dagio.read_file(&deriv.exec).await?;
     let execmod = Module::new(engine, execbytes)?;
     Ok(execmod)
+}
+
+fn instantiate_linker<B>(engine: &Engine) -> anyhow::Result<Linker<State<B>>>
+where
+    B: BlobStore,
+{
+    use wasmtime::Caller;
+
+    const HOSTMOD: &str = env!("CARGO_PKG_NAME");
+
+    let mut linker = Linker::new(engine);
+    linker.func_wrap1_async(
+        HOSTMOD,
+        "ident",
+        |_caller: Caller<'_, State<B>>, param: u64| Box::new(async move { param }),
+    )?;
+
+    Ok(linker)
 }
