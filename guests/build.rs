@@ -13,6 +13,8 @@ fn main_inner() -> anyhow::Result<()> {
     use std::path::Path;
     use std::process::Command;
 
+    println!("cargo:rerun-if-changed=guests");
+
     let guestworkspace = Path::new("guests");
 
     let mut cmd = Command::new(env!("CARGO"));
