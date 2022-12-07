@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "ident",
+  "get_derivation",
 ]
 
 [workspace.package]

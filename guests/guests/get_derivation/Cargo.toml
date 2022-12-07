@@ -1,5 +1,5 @@
 [package]
-name = "ident"
+name = "get_derivation"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

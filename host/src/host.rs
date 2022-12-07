@@ -3,8 +3,15 @@ use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::LinkFor;
 use wasmtime::{Engine, Module};
 
-#[allow(dead_code)]
-pub struct Host {
+pub async fn derive<B>(blobstore: B, derivation: &LinkFor<B>) -> anyhow::Result<LinkFor<B>>
+where
+    B: BlobStore,
+{
+    let mut host = Host::new()?;
+    host.execute(blobstore, derivation).await
+}
+
+struct Host {
     engine: Engine,
 }
 
@@ -36,7 +43,7 @@ impl Host {
 
         let mut state = State::new(blobstore);
         let execmod = load_exec_mod(&mut state, &self.engine, derivation).await?;
-        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod)?;
+        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod).await?;
 
         derivefunc.call_async(derivation).await
     }

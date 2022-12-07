@@ -18,11 +18,15 @@ impl<B> DeriveFunc<B>
 where
     B: BlobStore,
 {
-    pub(crate) fn new(engine: &Engine, state: State<B>, execmod: &Module) -> anyhow::Result<Self> {
+    pub(crate) async fn new(
+        engine: &Engine,
+        state: State<B>,
+        execmod: &Module,
+    ) -> anyhow::Result<Self> {
         use wasmtime::Instance;
 
         let mut store = Store::new(engine, state);
-        let instance = Instance::new(&mut store, execmod, &[])?;
+        let instance = Instance::new_async(&mut store, execmod, &[]).await?;
         let tfunc = instance
             .get_typed_func::<(RawLinkHandle,), (RawLinkHandle,), _>(&mut store, "derive")?;
 

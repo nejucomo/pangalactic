@@ -9,5 +9,24 @@ edition = "2021"
 anyhow.workspace = true
 include_dir.workspace = true
 
+[dev-dependencies]
+tokio.workspace = true
+
+[dev-dependencies.dagwasm-dagio]
+path = "../dagio"
+version = "^0.1.0"
+
+[dev-dependencies.dagwasm-dir]
+path = "../dir"
+version = "^0.1.0"
+
+[dev-dependencies.dagwasm-host]
+path = "../host"
+version = "^0.1.0"
+
+[dev-dependencies.dagwasm-memstore]
+path = "../memstore"
+version = "^0.1.0"
+
 [build-dependencies]
 anyhow.workspace = true
