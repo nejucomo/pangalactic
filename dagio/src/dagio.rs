@@ -55,7 +55,7 @@ where
         Ok(dir)
     }
 
-    pub async fn write_fil(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<B>> {
+    pub async fn write_file(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<B>> {
         self.0.write(contents).await.map(|k| Link::new(File, k))
     }
 
