@@ -1,5 +1,6 @@
 mod derivefunc;
 mod host;
+pub(crate) mod hostapi;
 mod state;
 
 pub(crate) use self::derivefunc::DeriveFunc;
