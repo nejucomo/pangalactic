@@ -1,9 +1,9 @@
-#[link(wasm_import_module = "dagwasm_host")]
+#[link(wasm_import_module = "dagwasm-host")]
 extern "C" {
     fn link_get_kind(handle_link: u64) -> u64;
 }
 
-const LINK_KIND_DIR: u64 = 2;
+const LINK_KIND_DIR: u64 = 1;
 
 #[no_mangle]
 pub extern "C" fn derive(derivation: u64) -> u64 {

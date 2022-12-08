@@ -27,10 +27,8 @@ fn main_inner() -> anyhow::Result<()> {
 
     let guesttarget = guestworkspace.join("target");
     let wasmdir = guesttarget.join("wasms");
-    let testwasmdir = guesttarget.join("test-wasms");
 
     recreate_dir(&wasmdir)?;
-    recreate_dir(&testwasmdir)?;
 
     let debugdir = guesttarget.join("wasm32-unknown-unknown").join("debug");
     for entres in debugdir
@@ -46,13 +44,7 @@ fn main_inner() -> anyhow::Result<()> {
                 .unwrap_or(false)
             {
                 let file_name = path.file_name().unwrap().to_str().unwrap();
-                let (dstdir, file_name) = if let Some(suffix) = file_name.strip_prefix("test_") {
-                    (&testwasmdir, suffix)
-                } else {
-                    (&wasmdir, file_name)
-                };
-
-                let dst = dstdir.join(file_name);
+                let dst = wasmdir.join(file_name);
                 std::fs::copy(&path, &dst)
                     .with_context(|| format!("from {:?} to {:?}", path.display(), dst.display()))?;
             }
