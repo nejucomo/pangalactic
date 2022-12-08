@@ -16,6 +16,10 @@ impl<K> Link<K> {
         Link { kind, key }
     }
 
+    pub fn kind(&self) -> LinkKind {
+        self.kind
+    }
+
     pub fn peek_key(&self, kind: LinkKind) -> anyhow::Result<&K>
     where
         K: Debug,

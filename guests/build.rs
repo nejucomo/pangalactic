@@ -3,7 +3,7 @@
 fn main() -> anyhow::Result<()> {
     let r = main_inner();
     if let Some(e) = r.as_ref().err() {
-        eprintln!("{:#}", e);
+        eprintln!("{e:#}");
     }
     r
 }

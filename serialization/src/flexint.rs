@@ -99,18 +99,16 @@ impl<'a> TryFrom<&'a FlexIntEncoding> for u64 {
         let slice = fie.as_slice();
         for (i, &b) in slice.iter().enumerate() {
             if i + 1 == MAX_SIZE && b > 0x01 {
-                return Err(anyhow::Error::msg(format!("overflow @{} {:?}", i, slice)));
+                return Err(anyhow::Error::msg(format!("overflow @{i} {slice:?}")));
             } else if i + 1 == slice.len() {
                 if high_bit_set(b) {
                     return Err(anyhow::Error::msg(format!(
-                        "unexpected continuation bit @{} {:?}",
-                        i, slice
+                        "unexpected continuation bit @{i} {slice:?}"
                     )));
                 }
             } else if !high_bit_set(b) {
                 return Err(anyhow::Error::msg(format!(
-                    "missing continuation bit @{} {:?}",
-                    i, slice
+                    "missing continuation bit @{i} {slice:?}"
                 )));
             }
 

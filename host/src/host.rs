@@ -1,7 +1,7 @@
 use crate::State;
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::LinkFor;
-use wasmtime::{Engine, Module};
+use wasmtime::{Engine, Linker, Module};
 
 pub async fn derive<B>(blobstore: B, derivation: &LinkFor<B>) -> anyhow::Result<LinkFor<B>>
 where
@@ -11,11 +11,18 @@ where
     host.execute(blobstore, derivation).await
 }
 
-struct Host {
+struct Host<B>
+where
+    B: BlobStore,
+{
     engine: Engine,
+    linker: Linker<State<B>>,
 }
 
-impl Host {
+impl<B> Host<B>
+where
+    B: BlobStore,
+{
     pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();
 
@@ -28,22 +35,21 @@ impl Host {
             .cranelift_nan_canonicalization(true);
 
         let engine = Engine::new(&config)?;
-        Ok(Host { engine })
+        let linker = crate::hostapi::instantiate_linker(&engine)?;
+
+        Ok(Host { engine, linker })
     }
 
-    pub async fn execute<B>(
+    pub async fn execute(
         &mut self,
         blobstore: B,
         derivation: &LinkFor<B>,
-    ) -> anyhow::Result<LinkFor<B>>
-    where
-        B: BlobStore,
-    {
+    ) -> anyhow::Result<LinkFor<B>> {
         use crate::DeriveFunc;
 
         let mut state = State::new(blobstore);
         let execmod = load_exec_mod(&mut state, &self.engine, derivation).await?;
-        let mut derivefunc = DeriveFunc::new(&self.engine, state, &execmod).await?;
+        let mut derivefunc = DeriveFunc::new(&self.engine, &self.linker, state, &execmod).await?;
 
         derivefunc.call_async(derivation).await
     }

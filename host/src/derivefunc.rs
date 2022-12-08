@@ -2,7 +2,7 @@ use crate::State;
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::LinkFor;
 use dagwasm_handle::Handle;
-use wasmtime::{Engine, Module, Store, TypedFunc};
+use wasmtime::{Engine, Linker, Module, Store, TypedFunc};
 
 type RawLinkHandle = u64;
 
@@ -20,13 +20,12 @@ where
 {
     pub(crate) async fn new(
         engine: &Engine,
+        linker: &Linker<State<B>>,
         state: State<B>,
         execmod: &Module,
     ) -> anyhow::Result<Self> {
-        use wasmtime::Instance;
-
         let mut store = Store::new(engine, state);
-        let instance = Instance::new_async(&mut store, execmod, &[]).await?;
+        let instance = linker.instantiate_async(&mut store, execmod).await?;
         let tfunc = instance
             .get_typed_func::<(RawLinkHandle,), (RawLinkHandle,), _>(&mut store, "derive")?;
 

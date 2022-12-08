@@ -39,8 +39,7 @@ impl AsyncDeserialize for LinkKind {
             0 => Ok(File),
             1 => Ok(Dir),
             other => Err(anyhow::Error::msg(format!(
-                "invalid Link encoding {:?}",
-                other
+                "invalid Link encoding {other:?}"
             ))),
         }
     }

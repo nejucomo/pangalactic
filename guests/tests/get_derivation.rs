@@ -6,7 +6,7 @@ use dagwasm_memstore::MemStore;
 async fn get_derivation_outputs_derivation() -> anyhow::Result<()> {
     let r = get_derivation_outputs_derivation_impl().await;
     if let Some(e) = r.as_ref().err() {
-        eprintln!("{:#}", e);
+        eprintln!("{e:#}");
     }
     r
 }
