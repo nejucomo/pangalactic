@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "get_derivation",
+  "test_derivation_is_dir",
 ]
 
 [workspace.package]

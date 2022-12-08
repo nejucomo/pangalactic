@@ -1,5 +1,8 @@
 #![feature(exit_status_error)]
 
+use anyhow::Context;
+use std::path::Path;
+
 fn main() -> anyhow::Result<()> {
     let r = main_inner();
     if let Some(e) = r.as_ref().err() {
@@ -9,8 +12,6 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn main_inner() -> anyhow::Result<()> {
-    use anyhow::Context;
-    use std::path::Path;
     use std::process::Command;
 
     println!("cargo:rerun-if-changed=guests");
@@ -27,19 +28,7 @@ fn main_inner() -> anyhow::Result<()> {
     let guesttarget = guestworkspace.join("target");
     let wasmdir = guesttarget.join("wasms");
 
-    std::fs::remove_dir_all(&wasmdir)
-        .or_else(|e| {
-            use std::io::ErrorKind::NotFound;
-
-            if e.kind() == NotFound {
-                Ok(())
-            } else {
-                Err(e)
-            }
-        })
-        .with_context(|| format!("{:?}", wasmdir.display()))?;
-
-    std::fs::create_dir(&wasmdir).with_context(|| format!("{:?}", wasmdir.display()))?;
+    recreate_dir(&wasmdir)?;
 
     let debugdir = guesttarget.join("wasm32-unknown-unknown").join("debug");
     for entres in debugdir
@@ -54,12 +43,31 @@ fn main_inner() -> anyhow::Result<()> {
                 .map(|s| s.to_str() == Some("wasm"))
                 .unwrap_or(false)
             {
-                let dst = wasmdir.join(path.file_name().unwrap());
+                let file_name = path.file_name().unwrap().to_str().unwrap();
+                let dst = wasmdir.join(file_name);
                 std::fs::copy(&path, &dst)
                     .with_context(|| format!("from {:?} to {:?}", path.display(), dst.display()))?;
             }
         }
     }
+
+    Ok(())
+}
+
+fn recreate_dir(dir: &Path) -> anyhow::Result<()> {
+    std::fs::remove_dir_all(dir)
+        .or_else(|e| {
+            use std::io::ErrorKind::NotFound;
+
+            if e.kind() == NotFound {
+                Ok(())
+            } else {
+                Err(e)
+            }
+        })
+        .with_context(|| format!("{:?}", dir.display()))?;
+
+    std::fs::create_dir(dir).with_context(|| format!("{:?}", dir.display()))?;
 
     Ok(())
 }

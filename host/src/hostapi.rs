@@ -14,8 +14,8 @@ where
     macro_rules! link_host_fn {
         ( method $wrapmethod:ident, $name:ident, $( $arg:ident ),* ) => {
             linker . $wrapmethod(
-                HOSTMOD,
-                stringify!($name),
+                dbg!(HOSTMOD),
+                dbg!(stringify!($name)),
                 |caller: Caller<'_, State<B>>, $( $arg : u64 ),* | Box::new($name(caller, $( $arg ),* )),
             )
         };
