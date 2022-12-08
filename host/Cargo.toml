@@ -11,18 +11,28 @@ wasmtime.workspace = true
 
 [dependencies.dagwasm-blobstore]
 path = "../blobstore"
+version = "^0.1.0"
 
 [dependencies.dagwasm-dagify]
 path = "../dagify"
+version = "^0.1.0"
 
 [dependencies.dagwasm-dagio]
 path = "../dagio"
+version = "^0.1.0"
 
 [dependencies.dagwasm-derivation]
 path = "../derivation"
+version = "^0.1.0"
+
+[dependencies.dagwasm-dir]
+path = "../dir"
+version = "^0.1.0"
 
 [dependencies.dagwasm-handle]
 path = "../handle"
+version = "^0.1.0"
 
 [dependencies.dagwasm-table]
 path = "../table"
+version = "^0.1.0"
