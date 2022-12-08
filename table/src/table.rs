@@ -28,6 +28,6 @@ impl<T> Table<T> {
     pub fn lookup(&self, handle: Handle<T>) -> anyhow::Result<&T> {
         self.map
             .get(&unsafe { handle.peek() })
-            .ok_or_else(|| anyhow::Error::msg(format!("invalid lookup {:?}", handle)))
+            .ok_or_else(|| anyhow::Error::msg(format!("invalid lookup {handle:?}")))
     }
 }

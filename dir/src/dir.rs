@@ -41,8 +41,7 @@ impl<K> Directory<K> {
             Ok(())
         } else {
             Err(anyhow::Error::msg(format!(
-                "duplicate entry for {:?}",
-                errname
+                "duplicate entry for {errname:?}"
             )))
         }
     }
@@ -57,7 +56,7 @@ impl<K> Directory<K> {
 
     pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<Link<K>> {
         self.remove(name)
-            .ok_or_else(|| anyhow::Error::msg(format!("missing required name {:?}", name)))
+            .ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
     }
 
     pub fn require_empty(self) -> anyhow::Result<()> {
@@ -109,8 +108,7 @@ where
         let version = u64::read_from(&mut r).await?;
         if version != SERIALIZATION_VERSION {
             return Err(anyhow::Error::msg(format!(
-                "expected serialization version {}, found {}",
-                SERIALIZATION_VERSION, version
+                "expected serialization version {SERIALIZATION_VERSION}, found {version}"
             )));
         }
 

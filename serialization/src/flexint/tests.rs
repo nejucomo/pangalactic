@@ -31,16 +31,14 @@ fn try_from_overflow(slice: &[u8], expected: Result<u64, &str>) {
         (Err(s), Err(prefix)) => {
             assert!(
                 s.starts_with(prefix),
-                "missing prefix {:?} in {:?}",
-                prefix,
-                s
+                "missing prefix {prefix:?} in {s:?}"
             );
         }
         (Err(s), Ok(v)) => {
-            panic!("expected Ok({:?}), found Err({:?})", v, s);
+            panic!("expected Ok({v:?}), found Err({s:?})");
         }
         (Ok(v), Err(_)) => {
-            panic!("expected Err(_), found Ok({:?})", v);
+            panic!("expected Err(_), found Ok({v:?})");
         }
     }
 }

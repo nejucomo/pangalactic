@@ -54,7 +54,7 @@ async fn insert_singleton_directory_and_read_result() -> anyhow::Result<()> {
     assert_eq!(input_dir, output_dir);
 
     let outlink_hw = output_dir.get("hello.txt").unwrap();
-    let mut r = dagio.open_file_reader(&outlink_hw).await?;
+    let mut r = dagio.open_file_reader(outlink_hw).await?;
     let mut output_hw = vec![];
     r.read_to_end(&mut output_hw).await?;
 
