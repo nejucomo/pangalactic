@@ -63,7 +63,7 @@ async fn load_exec_mod<B>(
 where
     B: BlobStore,
 {
-    use dagwasm_dagify::FromDag;
+    use dagwasm_dagio::FromDag;
     use dagwasm_derivation::Derivation;
 
     let dagio = state.dagio_mut();

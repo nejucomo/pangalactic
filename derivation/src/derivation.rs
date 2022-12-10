@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagify::{FromDag, ToDag};
-use dagwasm_dagio::{Dagio, LinkFor};
+use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use dagwasm_dir::Directory;
 
 #[derive(Debug)]

@@ -1,6 +1,6 @@
+use crate::{Dagio, LinkFor};
 use async_trait::async_trait;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_dir::Directory;
 
 #[async_trait]
