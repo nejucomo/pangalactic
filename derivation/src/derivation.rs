@@ -2,6 +2,8 @@ use async_trait::async_trait;
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use dagwasm_dir::Directory;
+use std::marker::Unpin;
+use std::ops::Deref;
 
 #[derive(Debug)]
 pub struct Derivation<B>
@@ -30,6 +32,8 @@ where
 impl<B> ToDag<B> for Derivation<B>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
     LinkFor<B>: Clone,
 {
     async fn to_dag(&self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {

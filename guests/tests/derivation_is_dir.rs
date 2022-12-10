@@ -21,7 +21,7 @@ async fn derivation_is_dir_impl() -> anyhow::Result<()> {
         .await?;
     let empty = dagio.write_file(b"").await?;
     let derivation = dagio
-        .commit_directory(&Directory::from_iter([("exec", exec), ("input", empty)]))
+        .commit(Directory::from_iter([("exec", exec), ("input", empty)]))
         .await?;
 
     // Execute derive:

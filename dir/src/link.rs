@@ -33,6 +33,10 @@ impl<K> Link<K> {
             )))
         }
     }
+
+    pub fn unwrap(self) -> (LinkKind, K) {
+        (self.kind, self.key)
+    }
 }
 
 #[async_trait]

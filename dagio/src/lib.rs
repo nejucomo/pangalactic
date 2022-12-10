@@ -1,4 +1,5 @@
 mod dagio;
+mod dirimpl;
 mod filewriter;
 mod fromdag;
 mod linkfor;
