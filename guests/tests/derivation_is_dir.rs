@@ -1,5 +1,5 @@
 use dagwasm_dagio::Dagio;
-use dagwasm_dir::Directory;
+use dagwasm_derivation::Derivation;
 use dagwasm_memstore::MemStore;
 
 #[tokio::test]
@@ -19,10 +19,9 @@ async fn derivation_is_dir_impl() -> anyhow::Result<()> {
     let exec = dagio
         .write_file(dagwasm_guests::get_wasm_bytes("test_derivation_is_dir")?)
         .await?;
-    let empty = dagio.write_file(b"").await?;
-    let derivation = dagio
-        .commit(Directory::from_iter([("exec", exec), ("input", empty)]))
-        .await?;
+    let input = dagio.write_file(b"").await?;
+
+    let derivation = dagio.commit(Derivation { exec, input }).await?;
 
     // Execute derive:
     let _ = dagwasm_host::derive(&mut ms, &derivation).await?;

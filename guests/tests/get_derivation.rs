@@ -1,4 +1,5 @@
 use dagwasm_dagio::Dagio;
+use dagwasm_derivation::Derivation;
 use dagwasm_memstore::MemStore;
 
 #[tokio::test]
@@ -18,8 +19,9 @@ async fn get_derivation_outputs_derivation_impl() -> anyhow::Result<()> {
     let exec = dagio
         .write_file(dagwasm_guests::get_wasm_bytes("get_derivation")?)
         .await?;
-    let empty = dagio.write_file(b"").await?;
-    let derivation = dagio.commit([("exec", exec), ("input", empty)]).await?;
+    let input = dagio.write_file(b"").await?;
+
+    let derivation = dagio.commit(Derivation { exec, input }).await?;
 
     // Execute derive:
     let output = dagwasm_host::derive(&mut ms, &derivation).await?;
