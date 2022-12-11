@@ -21,7 +21,7 @@ where
     where
         T: ToDag<B>,
     {
-        object.to_dag(self).await
+        object.into_dag(self).await
     }
 
     pub async fn open_file_reader(

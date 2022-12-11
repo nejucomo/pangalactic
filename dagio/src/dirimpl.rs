@@ -12,9 +12,8 @@ where
     B: BlobStore,
     <B as BlobStore>::Writer: Deref,
     <<B as BlobStore>::Writer as Deref>::Target: Unpin,
-    LinkFor<B>: Clone,
 {
-    async fn to_dag(&self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
         use dagwasm_dir::{Link, LinkKind::Dir};
         use dagwasm_serialization::AsyncSerialize;
 
@@ -26,6 +25,20 @@ where
             // Transmute the file link into a dir link:
             .map(Link::unwrap)
             .map(|(_, key)| Link::new(Dir, key))
+    }
+}
+
+#[async_trait]
+impl<const K: usize, B, N> ToDag<B> for [(N, LinkFor<B>); K]
+where
+    B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    N: Send,
+    String: From<N>,
+{
+    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+        Directory::from_iter(self.into_iter()).into_dag(dagio).await
     }
 }
 

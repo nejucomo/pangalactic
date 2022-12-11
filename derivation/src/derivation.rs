@@ -36,9 +36,9 @@ where
     <<B as BlobStore>::Writer as Deref>::Target: Unpin,
     LinkFor<B>: Clone,
 {
-    async fn to_dag(&self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
-        Directory::from_iter([("exec", self.exec.clone()), ("input", self.input.clone())])
-            .to_dag(dagio)
+    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+        dagio
+            .commit([("exec", self.exec), ("input", self.input)])
             .await
     }
 }

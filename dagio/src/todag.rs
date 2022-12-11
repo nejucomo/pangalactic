@@ -7,7 +7,7 @@ pub trait ToDag<B>
 where
     B: BlobStore,
 {
-    async fn to_dag(&self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>>;
+    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>>;
 }
 
 #[async_trait]
@@ -16,7 +16,7 @@ where
     B: BlobStore,
     LinkFor<B>: Clone,
 {
-    async fn to_dag(&self, _: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
-        Ok(self.clone())
+    async fn into_dag(self, _: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+        Ok(self)
     }
 }
