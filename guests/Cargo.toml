@@ -12,6 +12,10 @@ include_dir.workspace = true
 [dev-dependencies]
 tokio.workspace = true
 
+[dev-dependencies.dagwasm-blobstore]
+path = "../blobstore"
+version = "^0.1.0"
+
 [dev-dependencies.dagwasm-dagio]
 path = "../dagio"
 version = "^0.1.0"
