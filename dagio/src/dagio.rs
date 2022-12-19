@@ -1,9 +1,6 @@
-use crate::{FileWriter, LinkFor};
+use crate::{FileWriter, FromDag, LinkFor, ToDag};
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dir::{
-    Directory, Link,
-    LinkKind::{Dir, File},
-};
+use dagwasm_dir::{Link, LinkKind::File};
 
 #[derive(Debug, derive_more::From)]
 pub struct Dagio<B>(B);
@@ -13,6 +10,20 @@ where
     B: BlobStore,
     <B as BlobStore>::Writer: Send + std::marker::Unpin,
 {
+    pub async fn read<T>(&mut self, link: &LinkFor<B>) -> anyhow::Result<T>
+    where
+        T: FromDag<B>,
+    {
+        T::from_dag(self, link).await
+    }
+
+    pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<LinkFor<B>>
+    where
+        T: ToDag<B>,
+    {
+        object.into_dag(self).await
+    }
+
     pub async fn open_file_reader(
         &mut self,
         link: &LinkFor<B>,
@@ -43,30 +54,7 @@ where
         self.0.read(key).await
     }
 
-    pub async fn read_directory(
-        &mut self,
-        link: &LinkFor<B>,
-    ) -> anyhow::Result<Directory<<B as BlobStore>::Key>> {
-        use dagwasm_serialization::AsyncDeserialize;
-
-        let key = link.peek_key(Dir)?;
-        let r = self.0.open_reader(key).await?;
-        let dir = Directory::read_from(r).await?;
-        Ok(dir)
-    }
-
     pub async fn write_file(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<B>> {
         self.0.write(contents).await.map(|k| Link::new(File, k))
-    }
-
-    pub async fn commit_directory(
-        &mut self,
-        dir: &Directory<<B as BlobStore>::Key>,
-    ) -> anyhow::Result<LinkFor<B>> {
-        use dagwasm_serialization::AsyncSerialize;
-
-        let mut w = self.0.open_writer().await?;
-        dir.write_into(&mut w).await?;
-        self.0.commit_writer(w).await.map(|k| Link::new(Dir, k))
     }
 }

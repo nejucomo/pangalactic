@@ -13,10 +13,6 @@ wasmtime.workspace = true
 path = "../blobstore"
 version = "^0.1.0"
 
-[dependencies.dagwasm-dagify]
-path = "../dagify"
-version = "^0.1.0"
-
 [dependencies.dagwasm-dagio]
 path = "../dagio"
 version = "^0.1.0"

@@ -26,10 +26,10 @@ async fn insert_empty_directory_and_read_result() -> anyhow::Result<()> {
     let input = Directory::default();
 
     let mut dagio = Dagio::from(MemStore::default());
-    let link = dagio.commit_directory(&input).await?;
+    let link = dagio.commit(input.clone()).await?;
     dbg!(&link);
 
-    let output = dagio.read_directory(&link).await?;
+    let output: Directory<_> = dagio.read(&link).await?;
     dbg!(&input, &output);
 
     assert_eq!(input, output);
@@ -48,9 +48,9 @@ async fn insert_singleton_directory_and_read_result() -> anyhow::Result<()> {
     dbg!(&link_hw);
 
     let input_dir = Directory::from_iter([("hello.txt", link_hw)]);
-    let link_dir = dagio.commit_directory(&input_dir).await?;
+    let link_dir = dagio.commit(input_dir.clone()).await?;
 
-    let output_dir = dagio.read_directory(&link_dir).await?;
+    let output_dir: Directory<_> = dagio.read(&link_dir).await?;
     assert_eq!(input_dir, output_dir);
 
     let outlink_hw = output_dir.get("hello.txt").unwrap();
