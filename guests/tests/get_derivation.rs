@@ -12,8 +12,7 @@ async fn get_derivation_outputs_derivation() -> anyhow::Result<()> {
 }
 
 async fn get_derivation_outputs_derivation_impl() -> anyhow::Result<()> {
-    let mut ms = MemStore::default();
-    let mut dagio = Dagio::from(&mut ms);
+    let mut dagio = Dagio::from(MemStore::default());
 
     // Set up derivation:
     let exec = dagio
@@ -24,7 +23,7 @@ async fn get_derivation_outputs_derivation_impl() -> anyhow::Result<()> {
     let derivation = dagio.commit(Derivation { exec, input }).await?;
 
     // Execute derive:
-    let output = dagwasm_host::derive(&mut ms, &derivation).await?;
+    let output = dagwasm_host::derive(dagio, &derivation).await?;
 
     // Verify output is the derivation:
     assert_eq!(output, derivation);

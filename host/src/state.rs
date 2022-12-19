@@ -15,9 +15,9 @@ impl<B> State<B>
 where
     B: BlobStore,
 {
-    pub(crate) fn new(blobstore: B) -> Self {
+    pub(crate) fn new(dagio: Dagio<B>) -> Self {
         State {
-            dagio: Dagio::from(blobstore),
+            dagio,
             links: Table::default(),
         }
     }
