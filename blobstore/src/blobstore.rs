@@ -30,25 +30,3 @@ pub trait BlobStore: Debug + Send {
         self.commit_writer(w).await
     }
 }
-
-#[async_trait]
-impl<'a, B> BlobStore for &'a mut B
-where
-    B: BlobStore,
-{
-    type Key = <B as BlobStore>::Key;
-    type Reader = <B as BlobStore>::Reader;
-    type Writer = <B as BlobStore>::Writer;
-
-    async fn open_reader(&mut self, key: &Self::Key) -> anyhow::Result<Self::Reader> {
-        (*self).open_reader(key).await
-    }
-
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer> {
-        (*self).open_writer().await
-    }
-
-    async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::Key> {
-        (*self).commit_writer(w).await
-    }
-}
