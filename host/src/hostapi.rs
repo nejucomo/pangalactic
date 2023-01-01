@@ -29,6 +29,7 @@ where
     link_host_fn!(link_open_directory_reader, link)?;
     link_host_fn!(directory_reader_has_more_entries, directory_reader)?;
     link_host_fn!(directory_reader_load_link, directory_reader)?;
+    link_host_fn!(directory_reader_open_name_reader, directory_reader)?;
     link_host_fn!(directory_reader_next_entry, directory_reader)?;
 
     Ok(linker)
@@ -89,11 +90,27 @@ where
 
     let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
-    let link = dr
-        .take_link()
-        .ok_or_else(|| anyhow::Error::msg("link already taken in DirectoryReader"))?;
+    let link = dr.take_link()?;
     let h_link = caller.data_mut().links_mut().insert(link);
     Ok(h_link.into_wasm())
+}
+
+async fn directory_reader_open_name_reader<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_dr: u64,
+) -> Result<u64, Trap>
+where
+    B: BlobStore,
+{
+    use crate::{ByteReader, DirectoryReader};
+    use dagwasm_handle::Handle;
+
+    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
+    let name = dr.take_name()?;
+    let br = ByteReader::from(name);
+    let h_br = caller.data_mut().byte_readers_mut().insert(br);
+    Ok(h_br.into_wasm())
 }
 
 async fn directory_reader_next_entry<B>(

@@ -1,3 +1,4 @@
+mod bytereader;
 mod derivefunc;
 mod directoryreader;
 mod host;
@@ -5,6 +6,7 @@ pub(crate) mod hostapi;
 mod state;
 mod tofro;
 
+pub(crate) use self::bytereader::ByteReader;
 pub(crate) use self::derivefunc::DeriveFunc;
 pub(crate) use self::directoryreader::DirectoryReader;
 pub use self::host::derive;

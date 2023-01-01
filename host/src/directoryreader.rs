@@ -21,13 +21,16 @@ where
         self.name.is_some() || self.link.is_some()
     }
 
-    #[allow(dead_code)]
-    pub(crate) fn take_name(&mut self) -> Option<Name> {
-        self.name.take()
+    pub(crate) fn take_name(&mut self) -> anyhow::Result<Name> {
+        self.name
+            .take()
+            .ok_or_else(|| anyhow::Error::msg("name already taken in DirectoryReader"))
     }
 
-    pub(crate) fn take_link(&mut self) -> Option<LinkFor<B>> {
-        self.link.take()
+    pub(crate) fn take_link(&mut self) -> anyhow::Result<LinkFor<B>> {
+        self.link
+            .take()
+            .ok_or_else(|| anyhow::Error::msg("link already taken in DirectoryReader"))
     }
 
     pub(crate) fn next_entry(&mut self) {
