@@ -20,6 +20,12 @@ impl HostToWasm for LinkKind {
     }
 }
 
+impl<T> HostToWasm for Handle<T> {
+    fn into_wasm(self) -> u64 {
+        unsafe { self.peek() }
+    }
+}
+
 impl<T> WasmToHost<Handle<T>> for u64 {
     fn into_host(self) -> Handle<T> {
         unsafe { Handle::wrap(self) }

@@ -34,6 +34,15 @@ where
     }
 }
 
+impl<K> IntoIterator for Directory<K> {
+    type Item = (Name, Link<K>);
+    type IntoIter = <BTreeMap<Name, Link<K>> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl<K> Directory<K> {
     pub fn insert(&mut self, name: Name, link: Link<K>) -> anyhow::Result<()> {
         let errname = name.clone();

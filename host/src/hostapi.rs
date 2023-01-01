@@ -26,6 +26,7 @@ where
     }
 
     link_host_fn!(link_get_kind, link)?;
+    link_host_fn!(link_open_directory_reader, link)?;
 
     Ok(linker)
 }
@@ -39,4 +40,21 @@ where
     let h_link: Handle<LinkFor<B>> = rh_link.into_host();
     let link = caller.data().links().lookup(h_link)?;
     Ok(link.kind().into_wasm())
+}
+
+async fn link_open_directory_reader<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_link: u64,
+) -> Result<u64, Trap>
+where
+    B: BlobStore,
+{
+    use crate::DirectoryReader;
+    use dagwasm_handle::Handle;
+
+    let h_link: Handle<LinkFor<B>> = rh_link.into_host();
+    let link = caller.data().links().lookup(h_link)?.clone();
+    let dr: DirectoryReader<B> = caller.data_mut().dagio_mut().read(&link).await?;
+    let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
+    Ok(h_dr.into_wasm())
 }
