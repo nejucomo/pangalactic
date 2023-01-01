@@ -8,7 +8,6 @@ pub(crate) struct DirectoryReader<B>
 where
     B: BlobStore,
 {
-    #[allow(dead_code)]
     iter: <Directory<<B as BlobStore>::Key> as IntoIterator>::IntoIter,
     next: Option<(Name, LinkFor<B>)>,
 }
@@ -19,6 +18,10 @@ where
 {
     pub(crate) fn has_more_entries(&self) -> bool {
         self.next.is_some()
+    }
+
+    pub(crate) fn next_entry(&mut self) {
+        self.next = self.iter.next();
     }
 }
 

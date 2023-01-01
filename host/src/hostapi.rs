@@ -28,6 +28,7 @@ where
     link_host_fn!(link_get_kind, link)?;
     link_host_fn!(link_open_directory_reader, link)?;
     link_host_fn!(directory_reader_has_more_entries, directory_reader)?;
+    link_host_fn!(directory_reader_next_entry, directory_reader)?;
 
     Ok(linker)
 }
@@ -73,4 +74,20 @@ where
     let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
     let dr = caller.data().directory_readers().lookup(h_dr)?;
     Ok(dr.has_more_entries().into_wasm())
+}
+
+async fn directory_reader_next_entry<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_dr: u64,
+) -> Result<(), Trap>
+where
+    B: BlobStore,
+{
+    use crate::DirectoryReader;
+    use dagwasm_handle::Handle;
+
+    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
+    dr.next_entry();
+    Ok(())
 }
