@@ -41,6 +41,10 @@ where
         &mut self.links
     }
 
+    pub(crate) fn directory_readers(&self) -> &Table<DirectoryReader<B>> {
+        &self.dreaders
+    }
+
     pub(crate) fn directory_readers_mut(&mut self) -> &mut Table<DirectoryReader<B>> {
         &mut self.dreaders
     }

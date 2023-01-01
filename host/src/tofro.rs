@@ -9,6 +9,16 @@ pub(crate) trait WasmToHost<T> {
     fn into_host(self) -> T;
 }
 
+impl HostToWasm for bool {
+    fn into_wasm(self) -> u64 {
+        if self {
+            1
+        } else {
+            0
+        }
+    }
+}
+
 impl HostToWasm for LinkKind {
     fn into_wasm(self) -> u64 {
         use LinkKind::*;
