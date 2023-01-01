@@ -22,6 +22,10 @@ where
 
         ( $name:ident, $a0:ident ) => {
             link_host_fn!(method func_wrap1_async, $name, $a0)
+        };
+
+        ( $name:ident, $a0:ident, $a1:ident, $a2:ident ) => {
+            link_host_fn!(method func_wrap3_async, $name, $a0, $a1, $a2)
         }
     }
 
@@ -31,6 +35,8 @@ where
     link_host_fn!(directory_reader_load_link, directory_reader)?;
     link_host_fn!(directory_reader_open_name_reader, directory_reader)?;
     link_host_fn!(directory_reader_next_entry, directory_reader)?;
+    link_host_fn!(byte_reader_read, byte_reader, ptr, len)?;
+    link_host_fn!(byte_reader_close, byte_reader)?;
 
     Ok(linker)
 }
@@ -126,5 +132,34 @@ where
     let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     dr.next_entry();
+    Ok(())
+}
+
+async fn byte_reader_read<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_br: u64,
+    ptr: u64,
+    len: u64,
+) -> Result<u64, Trap>
+where
+    B: BlobStore,
+{
+    use crate::ByteReader;
+    use dagwasm_handle::Handle;
+
+    let h_br: Handle<ByteReader> = rh_br.into_host();
+    let reader = caller.data_mut().byte_readers_mut().lookup_mut(h_br)?;
+    todo!("read from {reader:?} into ({ptr:?}, {len:?})");
+}
+
+async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
+where
+    B: BlobStore,
+{
+    use crate::ByteReader;
+    use dagwasm_handle::Handle;
+
+    let h_br: Handle<ByteReader> = rh_br.into_host();
+    caller.data_mut().byte_readers_mut().close(h_br)?;
     Ok(())
 }

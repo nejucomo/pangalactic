@@ -36,4 +36,11 @@ impl<T> Table<T> {
             .get_mut(&unsafe { handle.peek() })
             .ok_or_else(|| anyhow::Error::msg(format!("invalid lookup {handle:?}")))
     }
+
+    pub fn close(&mut self, handle: Handle<T>) -> anyhow::Result<()> {
+        self.map
+            .remove(&unsafe { handle.peek() })
+            .map(|_| ())
+            .ok_or_else(|| anyhow::Error::msg(format!("invalid close {handle:?}")))
+    }
 }
