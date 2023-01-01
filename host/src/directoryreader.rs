@@ -9,7 +9,8 @@ where
     B: BlobStore,
 {
     iter: <Directory<<B as BlobStore>::Key> as IntoIterator>::IntoIter,
-    next: Option<(Name, LinkFor<B>)>,
+    name: Option<Name>,
+    link: Option<LinkFor<B>>,
 }
 
 impl<B> DirectoryReader<B>
@@ -17,11 +18,26 @@ where
     B: BlobStore,
 {
     pub(crate) fn has_more_entries(&self) -> bool {
-        self.next.is_some()
+        self.name.is_some() || self.link.is_some()
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn take_name(&mut self) -> Option<Name> {
+        self.name.take()
+    }
+
+    pub(crate) fn take_link(&mut self) -> Option<LinkFor<B>> {
+        self.link.take()
     }
 
     pub(crate) fn next_entry(&mut self) {
-        self.next = self.iter.next();
+        if let Some((name, link)) = self.iter.next() {
+            self.name = Some(name);
+            self.link = Some(link);
+        } else {
+            self.name = None;
+            self.link = None;
+        }
     }
 }
 
@@ -32,8 +48,12 @@ where
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
         let dir: Directory<<B as BlobStore>::Key> = dagio.read(link).await?;
-        let mut iter = dir.into_iter();
-        let next = iter.next();
-        Ok(DirectoryReader { iter, next })
+        let mut dr = DirectoryReader {
+            iter: dir.into_iter(),
+            name: None,
+            link: None,
+        };
+        dr.next_entry();
+        Ok(dr)
     }
 }
