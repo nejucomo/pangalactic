@@ -22,6 +22,10 @@ where
         }
     }
 
+    pub(crate) fn unwrap_dagio(self) -> Dagio<B> {
+        self.dagio
+    }
+
     #[allow(dead_code)]
     pub(crate) fn dagio(&self) -> &Dagio<B> {
         &self.dagio

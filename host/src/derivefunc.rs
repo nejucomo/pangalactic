@@ -1,6 +1,6 @@
 use crate::State;
 use dagwasm_blobstore::BlobStore;
-use dagwasm_dagio::LinkFor;
+use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_handle::Handle;
 use wasmtime::{Engine, Linker, Module, Store, TypedFunc};
 
@@ -33,9 +33,9 @@ where
     }
 
     pub(crate) async fn call_async(
-        &mut self,
+        mut self,
         derivation: &LinkFor<B>,
-    ) -> anyhow::Result<LinkFor<B>> {
+    ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
         let derive_handle = self.store.data_mut().links_mut().insert(derivation.clone());
         let derive_handle_raw = unsafe { derive_handle.peek() };
 
@@ -45,6 +45,7 @@ where
             .await?;
         let output_handle = unsafe { Handle::wrap(raw_output) };
         let output_link = self.store.data().links().lookup(output_handle).cloned()?;
-        Ok(output_link)
+        let dagio = self.store.into_data().unwrap_dagio();
+        Ok((dagio, output_link))
     }
 }

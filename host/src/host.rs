@@ -3,7 +3,10 @@ use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, LinkFor};
 use wasmtime::{Engine, Linker, Module};
 
-pub async fn derive<B>(dagio: Dagio<B>, derivation: &LinkFor<B>) -> anyhow::Result<LinkFor<B>>
+pub async fn derive<B>(
+    dagio: Dagio<B>,
+    derivation: &LinkFor<B>,
+) -> anyhow::Result<(Dagio<B>, LinkFor<B>)>
 where
     B: BlobStore,
 {
@@ -44,12 +47,12 @@ where
         &mut self,
         dagio: Dagio<B>,
         derivation: &LinkFor<B>,
-    ) -> anyhow::Result<LinkFor<B>> {
+    ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
         use crate::DeriveFunc;
 
         let mut state = State::new(dagio);
         let execmod = load_exec_mod(&mut state, &self.engine, derivation).await?;
-        let mut derivefunc = DeriveFunc::new(&self.engine, &self.linker, state, &execmod).await?;
+        let derivefunc = DeriveFunc::new(&self.engine, &self.linker, state, &execmod).await?;
 
         derivefunc.call_async(derivation).await
     }

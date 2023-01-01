@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "get_derivation",
+  "identity",
   "test_derivation_is_dir",
 ]
 
