@@ -1,6 +1,6 @@
 use dagwasm_dagio::Dagio;
-use dagwasm_derivation::{Attestation, Derivation};
 use dagwasm_memstore::MemStore;
+use dagwasm_schemata::{Attestation, Derivation};
 use std::future::Future;
 
 #[tokio::test]

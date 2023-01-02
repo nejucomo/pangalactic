@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-derivation"
+name = "dagwasm-schemata"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

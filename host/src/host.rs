@@ -74,7 +74,7 @@ where
     B: BlobStore,
 {
     use dagwasm_dagio::FromDag;
-    use dagwasm_derivation::Derivation;
+    use dagwasm_schemata::Derivation;
 
     let dagio = state.dagio_mut();
     let deriv = Derivation::from_dag(dagio, derivation).await?;

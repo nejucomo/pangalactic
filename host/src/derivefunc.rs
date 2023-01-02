@@ -41,7 +41,7 @@ where
         mut self,
         derivation: &LinkFor<B>,
     ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
-        use dagwasm_derivation::Attestation;
+        use dagwasm_schemata::Attestation;
 
         let derive_handle = self.store.data_mut().links_mut().insert(derivation.clone());
         let derive_handle_raw = unsafe { derive_handle.peek() };

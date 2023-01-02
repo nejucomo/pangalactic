@@ -20,8 +20,8 @@ version = "^0.1.0"
 path = "../dagio"
 version = "^0.1.0"
 
-[dev-dependencies.dagwasm-derivation]
-path = "../derivation"
+[dev-dependencies.dagwasm-schemata]
+path = "../schemata"
 version = "^0.1.0"
 
 [dev-dependencies.dagwasm-dir]
