@@ -8,7 +8,7 @@ pub(crate) struct DirectoryReader<B>
 where
     B: Store,
 {
-    iter: <Directory<<B as Store>::Key> as IntoIterator>::IntoIter,
+    iter: <Directory<<B as Store>::CID> as IntoIterator>::IntoIter,
     name: Option<Name>,
     link: Option<LinkFor<B>>,
 }
@@ -50,7 +50,7 @@ where
     B: Store,
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
-        let dir: Directory<<B as Store>::Key> = dagio.read(link).await?;
+        let dir: Directory<<B as Store>::CID> = dagio.read(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

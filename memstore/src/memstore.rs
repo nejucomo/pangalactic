@@ -10,7 +10,7 @@ pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
 
 #[async_trait]
 impl Store for MemStore {
-    type Key = Hash;
+    type CID = Hash;
     type Reader = Reader;
     type Writer = Vec<u8>;
 
@@ -26,7 +26,7 @@ impl Store for MemStore {
         Ok(Vec::new())
     }
 
-    async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::Key> {
+    async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::CID> {
         let key = Hash::of(&w);
         self.0.insert(key.clone(), Arc::new(w));
         Ok(key)

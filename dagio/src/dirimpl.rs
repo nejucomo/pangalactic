@@ -7,7 +7,7 @@ use std::marker::Unpin;
 use std::ops::Deref;
 
 #[async_trait]
-impl<B> ToDag<B> for Directory<<B as Store>::Key>
+impl<B> ToDag<B> for Directory<<B as Store>::CID>
 where
     B: Store,
     <B as Store>::Writer: Deref,
@@ -43,7 +43,7 @@ where
 }
 
 #[async_trait]
-impl<B> FromDag<B> for Directory<<B as Store>::Key>
+impl<B> FromDag<B> for Directory<<B as Store>::CID>
 where
     B: Store,
 {
