@@ -1,6 +1,7 @@
 use crate::State;
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, LinkFor};
+use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module};
 
 pub async fn derive<B>(
@@ -9,6 +10,8 @@ pub async fn derive<B>(
 ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
 {
     let mut host = Host::new()?;
     host.execute(dagio, derivation).await
@@ -17,6 +20,8 @@ where
 struct Host<B>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
 {
     engine: Engine,
     linker: Linker<State<B>>,
@@ -25,6 +30,8 @@ where
 impl<B> Host<B>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
 {
     pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();

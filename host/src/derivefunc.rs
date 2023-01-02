@@ -2,6 +2,7 @@ use crate::State;
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_handle::Handle;
+use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module, Store, TypedFunc};
 
 type RawLinkHandle = u64;
@@ -9,6 +10,8 @@ type RawLinkHandle = u64;
 pub(crate) struct DeriveFunc<B>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
 {
     store: Store<State<B>>,
     tfunc: TypedFunc<(RawLinkHandle,), (RawLinkHandle,)>,
@@ -17,6 +20,8 @@ where
 impl<B> DeriveFunc<B>
 where
     B: BlobStore,
+    <B as BlobStore>::Writer: Deref,
+    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
 {
     pub(crate) async fn new(
         engine: &Engine,
@@ -36,6 +41,8 @@ where
         mut self,
         derivation: &LinkFor<B>,
     ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
+        use dagwasm_derivation::Attestation;
+
         let derive_handle = self.store.data_mut().links_mut().insert(derivation.clone());
         let derive_handle_raw = unsafe { derive_handle.peek() };
 
@@ -45,7 +52,15 @@ where
             .await?;
         let output_handle = unsafe { Handle::wrap(raw_output) };
         let output_link = self.store.data().links().lookup(output_handle).cloned()?;
-        let dagio = self.store.into_data().unwrap_dagio();
-        Ok((dagio, output_link))
+
+        let mut dagio = self.store.into_data().unwrap_dagio();
+        let attestation_link = dagio
+            .commit(Attestation {
+                derivation: derivation.clone(),
+                output: output_link,
+            })
+            .await?;
+
+        Ok((dagio, attestation_link))
     }
 }

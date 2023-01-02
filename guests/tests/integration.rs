@@ -1,4 +1,4 @@
-use dagwasm_dagio::{Dagio, LinkFor};
+use dagwasm_dagio::Dagio;
 use dagwasm_derivation::{Attestation, Derivation};
 use dagwasm_memstore::MemStore;
 use std::future::Future;
@@ -10,18 +10,20 @@ async fn derivation_is_dir() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn get_derivation_outputs_derivation() -> anyhow::Result<()> {
-    verify_guest("get_derivation", |_dagio, derivation, output| async move {
-        assert_eq!(derivation, output);
-        Ok(())
-    })
+    verify_guest(
+        "get_derivation",
+        |_dagio, _derivation, attestation| async move {
+            assert_eq!(attestation.derivation, attestation.output);
+            Ok(())
+        },
+    )
     .await
 }
 
 #[tokio::test]
 async fn identity() -> anyhow::Result<()> {
-    verify_guest("identity", |mut dagio, derivation, output| async move {
-        let att: Attestation<MemStore> = dagio.read(&derivation).await?;
-        assert_eq!(att.output, output);
+    verify_guest("identity", |_dagio, derivation, attestation| async move {
+        assert_eq!(derivation.input, attestation.output);
         Ok(())
     })
     .await
@@ -29,7 +31,7 @@ async fn identity() -> anyhow::Result<()> {
 
 async fn verify_guest<F, Fut>(guest: &str, verify: F) -> anyhow::Result<()>
 where
-    F: FnOnce(Dagio<MemStore>, LinkFor<MemStore>, LinkFor<MemStore>) -> Fut,
+    F: FnOnce(Dagio<MemStore>, Derivation<MemStore>, Attestation<MemStore>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     let r = verify_guest_inner(guest, verify).await;
@@ -41,7 +43,7 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, verify: F) -> anyhow::Result<()>
 where
-    F: FnOnce(Dagio<MemStore>, LinkFor<MemStore>, LinkFor<MemStore>) -> Fut,
+    F: FnOnce(Dagio<MemStore>, Derivation<MemStore>, Attestation<MemStore>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     let mut dagio = Dagio::from(MemStore::default());
@@ -57,10 +59,13 @@ where
     };
 
     // Execute derive:
-    let (dagio, output) = dagwasm_host::derive(dagio, &derivation).await?;
+    let (mut dagio, attestation) = dagwasm_host::derive(dagio, &derivation).await?;
+
+    let att: Attestation<MemStore> = dagio.read(&attestation).await?;
+    let der: Derivation<MemStore> = dagio.read(&att.derivation).await?;
 
     // Verify
-    verify(dagio, derivation, output).await?;
+    verify(dagio, der, att).await?;
 
     Ok(())
 }

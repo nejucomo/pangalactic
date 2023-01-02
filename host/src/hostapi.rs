@@ -1,7 +1,7 @@
 use crate::{HostToWasm, State, WasmToHost};
 use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::LinkFor;
-use wasmtime::{Caller, Engine, Linker, Trap};
+use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
 pub(crate) fn instantiate_linker<B>(engine: &Engine) -> anyhow::Result<Linker<State<B>>>
 where
@@ -14,8 +14,8 @@ where
     macro_rules! link_host_fn {
         ( method $wrapmethod:ident, $name:ident, $( $arg:ident ),* ) => {
             linker . $wrapmethod(
-                dbg!(HOSTMOD),
-                dbg!(stringify!($name)),
+                HOSTMOD,
+                stringify!($name),
                 |caller: Caller<'_, State<B>>, $( $arg : u64 ),* | Box::new($name(caller, $( $arg ),* )),
             )
         };
@@ -146,10 +146,31 @@ where
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
+    use tokio::io::AsyncReadExt;
 
     let h_br: Handle<ByteReader> = rh_br.into_host();
+    let ptr: usize = ptr.into_host();
+    let len: usize = len.into_host();
+
     let reader = caller.data_mut().byte_readers_mut().lookup_mut(h_br)?;
-    todo!("read from {reader:?} into ({ptr:?}, {len:?})");
+    // TODO: Use a fixed-length host controlled buffer instead of guest-provided len:
+    let mut buf = vec![0; len];
+    let mut readlen = 0;
+    while readlen < len {
+        let c = reader
+            .read(&mut buf[readlen..])
+            .await
+            .map_err(|e| anyhow::Error::msg(e.to_string()))?;
+
+        if c == 0 {
+            break;
+        }
+        readlen += c;
+    }
+    assert!(readlen <= len);
+    let mem = get_memory(&mut caller)?;
+    mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
+    Ok(readlen.into_wasm())
 }
 
 async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
@@ -162,4 +183,22 @@ where
     let h_br: Handle<ByteReader> = rh_br.into_host();
     caller.data_mut().byte_readers_mut().close(h_br)?;
     Ok(())
+}
+
+fn get_memory<B>(caller: &mut Caller<'_, State<B>>) -> anyhow::Result<Memory>
+where
+    B: BlobStore,
+{
+    use wasmtime::Extern::*;
+
+    let export = caller
+        .get_export("memory")
+        .ok_or_else(|| anyhow::Error::msg("no 'memory' export found"))?;
+
+    match export {
+        Memory(m) => Ok(m),
+        _ => Err(anyhow::Error::msg(
+            "the 'memory' export is not a wasmtime::Memory",
+        )),
+    }
 }
