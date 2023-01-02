@@ -1,5 +1,12 @@
 # dagwasm
 
+## Terminology
+
+- A WASM module defines how to *derive* an `output` from a *plan*.
+- Each *schema* is a specific format of DAG.
+- A *plan* is a schema specifying an `exec` WASM and an `input` link. This is the sole input to the `derive` API.
+- An *attestation* schema contains `plan` and `output` links. This is the sole output of the `derive` API.
+
 ## Design Notes
 
 ### Directories in Host Layer
