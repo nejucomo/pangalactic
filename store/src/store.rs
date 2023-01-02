@@ -4,7 +4,7 @@ use std::fmt::Debug;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 #[async_trait]
-pub trait BlobStore: Debug + Send {
+pub trait Store: Debug + Send {
     type Key: Clone + Debug + AsyncSerialize + AsyncDeserialize + Send + Sync;
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;

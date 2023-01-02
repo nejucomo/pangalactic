@@ -10,8 +10,8 @@ license.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 
-[dependencies.dagwasm-blobstore]
-path = "../blobstore"
+[dependencies.dagwasm-store]
+path = "../store"
 version = "^0.1.0"
 
 [dependencies.dagwasm-dagio]

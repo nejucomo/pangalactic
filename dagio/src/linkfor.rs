@@ -1,4 +1,4 @@
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dir::Link;
+use dagwasm_store::Store;
 
-pub type LinkFor<B> = Link<<B as BlobStore>::Key>;
+pub type LinkFor<B> = Link<<B as Store>::Key>;

@@ -1,27 +1,27 @@
 use crate::State;
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_handle::Handle;
+use dagwasm_store::Store;
 use std::ops::Deref;
-use wasmtime::{Engine, Linker, Module, Store, TypedFunc};
+use wasmtime::{Engine, Linker, Module, TypedFunc};
 
 type RawLinkHandle = u64;
 
 pub(crate) struct DeriveFunc<B>
 where
-    B: BlobStore,
-    <B as BlobStore>::Writer: Deref,
-    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    B: Store,
+    <B as Store>::Writer: Deref,
+    <<B as Store>::Writer as Deref>::Target: Unpin,
 {
-    store: Store<State<B>>,
+    store: wasmtime::Store<State<B>>,
     tfunc: TypedFunc<(RawLinkHandle,), (RawLinkHandle,)>,
 }
 
 impl<B> DeriveFunc<B>
 where
-    B: BlobStore,
-    <B as BlobStore>::Writer: Deref,
-    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    B: Store,
+    <B as Store>::Writer: Deref,
+    <<B as Store>::Writer as Deref>::Target: Unpin,
 {
     pub(crate) async fn new(
         engine: &Engine,
@@ -29,7 +29,7 @@ where
         state: State<B>,
         execmod: &Module,
     ) -> anyhow::Result<Self> {
-        let mut store = Store::new(engine, state);
+        let mut store = wasmtime::Store::new(engine, state);
         let instance = linker.instantiate_async(&mut store, execmod).await?;
         let tfunc = instance
             .get_typed_func::<(RawLinkHandle,), (RawLinkHandle,), _>(&mut store, "derive")?;

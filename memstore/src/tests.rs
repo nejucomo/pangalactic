@@ -14,7 +14,7 @@ async fn insert_and_read(input: &[u8]) {
 
 async fn insert_and_read_result(input: &[u8]) -> anyhow::Result<()> {
     use crate::MemStore;
-    use dagwasm_blobstore::BlobStore;
+    use dagwasm_store::Store;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
     let mut store = MemStore::default();

@@ -1,14 +1,14 @@
 use async_trait::async_trait;
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use dagwasm_dir::Directory;
+use dagwasm_store::Store;
 use std::marker::Unpin;
 use std::ops::Deref;
 
 #[derive(Debug)]
 pub struct Attestation<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     pub plan: LinkFor<B>,
     pub output: LinkFor<B>,
@@ -17,7 +17,7 @@ where
 #[async_trait]
 impl<B> FromDag<B> for Attestation<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
         let mut dir = Directory::from_dag(dagio, link).await?;
@@ -31,9 +31,9 @@ where
 #[async_trait]
 impl<B> ToDag<B> for Attestation<B>
 where
-    B: BlobStore,
-    <B as BlobStore>::Writer: Deref,
-    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    B: Store,
+    <B as Store>::Writer: Deref,
+    <<B as Store>::Writer as Deref>::Target: Unpin,
     LinkFor<B>: Clone,
 {
     async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {

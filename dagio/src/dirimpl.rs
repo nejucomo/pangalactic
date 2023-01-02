@@ -1,17 +1,17 @@
 use crate::{Dagio, LinkFor};
 use crate::{FromDag, ToDag};
 use async_trait::async_trait;
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dir::Directory;
+use dagwasm_store::Store;
 use std::marker::Unpin;
 use std::ops::Deref;
 
 #[async_trait]
-impl<B> ToDag<B> for Directory<<B as BlobStore>::Key>
+impl<B> ToDag<B> for Directory<<B as Store>::Key>
 where
-    B: BlobStore,
-    <B as BlobStore>::Writer: Deref,
-    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    B: Store,
+    <B as Store>::Writer: Deref,
+    <<B as Store>::Writer as Deref>::Target: Unpin,
 {
     async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
         use dagwasm_dir::{Link, LinkKind::Dir};
@@ -31,9 +31,9 @@ where
 #[async_trait]
 impl<const K: usize, B, N> ToDag<B> for [(N, LinkFor<B>); K]
 where
-    B: BlobStore,
-    <B as BlobStore>::Writer: Deref,
-    <<B as BlobStore>::Writer as Deref>::Target: Unpin,
+    B: Store,
+    <B as Store>::Writer: Deref,
+    <<B as Store>::Writer as Deref>::Target: Unpin,
     N: Send,
     String: From<N>,
 {
@@ -43,9 +43,9 @@ where
 }
 
 #[async_trait]
-impl<B> FromDag<B> for Directory<<B as BlobStore>::Key>
+impl<B> FromDag<B> for Directory<<B as Store>::Key>
 where
-    B: BlobStore,
+    B: Store,
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
         use dagwasm_dir::{

@@ -1,5 +1,5 @@
 // TODO: This design doesn't address GC / data availability.
 
-mod blobstore;
+mod store;
 
-pub use self::blobstore::BlobStore;
+pub use self::store::Store;

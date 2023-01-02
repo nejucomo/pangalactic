@@ -1,7 +1,7 @@
 use crate::Reader;
 use async_trait::async_trait;
-use dagwasm_blobstore::BlobStore;
 use dagwasm_hash::Hash;
+use dagwasm_store::Store;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -9,7 +9,7 @@ use std::sync::Arc;
 pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
 
 #[async_trait]
-impl BlobStore for MemStore {
+impl Store for MemStore {
     type Key = Hash;
     type Reader = Reader;
     type Writer = Vec<u8>;

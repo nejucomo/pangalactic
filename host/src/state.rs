@@ -1,12 +1,12 @@
 use crate::{ByteReader, DirectoryReader};
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, LinkFor};
+use dagwasm_store::Store;
 use dagwasm_table::Table;
 
 #[derive(Debug)]
 pub struct State<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     dagio: Dagio<B>,
     links: Table<LinkFor<B>>,
@@ -16,7 +16,7 @@ where
 
 impl<B> State<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     pub(crate) fn new(dagio: Dagio<B>) -> Self {
         State {
