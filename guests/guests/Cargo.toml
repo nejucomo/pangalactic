@@ -1,8 +1,8 @@
 [workspace]
 members = [
-  "get_derivation",
+  "get_plan",
   "identity",
-  "test_derivation_is_dir",
+  "test_plan_is_dir",
 ]
 
 [workspace.package]

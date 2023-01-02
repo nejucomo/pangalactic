@@ -1,5 +1,5 @@
 mod attestation;
-mod derivation;
+mod plan;
 
 pub use self::attestation::Attestation;
-pub use self::derivation::Derivation;
+pub use self::plan::Plan;

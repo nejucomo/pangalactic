@@ -39,11 +39,11 @@ where
 
     pub(crate) async fn call_async(
         mut self,
-        derivation: &LinkFor<B>,
+        plan: &LinkFor<B>,
     ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
         use dagwasm_schemata::Attestation;
 
-        let derive_handle = self.store.data_mut().links_mut().insert(derivation.clone());
+        let derive_handle = self.store.data_mut().links_mut().insert(plan.clone());
         let derive_handle_raw = unsafe { derive_handle.peek() };
 
         let (raw_output,): (RawLinkHandle,) = self
@@ -56,7 +56,7 @@ where
         let mut dagio = self.store.into_data().unwrap_dagio();
         let attestation_link = dagio
             .commit(Attestation {
-                derivation: derivation.clone(),
+                plan: plan.clone(),
                 output: output_link,
             })
             .await?;

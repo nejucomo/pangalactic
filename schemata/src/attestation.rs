@@ -10,7 +10,7 @@ pub struct Attestation<B>
 where
     B: BlobStore,
 {
-    pub derivation: LinkFor<B>,
+    pub plan: LinkFor<B>,
     pub output: LinkFor<B>,
 }
 
@@ -21,10 +21,10 @@ where
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
         let mut dir = Directory::from_dag(dagio, link).await?;
-        let derivation = dir.remove_required("derivation")?;
+        let plan = dir.remove_required("plan")?;
         let output = dir.remove_required("output")?;
         dir.require_empty()?;
-        Ok(Attestation { derivation, output })
+        Ok(Attestation { plan, output })
     }
 }
 
@@ -38,7 +38,7 @@ where
 {
     async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
         dagio
-            .commit([("derivation", self.derivation), ("output", self.output)])
+            .commit([("plan", self.plan), ("output", self.output)])
             .await
     }
 }

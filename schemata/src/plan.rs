@@ -6,7 +6,7 @@ use std::marker::Unpin;
 use std::ops::Deref;
 
 #[derive(Debug)]
-pub struct Derivation<B>
+pub struct Plan<B>
 where
     B: BlobStore,
 {
@@ -15,7 +15,7 @@ where
 }
 
 #[async_trait]
-impl<B> FromDag<B> for Derivation<B>
+impl<B> FromDag<B> for Plan<B>
 where
     B: BlobStore,
 {
@@ -24,12 +24,12 @@ where
         let exec = dir.remove_required("exec")?;
         let input = dir.remove_required("input")?;
         dir.require_empty()?;
-        Ok(Derivation { exec, input })
+        Ok(Plan { exec, input })
     }
 }
 
 #[async_trait]
-impl<B> ToDag<B> for Derivation<B>
+impl<B> ToDag<B> for Plan<B>
 where
     B: BlobStore,
     <B as BlobStore>::Writer: Deref,

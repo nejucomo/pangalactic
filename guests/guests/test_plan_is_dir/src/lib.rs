@@ -6,8 +6,8 @@ extern "C" {
 const LINK_KIND_DIR: u64 = 1;
 
 #[no_mangle]
-pub extern "C" fn derive(derivation: u64) -> u64 {
-    let kind = unsafe { link_get_kind(derivation) };
+pub extern "C" fn derive(plan: u64) -> u64 {
+    let kind = unsafe { link_get_kind(plan) };
     assert_eq!(kind, LINK_KIND_DIR);
     0
 }
