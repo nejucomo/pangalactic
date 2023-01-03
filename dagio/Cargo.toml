@@ -12,8 +12,8 @@ async-trait.workspace = true
 derive_more.workspace = true
 tokio.workspace = true
 
-[dependencies.dagwasm-blobstore]
-path = "../blobstore"
+[dependencies.dagwasm-store]
+path = "../store"
 version = "^0.1.0"
 
 [dependencies.dagwasm-dir]

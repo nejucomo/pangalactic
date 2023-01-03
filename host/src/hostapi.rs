@@ -1,11 +1,11 @@
 use crate::{HostToWasm, State, WasmToHost};
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::LinkFor;
+use dagwasm_store::Store;
 use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
 pub(crate) fn instantiate_linker<B>(engine: &Engine) -> anyhow::Result<Linker<State<B>>>
 where
-    B: BlobStore,
+    B: Store,
 {
     const HOSTMOD: &str = env!("CARGO_PKG_NAME");
 
@@ -43,7 +43,7 @@ where
 
 async fn link_get_kind<B>(caller: Caller<'_, State<B>>, rh_link: u64) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use dagwasm_handle::Handle;
 
@@ -57,7 +57,7 @@ async fn link_open_directory_reader<B>(
     rh_link: u64,
 ) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
@@ -74,7 +74,7 @@ async fn directory_reader_has_more_entries<B>(
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
@@ -89,7 +89,7 @@ async fn directory_reader_load_link<B>(
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
@@ -106,7 +106,7 @@ async fn directory_reader_open_name_reader<B>(
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::{ByteReader, DirectoryReader};
     use dagwasm_handle::Handle;
@@ -124,7 +124,7 @@ async fn directory_reader_next_entry<B>(
     rh_dr: u64,
 ) -> Result<(), Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
@@ -142,7 +142,7 @@ async fn byte_reader_read<B>(
     len: u64,
 ) -> Result<u64, Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
@@ -175,7 +175,7 @@ where
 
 async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
 where
-    B: BlobStore,
+    B: Store,
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
@@ -187,7 +187,7 @@ where
 
 fn get_memory<B>(caller: &mut Caller<'_, State<B>>) -> anyhow::Result<Memory>
 where
-    B: BlobStore,
+    B: Store,
 {
     use wasmtime::Extern::*;
 

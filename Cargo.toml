@@ -1,14 +1,14 @@
 [workspace]
 members = [
-  "blobstore",
   "dagio",
-  "derivation",
   "dir",
   "guests",
   "handle",
   "host",
   "memstore",
+  "schemata",
   "serialization",
+  "store",
   "table",
 ]
 

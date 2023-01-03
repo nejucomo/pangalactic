@@ -6,11 +6,11 @@ use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, PartialEq, Eq)]
-struct FakeKey;
-type FLDirectory = Directory<FakeKey>;
+struct FakeCID;
+type FLDirectory = Directory<FakeCID>;
 
 #[async_trait]
-impl AsyncSerialize for FakeKey {
+impl AsyncSerialize for FakeCID {
     async fn write_into<W>(&self, _w: W) -> anyhow::Result<()>
     where
         W: AsyncWrite + Unpin + Send,
@@ -20,12 +20,12 @@ impl AsyncSerialize for FakeKey {
 }
 
 #[async_trait]
-impl AsyncDeserialize for FakeKey {
+impl AsyncDeserialize for FakeCID {
     async fn read_from<R>(_r: R) -> anyhow::Result<Self>
     where
         R: AsyncRead + Unpin + Send,
     {
-        Ok(FakeKey)
+        Ok(FakeCID)
     }
 }
 
@@ -39,9 +39,9 @@ async fn test_directory() {
     use LinkKind::*;
 
     let mut d: FLDirectory = Directory::default();
-    d.insert("alpha".to_string(), Link::new(File, FakeKey))
+    d.insert("alpha".to_string(), Link::new(File, FakeCID))
         .unwrap();
-    d.insert("beta".to_string(), Link::new(Dir, FakeKey))
+    d.insert("beta".to_string(), Link::new(Dir, FakeCID))
         .unwrap();
 
     check_serialize_then_deserialize_equality::<FLDirectory>(d).await;

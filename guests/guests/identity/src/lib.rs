@@ -14,13 +14,13 @@ const TRUE: u64 = 1;
 const LINK_KIND_DIR: u64 = 1;
 
 #[no_mangle]
-pub extern "C" fn derive(link_derivation: u64) -> u64 {
+pub extern "C" fn derive(link_plan: u64) -> u64 {
     {
-        let kind = unsafe { link_get_kind(link_derivation) };
+        let kind = unsafe { link_get_kind(link_plan) };
         assert_eq!(kind, LINK_KIND_DIR);
     }
 
-    let dir_reader = unsafe { link_open_directory_reader(link_derivation) };
+    let dir_reader = unsafe { link_open_directory_reader(link_plan) };
 
     let mut link_input = None;
     let mut found_exec = false;

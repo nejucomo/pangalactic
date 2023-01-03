@@ -1,5 +1,5 @@
 [package]
-name = "test_derivation_is_dir"
+name = "get_plan"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

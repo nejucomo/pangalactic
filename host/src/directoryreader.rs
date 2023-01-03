@@ -1,21 +1,21 @@
 use async_trait::async_trait;
-use dagwasm_blobstore::BlobStore;
 use dagwasm_dagio::{Dagio, FromDag, LinkFor};
 use dagwasm_dir::{Directory, Name};
+use dagwasm_store::Store;
 
 #[derive(Debug)]
 pub(crate) struct DirectoryReader<B>
 where
-    B: BlobStore,
+    B: Store,
 {
-    iter: <Directory<<B as BlobStore>::Key> as IntoIterator>::IntoIter,
+    iter: <Directory<<B as Store>::CID> as IntoIterator>::IntoIter,
     name: Option<Name>,
     link: Option<LinkFor<B>>,
 }
 
 impl<B> DirectoryReader<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     pub(crate) fn has_more_entries(&self) -> bool {
         self.name.is_some() || self.link.is_some()
@@ -47,10 +47,10 @@ where
 #[async_trait]
 impl<B> FromDag<B> for DirectoryReader<B>
 where
-    B: BlobStore,
+    B: Store,
 {
     async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
-        let dir: Directory<<B as BlobStore>::Key> = dagio.read(link).await?;
+        let dir: Directory<<B as Store>::CID> = dagio.read(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

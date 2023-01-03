@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "get_derivation"
+name = "get_plan"
 version = "0.1.0"
 
 [[package]]
@@ -11,5 +11,5 @@ name = "identity"
 version = "0.1.0"
 
 [[package]]
-name = "test_derivation_is_dir"
+name = "test_plan_is_dir"
 version = "0.1.0"

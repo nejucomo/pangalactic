@@ -11,16 +11,16 @@ async-trait.workspace = true
 tokio.workspace = true
 wasmtime.workspace = true
 
-[dependencies.dagwasm-blobstore]
-path = "../blobstore"
+[dependencies.dagwasm-store]
+path = "../store"
 version = "^0.1.0"
 
 [dependencies.dagwasm-dagio]
 path = "../dagio"
 version = "^0.1.0"
 
-[dependencies.dagwasm-derivation]
-path = "../derivation"
+[dependencies.dagwasm-schemata]
+path = "../schemata"
 version = "^0.1.0"
 
 [dependencies.dagwasm-dir]
