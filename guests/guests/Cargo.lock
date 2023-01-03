@@ -11,5 +11,9 @@ name = "identity"
 version = "0.1.0"
 
 [[package]]
+name = "test_input_is_hello_world"
+version = "0.1.0"
+
+[[package]]
 name = "test_plan_is_dir"
 version = "0.1.0"

@@ -2,6 +2,7 @@
 members = [
   "get_plan",
   "identity",
+  "test_input_is_hello_world",
   "test_plan_is_dir",
 ]
 
