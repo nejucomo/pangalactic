@@ -7,26 +7,26 @@ use wasmtime::{Engine, Linker, Module, TypedFunc};
 
 type RawLinkHandle = u64;
 
-pub(crate) struct DeriveFunc<B>
+pub(crate) struct DeriveFunc<S>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
-    store: wasmtime::Store<State<B>>,
+    store: wasmtime::Store<State<S>>,
     tfunc: TypedFunc<(RawLinkHandle,), (RawLinkHandle,)>,
 }
 
-impl<B> DeriveFunc<B>
+impl<S> DeriveFunc<S>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     pub(crate) async fn new(
         engine: &Engine,
-        linker: &Linker<State<B>>,
-        state: State<B>,
+        linker: &Linker<State<S>>,
+        state: State<S>,
         execmod: &Module,
     ) -> anyhow::Result<Self> {
         let mut store = wasmtime::Store::new(engine, state);
@@ -39,8 +39,8 @@ where
 
     pub(crate) async fn call_async(
         mut self,
-        plan: &LinkFor<B>,
-    ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
+        plan: &LinkFor<S>,
+    ) -> anyhow::Result<(Dagio<S>, LinkFor<S>)> {
         use dagwasm_schemata::Attestation;
 
         let derive_handle = self.store.data_mut().links_mut().insert(plan.clone());

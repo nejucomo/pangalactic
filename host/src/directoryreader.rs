@@ -4,18 +4,18 @@ use dagwasm_dir::{Directory, Name};
 use dagwasm_store::Store;
 
 #[derive(Debug)]
-pub(crate) struct DirectoryReader<B>
+pub(crate) struct DirectoryReader<S>
 where
-    B: Store,
+    S: Store,
 {
-    iter: <Directory<<B as Store>::CID> as IntoIterator>::IntoIter,
+    iter: <Directory<<S as Store>::CID> as IntoIterator>::IntoIter,
     name: Option<Name>,
-    link: Option<LinkFor<B>>,
+    link: Option<LinkFor<S>>,
 }
 
-impl<B> DirectoryReader<B>
+impl<S> DirectoryReader<S>
 where
-    B: Store,
+    S: Store,
 {
     pub(crate) fn has_more_entries(&self) -> bool {
         self.name.is_some() || self.link.is_some()
@@ -27,7 +27,7 @@ where
             .ok_or_else(|| anyhow::Error::msg("name already taken in DirectoryReader"))
     }
 
-    pub(crate) fn take_link(&mut self) -> anyhow::Result<LinkFor<B>> {
+    pub(crate) fn take_link(&mut self) -> anyhow::Result<LinkFor<S>> {
         self.link
             .take()
             .ok_or_else(|| anyhow::Error::msg("link already taken in DirectoryReader"))
@@ -45,12 +45,12 @@ where
 }
 
 #[async_trait]
-impl<B> FromDag<B> for DirectoryReader<B>
+impl<S> FromDag<S> for DirectoryReader<S>
 where
-    B: Store,
+    S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
-        let dir: Directory<<B as Store>::CID> = dagio.read(link).await?;
+    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+        let dir: Directory<<S as Store>::CID> = dagio.read(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

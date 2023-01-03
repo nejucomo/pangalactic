@@ -4,31 +4,31 @@ use dagwasm_store::Store;
 use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module};
 
-pub async fn derive<B>(dagio: Dagio<B>, plan: &LinkFor<B>) -> anyhow::Result<(Dagio<B>, LinkFor<B>)>
+pub async fn derive<S>(dagio: Dagio<S>, plan: &LinkFor<S>) -> anyhow::Result<(Dagio<S>, LinkFor<S>)>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     let mut host = Host::new()?;
     host.execute(dagio, plan).await
 }
 
-struct Host<B>
+struct Host<S>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     engine: Engine,
-    linker: Linker<State<B>>,
+    linker: Linker<State<S>>,
 }
 
-impl<B> Host<B>
+impl<S> Host<S>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();
@@ -49,9 +49,9 @@ where
 
     pub async fn execute(
         &mut self,
-        dagio: Dagio<B>,
-        plan: &LinkFor<B>,
-    ) -> anyhow::Result<(Dagio<B>, LinkFor<B>)> {
+        dagio: Dagio<S>,
+        plan: &LinkFor<S>,
+    ) -> anyhow::Result<(Dagio<S>, LinkFor<S>)> {
         use crate::DeriveFunc;
 
         let mut state = State::new(dagio);
@@ -62,13 +62,13 @@ where
     }
 }
 
-async fn load_exec_mod<B>(
-    state: &mut State<B>,
+async fn load_exec_mod<S>(
+    state: &mut State<S>,
     engine: &Engine,
-    plan: &LinkFor<B>,
+    plan: &LinkFor<S>,
 ) -> anyhow::Result<Module>
 where
-    B: Store,
+    S: Store,
 {
     use dagwasm_dagio::FromDag;
     use dagwasm_schemata::Plan;

@@ -3,9 +3,9 @@ use dagwasm_dagio::LinkFor;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
-pub(crate) fn instantiate_linker<B>(engine: &Engine) -> anyhow::Result<Linker<State<B>>>
+pub(crate) fn instantiate_linker<S>(engine: &Engine) -> anyhow::Result<Linker<State<S>>>
 where
-    B: Store,
+    S: Store,
 {
     const HOSTMOD: &str = env!("CARGO_PKG_NAME");
 
@@ -16,7 +16,7 @@ where
             linker . $wrapmethod(
                 HOSTMOD,
                 stringify!($name),
-                |caller: Caller<'_, State<B>>, $( $arg : u64 ),* | Box::new($name(caller, $( $arg ),* )),
+                |caller: Caller<'_, State<S>>, $( $arg : u64 ),* | Box::new($name(caller, $( $arg ),* )),
             )
         };
 
@@ -42,28 +42,28 @@ where
     Ok(linker)
 }
 
-async fn link_get_kind<B>(caller: Caller<'_, State<B>>, rh_link: u64) -> Result<u64, Trap>
+async fn link_get_kind<S>(caller: Caller<'_, State<S>>, rh_link: u64) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use dagwasm_handle::Handle;
 
-    let h_link: Handle<LinkFor<B>> = rh_link.into_host();
+    let h_link: Handle<LinkFor<S>> = rh_link.into_host();
     let link = caller.data().links().lookup(h_link)?;
     Ok(link.kind().into_wasm())
 }
 
-async fn link_open_file_reader<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn link_open_file_reader<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_link: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
 
-    let h_link: Handle<LinkFor<B>> = rh_link.into_host();
+    let h_link: Handle<LinkFor<S>> = rh_link.into_host();
 
     let link = caller.data().links().lookup(h_link)?.clone();
 
@@ -81,37 +81,37 @@ where
     Ok(h_fr.into_wasm())
 }
 
-async fn link_open_directory_reader<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn link_open_directory_reader<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_link: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
 
-    let h_link: Handle<LinkFor<B>> = rh_link.into_host();
+    let h_link: Handle<LinkFor<S>> = rh_link.into_host();
     let link = caller.data().links().lookup(h_link)?.clone();
-    let dr: DirectoryReader<B> = caller.data_mut().dagio_mut().read(&link).await?;
+    let dr: DirectoryReader<S> = caller.data_mut().dagio_mut().read(&link).await?;
     let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
     Ok(h_dr.into_wasm())
 }
 
-async fn byte_reader_read<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn byte_reader_read<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_br: u64,
     ptr: u64,
     len: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
     use tokio::io::AsyncReadExt;
 
-    let h_br: Handle<ByteReader<B>> = rh_br.into_host();
+    let h_br: Handle<ByteReader<S>> = rh_br.into_host();
     let ptr: usize = ptr.into_host();
     let len: usize = len.into_host();
 
@@ -136,61 +136,61 @@ where
     Ok(readlen.into_wasm())
 }
 
-async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
+async fn byte_reader_close<S>(mut caller: Caller<'_, State<S>>, rh_br: u64) -> Result<(), Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::ByteReader;
     use dagwasm_handle::Handle;
 
-    let h_br: Handle<ByteReader<B>> = rh_br.into_host();
+    let h_br: Handle<ByteReader<S>> = rh_br.into_host();
     caller.data_mut().byte_readers_mut().close(h_br)?;
     Ok(())
 }
 
-async fn directory_reader_has_more_entries<B>(
-    caller: Caller<'_, State<B>>,
+async fn directory_reader_has_more_entries<S>(
+    caller: Caller<'_, State<S>>,
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
 
-    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data().directory_readers().lookup(h_dr)?;
     Ok(dr.has_more_entries().into_wasm())
 }
 
-async fn directory_reader_load_link<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn directory_reader_load_link<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
 
-    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     let link = dr.take_link()?;
     let h_link = caller.data_mut().links_mut().insert(link);
     Ok(h_link.into_wasm())
 }
 
-async fn directory_reader_open_name_reader<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn directory_reader_open_name_reader<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_dr: u64,
 ) -> Result<u64, Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::{ByteReader, DirectoryReader};
     use dagwasm_handle::Handle;
 
-    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     let name = dr.take_name()?;
     let br = ByteReader::from(name);
@@ -198,25 +198,25 @@ where
     Ok(h_br.into_wasm())
 }
 
-async fn directory_reader_next_entry<B>(
-    mut caller: Caller<'_, State<B>>,
+async fn directory_reader_next_entry<S>(
+    mut caller: Caller<'_, State<S>>,
     rh_dr: u64,
 ) -> Result<(), Trap>
 where
-    B: Store,
+    S: Store,
 {
     use crate::DirectoryReader;
     use dagwasm_handle::Handle;
 
-    let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
+    let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     dr.next_entry();
     Ok(())
 }
 
-fn get_memory<B>(caller: &mut Caller<'_, State<B>>) -> anyhow::Result<Memory>
+fn get_memory<S>(caller: &mut Caller<'_, State<S>>) -> anyhow::Result<Memory>
 where
-    B: Store,
+    S: Store,
 {
     use wasmtime::Extern::*;
 
