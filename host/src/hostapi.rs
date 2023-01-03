@@ -30,13 +30,14 @@ where
     }
 
     link_host_fn!(link_get_kind, link)?;
+    link_host_fn!(link_open_file_reader, link)?;
     link_host_fn!(link_open_directory_reader, link)?;
+    link_host_fn!(byte_reader_read, byte_reader, ptr, len)?;
+    link_host_fn!(byte_reader_close, byte_reader)?;
     link_host_fn!(directory_reader_has_more_entries, directory_reader)?;
     link_host_fn!(directory_reader_load_link, directory_reader)?;
     link_host_fn!(directory_reader_open_name_reader, directory_reader)?;
     link_host_fn!(directory_reader_next_entry, directory_reader)?;
-    link_host_fn!(byte_reader_read, byte_reader, ptr, len)?;
-    link_host_fn!(byte_reader_close, byte_reader)?;
 
     Ok(linker)
 }
@@ -50,6 +51,34 @@ where
     let h_link: Handle<LinkFor<B>> = rh_link.into_host();
     let link = caller.data().links().lookup(h_link)?;
     Ok(link.kind().into_wasm())
+}
+
+async fn link_open_file_reader<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_link: u64,
+) -> Result<u64, Trap>
+where
+    B: Store,
+{
+    use crate::ByteReader;
+    use dagwasm_handle::Handle;
+
+    let h_link: Handle<LinkFor<B>> = rh_link.into_host();
+
+    let link = caller.data().links().lookup(h_link)?.clone();
+
+    let fr = caller
+        .data_mut()
+        .dagio_mut()
+        .open_file_reader(&link)
+        .await?;
+
+    let h_fr = caller
+        .data_mut()
+        .byte_readers_mut()
+        .insert(ByteReader::Store(fr));
+
+    Ok(h_fr.into_wasm())
 }
 
 async fn link_open_directory_reader<B>(
@@ -67,6 +96,56 @@ where
     let dr: DirectoryReader<B> = caller.data_mut().dagio_mut().read(&link).await?;
     let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
     Ok(h_dr.into_wasm())
+}
+
+async fn byte_reader_read<B>(
+    mut caller: Caller<'_, State<B>>,
+    rh_br: u64,
+    ptr: u64,
+    len: u64,
+) -> Result<u64, Trap>
+where
+    B: Store,
+{
+    use crate::ByteReader;
+    use dagwasm_handle::Handle;
+    use tokio::io::AsyncReadExt;
+
+    let h_br: Handle<ByteReader<B>> = rh_br.into_host();
+    let ptr: usize = ptr.into_host();
+    let len: usize = len.into_host();
+
+    let reader = caller.data_mut().byte_readers_mut().lookup_mut(h_br)?;
+    // TODO: Use a fixed-length host controlled buffer instead of guest-provided len:
+    let mut buf = vec![0; len];
+    let mut readlen = 0;
+    while readlen < len {
+        let c = reader
+            .read(&mut buf[readlen..])
+            .await
+            .map_err(|e| anyhow::Error::msg(e.to_string()))?;
+
+        if c == 0 {
+            break;
+        }
+        readlen += c;
+    }
+    assert!(readlen <= len);
+    let mem = get_memory(&mut caller)?;
+    mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
+    Ok(readlen.into_wasm())
+}
+
+async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
+where
+    B: Store,
+{
+    use crate::ByteReader;
+    use dagwasm_handle::Handle;
+
+    let h_br: Handle<ByteReader<B>> = rh_br.into_host();
+    caller.data_mut().byte_readers_mut().close(h_br)?;
+    Ok(())
 }
 
 async fn directory_reader_has_more_entries<B>(
@@ -132,56 +211,6 @@ where
     let h_dr: Handle<DirectoryReader<B>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     dr.next_entry();
-    Ok(())
-}
-
-async fn byte_reader_read<B>(
-    mut caller: Caller<'_, State<B>>,
-    rh_br: u64,
-    ptr: u64,
-    len: u64,
-) -> Result<u64, Trap>
-where
-    B: Store,
-{
-    use crate::ByteReader;
-    use dagwasm_handle::Handle;
-    use tokio::io::AsyncReadExt;
-
-    let h_br: Handle<ByteReader> = rh_br.into_host();
-    let ptr: usize = ptr.into_host();
-    let len: usize = len.into_host();
-
-    let reader = caller.data_mut().byte_readers_mut().lookup_mut(h_br)?;
-    // TODO: Use a fixed-length host controlled buffer instead of guest-provided len:
-    let mut buf = vec![0; len];
-    let mut readlen = 0;
-    while readlen < len {
-        let c = reader
-            .read(&mut buf[readlen..])
-            .await
-            .map_err(|e| anyhow::Error::msg(e.to_string()))?;
-
-        if c == 0 {
-            break;
-        }
-        readlen += c;
-    }
-    assert!(readlen <= len);
-    let mem = get_memory(&mut caller)?;
-    mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
-    Ok(readlen.into_wasm())
-}
-
-async fn byte_reader_close<B>(mut caller: Caller<'_, State<B>>, rh_br: u64) -> Result<(), Trap>
-where
-    B: Store,
-{
-    use crate::ByteReader;
-    use dagwasm_handle::Handle;
-
-    let h_br: Handle<ByteReader> = rh_br.into_host();
-    caller.data_mut().byte_readers_mut().close(h_br)?;
     Ok(())
 }
 

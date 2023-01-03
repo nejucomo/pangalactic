@@ -3,14 +3,13 @@ use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_store::Store;
 use dagwasm_table::Table;
 
-#[derive(Debug)]
 pub struct State<B>
 where
     B: Store,
 {
     dagio: Dagio<B>,
     links: Table<LinkFor<B>>,
-    byte_readers: Table<ByteReader>,
+    byte_readers: Table<ByteReader<B>>,
     dir_readers: Table<DirectoryReader<B>>,
 }
 
@@ -43,7 +42,7 @@ where
         &mut self.links
     }
 
-    pub(crate) fn byte_readers_mut(&mut self) -> &mut Table<ByteReader> {
+    pub(crate) fn byte_readers_mut(&mut self) -> &mut Table<ByteReader<B>> {
         &mut self.byte_readers
     }
 
