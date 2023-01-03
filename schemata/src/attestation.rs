@@ -6,20 +6,20 @@ use std::marker::Unpin;
 use std::ops::Deref;
 
 #[derive(Debug)]
-pub struct Attestation<B>
+pub struct Attestation<S>
 where
-    B: Store,
+    S: Store,
 {
-    pub plan: LinkFor<B>,
-    pub output: LinkFor<B>,
+    pub plan: LinkFor<S>,
+    pub output: LinkFor<S>,
 }
 
 #[async_trait]
-impl<B> FromDag<B> for Attestation<B>
+impl<S> FromDag<S> for Attestation<S>
 where
-    B: Store,
+    S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
+    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         let mut dir = Directory::from_dag(dagio, link).await?;
         let plan = dir.remove_required("plan")?;
         let output = dir.remove_required("output")?;
@@ -29,14 +29,14 @@ where
 }
 
 #[async_trait]
-impl<B> ToDag<B> for Attestation<B>
+impl<S> ToDag<S> for Attestation<S>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
-    LinkFor<B>: Clone,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
+    LinkFor<S>: Clone,
 {
-    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         dagio
             .commit([("plan", self.plan), ("output", self.output)])
             .await

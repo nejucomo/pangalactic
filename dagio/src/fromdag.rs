@@ -3,20 +3,20 @@ use async_trait::async_trait;
 use dagwasm_store::Store;
 
 #[async_trait]
-pub trait FromDag<B>: Sized
+pub trait FromDag<S>: Sized
 where
-    B: Store,
+    S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self>;
+    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self>;
 }
 
 #[async_trait]
-impl<B> FromDag<B> for LinkFor<B>
+impl<S> FromDag<S> for LinkFor<S>
 where
-    B: Store,
-    LinkFor<B>: Clone,
+    S: Store,
+    LinkFor<S>: Clone,
 {
-    async fn from_dag(_: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
+    async fn from_dag(_: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         Ok(link.clone())
     }
 }

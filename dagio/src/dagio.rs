@@ -3,56 +3,56 @@ use dagwasm_dir::{Link, LinkKind::File};
 use dagwasm_store::Store;
 
 #[derive(Debug, derive_more::From)]
-pub struct Dagio<B>(B);
+pub struct Dagio<S>(S);
 
-impl<B> Dagio<B>
+impl<S> Dagio<S>
 where
-    B: Store,
-    <B as Store>::Writer: Send + std::marker::Unpin,
+    S: Store,
+    <S as Store>::Writer: Send + std::marker::Unpin,
 {
-    pub async fn read<T>(&mut self, link: &LinkFor<B>) -> anyhow::Result<T>
+    pub async fn read<T>(&mut self, link: &LinkFor<S>) -> anyhow::Result<T>
     where
-        T: FromDag<B>,
+        T: FromDag<S>,
     {
         T::from_dag(self, link).await
     }
 
-    pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<LinkFor<B>>
+    pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<LinkFor<S>>
     where
-        T: ToDag<B>,
+        T: ToDag<S>,
     {
         object.into_dag(self).await
     }
 
     pub async fn open_file_reader(
         &mut self,
-        link: &LinkFor<B>,
-    ) -> anyhow::Result<<B as Store>::Reader> {
+        link: &LinkFor<S>,
+    ) -> anyhow::Result<<S as Store>::Reader> {
         let key = link.peek_key(File)?;
         self.0.open_reader(key).await
     }
 
-    pub async fn open_file_writer(&mut self) -> anyhow::Result<FileWriter<<B as Store>::Writer>> {
+    pub async fn open_file_writer(&mut self) -> anyhow::Result<FileWriter<<S as Store>::Writer>> {
         let inner = self.0.open_writer().await?;
         Ok(FileWriter::from(inner))
     }
 
     pub async fn commit_file_writer(
         &mut self,
-        w: FileWriter<<B as Store>::Writer>,
-    ) -> anyhow::Result<LinkFor<B>> {
+        w: FileWriter<<S as Store>::Writer>,
+    ) -> anyhow::Result<LinkFor<S>> {
         self.0
             .commit_writer(w.unwrap())
             .await
             .map(|k| Link::new(File, k))
     }
 
-    pub async fn read_file(&mut self, link: &LinkFor<B>) -> anyhow::Result<Vec<u8>> {
+    pub async fn read_file(&mut self, link: &LinkFor<S>) -> anyhow::Result<Vec<u8>> {
         let key = link.peek_key(File)?;
         self.0.read(key).await
     }
 
-    pub async fn write_file(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<B>> {
+    pub async fn write_file(&mut self, contents: &[u8]) -> anyhow::Result<LinkFor<S>> {
         self.0.write(contents).await.map(|k| Link::new(File, k))
     }
 }

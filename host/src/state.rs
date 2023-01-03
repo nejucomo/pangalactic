@@ -3,21 +3,21 @@ use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_store::Store;
 use dagwasm_table::Table;
 
-pub struct State<B>
+pub struct State<S>
 where
-    B: Store,
+    S: Store,
 {
-    dagio: Dagio<B>,
-    links: Table<LinkFor<B>>,
-    byte_readers: Table<ByteReader<B>>,
-    dir_readers: Table<DirectoryReader<B>>,
+    dagio: Dagio<S>,
+    links: Table<LinkFor<S>>,
+    byte_readers: Table<ByteReader<S>>,
+    dir_readers: Table<DirectoryReader<S>>,
 }
 
-impl<B> State<B>
+impl<S> State<S>
 where
-    B: Store,
+    S: Store,
 {
-    pub(crate) fn new(dagio: Dagio<B>) -> Self {
+    pub(crate) fn new(dagio: Dagio<S>) -> Self {
         State {
             dagio,
             links: Table::default(),
@@ -26,31 +26,31 @@ where
         }
     }
 
-    pub(crate) fn unwrap_dagio(self) -> Dagio<B> {
+    pub(crate) fn unwrap_dagio(self) -> Dagio<S> {
         self.dagio
     }
 
-    pub(crate) fn dagio_mut(&mut self) -> &mut Dagio<B> {
+    pub(crate) fn dagio_mut(&mut self) -> &mut Dagio<S> {
         &mut self.dagio
     }
 
-    pub(crate) fn links(&self) -> &Table<LinkFor<B>> {
+    pub(crate) fn links(&self) -> &Table<LinkFor<S>> {
         &self.links
     }
 
-    pub(crate) fn links_mut(&mut self) -> &mut Table<LinkFor<B>> {
+    pub(crate) fn links_mut(&mut self) -> &mut Table<LinkFor<S>> {
         &mut self.links
     }
 
-    pub(crate) fn byte_readers_mut(&mut self) -> &mut Table<ByteReader<B>> {
+    pub(crate) fn byte_readers_mut(&mut self) -> &mut Table<ByteReader<S>> {
         &mut self.byte_readers
     }
 
-    pub(crate) fn directory_readers(&self) -> &Table<DirectoryReader<B>> {
+    pub(crate) fn directory_readers(&self) -> &Table<DirectoryReader<S>> {
         &self.dir_readers
     }
 
-    pub(crate) fn directory_readers_mut(&mut self) -> &mut Table<DirectoryReader<B>> {
+    pub(crate) fn directory_readers_mut(&mut self) -> &mut Table<DirectoryReader<S>> {
         &mut self.dir_readers
     }
 }

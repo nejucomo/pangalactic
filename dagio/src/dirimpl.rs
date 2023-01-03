@@ -7,13 +7,13 @@ use std::marker::Unpin;
 use std::ops::Deref;
 
 #[async_trait]
-impl<B> ToDag<B> for Directory<<B as Store>::CID>
+impl<S> ToDag<S> for Directory<<S as Store>::CID>
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
-    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         use dagwasm_dir::{Link, LinkKind::Dir};
         use dagwasm_serialization::AsyncSerialize;
 
@@ -29,25 +29,25 @@ where
 }
 
 #[async_trait]
-impl<const K: usize, B, N> ToDag<B> for [(N, LinkFor<B>); K]
+impl<const K: usize, S, N> ToDag<S> for [(N, LinkFor<S>); K]
 where
-    B: Store,
-    <B as Store>::Writer: Deref,
-    <<B as Store>::Writer as Deref>::Target: Unpin,
+    S: Store,
+    <S as Store>::Writer: Deref,
+    <<S as Store>::Writer as Deref>::Target: Unpin,
     N: Send,
     String: From<N>,
 {
-    async fn into_dag(self, dagio: &mut Dagio<B>) -> anyhow::Result<LinkFor<B>> {
+    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         Directory::from_iter(self.into_iter()).into_dag(dagio).await
     }
 }
 
 #[async_trait]
-impl<B> FromDag<B> for Directory<<B as Store>::CID>
+impl<S> FromDag<S> for Directory<<S as Store>::CID>
 where
-    B: Store,
+    S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<B>, link: &LinkFor<B>) -> anyhow::Result<Self> {
+    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         use dagwasm_dir::{
             Link,
             LinkKind::{Dir, File},
