@@ -1,9 +1,9 @@
-use dagwasm_guest::bindings::link_get_kind;
-use dagwasm_guest::prim::{HandleLink, LINK_KIND_DIR};
+use dagwasm_guest::{prim, Link, LinkKind};
 
 #[no_mangle]
-pub extern "C" fn derive(plan: HandleLink) -> HandleLink {
-    let kind = unsafe { link_get_kind(plan) };
-    assert_eq!(kind, LINK_KIND_DIR);
+pub extern "C" fn derive(primplan: prim::HandleLink) -> prim::HandleLink {
+    let plan = unsafe { Link::wrap_handle(primplan) };
+    let kind = plan.kind();
+    assert_eq!(kind, LinkKind::Dir);
     0
 }
