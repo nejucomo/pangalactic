@@ -1,20 +1,12 @@
-#[link(wasm_import_module = "dagwasm-host")]
-extern "C" {
-    fn link_get_kind(handle_link: u64) -> u64;
-    fn link_open_directory_reader(handle_link: u64) -> u64;
-    fn directory_reader_has_more_entries(handle_directory_reader: u64) -> u64;
-    fn directory_reader_open_name_reader(handle_directory_reader: u64) -> u64;
-    fn directory_reader_load_link(handle_directory_reader: u64) -> u64;
-    fn directory_reader_next_entry(handle_directory_reader: u64);
-    fn byte_reader_read(handle_byte_reader: u64, ptr: i64, len: u64) -> u64;
-    fn byte_reader_close(handle_byte_reader: u64);
-}
-
-const TRUE: u64 = 1;
-const LINK_KIND_DIR: u64 = 1;
+use dagwasm_guest::bindings::{
+    byte_reader_close, byte_reader_read, directory_reader_close, directory_reader_has_more_entries,
+    directory_reader_load_link, directory_reader_next_entry, directory_reader_open_name_reader,
+    link_get_kind, link_open_directory_reader,
+};
+use dagwasm_guest::prim::{ByteLen, HandleLink, LINK_KIND_DIR, TRUE};
 
 #[no_mangle]
-pub extern "C" fn derive(link_plan: u64) -> u64 {
+pub extern "C" fn derive(link_plan: HandleLink) -> HandleLink {
     {
         let kind = unsafe { link_get_kind(link_plan) };
         assert_eq!(kind, LINK_KIND_DIR);
@@ -34,7 +26,7 @@ pub extern "C" fn derive(link_plan: u64) -> u64 {
             byte_reader_read(
                 reader_name,
                 (&mut namebuf[..]).as_mut_ptr() as i64, // FIXME: safer cast
-                u64::try_from(LEN).expect("usize->u64 failure"),
+                ByteLen::try_from(LEN).expect("usize->u64 failure"),
             )
         })
         .expect("u64->usize failure");
@@ -52,6 +44,7 @@ pub extern "C" fn derive(link_plan: u64) -> u64 {
 
         unsafe { directory_reader_next_entry(dir_reader) };
     }
+    unsafe { directory_reader_close(dir_reader) };
 
     if found_exec {
         link_input.expect("no 'input' link found")

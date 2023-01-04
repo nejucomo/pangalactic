@@ -29,15 +29,22 @@ where
         }
     }
 
+    // Method bindings should follow structure in `dagwasm_guest::bindings`:
+    // Link methods:
     link_host_fn!(link_get_kind, link)?;
     link_host_fn!(link_open_file_reader, link)?;
     link_host_fn!(link_open_directory_reader, link)?;
+
+    // ByteReader methods:
     link_host_fn!(byte_reader_read, byte_reader, ptr, len)?;
     link_host_fn!(byte_reader_close, byte_reader)?;
+
+    // DirectoryReader methods:
     link_host_fn!(directory_reader_has_more_entries, directory_reader)?;
     link_host_fn!(directory_reader_load_link, directory_reader)?;
     link_host_fn!(directory_reader_open_name_reader, directory_reader)?;
     link_host_fn!(directory_reader_next_entry, directory_reader)?;
+    link_host_fn!(directory_reader_close, directory_reader)?;
 
     Ok(linker)
 }
@@ -211,6 +218,18 @@ where
     let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     dr.next_entry();
+    Ok(())
+}
+
+async fn directory_reader_close<S>(mut caller: Caller<'_, State<S>>, rh_dr: u64) -> Result<(), Trap>
+where
+    S: Store,
+{
+    use crate::DirectoryReader;
+    use dagwasm_handle::Handle;
+
+    let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
+    caller.data_mut().directory_readers_mut().close(h_dr)?;
     Ok(())
 }
 
