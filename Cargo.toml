@@ -2,6 +2,7 @@
 members = [
   "dagio",
   "dir",
+  "guest",
   "guests",
   "handle",
   "host",
