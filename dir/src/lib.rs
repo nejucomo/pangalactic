@@ -1,9 +1,7 @@
 mod dir;
-mod kind;
 mod link;
 
 pub use self::dir::{Directory, Name, NameRef};
-pub use self::kind::LinkKind;
 pub use self::link::Link;
 
 #[cfg(test)]

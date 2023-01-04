@@ -1,5 +1,6 @@
 use crate::{FileWriter, FromDag, LinkFor, ToDag};
-use dagwasm_dir::{Link, LinkKind::File};
+use dagwasm_dir::Link;
+use dagwasm_linkkind::LinkKind::File;
 use dagwasm_store::Store;
 
 #[derive(Debug, derive_more::From)]

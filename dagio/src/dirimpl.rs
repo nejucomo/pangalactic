@@ -14,7 +14,8 @@ where
     <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        use dagwasm_dir::{Link, LinkKind::Dir};
+        use dagwasm_dir::Link;
+        use dagwasm_linkkind::LinkKind::Dir;
         use dagwasm_serialization::AsyncSerialize;
 
         let mut w = dagio.open_file_writer().await?;
@@ -48,10 +49,8 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        use dagwasm_dir::{
-            Link,
-            LinkKind::{Dir, File},
-        };
+        use dagwasm_dir::Link;
+        use dagwasm_linkkind::LinkKind::{Dir, File};
         use dagwasm_serialization::AsyncDeserialize;
 
         let key = link.peek_key(Dir)?;

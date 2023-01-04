@@ -6,6 +6,7 @@ members = [
   "guests",
   "handle",
   "host",
+  "linkkind",
   "memstore",
   "schemata",
   "serialization",

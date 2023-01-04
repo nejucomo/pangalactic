@@ -1,5 +1,6 @@
-use crate::{Directory, Link, LinkKind};
+use crate::{Directory, Link};
 use async_trait::async_trait;
+use dagwasm_linkkind::LinkKind;
 use dagwasm_serialization::testutil::check_serialize_then_deserialize_equality;
 use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;

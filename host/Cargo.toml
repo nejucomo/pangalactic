@@ -32,6 +32,10 @@ version = "^0.1.0"
 path = "../handle"
 version = "^0.1.0"
 
+[dependencies.dagwasm-linkkind]
+path = "../linkkind"
+version = "^0.1.0"
+
 [dependencies.dagwasm-table]
 path = "../table"
 version = "^0.1.0"
