@@ -34,7 +34,7 @@ fn get_input_link(link_plan: HandleLink) -> HandleLink {
         let mut namebuf: [u8; LEN] = [0; LEN];
         let read_amount = read_initial_bytes(reader_name, &mut namebuf);
 
-        if &namebuf[..read_amount] == &b"input"[..] {
+        if namebuf[..read_amount] == b"input"[..] {
             let link_input = unsafe { directory_reader_load_link(dir_reader) };
             unsafe { directory_reader_close(dir_reader) };
 
@@ -53,7 +53,7 @@ fn read_initial_bytes(byte_reader: u64, buf: &mut [u8; LEN]) -> usize {
     let read_amount = usize::try_from(unsafe {
         byte_reader_read(
             byte_reader,
-            (&mut buf[..]).as_mut_ptr() as i64, // FIXME: safer cast
+            buf[..].as_mut_ptr() as i64, // FIXME: safer cast
             u64::try_from(LEN).expect("usize->u64 failure"),
         )
     })

@@ -25,7 +25,7 @@ pub extern "C" fn derive(link_plan: HandleLink) -> HandleLink {
         let read_amount = usize::try_from(unsafe {
             byte_reader_read(
                 reader_name,
-                (&mut namebuf[..]).as_mut_ptr() as i64, // FIXME: safer cast
+                namebuf[..].as_mut_ptr() as i64, // FIXME: safer cast
                 ByteLen::try_from(LEN).expect("usize->u64 failure"),
             )
         })
@@ -34,9 +34,9 @@ pub extern "C" fn derive(link_plan: HandleLink) -> HandleLink {
 
         unsafe { byte_reader_close(reader_name) };
 
-        if &namebuf[..read_amount] == &b"input"[..] {
+        if namebuf[..read_amount] == b"input"[..] {
             link_input = Some(unsafe { directory_reader_load_link(dir_reader) });
-        } else if &namebuf[..read_amount] == &b"exec"[..] {
+        } else if namebuf[..read_amount] == b"exec"[..] {
             found_exec = true;
         } else {
             panic!("unexpected entry");
