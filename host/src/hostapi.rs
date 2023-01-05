@@ -24,12 +24,19 @@ where
             link_host_fn!(method func_wrap1_async, $name, $a0)
         };
 
+        ( $name:ident, $a0:ident, $a1:ident ) => {
+            link_host_fn!(method func_wrap2_async, $name, $a0, $a1)
+        };
+
         ( $name:ident, $a0:ident, $a1:ident, $a2:ident ) => {
             link_host_fn!(method func_wrap3_async, $name, $a0, $a1, $a2)
         }
     }
 
     // Method bindings should follow structure in `dagwasm_guest::bindings`:
+    // Log:
+    link_host_fn!(log, ptr, len)?;
+
     // Link methods:
     link_host_fn!(link_get_kind, link)?;
     link_host_fn!(link_open_file_reader, link)?;
@@ -48,6 +55,21 @@ where
     link_host_fn!(directory_reader_close, directory_reader)?;
 
     Ok(linker)
+}
+
+async fn log<S>(mut caller: Caller<'_, State<S>>, ptr: u64, len: u64) -> Result<(), Trap>
+where
+    S: Store,
+{
+    let ptr: usize = ptr.into_host();
+    let len: usize = len.into_host();
+
+    let mem = get_memory(&mut caller)?;
+    println!(
+        "[guest log] {}",
+        String::from_utf8_lossy(&mem.data(&caller)[ptr..ptr + len])
+    );
+    Ok(())
 }
 
 async fn link_get_kind<S>(caller: Caller<'_, State<S>>, rh_link: u64) -> Result<u64, Trap>
@@ -113,7 +135,6 @@ where
     use dagwasm_handle::Handle;
 
     let link: Handle<LinkFor<S>> = rh_link.into_host();
-    dbg!(&link, caller.data().links());
     caller.data_mut().links_mut().close(link)?;
     Ok(())
 }

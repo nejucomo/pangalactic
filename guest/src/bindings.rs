@@ -1,9 +1,12 @@
 use crate::prim::{
-    Bool, ByteLen, HandleByteReader, HandleDirReader, HandleLink, LinkKind, PtrRead,
+    Bool, ByteLen, HandleByteReader, HandleDirReader, HandleLink, LinkKind, PtrRead, PtrWrite,
 };
 
 #[link(wasm_import_module = "dagwasm-host")]
 extern "C" {
+    // Log:
+    pub fn log(ptr: PtrWrite, len: ByteLen);
+
     // Link methods:
     pub fn link_get_kind(handle_link: HandleLink) -> LinkKind;
     pub fn link_open_file_reader(handle_link: HandleLink) -> HandleByteReader;

@@ -14,6 +14,10 @@ impl ByteReader {
 
         let read_amount = usize::try_from(unsafe { bindings::byte_reader_read(self.0, ptr, len) })
             .expect("u64->usize failure");
+        crate::log(&format!(
+            "Read into &{ptr}[..{len}]: {:?}",
+            String::from_utf8_lossy(&buf[..read_amount])
+        ));
         assert!(read_amount <= buf.len());
         read_amount
     }
@@ -23,12 +27,17 @@ impl ByteReader {
         let mut i = 0;
 
         let mut c = self.read(&mut v[i..]);
-        while c == v.len() - i {
+        i += c;
+        while i == v.len() {
             v.resize_with(v.len() * 2, Default::default);
-            i += c;
             c = self.read(&mut v[i..]);
+            i += c;
         }
-        v.shrink_to_fit();
+        v.truncate(i);
+        crate::log(&format!(
+            "read_to_vec -> {:?}",
+            String::from_utf8_lossy(&v[..])
+        ));
         v
     }
 }

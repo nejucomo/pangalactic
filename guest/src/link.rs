@@ -1,4 +1,4 @@
-use crate::{bindings, prim, DirectoryReader, Reader};
+use crate::{bindings, prim, ByteReader, DirectoryReader, Reader};
 use dagwasm_linkkind::LinkKind;
 
 #[derive(Debug)]
@@ -14,7 +14,9 @@ impl Link {
         use LinkKind::*;
 
         match self.kind() {
-            File => todo!("open file reader"),
+            File => Reader::File(ByteReader::wrap_handle(unsafe {
+                bindings::link_open_file_reader(self.0)
+            })),
             Dir => Reader::Dir(DirectoryReader::wrap_handle(unsafe {
                 bindings::link_open_directory_reader(self.0)
             })),
