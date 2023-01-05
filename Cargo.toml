@@ -9,6 +9,7 @@ members = [
   "linkkind",
   "log",
   "memstore",
+  "primitives",
   "schemata",
   "serialization",
   "store",

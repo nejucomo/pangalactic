@@ -1,3 +1,5 @@
+//! Primitive types shared across the dagwasm host/guest boundary.
+
 pub type HandleLink = u64;
 pub type HandleByteReader = u64;
 pub type HandleDirReader = u64;
