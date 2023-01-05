@@ -1,6 +1,6 @@
 use dagwasm_guest::prim::HandleLink;
 use dagwasm_guest::{
-    log, Link,
+    fail, log, Link,
     Reader::{Dir, File},
 };
 
@@ -16,7 +16,7 @@ pub extern "C" fn derive(planprim: HandleLink) -> HandleLink {
         assert_eq!(contents[..], b"Hello World!"[..]);
         unsafe { plan.unwrap_handle() }
     } else {
-        fail("input was not a file");
+        fail!("input {:?} was not a file", input);
     }
 }
 
@@ -27,13 +27,8 @@ fn get_input_link(plan: &Link) -> Link {
                 return link;
             }
         }
-        fail("No `input` link found.");
+        fail!("No `input` link found.");
     } else {
-        fail("plan was not a directory.");
+        fail!("plan {:?} was not a directory.", plan);
     }
-}
-
-fn fail(s: &str) -> ! {
-    log!(s);
-    panic!("{s}")
 }
