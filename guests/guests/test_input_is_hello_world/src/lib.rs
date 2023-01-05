@@ -1,25 +1,17 @@
 use dagwasm_guest::prim::HandleLink;
-use dagwasm_guest::{fail, log, Link};
+use dagwasm_guest::{log, Link};
 
 #[no_mangle]
 pub extern "C" fn derive(planprim: HandleLink) -> HandleLink {
     let plan = unsafe { Link::wrap_handle(planprim) };
 
-    let input = get_input_link(&plan);
+    let input = plan.open_directory().select_entry("input");
     log!("input: {:?}", input);
 
-    let reader = input.open_file();
-    let contents = reader.read_to_vec();
-    assert_eq!(contents[..], b"Hello World!"[..]);
-    unsafe { plan.unwrap_handle() }
-}
+    let bytes = input.open_file().read_to_vec();
+    let contents = String::from_utf8_lossy(&bytes);
+    log!("contents: {:?}", &contents);
+    assert_eq!(contents, "Hello World!"[..]);
 
-fn get_input_link(plan: &Link) -> Link {
-    let reader = plan.open_directory();
-    for (name, link) in reader {
-        if &name == "input" {
-            return link;
-        }
-    }
-    fail!("No `input` link found.");
+    unsafe { plan.unwrap_handle() }
 }
