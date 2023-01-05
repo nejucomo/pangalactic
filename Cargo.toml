@@ -7,6 +7,7 @@ members = [
   "handle",
   "host",
   "linkkind",
+  "log",
   "memstore",
   "schemata",
   "serialization",
@@ -25,6 +26,9 @@ async-trait = "0.1.58"
 blake3 = "1.3.1"
 derive_more = "0.99.17"
 include_dir = "0.7.3"
+log = "0.4.17"
+once_cell = "1.17.0"
+simple_logger = "4.0.0"
 test-case = "2.2.2"
 
 [workspace.dependencies.tokio]

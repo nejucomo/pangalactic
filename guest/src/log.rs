@@ -35,11 +35,11 @@ macro_rules! trace {
 }
 
 pub fn log_str(msg: &str) {
-    log_str_raw("application", msg);
+    log_str_raw("exec", msg);
 }
 
 pub(crate) fn log_str_inner(msg: &str) {
-    log_str_raw("API trace  ", msg);
+    log_str_raw("api ", msg);
 }
 
 fn log_str_raw(prefix: &str, msg: &str) {
