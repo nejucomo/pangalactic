@@ -23,7 +23,7 @@ impl Link {
             })),
         };
 
-        trace!("{:?}.open() -> {:?}", self, &reader);
+        trace!("{self:?}.open() -> {:?}", &reader);
         reader
     }
 
@@ -33,7 +33,7 @@ impl Link {
         if let File(reader) = self.open() {
             reader
         } else {
-            fail!("expected {:?} to be a file", self)
+            fail!("expected {self:?} to be a file")
         }
     }
 
@@ -43,7 +43,7 @@ impl Link {
         if let Dir(reader) = self.open() {
             reader
         } else {
-            fail!("expected {:?} to be a directory", self)
+            fail!("expected {self:?} to be a directory")
         }
     }
 

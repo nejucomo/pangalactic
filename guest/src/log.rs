@@ -3,34 +3,34 @@ use crate::{bindings, prim};
 #[macro_export]
 macro_rules! log {
     ( $msg:expr ) => {
-        $crate::log_str($msg);
+        $crate::log_str(&std::fmt::format(format_args!($msg)));
     };
 
     ( $tmpl:expr, $( $arg:expr ),* ) => {
-        $crate::log_str(&format!( $tmpl, $( $arg ),* ));
+        $crate::log_str(&std::fmt::format(format_args!( $tmpl, $( $arg ),* )));
     }
 }
 
 #[macro_export]
 macro_rules! fail {
     ( $msg:expr ) => {{
-        $crate::log_str($msg);
+        $crate::log!($msg);
         panic!($msg)
     }};
 
     ( $tmpl:expr, $( $arg:expr ),* ) => {{
-        $crate::log_str(&format!( $tmpl, $( $arg ),* ));
+        $crate::log!( $tmpl, $( $arg ),* );
         panic!( $tmpl, $( $arg ),* )
     }}
 }
 
 macro_rules! trace {
     ( $msg:expr ) => {
-        $crate::log_str_inner($msg);
+        $crate::log_str_inner(&std::fmt::format(format_args!($msg)));
     };
 
     ( $tmpl:expr, $( $arg:expr ),* ) => {
-        $crate::log::log_str_inner(&format!( $tmpl, $( $arg ),* ));
+        $crate::log::log_str_inner(&std::fmt::format(format_args!( $tmpl, $( $arg ),* )));
     }
 }
 

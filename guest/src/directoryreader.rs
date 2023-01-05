@@ -14,7 +14,7 @@ impl DirectoryReader {
                 return link;
             }
         }
-        fail!("failed to find entry {:?}", name)
+        fail!("failed to find entry {name:?}")
     }
 
     fn next_inner(&self) -> Option<(String, Link)> {
@@ -40,7 +40,7 @@ impl Iterator for DirectoryReader {
 
     fn next(&mut self) -> Option<Self::Item> {
         let item = self.next_inner();
-        trace!("{:?}.iter() -> {:?}", self, &item);
+        trace!("{self:?}.iter() -> {:?}", &item);
         item
     }
 }
