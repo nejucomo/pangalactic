@@ -1,4 +1,4 @@
-use dagwasm_guest::{fail, prim, Link, Reader::Dir};
+use dagwasm_guest::{fail, prim, Link};
 
 #[no_mangle]
 pub extern "C" fn derive(primplan: prim::HandleLink) -> prim::HandleLink {
@@ -8,14 +8,10 @@ pub extern "C" fn derive(primplan: prim::HandleLink) -> prim::HandleLink {
 }
 
 fn derive_inner(plan: Link) -> Link {
-    if let Dir(reader) = plan.open() {
-        for (name, link) in reader {
-            if name == "input" {
-                return link;
-            }
+    for (name, link) in plan.open_directory() {
+        if name == "input" {
+            return link;
         }
-        fail!("no 'input' found in directory")
-    } else {
-        fail!("plan {:?} was not a directory", plan)
     }
+    fail!("no 'input' found in directory")
 }

@@ -27,6 +27,26 @@ impl Link {
         reader
     }
 
+    pub fn open_file(&self) -> ByteReader {
+        use Reader::*;
+
+        if let File(reader) = self.open() {
+            reader
+        } else {
+            fail!("expected {:?} to be a file", self)
+        }
+    }
+
+    pub fn open_directory(&self) -> DirectoryReader {
+        use Reader::*;
+
+        if let Dir(reader) = self.open() {
+            reader
+        } else {
+            fail!("expected {:?} to be a directory", self)
+        }
+    }
+
     /// Wrap a bare primitive handle from the host.
     ///
     /// # Safety
