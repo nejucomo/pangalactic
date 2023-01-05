@@ -13,15 +13,15 @@ macro_rules! log {
 
 #[macro_export]
 macro_rules! fail {
-    ( $msg:expr ) => {
+    ( $msg:expr ) => {{
         $crate::log_str($msg);
-        panic!($msg);
-    };
+        panic!($msg)
+    }};
 
-    ( $tmpl:expr, $( $arg:expr ),* ) => {
+    ( $tmpl:expr, $( $arg:expr ),* ) => {{
         $crate::log_str(&format!( $tmpl, $( $arg ),* ));
-        panic!( $tmpl, $( $arg ),* );
-    }
+        panic!( $tmpl, $( $arg ),* )
+    }}
 }
 
 macro_rules! trace {
