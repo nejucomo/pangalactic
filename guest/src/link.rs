@@ -13,14 +13,18 @@ impl Link {
     pub fn open(&self) -> Reader {
         use LinkKind::*;
 
-        match self.kind() {
-            File => Reader::File(ByteReader::wrap_handle(unsafe {
-                bindings::link_open_file_reader(self.0)
-            })),
+        let reader = match self.kind() {
+            File => Reader::File(ByteReader::wrap_handle(
+                unsafe { bindings::link_open_file_reader(self.0) },
+                true,
+            )),
             Dir => Reader::Dir(DirectoryReader::wrap_handle(unsafe {
                 bindings::link_open_directory_reader(self.0)
             })),
-        }
+        };
+
+        trace!("{:?}.open() -> {:?}", self, &reader);
+        reader
     }
 
     /// Wrap a bare primitive handle from the host.

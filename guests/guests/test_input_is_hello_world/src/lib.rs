@@ -9,11 +9,10 @@ pub extern "C" fn derive(planprim: HandleLink) -> HandleLink {
     let plan = unsafe { Link::wrap_handle(planprim) };
 
     let input = get_input_link(&plan);
-    log(&format!("input: {input:?}"));
+    log!("input: {:?}", input);
 
-    if let File(reader) = dbg!(input.open()) {
-        dbg!(&reader);
-        let contents = dbg!(reader.read_to_vec());
+    if let File(reader) = input.open() {
+        let contents = reader.read_to_vec();
         assert_eq!(contents[..], b"Hello World!"[..]);
         unsafe { plan.unwrap_handle() }
     } else {
@@ -35,6 +34,6 @@ fn get_input_link(plan: &Link) -> Link {
 }
 
 fn fail(s: &str) -> ! {
-    log(s);
+    log!(s);
     panic!("{s}")
 }
