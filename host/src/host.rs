@@ -4,17 +4,7 @@ use dagwasm_store::Store;
 use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module};
 
-pub async fn derive<S>(dagio: Dagio<S>, plan: &LinkFor<S>) -> anyhow::Result<(Dagio<S>, LinkFor<S>)>
-where
-    S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
-{
-    let mut host = Host::new()?;
-    host.execute(dagio, plan).await
-}
-
-struct Host<S>
+pub(crate) struct Host<S>
 where
     S: Store,
     <S as Store>::Writer: Deref,

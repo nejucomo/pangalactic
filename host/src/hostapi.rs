@@ -65,10 +65,7 @@ where
     let len: usize = len.into_host();
 
     let mem = get_memory(&mut caller)?;
-    println!(
-        "[guest log] {}",
-        String::from_utf8_lossy(&mem.data(&caller)[ptr..ptr + len])
-    );
+    crate::guest_log::bytes(&mem.data(&caller)[ptr..ptr + len]);
     Ok(())
 }
 

@@ -54,6 +54,7 @@ where
     F: Fn(Dagio<MemStore>, Plan<MemStore>, Attestation<MemStore>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
+    dagwasm_log::test_init();
     let r = verify_guests_inner(guests, input_bytes, verify).await;
     if let Some(e) = r.as_ref().err() {
         eprintln!("{e:#}");

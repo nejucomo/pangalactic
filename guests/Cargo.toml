@@ -11,6 +11,7 @@ anyhow.workspace = true
 include_dir.workspace = true
 
 [dev-dependencies]
+simple_logger.workspace = true
 tokio.workspace = true
 
 [dev-dependencies.dagwasm-store]
@@ -35,6 +36,10 @@ version = "^0.1.0"
 
 [dev-dependencies.dagwasm-memstore]
 path = "../memstore"
+version = "^0.1.0"
+
+[dev-dependencies.dagwasm-log]
+path = "../log"
 version = "^0.1.0"
 
 [build-dependencies]
