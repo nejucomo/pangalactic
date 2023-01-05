@@ -1,5 +1,5 @@
 [package]
-name = "get_plan"
+name = "test_bindings_plan_is_dir"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

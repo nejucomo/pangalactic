@@ -1,5 +1,5 @@
-use dagwasm_dir::LinkKind;
 use dagwasm_handle::Handle;
+use dagwasm_linkkind::LinkKind;
 
 pub(crate) trait HostToWasm {
     fn into_wasm(self) -> u64;

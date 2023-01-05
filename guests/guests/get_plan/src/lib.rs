@@ -1,4 +1,6 @@
+use dagwasm_guest::prim::HandleLink;
+
 #[no_mangle]
-pub extern "C" fn derive(plan: u64) -> u64 {
+pub extern "C" fn derive(plan: HandleLink) -> HandleLink {
     plan
 }

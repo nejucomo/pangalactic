@@ -2,9 +2,11 @@
 members = [
   "dagio",
   "dir",
+  "guest",
   "guests",
   "handle",
   "host",
+  "linkkind",
   "memstore",
   "schemata",
   "serialization",

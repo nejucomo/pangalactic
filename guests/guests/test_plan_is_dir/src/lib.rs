@@ -1,13 +1,9 @@
-#[link(wasm_import_module = "dagwasm-host")]
-extern "C" {
-    fn link_get_kind(handle_link: u64) -> u64;
-}
-
-const LINK_KIND_DIR: u64 = 1;
+use dagwasm_guest::{prim, Link, LinkKind};
 
 #[no_mangle]
-pub extern "C" fn derive(plan: u64) -> u64 {
-    let kind = unsafe { link_get_kind(plan) };
-    assert_eq!(kind, LINK_KIND_DIR);
-    0
+pub extern "C" fn derive(primplan: prim::HandleLink) -> prim::HandleLink {
+    let plan = unsafe { Link::wrap_handle(primplan) };
+    let kind = plan.kind();
+    assert_eq!(kind, LinkKind::Dir);
+    unsafe { plan.unwrap_handle() }
 }

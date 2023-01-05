@@ -9,20 +9,38 @@ pub enum LinkKind {
     Dir,
 }
 
+impl TryFrom<u64> for LinkKind {
+    type Error = String;
+
+    fn try_from(u: u64) -> Result<Self, Self::Error> {
+        use LinkKind::*;
+
+        match u {
+            0 => Ok(File),
+            1 => Ok(Dir),
+            _ => Err(format!("invalid LinkKind encoding {u:?}")),
+        }
+    }
+}
+
+impl From<LinkKind> for u64 {
+    fn from(lk: LinkKind) -> u64 {
+        use LinkKind::*;
+
+        match lk {
+            File => 0,
+            Dir => 1,
+        }
+    }
+}
+
 #[async_trait]
 impl AsyncSerialize for LinkKind {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
         W: AsyncWrite + Unpin + Send,
     {
-        use LinkKind::*;
-
-        let encoding: u64 = match self {
-            File => 0,
-            Dir => 1,
-        };
-
-        encoding.write_into(w).await
+        u64::from(*self).write_into(w).await
     }
 }
 
@@ -32,15 +50,7 @@ impl AsyncDeserialize for LinkKind {
     where
         R: AsyncRead + Unpin + Send,
     {
-        use LinkKind::*;
-
         let encoding = u64::read_from(r).await?;
-        match encoding {
-            0 => Ok(File),
-            1 => Ok(Dir),
-            other => Err(anyhow::Error::msg(format!(
-                "invalid Link encoding {other:?}"
-            ))),
-        }
+        LinkKind::try_from(encoding).map_err(anyhow::Error::msg)
     }
 }

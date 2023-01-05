@@ -12,6 +12,10 @@ async-trait.workspace = true
 derive_more.workspace = true
 tokio.workspace = true
 
+[dependencies.dagwasm-linkkind]
+path = "../linkkind"
+version = "^0.1.0"
+
 [dependencies.dagwasm-serialization]
 path = "../serialization"
 version = "^0.1.0"
