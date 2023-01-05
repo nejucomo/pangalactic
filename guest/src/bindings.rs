@@ -8,6 +8,7 @@ extern "C" {
     pub fn link_get_kind(handle_link: HandleLink) -> LinkKind;
     pub fn link_open_file_reader(handle_link: HandleLink) -> HandleByteReader;
     pub fn link_open_directory_reader(handle_link: HandleLink) -> HandleDirReader;
+    pub fn link_close(handle_link: HandleLink);
 
     // ByteReader methods:
     pub fn byte_reader_read(

@@ -34,6 +34,7 @@ where
     link_host_fn!(link_get_kind, link)?;
     link_host_fn!(link_open_file_reader, link)?;
     link_host_fn!(link_open_directory_reader, link)?;
+    link_host_fn!(link_close, link)?;
 
     // ByteReader methods:
     link_host_fn!(byte_reader_read, byte_reader, ptr, len)?;
@@ -103,6 +104,18 @@ where
     let dr: DirectoryReader<S> = caller.data_mut().dagio_mut().read(&link).await?;
     let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
     Ok(h_dr.into_wasm())
+}
+
+async fn link_close<S>(mut caller: Caller<'_, State<S>>, rh_link: u64) -> Result<(), Trap>
+where
+    S: Store,
+{
+    use dagwasm_handle::Handle;
+
+    let link: Handle<LinkFor<S>> = rh_link.into_host();
+    dbg!(&link, caller.data().links());
+    caller.data_mut().links_mut().close(link)?;
+    Ok(())
 }
 
 async fn byte_reader_read<S>(

@@ -5,5 +5,5 @@ pub extern "C" fn derive(primplan: prim::HandleLink) -> prim::HandleLink {
     let plan = unsafe { Link::wrap_handle(primplan) };
     let kind = plan.kind();
     assert_eq!(kind, LinkKind::Dir);
-    0
+    unsafe { plan.unwrap_handle() }
 }
