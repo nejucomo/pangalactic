@@ -1,10 +1,26 @@
-use crate::{bindings, prim};
+use crate::{bindings, prim, DirectoryReader, Reader};
 use dagwasm_linkkind::LinkKind;
 
 #[derive(Debug)]
 pub struct Link(prim::HandleLink);
 
 impl Link {
+    pub fn kind(&self) -> LinkKind {
+        let lkprim: prim::LinkKind = unsafe { bindings::link_get_kind(self.0) };
+        LinkKind::try_from(lkprim).unwrap()
+    }
+
+    pub fn open(&self) -> Reader {
+        use LinkKind::*;
+
+        match self.kind() {
+            File => todo!("open file reader"),
+            Dir => Reader::Dir(DirectoryReader::wrap_handle(unsafe {
+                bindings::link_open_directory_reader(self.0)
+            })),
+        }
+    }
+
     /// Wrap a bare primitive handle from the host.
     ///
     /// # Safety
@@ -29,11 +45,6 @@ impl Link {
         // Do not exercise drop/close because the caller is responsible for the handle.
         std::mem::forget(self);
         h
-    }
-
-    pub fn kind(&self) -> LinkKind {
-        let lkprim: prim::LinkKind = unsafe { bindings::link_get_kind(self.0) };
-        LinkKind::try_from(lkprim).unwrap()
     }
 }
 

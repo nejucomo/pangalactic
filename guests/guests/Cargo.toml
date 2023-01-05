@@ -3,6 +3,7 @@ members = [
   "get_plan",
   "identity",
   "test_bindings_plan_is_dir",
+  "test_bindings_input_is_hello_world",
   "test_input_is_hello_world",
   "test_plan_is_dir",
 ]
