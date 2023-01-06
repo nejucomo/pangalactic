@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use dagwasm_primitives::{self as prim, LINK_KIND_DIR, LINK_KIND_FILE};
 use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
@@ -9,27 +10,27 @@ pub enum LinkKind {
     Dir,
 }
 
-impl TryFrom<u64> for LinkKind {
+impl TryFrom<prim::LinkKind> for LinkKind {
     type Error = String;
 
-    fn try_from(u: u64) -> Result<Self, Self::Error> {
+    fn try_from(u: prim::LinkKind) -> Result<Self, Self::Error> {
         use LinkKind::*;
 
         match u {
-            0 => Ok(File),
-            1 => Ok(Dir),
+            LINK_KIND_FILE => Ok(File),
+            LINK_KIND_DIR => Ok(Dir),
             _ => Err(format!("invalid LinkKind encoding {u:?}")),
         }
     }
 }
 
-impl From<LinkKind> for u64 {
-    fn from(lk: LinkKind) -> u64 {
+impl From<LinkKind> for prim::LinkKind {
+    fn from(lk: LinkKind) -> prim::LinkKind {
         use LinkKind::*;
 
         match lk {
-            File => 0,
-            Dir => 1,
+            File => LINK_KIND_FILE,
+            Dir => LINK_KIND_DIR,
         }
     }
 }
@@ -40,7 +41,7 @@ impl AsyncSerialize for LinkKind {
     where
         W: AsyncWrite + Unpin + Send,
     {
-        u64::from(*self).write_into(w).await
+        prim::LinkKind::from(*self).write_into(w).await
     }
 }
 
@@ -50,7 +51,7 @@ impl AsyncDeserialize for LinkKind {
     where
         R: AsyncRead + Unpin + Send,
     {
-        let encoding = u64::read_from(r).await?;
+        let encoding = prim::LinkKind::read_from(r).await?;
         LinkKind::try_from(encoding).map_err(anyhow::Error::msg)
     }
 }
