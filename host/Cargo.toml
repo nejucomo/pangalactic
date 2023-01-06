@@ -40,3 +40,7 @@ version = "^0.1.0"
 [dependencies.dagwasm-table]
 path = "../table"
 version = "^0.1.0"
+
+[dependencies.dagwasm-primitives]
+path = "../primitives"
+version = "^0.1.0"

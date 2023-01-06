@@ -3,7 +3,7 @@ use dagwasm_guest::bindings::{
     directory_reader_load_link, directory_reader_next_entry, directory_reader_open_name_reader,
     link_get_kind, link_open_directory_reader, link_open_file_reader,
 };
-use dagwasm_guest::prim::{HandleLink, LINK_KIND_DIR, LINK_KIND_FILE, TRUE};
+use dagwasm_guest::prim::{ByteLen, HandleLink, PtrRead, LINK_KIND_DIR, LINK_KIND_FILE, TRUE};
 
 const LEN: usize = 16;
 
@@ -53,8 +53,8 @@ fn read_initial_bytes(byte_reader: u64, buf: &mut [u8; LEN]) -> usize {
     let read_amount = usize::try_from(unsafe {
         byte_reader_read(
             byte_reader,
-            buf[..].as_mut_ptr() as i64, // FIXME: safer cast
-            u64::try_from(LEN).expect("usize->u64 failure"),
+            buf[..].as_mut_ptr() as PtrRead, // FIXME: safer cast
+            ByteLen::try_from(LEN).expect("usize->u64 failure"),
         )
     })
     .expect("u64->usize failure");
