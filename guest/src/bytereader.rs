@@ -11,12 +11,12 @@ impl ByteReader {
     }
 
     pub fn read(&self, buf: &mut [u8]) -> usize {
-        let ptr = buf.as_mut_ptr() as i64; // FIXME: Safe conversion which panics on overflow.
+        let ptr = buf.as_mut_ptr() as prim::PtrRead; // FIXME: Safe conversion which panics on overflow.
         let len = prim::ByteLen::try_from(buf.len()).expect("usize->prim::ByteLen failure");
 
         let read_amount =
             usize::try_from(unsafe { bindings::byte_reader_read(self.handle, ptr, len) })
-                .expect("u64->usize failure");
+                .expect("ByteLen->usize failure");
         if self.trace {
             trace!(
                 "{self:?} read into &{ptr}[..{len}]: {:?}",

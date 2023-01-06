@@ -9,6 +9,10 @@ async-trait.workspace = true
 anyhow.workspace = true
 tokio.workspace = true
 
+[dependencies.dagwasm-primitives]
+path = "../primitives"
+version = "^0.1.0"
+
 [dependencies.dagwasm-serialization]
 path = "../serialization"
 version = "^0.1.0"

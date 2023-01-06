@@ -1,5 +1,6 @@
 use crate::{HostToWasm, State, WasmToHost};
 use dagwasm_dagio::LinkFor;
+use dagwasm_primitives as prim;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
@@ -57,7 +58,11 @@ where
     Ok(linker)
 }
 
-async fn log<S>(mut caller: Caller<'_, State<S>>, ptr: u64, len: u64) -> Result<(), Trap>
+async fn log<S>(
+    mut caller: Caller<'_, State<S>>,
+    ptr: prim::PtrWrite,
+    len: prim::ByteLen,
+) -> Result<(), Trap>
 where
     S: Store,
 {
@@ -69,7 +74,10 @@ where
     Ok(())
 }
 
-async fn link_get_kind<S>(caller: Caller<'_, State<S>>, rh_link: u64) -> Result<u64, Trap>
+async fn link_get_kind<S>(
+    caller: Caller<'_, State<S>>,
+    rh_link: prim::HandleLink,
+) -> Result<prim::LinkKind, Trap>
 where
     S: Store,
 {
@@ -82,8 +90,8 @@ where
 
 async fn link_open_file_reader<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_link: u64,
-) -> Result<u64, Trap>
+    rh_link: prim::HandleLink,
+) -> Result<prim::HandleByteReader, Trap>
 where
     S: Store,
 {
@@ -110,8 +118,8 @@ where
 
 async fn link_open_directory_reader<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_link: u64,
-) -> Result<u64, Trap>
+    rh_link: prim::HandleLink,
+) -> Result<prim::HandleDirReader, Trap>
 where
     S: Store,
 {
@@ -125,7 +133,10 @@ where
     Ok(h_dr.into_wasm())
 }
 
-async fn link_close<S>(mut caller: Caller<'_, State<S>>, rh_link: u64) -> Result<(), Trap>
+async fn link_close<S>(
+    mut caller: Caller<'_, State<S>>,
+    rh_link: prim::HandleLink,
+) -> Result<(), Trap>
 where
     S: Store,
 {
@@ -138,10 +149,10 @@ where
 
 async fn byte_reader_read<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_br: u64,
-    ptr: u64,
-    len: u64,
-) -> Result<u64, Trap>
+    rh_br: prim::HandleByteReader,
+    ptr: prim::PtrRead,
+    len: prim::ByteLen,
+) -> Result<prim::ByteLen, Trap>
 where
     S: Store,
 {
@@ -174,7 +185,10 @@ where
     Ok(readlen.into_wasm())
 }
 
-async fn byte_reader_close<S>(mut caller: Caller<'_, State<S>>, rh_br: u64) -> Result<(), Trap>
+async fn byte_reader_close<S>(
+    mut caller: Caller<'_, State<S>>,
+    rh_br: prim::HandleByteReader,
+) -> Result<(), Trap>
 where
     S: Store,
 {
@@ -188,8 +202,8 @@ where
 
 async fn directory_reader_has_more_entries<S>(
     caller: Caller<'_, State<S>>,
-    rh_dr: u64,
-) -> Result<u64, Trap>
+    rh_dr: prim::HandleDirReader,
+) -> Result<prim::Bool, Trap>
 where
     S: Store,
 {
@@ -203,8 +217,8 @@ where
 
 async fn directory_reader_load_link<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_dr: u64,
-) -> Result<u64, Trap>
+    rh_dr: prim::HandleDirReader,
+) -> Result<prim::HandleLink, Trap>
 where
     S: Store,
 {
@@ -220,8 +234,8 @@ where
 
 async fn directory_reader_open_name_reader<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_dr: u64,
-) -> Result<u64, Trap>
+    rh_dr: prim::HandleDirReader,
+) -> Result<prim::HandleByteReader, Trap>
 where
     S: Store,
 {
@@ -238,7 +252,7 @@ where
 
 async fn directory_reader_next_entry<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_dr: u64,
+    rh_dr: prim::HandleDirReader,
 ) -> Result<(), Trap>
 where
     S: Store,
@@ -252,7 +266,10 @@ where
     Ok(())
 }
 
-async fn directory_reader_close<S>(mut caller: Caller<'_, State<S>>, rh_dr: u64) -> Result<(), Trap>
+async fn directory_reader_close<S>(
+    mut caller: Caller<'_, State<S>>,
+    rh_dr: prim::HandleDirReader,
+) -> Result<(), Trap>
 where
     S: Store,
 {

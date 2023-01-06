@@ -36,6 +36,7 @@ name = "dagwasm-guest"
 version = "0.1.0"
 dependencies = [
  "dagwasm-linkkind",
+ "dagwasm-primitives",
 ]
 
 [[package]]
@@ -44,9 +45,14 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "dagwasm-primitives",
  "dagwasm-serialization",
  "tokio",
 ]
+
+[[package]]
+name = "dagwasm-primitives"
+version = "0.1.0"
 
 [[package]]
 name = "dagwasm-serialization"
