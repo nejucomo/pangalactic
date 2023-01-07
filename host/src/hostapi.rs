@@ -318,21 +318,27 @@ where
     use tokio::io::AsyncWriteExt;
 
     let h_bw: Handle<<S as Store>::Writer> = rh_bw.into_host();
-    let writer = caller.data_mut().byte_writers_mut().lookup_mut(h_bw)?;
 
     let ptr: usize = ptr.into_host();
     let len: usize = len.into_host();
 
-    let mem = get_memory(&mut caller)?;
-    let srcbuf = &mem.data(&caller)[ptr..ptr + len];
+    let intermediate = {
+        let mut buf = vec![0; len]; // FIXME: don't allocate on guest-provided `len`.
+        let mem = get_memory(&mut caller)?;
+        buf.copy_from_slice(&mem.data(&caller)[ptr..ptr + len]);
+        buf
+    };
 
-    while srcbuf.len() > 0 {
+    let writer = caller.data_mut().byte_writers_mut().lookup_mut(h_bw)?;
+    let mut buf = &intermediate[..];
+
+    while !buf.is_empty() {
         let c = writer
-            .write(srcbuf)
+            .write(buf)
             .await
             .map_err(|e| anyhow::Error::msg(e.to_string()))?;
         assert!(c > 0);
-        srcbuf = &srcbuf[c..];
+        buf = &buf[c..];
     }
 
     Ok(())
