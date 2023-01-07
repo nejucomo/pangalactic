@@ -1,5 +1,11 @@
 use crate::{bindings, prim, Link};
 
+pub fn write_bytes(bytes: &[u8]) -> Link {
+    let w = ByteWriter::open();
+    w.write(bytes);
+    w.commit()
+}
+
 #[derive(Debug)]
 pub struct ByteWriter(prim::HandleByteWriter);
 

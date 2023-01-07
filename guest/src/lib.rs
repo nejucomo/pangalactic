@@ -10,7 +10,7 @@ pub(crate) mod ptr;
 mod reader;
 
 pub use self::bytereader::ByteReader;
-pub use self::bytewriter::ByteWriter;
+pub use self::bytewriter::{write_bytes, ByteWriter};
 pub use self::directoryreader::DirectoryReader;
 pub use self::link::Link;
 pub use self::log::log_str;

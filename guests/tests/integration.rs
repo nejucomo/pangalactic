@@ -38,9 +38,26 @@ async fn identity() -> anyhow::Result<()> {
 #[tokio::test]
 async fn input_is_hello_world() -> anyhow::Result<()> {
     verify_guests(
-        &["test_input_is_hello_world"],
+        &[
+            "test_input_is_hello_world",
+            "test_bindings_input_is_hello_world",
+        ],
         b"Hello World!",
         |_, _, _| async { Ok(()) },
+    )
+    .await
+}
+
+#[tokio::test]
+async fn output_is_hello_world() -> anyhow::Result<()> {
+    verify_guests(
+        &["test_output_is_hello_world"],
+        b"",
+        |mut dagio, _, attestation| async move {
+            let output = dagio.read_file(&attestation.output).await?;
+            assert_eq!(output, b"Hello World!");
+            Ok(())
+        },
     )
     .await
 }

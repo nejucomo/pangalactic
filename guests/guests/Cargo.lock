@@ -140,6 +140,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "test_output_is_hello_world"
+version = "0.1.0"
+dependencies = [
+ "dagwasm-guest",
+]
+
+[[package]]
 name = "test_plan_is_dir"
 version = "0.1.0"
 dependencies = [
