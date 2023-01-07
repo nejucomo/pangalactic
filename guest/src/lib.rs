@@ -3,11 +3,14 @@ mod log;
 
 pub mod bindings;
 mod bytereader;
+mod bytewriter;
 mod directoryreader;
 mod link;
+pub(crate) mod ptr;
 mod reader;
 
 pub use self::bytereader::ByteReader;
+pub use self::bytewriter::{write_bytes, ByteWriter};
 pub use self::directoryreader::DirectoryReader;
 pub use self::link::Link;
 pub use self::log::log_str;

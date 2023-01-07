@@ -11,6 +11,7 @@ where
     links: Table<LinkFor<S>>,
     byte_readers: Table<ByteReader<S>>,
     dir_readers: Table<DirectoryReader<S>>,
+    byte_writers: Table<<S as Store>::Writer>,
 }
 
 impl<S> State<S>
@@ -23,6 +24,7 @@ where
             links: Table::default(),
             byte_readers: Table::default(),
             dir_readers: Table::default(),
+            byte_writers: Table::default(),
         }
     }
 
@@ -52,5 +54,9 @@ where
 
     pub(crate) fn directory_readers_mut(&mut self) -> &mut Table<DirectoryReader<S>> {
         &mut self.dir_readers
+    }
+
+    pub(crate) fn byte_writers_mut(&mut self) -> &mut Table<<S as Store>::Writer> {
+        &mut self.byte_writers
     }
 }

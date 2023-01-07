@@ -37,10 +37,9 @@ impl<T> Table<T> {
             .ok_or_else(|| anyhow::Error::msg(format!("invalid lookup {handle:?}")))
     }
 
-    pub fn close(&mut self, handle: Handle<T>) -> anyhow::Result<()> {
+    pub fn remove(&mut self, handle: Handle<T>) -> anyhow::Result<T> {
         self.map
             .remove(&unsafe { handle.peek() })
-            .map(|_| ())
             .ok_or_else(|| anyhow::Error::msg(format!("invalid close {handle:?}")))
     }
 }
