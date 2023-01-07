@@ -9,7 +9,6 @@ pub struct Dagio<S>(S);
 impl<S> Dagio<S>
 where
     S: Store,
-    <S as Store>::Writer: Send + std::marker::Unpin,
 {
     pub async fn read<T>(&mut self, link: &LinkFor<S>) -> anyhow::Result<T>
     where

@@ -3,15 +3,11 @@ use crate::{FromDag, ToDag};
 use async_trait::async_trait;
 use dagwasm_dir::Directory;
 use dagwasm_store::Store;
-use std::marker::Unpin;
-use std::ops::Deref;
 
 #[async_trait]
 impl<S> ToDag<S> for Directory<<S as Store>::CID>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         use dagwasm_dir::Link;
@@ -33,8 +29,6 @@ where
 impl<const K: usize, S, N> ToDag<S> for [(N, LinkFor<S>); K]
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
     N: Send,
     String: From<N>,
 {

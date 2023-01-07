@@ -2,7 +2,6 @@ use crate::State;
 use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_handle::Handle;
 use dagwasm_store::Store;
-use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module, TypedFunc};
 
 type RawLinkHandle = u64;
@@ -10,8 +9,6 @@ type RawLinkHandle = u64;
 pub(crate) struct DeriveFunc<S>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     store: wasmtime::Store<State<S>>,
     tfunc: TypedFunc<(RawLinkHandle,), (RawLinkHandle,)>,
@@ -20,8 +17,6 @@ where
 impl<S> DeriveFunc<S>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     pub(crate) async fn new(
         engine: &Engine,
