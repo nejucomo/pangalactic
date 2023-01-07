@@ -156,7 +156,7 @@ where
     use dagwasm_handle::Handle;
 
     let link: Handle<LinkFor<S>> = rh_link.into_host();
-    caller.data_mut().links_mut().close(link)?;
+    caller.data_mut().links_mut().remove(link)?;
     Ok(())
 }
 
@@ -209,7 +209,7 @@ where
     use dagwasm_handle::Handle;
 
     let h_br: Handle<ByteReader<S>> = rh_br.into_host();
-    caller.data_mut().byte_readers_mut().close(h_br)?;
+    caller.data_mut().byte_readers_mut().remove(h_br)?;
     Ok(())
 }
 
@@ -290,7 +290,7 @@ where
     use dagwasm_handle::Handle;
 
     let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
-    caller.data_mut().directory_readers_mut().close(h_dr)?;
+    caller.data_mut().directory_readers_mut().remove(h_dr)?;
     Ok(())
 }
 
@@ -345,17 +345,21 @@ where
 }
 
 async fn byte_writer_commit<S>(
-    _caller: Caller<'_, State<S>>,
-    _rh_bw: prim::HandleByteWriter,
+    mut caller: Caller<'_, State<S>>,
+    rh_bw: prim::HandleByteWriter,
 ) -> Result<prim::HandleLink, Trap>
 where
     S: Store,
 {
-    todo!()
+    use dagwasm_handle::Handle;
+
+    let h_bw: Handle<<S as Store>::Writer> = rh_bw.into_host();
+
+    let w = caller.data_mut().byte_writers_mut().remove(h_bw)?;
+    let link = caller.data_mut().dagio_mut().commit_file_writer(w).await?;
+    let h_link = caller.data_mut().links_mut().insert(link);
+    Ok(h_link.into_wasm())
 }
-/*
-    link_host_fn!(byte_writer_commit, byte_writer)?;
-*/
 
 fn get_memory<S>(caller: &mut Caller<'_, State<S>>) -> anyhow::Result<Memory>
 where
