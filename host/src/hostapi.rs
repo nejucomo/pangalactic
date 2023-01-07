@@ -294,23 +294,48 @@ where
     Ok(())
 }
 
-async fn byte_writer_open<S>(_caller: Caller<'_, State<S>>) -> Result<prim::HandleByteWriter, Trap>
+async fn byte_writer_open<S>(
+    mut caller: Caller<'_, State<S>>,
+) -> Result<prim::HandleByteWriter, Trap>
 where
     S: Store,
 {
-    todo!()
+    let writer = caller.data_mut().dagio_mut().open_file_writer().await?;
+    let handle = caller.data_mut().byte_writers_mut().insert(writer);
+    Ok(handle.into_wasm())
 }
 
 async fn byte_writer_write<S>(
-    _caller: Caller<'_, State<S>>,
-    _rh_bw: prim::HandleByteWriter,
-    _ptr: prim::PtrWrite,
-    _len: prim::ByteLen,
+    mut caller: Caller<'_, State<S>>,
+    rh_bw: prim::HandleByteWriter,
+    ptr: prim::PtrWrite,
+    len: prim::ByteLen,
 ) -> Result<(), Trap>
 where
     S: Store,
 {
-    todo!()
+    use dagwasm_handle::Handle;
+    use tokio::io::AsyncWriteExt;
+
+    let h_bw: Handle<<S as Store>::Writer> = rh_bw.into_host();
+    let writer = caller.data_mut().byte_writers_mut().lookup_mut(h_bw)?;
+
+    let ptr: usize = ptr.into_host();
+    let len: usize = len.into_host();
+
+    let mem = get_memory(&mut caller)?;
+    let srcbuf = &mem.data(&caller)[ptr..ptr + len];
+
+    while srcbuf.len() > 0 {
+        let c = writer
+            .write(srcbuf)
+            .await
+            .map_err(|e| anyhow::Error::msg(e.to_string()))?;
+        assert!(c > 0);
+        srcbuf = &srcbuf[c..];
+    }
+
+    Ok(())
 }
 
 async fn byte_writer_commit<S>(
