@@ -27,7 +27,7 @@ extern "C" {
     pub fn directory_reader_close(byte_reader: HandleByteReader);
 
     // ByteWriter methods:
-    pub fn byte_writer_new() -> HandleByteWriter;
+    pub fn byte_writer_open() -> HandleByteWriter;
     pub fn byte_writer_write(byte_writer: HandleByteWriter, ptr: PtrWrite, len: ByteLen);
     pub fn byte_writer_commit(byte_writer: HandleByteWriter) -> HandleLink;
 }

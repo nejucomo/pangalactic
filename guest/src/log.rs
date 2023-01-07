@@ -1,5 +1,3 @@
-use crate::{bindings, prim};
-
 #[macro_export]
 macro_rules! log {
     ( $msg:expr ) => {
@@ -45,7 +43,8 @@ pub(crate) fn log_str_inner(msg: &str) {
 fn log_str_raw(prefix: &str, msg: &str) {
     let buf = format!("[{prefix}] {msg}");
     let bytes = buf.as_bytes();
-    let ptr = bytes.as_ptr() as prim::PtrWrite; // FIXME: safe cast handling overflow.
-    let len = prim::ByteLen::try_from(bytes.len()).unwrap();
-    unsafe { bindings::log(ptr, len) };
+    unsafe {
+        let (ptr, len) = crate::ptr::unpack_for_write(bytes);
+        crate::bindings::log(ptr, len);
+    }
 }
