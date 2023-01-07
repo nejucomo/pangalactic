@@ -21,6 +21,14 @@ where
             )
         };
 
+        ( $name:ident ) => {
+            linker.func_wrap0_async(
+                HOSTMOD,
+                stringify!($name),
+                |caller: Caller<'_, State<S>>| Box::new($name(caller)),
+            )
+        };
+
         ( $name:ident, $a0:ident ) => {
             link_host_fn!(method func_wrap1_async, $name, $a0)
         };
@@ -54,6 +62,11 @@ where
     link_host_fn!(directory_reader_open_name_reader, directory_reader)?;
     link_host_fn!(directory_reader_next_entry, directory_reader)?;
     link_host_fn!(directory_reader_close, directory_reader)?;
+
+    // ByteWriter methods:
+    link_host_fn!(byte_writer_open)?;
+    link_host_fn!(byte_writer_write, byte_writer, ptr, len)?;
+    link_host_fn!(byte_writer_commit, byte_writer)?;
 
     Ok(linker)
 }
@@ -280,6 +293,38 @@ where
     caller.data_mut().directory_readers_mut().close(h_dr)?;
     Ok(())
 }
+
+async fn byte_writer_open<S>(_caller: Caller<'_, State<S>>) -> Result<prim::HandleByteWriter, Trap>
+where
+    S: Store,
+{
+    todo!()
+}
+
+async fn byte_writer_write<S>(
+    _caller: Caller<'_, State<S>>,
+    _rh_bw: prim::HandleByteWriter,
+    _ptr: prim::PtrWrite,
+    _len: prim::ByteLen,
+) -> Result<(), Trap>
+where
+    S: Store,
+{
+    todo!()
+}
+
+async fn byte_writer_commit<S>(
+    _caller: Caller<'_, State<S>>,
+    _rh_bw: prim::HandleByteWriter,
+) -> Result<prim::HandleLink, Trap>
+where
+    S: Store,
+{
+    todo!()
+}
+/*
+    link_host_fn!(byte_writer_commit, byte_writer)?;
+*/
 
 fn get_memory<S>(caller: &mut Caller<'_, State<S>>) -> anyhow::Result<Memory>
 where
