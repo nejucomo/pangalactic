@@ -2,8 +2,6 @@ use async_trait::async_trait;
 use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use dagwasm_dir::Directory;
 use dagwasm_store::Store;
-use std::marker::Unpin;
-use std::ops::Deref;
 
 #[derive(Debug)]
 pub struct Attestation<S>
@@ -32,9 +30,6 @@ where
 impl<S> ToDag<S> for Attestation<S>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
-    LinkFor<S>: Clone,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         dagio

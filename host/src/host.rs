@@ -1,14 +1,11 @@
 use crate::State;
 use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_store::Store;
-use std::ops::Deref;
 use wasmtime::{Engine, Linker, Module};
 
 pub(crate) struct Host<S>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     engine: Engine,
     linker: Linker<State<S>>,
@@ -17,8 +14,6 @@ where
 impl<S> Host<S>
 where
     S: Store,
-    <S as Store>::Writer: Deref,
-    <<S as Store>::Writer as Deref>::Target: Unpin,
 {
     pub fn new() -> anyhow::Result<Self> {
         let mut config = wasmtime::Config::new();

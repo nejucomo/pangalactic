@@ -1,4 +1,4 @@
-use crate::{FileWriter, FromDag, LinkFor, ToDag};
+use crate::{FromDag, LinkFor, ToDag};
 use dagwasm_dir::Link;
 use dagwasm_linkkind::LinkKind::File;
 use dagwasm_store::Store;
@@ -9,7 +9,6 @@ pub struct Dagio<S>(S);
 impl<S> Dagio<S>
 where
     S: Store,
-    <S as Store>::Writer: Send + std::marker::Unpin,
 {
     pub async fn read<T>(&mut self, link: &LinkFor<S>) -> anyhow::Result<T>
     where
@@ -33,19 +32,15 @@ where
         self.0.open_reader(key).await
     }
 
-    pub async fn open_file_writer(&mut self) -> anyhow::Result<FileWriter<<S as Store>::Writer>> {
-        let inner = self.0.open_writer().await?;
-        Ok(FileWriter::from(inner))
+    pub async fn open_file_writer(&mut self) -> anyhow::Result<<S as Store>::Writer> {
+        self.0.open_writer().await
     }
 
     pub async fn commit_file_writer(
         &mut self,
-        w: FileWriter<<S as Store>::Writer>,
+        w: <S as Store>::Writer,
     ) -> anyhow::Result<LinkFor<S>> {
-        self.0
-            .commit_writer(w.unwrap())
-            .await
-            .map(|k| Link::new(File, k))
+        self.0.commit_writer(w).await.map(|k| Link::new(File, k))
     }
 
     pub async fn read_file(&mut self, link: &LinkFor<S>) -> anyhow::Result<Vec<u8>> {
