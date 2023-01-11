@@ -3,8 +3,7 @@ mod byte_writer;
 mod directory_reader;
 mod link;
 
-use crate::State;
-use dagwasm_primitives as prim;
+use crate::{State, WasmToHost};
 use dagwasm_store::Store;
 use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
@@ -21,7 +20,7 @@ where
             linker . $wrapmethod(
                 HOSTMOD,
                 &format!("{}_{}", stringify!($modname), stringify!($methodname)),
-                |caller: Caller<'_, State<S>>, $( $arg : u64 ),* | Box::new(self::$modname::$methodname(caller, $( $arg ),* )),
+                |caller: Caller<'_, State<S>>, $( $arg : u64 ),* | Box::new(self::$modname::$methodname(caller, $( $arg.into_host() ),* )),
             )
         };
 
@@ -54,7 +53,9 @@ where
     linker.func_wrap2_async(
         HOSTMOD,
         "log",
-        |caller: Caller<'_, State<S>>, ptr: u64, len: u64| Box::new(log(caller, ptr, len)),
+        |caller: Caller<'_, State<S>>, ptr: u64, len: u64| {
+            Box::new(log(caller, ptr.into_host(), len.into_host()))
+        },
     )?;
 
     // Link methods:
@@ -82,19 +83,10 @@ where
     Ok(linker)
 }
 
-async fn log<S>(
-    mut caller: Caller<'_, State<S>>,
-    ptr: prim::PtrWrite,
-    len: prim::ByteLen,
-) -> Result<(), Trap>
+async fn log<S>(mut caller: Caller<'_, State<S>>, ptr: usize, len: usize) -> Result<(), Trap>
 where
     S: Store,
 {
-    use crate::WasmToHost;
-
-    let ptr: usize = ptr.into_host();
-    let len: usize = len.into_host();
-
     let mem = get_memory(&mut caller)?;
     crate::guest_log::bytes(&mem.data(&caller)[ptr..ptr + len]);
     Ok(())

@@ -1,4 +1,5 @@
-use crate::{HostToWasm, State, WasmToHost};
+use crate::{HostToWasm, State};
+use dagwasm_handle::Handle;
 use dagwasm_primitives as prim;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Trap};
@@ -16,20 +17,14 @@ where
 
 pub(super) async fn write<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_bw: prim::HandleByteWriter,
-    ptr: prim::PtrWrite,
-    len: prim::ByteLen,
+    h_bw: Handle<<S as Store>::Writer>,
+    ptr: usize,
+    len: usize,
 ) -> Result<(), Trap>
 where
     S: Store,
 {
-    use dagwasm_handle::Handle;
     use tokio::io::AsyncWriteExt;
-
-    let h_bw: Handle<<S as Store>::Writer> = rh_bw.into_host();
-
-    let ptr: usize = ptr.into_host();
-    let len: usize = len.into_host();
 
     let intermediate = {
         let mut buf = vec![0; len]; // FIXME: don't allocate on guest-provided `len`.
@@ -55,15 +50,11 @@ where
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
-    rh_bw: prim::HandleByteWriter,
+    h_bw: Handle<<S as Store>::Writer>,
 ) -> Result<prim::HandleLink, Trap>
 where
     S: Store,
 {
-    use dagwasm_handle::Handle;
-
-    let h_bw: Handle<<S as Store>::Writer> = rh_bw.into_host();
-
     let w = caller.data_mut().byte_writers_mut().remove(h_bw)?;
     let link = caller.data_mut().dagio_mut().commit_file_writer(w).await?;
     let h_link = caller.data_mut().links_mut().insert(link);
