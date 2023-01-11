@@ -5,13 +5,15 @@ mod directoryreader;
 pub(crate) mod guest_log;
 mod host;
 pub(crate) mod hostapi;
+mod hosttowasm;
 mod state;
-mod tofro;
+mod wasmtohost;
 
 pub(crate) use self::bytereader::ByteReader;
 pub use self::derive::derive;
 pub(crate) use self::derivefunc::DeriveFunc;
 pub(crate) use self::directoryreader::DirectoryReader;
 pub(crate) use self::host::Host;
+pub(crate) use self::hosttowasm::HostToWasm;
 pub(crate) use self::state::State;
-pub(crate) use self::tofro::{HostToWasm, WasmToHost};
+pub(crate) use self::wasmtohost::WasmToHost;
