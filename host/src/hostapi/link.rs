@@ -15,7 +15,7 @@ where
 
     let h_link: Handle<LinkFor<S>> = rh_link.into_host();
     let link = caller.data().links().lookup(h_link)?;
-    Ok(link.kind().into_wasm())
+    Ok(link.kind()).into_wasm()
 }
 
 pub(super) async fn open_file_reader<S>(
@@ -43,7 +43,7 @@ where
         .byte_readers_mut()
         .insert(ByteReader::Store(fr));
 
-    Ok(h_fr.into_wasm())
+    Ok(h_fr).into_wasm()
 }
 
 pub(super) async fn open_directory_reader<S>(
@@ -60,7 +60,7 @@ where
     let link = caller.data().links().lookup(h_link)?.clone();
     let dr: DirectoryReader<S> = caller.data_mut().dagio_mut().read(&link).await?;
     let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
-    Ok(h_dr.into_wasm())
+    Ok(h_dr).into_wasm()
 }
 
 pub(super) async fn close<S>(
@@ -74,5 +74,5 @@ where
 
     let link: Handle<LinkFor<S>> = rh_link.into_host();
     caller.data_mut().links_mut().remove(link)?;
-    Ok(())
+    Ok(()).into_wasm()
 }

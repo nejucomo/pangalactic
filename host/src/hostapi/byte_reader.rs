@@ -38,7 +38,7 @@ where
     assert!(readlen <= len);
     let mem = super::get_memory(&mut caller)?;
     mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
-    Ok(readlen.into_wasm())
+    Ok(readlen).into_wasm()
 }
 
 pub(super) async fn close<S>(
@@ -53,5 +53,5 @@ where
 
     let h_br: Handle<ByteReader<S>> = rh_br.into_host();
     caller.data_mut().byte_readers_mut().remove(h_br)?;
-    Ok(())
+    Ok(()).into_wasm()
 }

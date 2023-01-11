@@ -15,7 +15,7 @@ where
 
     let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data().directory_readers().lookup(h_dr)?;
-    Ok(dr.has_more_entries().into_wasm())
+    Ok(dr.has_more_entries()).into_wasm()
 }
 
 pub(super) async fn load_link<S>(
@@ -32,7 +32,7 @@ where
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     let link = dr.take_link()?;
     let h_link = caller.data_mut().links_mut().insert(link);
-    Ok(h_link.into_wasm())
+    Ok(h_link).into_wasm()
 }
 
 pub(super) async fn open_name_reader<S>(
@@ -50,7 +50,7 @@ where
     let name = dr.take_name()?;
     let br = ByteReader::from(name);
     let h_br = caller.data_mut().byte_readers_mut().insert(br);
-    Ok(h_br.into_wasm())
+    Ok(h_br).into_wasm()
 }
 
 pub(super) async fn next_entry<S>(
@@ -66,7 +66,7 @@ where
     let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     let dr = caller.data_mut().directory_readers_mut().lookup_mut(h_dr)?;
     dr.next_entry();
-    Ok(())
+    Ok(()).into_wasm()
 }
 
 pub(super) async fn close<S>(
@@ -81,5 +81,5 @@ where
 
     let h_dr: Handle<DirectoryReader<S>> = rh_dr.into_host();
     caller.data_mut().directory_readers_mut().remove(h_dr)?;
-    Ok(())
+    Ok(()).into_wasm()
 }

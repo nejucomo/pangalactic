@@ -11,7 +11,7 @@ where
 {
     let writer = caller.data_mut().dagio_mut().open_file_writer().await?;
     let handle = caller.data_mut().byte_writers_mut().insert(writer);
-    Ok(handle.into_wasm())
+    Ok(handle).into_wasm()
 }
 
 pub(super) async fn write<S>(
@@ -50,7 +50,7 @@ where
         buf = &buf[c..];
     }
 
-    Ok(())
+    Ok(()).into_wasm()
 }
 
 pub(super) async fn commit<S>(
@@ -67,5 +67,5 @@ where
     let w = caller.data_mut().byte_writers_mut().remove(h_bw)?;
     let link = caller.data_mut().dagio_mut().commit_file_writer(w).await?;
     let h_link = caller.data_mut().links_mut().insert(link);
-    Ok(h_link.into_wasm())
+    Ok(h_link).into_wasm()
 }
