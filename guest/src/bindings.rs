@@ -1,6 +1,6 @@
 use crate::prim::{
-    Bool, ByteLen, HandleByteReader, HandleByteWriter, HandleDirReader, HandleLink, LinkKind,
-    PtrRead, PtrWrite,
+    Bool, ByteLen, HandleByteReader, HandleByteWriter, HandleDirReader, HandleDirWriter,
+    HandleLink, LinkKind, PtrRead, PtrWrite,
 };
 
 #[link(wasm_import_module = "dagwasm-host")]
@@ -30,4 +30,14 @@ extern "C" {
     pub fn byte_writer_open() -> HandleByteWriter;
     pub fn byte_writer_write(byte_writer: HandleByteWriter, ptr: PtrWrite, len: ByteLen);
     pub fn byte_writer_commit(byte_writer: HandleByteWriter) -> HandleLink;
+
+    // DirectoryWriter methods:
+    pub fn directory_writer_open() -> HandleDirWriter;
+    pub fn directory_writer_insert(
+        directory_writer: HandleDirWriter,
+        nameptr: PtrWrite,
+        namelen: ByteLen,
+        link: HandleLink,
+    );
+    pub fn directory_writer_commit(directory_writer: HandleDirWriter) -> HandleLink;
 }
