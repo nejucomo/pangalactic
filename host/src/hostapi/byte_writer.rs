@@ -1,18 +1,18 @@
-use crate::{HostToWasm, State};
+use crate::State;
+use dagwasm_dagio::LinkFor;
 use dagwasm_handle::Handle;
-use dagwasm_primitives as prim;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn open<S>(
     mut caller: Caller<'_, State<S>>,
-) -> Result<prim::HandleByteWriter, Trap>
+) -> Result<Handle<<S as Store>::Writer>, Trap>
 where
     S: Store,
 {
     let writer = caller.data_mut().dagio_mut().open_file_writer().await?;
     let handle = caller.data_mut().byte_writers_mut().insert(writer);
-    Ok(handle).into_wasm()
+    Ok(handle)
 }
 
 pub(super) async fn write<S>(
@@ -45,18 +45,18 @@ where
         buf = &buf[c..];
     }
 
-    Ok(()).into_wasm()
+    Ok(())
 }
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
     h_bw: Handle<<S as Store>::Writer>,
-) -> Result<prim::HandleLink, Trap>
+) -> Result<Handle<LinkFor<S>>, Trap>
 where
     S: Store,
 {
     let w = caller.data_mut().byte_writers_mut().remove(h_bw)?;
     let link = caller.data_mut().dagio_mut().commit_file_writer(w).await?;
     let h_link = caller.data_mut().links_mut().insert(link);
-    Ok(h_link).into_wasm()
+    Ok(h_link)
 }

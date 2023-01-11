@@ -3,7 +3,7 @@ mod byte_writer;
 mod directory_reader;
 mod link;
 
-use crate::{State, WasmToHost};
+use crate::State;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Engine, Linker, Memory, Trap};
 
@@ -11,6 +11,8 @@ pub(crate) fn instantiate_linker<S>(engine: &Engine) -> anyhow::Result<Linker<St
 where
     S: Store,
 {
+    use crate::{HostToWasm, WasmToHost};
+
     const HOSTMOD: &str = env!("CARGO_PKG_NAME");
 
     let mut linker = Linker::new(engine);
@@ -20,7 +22,9 @@ where
             linker . $wrapmethod(
                 HOSTMOD,
                 &format!("{}_{}", stringify!($modname), stringify!($methodname)),
-                |caller: Caller<'_, State<S>>, $( $arg : u64 ),* | Box::new(self::$modname::$methodname(caller, $( $arg.into_host() ),* )),
+                |caller: Caller<'_, State<S>>, $( $arg : u64 ),* | Box::new(async move {
+                    self::$modname::$methodname(caller, $( $arg.into_host() ),* ).await.into_wasm()
+                }),
             )
         };
 
@@ -28,7 +32,9 @@ where
             linker.func_wrap0_async(
                 HOSTMOD,
                 &format!("{}_{}", stringify!($modname), stringify!($methodname)),
-                |caller: Caller<'_, State<S>>| Box::new(self::$modname::$methodname(caller)),
+                |caller: Caller<'_, State<S>>| Box::new(async {
+                    self::$modname::$methodname(caller).await.into_wasm()
+                }),
             )
         };
 

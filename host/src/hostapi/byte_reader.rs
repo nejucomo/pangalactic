@@ -1,7 +1,5 @@
-use crate::ByteReader;
-use crate::{HostToWasm, State};
+use crate::{ByteReader, State};
 use dagwasm_handle::Handle;
-use dagwasm_primitives as prim;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Trap};
 
@@ -10,7 +8,7 @@ pub(super) async fn read<S>(
     h_br: Handle<ByteReader<S>>,
     ptr: usize,
     len: usize,
-) -> Result<prim::ByteLen, Trap>
+) -> Result<usize, Trap>
 where
     S: Store,
 {
@@ -34,7 +32,7 @@ where
     assert!(readlen <= len);
     let mem = super::get_memory(&mut caller)?;
     mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
-    Ok(readlen).into_wasm()
+    Ok(readlen)
 }
 
 pub(super) async fn close<S>(
@@ -45,5 +43,5 @@ where
     S: Store,
 {
     caller.data_mut().byte_readers_mut().remove(h_br)?;
-    Ok(()).into_wasm()
+    Ok(())
 }
