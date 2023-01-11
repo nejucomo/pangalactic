@@ -1,15 +1,33 @@
 use dagwasm_handle::Handle;
 use dagwasm_linkkind::LinkKind;
+use wasmtime::{Trap, WasmRet};
 
 pub(crate) trait HostToWasm {
-    fn into_wasm(self) -> u64;
+    type WasmTy: WasmRet;
+
+    fn into_wasm(self) -> Self::WasmTy;
 }
 
-pub(crate) trait WasmToHost<T> {
-    fn into_host(self) -> T;
+impl<T> HostToWasm for Result<T, Trap>
+where
+    T: HostToWasm,
+{
+    type WasmTy = Result<<T as HostToWasm>::WasmTy, Trap>;
+
+    fn into_wasm(self) -> Self::WasmTy {
+        self.map(|v| v.into_wasm())
+    }
+}
+
+impl HostToWasm for () {
+    type WasmTy = ();
+
+    fn into_wasm(self) {}
 }
 
 impl HostToWasm for bool {
+    type WasmTy = u64;
+
     fn into_wasm(self) -> u64 {
         if self {
             1
@@ -20,18 +38,16 @@ impl HostToWasm for bool {
 }
 
 impl HostToWasm for usize {
+    type WasmTy = u64;
+
     fn into_wasm(self) -> u64 {
         u64::try_from(self).expect("HostToWasm usize->u64 failure")
     }
 }
 
-impl WasmToHost<usize> for u64 {
-    fn into_host(self) -> usize {
-        usize::try_from(self).expect("WasmToHost u64->usize failure")
-    }
-}
-
 impl HostToWasm for LinkKind {
+    type WasmTy = u64;
+
     fn into_wasm(self) -> u64 {
         use LinkKind::*;
 
@@ -43,13 +59,9 @@ impl HostToWasm for LinkKind {
 }
 
 impl<T> HostToWasm for Handle<T> {
+    type WasmTy = u64;
+
     fn into_wasm(self) -> u64 {
         unsafe { self.peek() }
-    }
-}
-
-impl<T> WasmToHost<Handle<T>> for u64 {
-    fn into_host(self) -> Handle<T> {
-        unsafe { Handle::wrap(self) }
     }
 }
