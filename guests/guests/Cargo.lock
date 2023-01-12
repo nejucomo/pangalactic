@@ -154,6 +154,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "test_reverse_contents"
+version = "0.1.0"
+dependencies = [
+ "dagwasm-guest",
+]
+
+[[package]]
 name = "tokio"
 version = "1.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

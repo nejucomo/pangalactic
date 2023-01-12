@@ -4,6 +4,7 @@ pub type HandleLink = u64;
 pub type HandleByteReader = u64;
 pub type HandleByteWriter = u64;
 pub type HandleDirReader = u64;
+pub type HandleDirWriter = u64;
 pub type PtrRead = u64;
 pub type PtrWrite = u64;
 pub type ByteLen = u64;

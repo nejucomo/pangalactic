@@ -2,11 +2,12 @@
 members = [
   "get_plan",
   "identity",
-  "test_bindings_plan_is_dir",
   "test_bindings_input_is_hello_world",
+  "test_bindings_plan_is_dir",
   "test_input_is_hello_world",
   "test_output_is_hello_world",
   "test_plan_is_dir",
+  "test_reverse_contents",
 ]
 
 [workspace.package]
