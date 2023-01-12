@@ -2,7 +2,7 @@ use dagwasm_guest::prim::HandleLink;
 use dagwasm_guest::{log, Link};
 
 #[no_mangle]
-pub extern "C" fn derive(planprim: HandleLink) -> HandleLink {
+pub extern "C" fn prim_derive_impl(planprim: HandleLink) -> HandleLink {
     let plan = unsafe { Link::wrap_handle(planprim) };
 
     let input = plan.open_directory().select_entry("input");
