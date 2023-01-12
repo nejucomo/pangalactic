@@ -1,9 +1,8 @@
-use dagwasm_guest::{prim, Link, LinkKind};
+use dagwasm_guest::{define_derive, Link, LinkKind};
 
-#[no_mangle]
-pub extern "C" fn prim_derive_impl(primplan: prim::HandleLink) -> prim::HandleLink {
-    let plan = unsafe { Link::wrap_handle(primplan) };
+#[define_derive]
+fn derive_impl(plan: Link) -> Link {
     let kind = plan.kind();
     assert_eq!(kind, LinkKind::Dir);
-    unsafe { plan.unwrap_handle() }
+    plan
 }

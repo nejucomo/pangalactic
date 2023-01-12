@@ -11,14 +11,16 @@ pub fn define_derive(attrs: PmTokenStream, body: PmTokenStream) -> PmTokenStream
 }
 
 fn define_derive_inner(_attrs: TokenStream, body: TokenStream) -> syn::Result<TokenStream> {
+    const DERIVE_IMPL: &str = "derive_impl";
+
     let guestfn: syn::ItemFn = syn::parse2(body)?;
     let gfspan = guestfn.span();
 
     let name = guestfn.sig.ident.to_string();
-    if &name != "derive_impl" {
+    if name != DERIVE_IMPL {
         return Err(syn::Error::new(
             gfspan,
-            format!(r#"Guest entrypoints must be named "derive", not {name:?}."#),
+            format!("Guest entrypoints must be named {DERIVE_IMPL:?}, not {name:?}."),
         ));
     }
 

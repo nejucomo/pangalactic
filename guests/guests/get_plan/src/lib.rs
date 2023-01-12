@@ -1,6 +1,6 @@
-use dagwasm_guest::prim::HandleLink;
+use dagwasm_guest::{define_derive, Link};
 
-#[no_mangle]
-pub extern "C" fn prim_derive_impl(plan: HandleLink) -> HandleLink {
+#[define_derive]
+fn derive_impl(plan: Link) -> Link {
     plan
 }
