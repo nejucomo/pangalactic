@@ -1,6 +1,7 @@
 mod byte_reader;
 mod byte_writer;
 mod directory_reader;
+mod directory_writer;
 mod link;
 
 use crate::State;
@@ -48,6 +49,10 @@ where
 
         ( $modname:ident, $methodname:ident, $a0:ident, $a1:ident, $a2:ident ) => {
             link_host_fn!(method func_wrap3_async, $modname, $methodname, $a0, $a1, $a2)
+        };
+
+        ( $modname:ident, $methodname:ident, $a0:ident, $a1:ident, $a2:ident, $a3:ident ) => {
+            link_host_fn!(method func_wrap4_async, $modname, $methodname, $a0, $a1, $a2, $a3)
         }
     }
 
@@ -85,6 +90,18 @@ where
     link_host_fn!(byte_writer, open)?;
     link_host_fn!(byte_writer, write, byte_writer, ptr, len)?;
     link_host_fn!(byte_writer, commit, byte_writer)?;
+
+    // ByteWriter methods:
+    link_host_fn!(directory_writer, open)?;
+    link_host_fn!(
+        directory_writer,
+        insert,
+        directory_writer,
+        nameptr,
+        namelen,
+        link
+    )?;
+    link_host_fn!(directory_writer, commit, directory_writer)?;
 
     Ok(linker)
 }
