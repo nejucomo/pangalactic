@@ -4,16 +4,13 @@ use dagwasm_dir::Directory;
 use dagwasm_store::Store;
 
 #[derive(Debug)]
-pub struct Attestation<S>
-where
-    S: Store,
-{
-    pub plan: LinkFor<S>,
-    pub output: LinkFor<S>,
+pub struct Attestation<L> {
+    pub plan: L,
+    pub output: L,
 }
 
 #[async_trait]
-impl<S> FromDag<S> for Attestation<S>
+impl<S> FromDag<S> for Attestation<LinkFor<S>>
 where
     S: Store,
 {
@@ -27,7 +24,7 @@ where
 }
 
 #[async_trait]
-impl<S> ToDag<S> for Attestation<S>
+impl<S> ToDag<S> for Attestation<LinkFor<S>>
 where
     S: Store,
 {
