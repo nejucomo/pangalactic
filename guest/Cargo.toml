@@ -13,3 +13,7 @@ version = "^0.1.0"
 [dependencies.dagwasm-primitives]
 path = "../primitives"
 version = "^0.1.0"
+
+[dependencies.dagwasm-guest-procmacro]
+path = "../guest-procmacro"
+version = "^0.1.0"
