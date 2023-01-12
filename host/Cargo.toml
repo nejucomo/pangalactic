@@ -24,6 +24,9 @@ version = "^0.1.0"
 [dependencies.dagwasm-schemata]
 path = "../schemata"
 version = "^0.1.0"
+features = [
+  "dagio",
+]
 
 [dependencies.dagwasm-dir]
 path = "../dir"
