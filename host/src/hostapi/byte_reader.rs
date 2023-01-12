@@ -12,6 +12,7 @@ pub(super) async fn read<S>(
 where
     S: Store,
 {
+    use crate::CallerIO;
     use tokio::io::AsyncReadExt;
 
     let reader = caller.data_mut().byte_readers_mut().lookup_mut(h_br)?;
@@ -30,8 +31,9 @@ where
         readlen += c;
     }
     assert!(readlen <= len);
-    let mem = super::get_memory(&mut caller)?;
-    mem.data_mut(&mut caller)[ptr..ptr + readlen].copy_from_slice(&buf[..readlen]);
+
+    caller.write_into_guest(ptr, &buf[..])?;
+
     Ok(readlen)
 }
 

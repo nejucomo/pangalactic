@@ -1,4 +1,5 @@
 mod bytereader;
+mod callerio;
 mod derive;
 mod derivefunc;
 mod directoryreader;
@@ -10,6 +11,7 @@ mod state;
 mod wasmtohost;
 
 pub(crate) use self::bytereader::ByteReader;
+pub(crate) use self::callerio::CallerIO;
 pub use self::derive::derive;
 pub(crate) use self::derivefunc::DeriveFunc;
 pub(crate) use self::directoryreader::DirectoryReader;

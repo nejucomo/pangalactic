@@ -6,7 +6,7 @@ mod link;
 
 use crate::State;
 use dagwasm_store::Store;
-use wasmtime::{Caller, Engine, Linker, Memory, Trap};
+use wasmtime::{Caller, Engine, Linker, Trap};
 
 pub(crate) fn instantiate_linker<S>(engine: &Engine) -> anyhow::Result<Linker<State<S>>>
 where
@@ -110,25 +110,8 @@ async fn log<S>(mut caller: Caller<'_, State<S>>, ptr: usize, len: usize) -> Res
 where
     S: Store,
 {
-    let mem = get_memory(&mut caller)?;
-    crate::guest_log::bytes(&mem.data(&caller)[ptr..ptr + len]);
+    use crate::CallerIO;
+
+    caller.peek_into_guest(ptr, len, crate::guest_log::bytes)?;
     Ok(())
-}
-
-fn get_memory<S>(caller: &mut Caller<'_, State<S>>) -> anyhow::Result<Memory>
-where
-    S: Store,
-{
-    use wasmtime::Extern::*;
-
-    let export = caller
-        .get_export("memory")
-        .ok_or_else(|| anyhow::Error::msg("no 'memory' export found"))?;
-
-    match export {
-        Memory(m) => Ok(m),
-        _ => Err(anyhow::Error::msg(
-            "the 'memory' export is not a wasmtime::Memory",
-        )),
-    }
 }

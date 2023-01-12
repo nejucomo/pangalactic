@@ -27,13 +27,9 @@ pub(super) async fn insert<S>(
 where
     S: Store,
 {
-    let namebytes = {
-        let mut buf = vec![0; namelen]; // FIXME: don't allocate on guest-provided `len`.
-        let mem = super::get_memory(&mut caller)?;
-        buf.copy_from_slice(&mem.data(&caller)[nameptr..nameptr + namelen]);
-        buf
-    };
+    use crate::CallerIO;
 
+    let namebytes = caller.guest_bytes_to_vec(nameptr, namelen)?;
     let name = String::from_utf8(namebytes).map_err(|e| anyhow::Error::msg(e.to_string()))?;
     let link = caller.data().links().lookup(link)?.clone();
     let dir = caller
