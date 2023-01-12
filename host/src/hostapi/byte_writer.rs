@@ -24,15 +24,10 @@ pub(super) async fn write<S>(
 where
     S: Store,
 {
+    use crate::CallerIO;
     use tokio::io::AsyncWriteExt;
 
-    let intermediate = {
-        let mut buf = vec![0; len]; // FIXME: don't allocate on guest-provided `len`.
-        let mem = super::get_memory(&mut caller)?;
-        buf.copy_from_slice(&mem.data(&caller)[ptr..ptr + len]);
-        buf
-    };
-
+    let intermediate = caller.guest_bytes_to_vec(ptr, len)?;
     let writer = caller.data_mut().byte_writers_mut().lookup_mut(h_bw)?;
     let mut buf = &intermediate[..];
 
