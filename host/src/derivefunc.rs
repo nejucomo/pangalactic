@@ -26,8 +26,10 @@ where
     ) -> anyhow::Result<Self> {
         let mut store = wasmtime::Store::new(engine, state);
         let instance = linker.instantiate_async(&mut store, execmod).await?;
-        let tfunc = instance
-            .get_typed_func::<(RawLinkHandle,), (RawLinkHandle,), _>(&mut store, "derive")?;
+        let tfunc = instance.get_typed_func::<(RawLinkHandle,), (RawLinkHandle,), _>(
+            &mut store,
+            "prim_derive_impl",
+        )?;
 
         Ok(DeriveFunc { store, tfunc })
     }

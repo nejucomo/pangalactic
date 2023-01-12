@@ -8,7 +8,7 @@ use dagwasm_guest::prim::{ByteLen, HandleLink, PtrRead, LINK_KIND_DIR, LINK_KIND
 const LEN: usize = 16;
 
 #[no_mangle]
-pub extern "C" fn derive(link_plan: HandleLink) -> HandleLink {
+pub extern "C" fn prim_derive_impl(link_plan: HandleLink) -> HandleLink {
     let link_input = get_input_link(link_plan);
 
     let byte_reader = unsafe { link_open_file_reader(link_input) };

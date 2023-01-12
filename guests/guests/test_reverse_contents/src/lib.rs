@@ -1,12 +1,9 @@
-use dagwasm_guest::prim::HandleLink;
-use dagwasm_guest::Link;
+use dagwasm_guest::{define_derive, Link};
 
-#[no_mangle]
-pub extern "C" fn derive(primplan: HandleLink) -> HandleLink {
-    let plan = unsafe { Link::wrap_handle(primplan) };
+#[define_derive]
+fn derive_impl(plan: Link) -> Link {
     let input = plan.open_directory().select_entry("input");
-    let output = reverse_contents(input);
-    unsafe { output.unwrap_handle() }
+    reverse_contents(input)
 }
 
 fn reverse_contents(link: Link) -> Link {

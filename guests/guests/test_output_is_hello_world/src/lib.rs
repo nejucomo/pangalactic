@@ -1,8 +1,7 @@
-use dagwasm_guest::prim::HandleLink;
 use dagwasm_guest::write_bytes;
+use dagwasm_guest::{define_derive, Link};
 
-#[no_mangle]
-pub extern "C" fn derive(_: HandleLink) -> HandleLink {
-    let link = write_bytes(b"Hello World!");
-    unsafe { link.unwrap_handle() }
+#[define_derive]
+fn derive_impl(_: Link) -> Link {
+    write_bytes(b"Hello World!")
 }
