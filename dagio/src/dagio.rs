@@ -1,5 +1,5 @@
 use crate::{FromDag, LinkFor, ToDag};
-use dagwasm_dir::Link;
+use dagwasm_link::Link;
 use dagwasm_linkkind::LinkKind::File;
 use dagwasm_store::Store;
 

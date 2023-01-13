@@ -1,5 +1,5 @@
-use crate::Link;
 use async_trait::async_trait;
+use dagwasm_link::Link;
 use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::collections::BTreeMap;
 use std::marker::Unpin;

@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-dir"
+name = "dagwasm-link"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -11,10 +11,6 @@ anyhow.workspace = true
 async-trait.workspace = true
 derive_more.workspace = true
 tokio.workspace = true
-
-[dependencies.dagwasm-link]
-path = "../link"
-version = "^0.1.0"
 
 [dependencies.dagwasm-linkkind]
 path = "../linkkind"

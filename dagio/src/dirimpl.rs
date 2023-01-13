@@ -10,7 +10,7 @@ where
     S: Store,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        use dagwasm_dir::Link;
+        use dagwasm_link::Link;
         use dagwasm_linkkind::LinkKind::Dir;
         use dagwasm_serialization::AsyncSerialize;
 
@@ -43,7 +43,7 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        use dagwasm_dir::Link;
+        use dagwasm_link::Link;
         use dagwasm_linkkind::LinkKind::{Dir, File};
         use dagwasm_serialization::AsyncDeserialize;
 
