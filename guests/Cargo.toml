@@ -30,6 +30,9 @@ version = "^0.1.0"
 [dev-dependencies.dagwasm-dir]
 path = "../dir"
 version = "^0.1.0"
+features = [
+  "host",
+]
 
 [dev-dependencies.dagwasm-host]
 path = "../host"

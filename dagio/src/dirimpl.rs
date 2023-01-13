@@ -1,11 +1,10 @@
-use crate::{Dagio, LinkFor};
-use crate::{FromDag, ToDag};
+use crate::{Dagio, DirectoryFor, FromDag, LinkFor, ToDag};
 use async_trait::async_trait;
 use dagwasm_dir::Directory;
 use dagwasm_store::Store;
 
 #[async_trait]
-impl<S> ToDag<S> for Directory<<S as Store>::CID>
+impl<S> ToDag<S> for DirectoryFor<S>
 where
     S: Store,
 {
@@ -38,7 +37,7 @@ where
 }
 
 #[async_trait]
-impl<S> FromDag<S> for Directory<<S as Store>::CID>
+impl<S> FromDag<S> for DirectoryFor<S>
 where
     S: Store,
 {

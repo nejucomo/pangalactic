@@ -15,6 +15,9 @@ tokio.workspace = true
 [dependencies.dagwasm-dir]
 path = "../dir"
 version = "^0.1.0"
+features = [
+  "host",
+]
 
 [dependencies.dagwasm-link]
 path = "../link"

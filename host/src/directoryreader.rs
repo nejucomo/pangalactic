@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use dagwasm_dagio::{Dagio, FromDag, LinkFor};
-use dagwasm_dir::{Directory, Name};
+use dagwasm_dagio::{Dagio, DirectoryFor, FromDag, LinkFor};
+use dagwasm_dir::Name;
 use dagwasm_store::Store;
 
 #[derive(Debug)]
@@ -8,7 +8,7 @@ pub(crate) struct DirectoryReader<S>
 where
     S: Store,
 {
-    iter: <Directory<<S as Store>::CID> as IntoIterator>::IntoIter,
+    iter: <DirectoryFor<S> as IntoIterator>::IntoIter,
     name: Option<Name>,
     link: Option<LinkFor<S>>,
 }
@@ -50,7 +50,7 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let dir: Directory<<S as Store>::CID> = dagio.read(link).await?;
+        let dir: DirectoryFor<S> = dagio.read(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

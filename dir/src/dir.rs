@@ -1,32 +1,22 @@
-use async_trait::async_trait;
-use dagwasm_link::Link;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use crate::{Name, NameRef};
 use std::collections::BTreeMap;
-use std::marker::Unpin;
-use tokio::io::{AsyncRead, AsyncWrite};
-
-const SERIALIZATION_VERSION: u64 = 0;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Directory<K>(BTreeMap<Name, Link<K>>);
+pub struct Directory<L>(pub(crate) BTreeMap<Name, L>);
 
-// TODO: newtype String which excludes illegal names:
-pub type Name = String;
-pub type NameRef = str;
-
-impl<K> Default for Directory<K> {
+impl<L> Default for Directory<L> {
     fn default() -> Self {
         Directory(BTreeMap::default())
     }
 }
 
-impl<N, K> FromIterator<(N, Link<K>)> for Directory<K>
+impl<N, L> FromIterator<(N, L)> for Directory<L>
 where
     Name: From<N>,
 {
     fn from_iter<T>(iter: T) -> Self
     where
-        T: IntoIterator<Item = (N, Link<K>)>,
+        T: IntoIterator<Item = (N, L)>,
     {
         Directory(BTreeMap::from_iter(
             iter.into_iter().map(|(n, link)| (Name::from(n), link)),
@@ -34,17 +24,17 @@ where
     }
 }
 
-impl<K> IntoIterator for Directory<K> {
-    type Item = (Name, Link<K>);
-    type IntoIter = <BTreeMap<Name, Link<K>> as IntoIterator>::IntoIter;
+impl<L> IntoIterator for Directory<L> {
+    type Item = (Name, L);
+    type IntoIter = <BTreeMap<Name, L> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
     }
 }
 
-impl<K> Directory<K> {
-    pub fn insert(&mut self, name: Name, link: Link<K>) -> anyhow::Result<()> {
+impl<L> Directory<L> {
+    pub fn insert(&mut self, name: Name, link: L) -> anyhow::Result<()> {
         let errname = name.clone();
         if self.0.insert(name, link).is_none() {
             Ok(())
@@ -55,15 +45,15 @@ impl<K> Directory<K> {
         }
     }
 
-    pub fn get(&self, name: &NameRef) -> Option<&Link<K>> {
+    pub fn get(&self, name: &NameRef) -> Option<&L> {
         self.0.get(name)
     }
 
-    pub fn remove(&mut self, name: &NameRef) -> Option<Link<K>> {
+    pub fn remove(&mut self, name: &NameRef) -> Option<L> {
         self.0.remove(name)
     }
 
-    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<Link<K>> {
+    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<L> {
         self.remove(name)
             .ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
     }
@@ -77,58 +67,5 @@ impl<K> Directory<K> {
                 self.0.into_keys().collect::<Vec<Name>>()
             )))
         }
-    }
-}
-
-#[async_trait]
-impl<K> AsyncSerialize for Directory<K>
-where
-    K: AsyncSerialize + Send + Sync,
-{
-    async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
-    where
-        W: AsyncWrite + Unpin + Send,
-    {
-        SERIALIZATION_VERSION.write_into(&mut w).await?;
-        self.0.len().write_into(&mut w).await?;
-
-        // We want to do this, but then links don't live long enough for async `write_into`:
-        // for (name, link) in self.0.iter() {
-
-        let entries: Vec<(&'_ String, &'_ Link<K>)> = self.0.iter().collect();
-        for (name, link) in entries {
-            name.write_into(&mut w).await?;
-            link.write_into(&mut w).await?;
-        }
-
-        Ok(())
-    }
-}
-
-#[async_trait]
-impl<K> AsyncDeserialize for Directory<K>
-where
-    K: AsyncDeserialize + Send + Sync,
-{
-    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
-    where
-        R: AsyncRead + Unpin + Send,
-    {
-        let version = u64::read_from(&mut r).await?;
-        if version != SERIALIZATION_VERSION {
-            return Err(anyhow::Error::msg(format!(
-                "expected serialization version {SERIALIZATION_VERSION}, found {version}"
-            )));
-        }
-
-        let mut d = Directory::default();
-        let entrycount = usize::read_from(&mut r).await?;
-        for _ in 0..entrycount {
-            let name = Name::read_from(&mut r).await?;
-            let link = Link::<K>::read_from(&mut r).await?;
-            d.insert(name, link)?;
-        }
-
-        Ok(d)
     }
 }

@@ -9,7 +9,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, PartialEq, Eq)]
 struct FakeCID;
-type FLDirectory = Directory<FakeCID>;
+type FLDirectory = Directory<Link<FakeCID>>;
 
 #[async_trait]
 impl AsyncSerialize for FakeCID {
