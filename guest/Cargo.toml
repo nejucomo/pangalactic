@@ -6,6 +6,10 @@ license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[dependencies.dagwasm-dir]
+path = "../dir"
+version = "^0.1.0"
+
 [dependencies.dagwasm-linkkind]
 path = "../linkkind"
 version = "^0.1.0"
