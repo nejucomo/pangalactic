@@ -28,7 +28,7 @@ fn define_derive_inner(_attrs: TokenStream, body: TokenStream) -> syn::Result<To
         #[no_mangle]
         pub extern "C" fn prim_derive_impl(primplan: ::dagwasm_guest::prim::HandleLink) -> ::dagwasm_guest::prim::HandleLink {
             let plan = unsafe { ::dagwasm_guest::Link::wrap_handle(primplan) };
-            let output = derive_impl(plan);
+            let output = Link::from(derive_impl(plan.into()));
             unsafe { output.unwrap_handle() }
         }
 

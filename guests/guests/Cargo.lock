@@ -76,6 +76,10 @@ version = "0.1.0"
 [[package]]
 name = "dagwasm-schemata"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "dagwasm-dir",
+]
 
 [[package]]
 name = "dagwasm-serialization"

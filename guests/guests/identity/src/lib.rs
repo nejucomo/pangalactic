@@ -1,6 +1,6 @@
-use dagwasm_guest::{define_derive, Link};
+use dagwasm_guest::{define_derive, Link, Plan};
 
 #[define_derive]
-fn derive_impl(plan: Link) -> Link {
-    plan.open_directory().select_entry("input")
+fn derive_impl(plan: Plan) -> Link {
+    plan.input
 }

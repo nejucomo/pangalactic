@@ -8,15 +8,6 @@ impl DirectoryReader {
         DirectoryReader(handle)
     }
 
-    pub fn select_entry(self, name: &str) -> Link {
-        for (entryname, link) in self {
-            if entryname == name {
-                return link;
-            }
-        }
-        fail!("failed to find entry {name:?}")
-    }
-
     fn next_inner(&self) -> Option<(String, Link)> {
         if unsafe { bindings::directory_reader_has_more_entries(self.0) } == prim::TRUE {
             let namereader = ByteReader::wrap_handle(
