@@ -32,12 +32,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfb24e866b15a1af2a1b663f10c6b6b8f397a84aadb828f12e5b289ec23a3a3c"
 
 [[package]]
+name = "dagwasm-dir"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
 name = "dagwasm-guest"
 version = "0.1.0"
 dependencies = [
+ "dagwasm-dir",
  "dagwasm-guest-procmacro",
  "dagwasm-linkkind",
  "dagwasm-primitives",
+ "dagwasm-schemata",
 ]
 
 [[package]]
@@ -62,6 +71,10 @@ dependencies = [
 
 [[package]]
 name = "dagwasm-primitives"
+version = "0.1.0"
+
+[[package]]
+name = "dagwasm-schemata"
 version = "0.1.0"
 
 [[package]]
