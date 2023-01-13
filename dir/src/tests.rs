@@ -1,5 +1,6 @@
-use crate::{Directory, Link};
+use crate::Directory;
 use async_trait::async_trait;
+use dagwasm_link::Link;
 use dagwasm_linkkind::LinkKind;
 use dagwasm_serialization::testutil::check_serialize_then_deserialize_equality;
 use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
@@ -8,7 +9,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, PartialEq, Eq)]
 struct FakeCID;
-type FLDirectory = Directory<FakeCID>;
+type FLDirectory = Directory<Link<FakeCID>>;
 
 #[async_trait]
 impl AsyncSerialize for FakeCID {

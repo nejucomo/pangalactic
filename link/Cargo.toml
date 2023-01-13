@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-dagio"
+name = "dagwasm-link"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,19 +9,7 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-derive_more.workspace = true
 tokio.workspace = true
-
-[dependencies.dagwasm-dir]
-path = "../dir"
-version = "^0.1.0"
-features = [
-  "host",
-]
-
-[dependencies.dagwasm-link]
-path = "../link"
-version = "^0.1.0"
 
 [dependencies.dagwasm-linkkind]
 path = "../linkkind"
@@ -31,10 +19,5 @@ version = "^0.1.0"
 path = "../serialization"
 version = "^0.1.0"
 
-[dependencies.dagwasm-store]
-path = "../store"
-version = "^0.1.0"
-
-[dev-dependencies.dagwasm-memstore]
-path = "../memstore"
-version = "^0.1.0"
+[dev-dependencies]
+test-case.workspace = true

@@ -137,7 +137,7 @@ where
 
 async fn verify_guests<F, Fut>(guests: &[&str], content: Content, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<MemStore>, Attestation<MemStore>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     dagwasm_log::test_init();
@@ -154,7 +154,7 @@ async fn verify_guests_inner<F, Fut>(
     verify: F,
 ) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<MemStore>, Attestation<MemStore>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     for guest in guests {
@@ -165,7 +165,7 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, content: Content, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<MemStore>, Attestation<MemStore>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     let mut dagio = Dagio::from(MemStore::default());
@@ -183,11 +183,11 @@ where
     // Execute derive:
     let (mut dagio, attestation) = dagwasm_host::derive(dagio, &plan).await?;
 
-    let att: Attestation<MemStore> = dagio.read(&attestation).await?;
-    let der: Plan<MemStore> = dagio.read(&att.plan).await?;
+    let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
+    let plan: Plan<LinkFor<MemStore>> = dagio.read(&att.plan).await?;
 
     // Verify
-    verify(dagio, der, att).await?;
+    verify(dagio, plan, att).await?;
 
     Ok(())
 }

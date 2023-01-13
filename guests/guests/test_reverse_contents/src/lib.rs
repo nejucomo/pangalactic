@@ -1,9 +1,8 @@
-use dagwasm_guest::{define_derive, Link};
+use dagwasm_guest::{define_derive, Link, Plan};
 
 #[define_derive]
-fn derive_impl(plan: Link) -> Link {
-    let input = plan.open_directory().select_entry("input");
-    reverse_contents(input)
+fn derive_impl(plan: Plan) -> Link {
+    reverse_contents(plan.input)
 }
 
 fn reverse_contents(link: Link) -> Link {

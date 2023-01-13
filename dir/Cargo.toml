@@ -6,19 +6,38 @@ license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+host = [
+  "async-trait",
+  "dagwasm-link",
+  "dagwasm-serialization",
+  "tokio",
+]
+
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
-derive_more.workspace = true
-tokio.workspace = true
 
-[dependencies.dagwasm-linkkind]
-path = "../linkkind"
+[dependencies.async-trait]
+workspace = true
+optional = true
+
+[dependencies.tokio]
+workspace = true
+optional = true
+
+[dependencies.dagwasm-link]
+path = "../link"
 version = "^0.1.0"
+optional = true
 
 [dependencies.dagwasm-serialization]
 path = "../serialization"
 version = "^0.1.0"
+optional = true
 
 [dev-dependencies]
 test-case.workspace = true
+
+[dev-dependencies.dagwasm-linkkind]
+path = "../linkkind"
+version = "^0.1.0"

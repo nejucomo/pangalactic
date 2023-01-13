@@ -1,39 +1,27 @@
-use async_trait::async_trait;
-use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use dagwasm_dir::Directory;
-use dagwasm_store::Store;
 
 #[derive(Debug)]
-pub struct Plan<S>
-where
-    S: Store,
-{
-    pub exec: LinkFor<S>,
-    pub input: LinkFor<S>,
+pub struct Plan<L> {
+    pub exec: L,
+    pub input: L,
 }
 
-#[async_trait]
-impl<S> FromDag<S> for Plan<S>
-where
-    S: Store,
-{
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let mut dir = Directory::from_dag(dagio, link).await?;
+impl<L> From<Plan<L>> for Directory<L> {
+    fn from(plan: Plan<L>) -> Self {
+        let mut d = Directory::default();
+        d.insert("exec".to_string(), plan.exec).unwrap();
+        d.insert("input".to_string(), plan.input).unwrap();
+        d
+    }
+}
+
+impl<L> TryFrom<Directory<L>> for Plan<L> {
+    type Error = anyhow::Error;
+
+    fn try_from(mut dir: Directory<L>) -> anyhow::Result<Self> {
         let exec = dir.remove_required("exec")?;
         let input = dir.remove_required("input")?;
         dir.require_empty()?;
         Ok(Plan { exec, input })
-    }
-}
-
-#[async_trait]
-impl<S> ToDag<S> for Plan<S>
-where
-    S: Store,
-{
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        dagio
-            .commit([("exec", self.exec), ("input", self.input)])
-            .await
     }
 }
