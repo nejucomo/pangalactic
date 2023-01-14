@@ -119,6 +119,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gunzip"
+version = "0.1.0"
+dependencies = [
+ "dagwasm-guest",
+ "libflate",
+]
+
+[[package]]
 name = "gzip"
 version = "0.1.0"
 dependencies = [
