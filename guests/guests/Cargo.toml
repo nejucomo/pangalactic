@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "get_plan",
+  "gzip",
   "identity",
   "test_bindings_input_is_hello_world",
   "test_bindings_plan_is_dir",
