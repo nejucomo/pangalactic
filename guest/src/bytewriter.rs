@@ -25,3 +25,14 @@ impl ByteWriter {
         unsafe { Link::wrap_handle(bindings::byte_writer_commit(self.0)) }
     }
 }
+
+impl std::io::Write for ByteWriter {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        ByteWriter::write(self, buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}

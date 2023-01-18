@@ -65,3 +65,9 @@ impl std::fmt::Debug for ByteReader {
         )
     }
 }
+
+impl std::io::Read for ByteReader {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        Ok(ByteReader::read(self, buf))
+    }
+}
