@@ -11,6 +11,7 @@ members = [
   "test_output_is_hello_world",
   "test_plan_is_dir",
   "test_reverse_contents",
+  "untar",
 ]
 
 [workspace.package]

@@ -6,6 +6,15 @@ pub fn write_bytes(bytes: &[u8]) -> Link {
     w.commit()
 }
 
+pub fn write_readable<R>(mut r: R) -> Link
+where
+    R: std::io::Read,
+{
+    let mut w = ByteWriter::open();
+    std::io::copy(&mut r, &mut w).unwrap();
+    w.commit()
+}
+
 #[derive(Debug)]
 pub struct ByteWriter(prim::HandleByteWriter);
 
