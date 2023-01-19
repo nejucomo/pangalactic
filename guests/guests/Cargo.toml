@@ -18,3 +18,7 @@ edition = "2021"
 license = "MIT"
 
 [workspace.dependencies]
+libflate = "1.2.0"
+
+[workspace.dependencies.dagwasm-guest]
+path = "../../guest"
