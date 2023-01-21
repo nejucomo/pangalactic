@@ -11,6 +11,26 @@ async fn gzip_gunzip() -> anyhow::Result<()> {
     run_round_trip("gzip", "gunzip", b"Hello World!").await
 }
 
+#[tokio::test]
+async fn tar_untar() -> anyhow::Result<()> {
+    dagwasm_log::test_init();
+    run_round_trip(
+        "create_tar",
+        "untar",
+        [
+            ("alpha", MemTree::from(b"alpha file")),
+            (
+                "beta",
+                MemTree::from([
+                    ("fruit", MemTree::from(b"banana")),
+                    ("creature", MemTree::from(b"barnacle")),
+                ]),
+            ),
+        ],
+    )
+    .await
+}
+
 async fn run_round_trip<M>(exec_in: &str, exec_out: &str, input: M) -> anyhow::Result<()>
 where
     MemTree: From<M>,

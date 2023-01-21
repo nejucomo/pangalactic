@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "create-tar",
+  "create_tar",
   "get_plan",
   "gunzip",
   "gzip",
