@@ -1,5 +1,4 @@
 use dagwasm_dagio::{Dagio, LinkFor};
-use dagwasm_dir::Directory;
 use dagwasm_memstore::MemStore;
 use dagwasm_schemata::{Attestation, Plan};
 use std::future::Future;
@@ -81,25 +80,22 @@ async fn reverse_contents() -> anyhow::Result<()> {
             ),
         ],
         |mut dagio, _, attestation| async move {
-            let mut top: Directory<_> = dagio.read(&attestation.output).await?;
+            let output: MemTree = dagio.read(&attestation.output).await?;
 
-            let ahpla_link = top.remove_required("ahpla")?;
-            let ahpla_contents = dagio.read_file(&ahpla_link).await?;
-            assert_eq!(&ahpla_contents, b"elif ahpla");
+            assert_eq!(
+                output,
+                MemTree::from([
+                    ("ahpla", MemTree::from(b"elif ahpla")),
+                    (
+                        "ateb",
+                        MemTree::from([
+                            ("tiurf", MemTree::from(b"ananab")),
+                            ("erutaerc", MemTree::from(b"elcanrab")),
+                        ])
+                    ),
+                ])
+            );
 
-            let ateb_link = top.remove_required("ateb")?;
-
-            let mut ateb: Directory<_> = dagio.read(&ateb_link).await?;
-            let tiurf_link = ateb.remove_required("tiurf")?;
-            let tiurf_contents = dagio.read_file(&tiurf_link).await?;
-            assert_eq!(&tiurf_contents, b"ananab");
-
-            let erutaerc_link = ateb.remove_required("erutaerc")?;
-            let erutaerc_contents = dagio.read_file(&erutaerc_link).await?;
-            assert_eq!(&erutaerc_contents, b"elcanrab");
-
-            ateb.require_empty()?;
-            top.require_empty()?;
             Ok(())
         },
     )
