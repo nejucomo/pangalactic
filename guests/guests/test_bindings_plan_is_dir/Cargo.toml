@@ -9,5 +9,5 @@ license.workspace = true
 [lib]
 crate-type = ["cdylib"]
 
-[dependencies.dagwasm-guest]
-path = "../../../guest"
+[dependencies]
+dagwasm-guest.workspace = true

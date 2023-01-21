@@ -10,7 +10,5 @@ license.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-libflate = "1.2.0"
-
-[dependencies.dagwasm-guest]
-path = "../../../guest"
+dagwasm-guest.workspace = true
+libflate.workspace = true

@@ -12,7 +12,7 @@ mod reader;
 mod schemata;
 
 pub use self::bytereader::ByteReader;
-pub use self::bytewriter::{write_bytes, ByteWriter};
+pub use self::bytewriter::{write_bytes, write_readable, ByteWriter};
 pub use self::directoryreader::DirectoryReader;
 pub use self::directorywriter::DirectoryWriter;
 pub use self::link::Link;

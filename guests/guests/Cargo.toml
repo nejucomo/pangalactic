@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "create_tar",
   "get_plan",
   "gunzip",
   "gzip",
@@ -10,6 +11,7 @@ members = [
   "test_output_is_hello_world",
   "test_plan_is_dir",
   "test_reverse_contents",
+  "untar",
 ]
 
 [workspace.package]
@@ -18,3 +20,8 @@ edition = "2021"
 license = "MIT"
 
 [workspace.dependencies]
+libflate = "1.2.0"
+tar = "0.4.38"
+
+[workspace.dependencies.dagwasm-guest]
+path = "../../guest"
