@@ -11,7 +11,7 @@ use self::memtree::MemTree;
 async fn plan_is_dir() -> anyhow::Result<()> {
     verify_guests(
         &["test_plan_is_dir", "test_bindings_plan_is_dir"],
-        MemTree::File(b""),
+        b"",
         |_, _, _| async { Ok(()) },
     )
     .await
@@ -21,7 +21,7 @@ async fn plan_is_dir() -> anyhow::Result<()> {
 async fn get_plan_outputs_plan() -> anyhow::Result<()> {
     verify_guests(
         &["get_plan"],
-        MemTree::File(b""),
+        b"",
         |_dagio, _plan, attestation| async move {
             assert_eq!(attestation.plan, attestation.output);
             Ok(())
@@ -32,14 +32,10 @@ async fn get_plan_outputs_plan() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn identity() -> anyhow::Result<()> {
-    verify_guests(
-        &["identity"],
-        MemTree::File(b""),
-        |_dagio, plan, attestation| async move {
-            assert_eq!(plan.input, attestation.output);
-            Ok(())
-        },
-    )
+    verify_guests(&["identity"], b"", |_dagio, plan, attestation| async move {
+        assert_eq!(plan.input, attestation.output);
+        Ok(())
+    })
     .await
 }
 
@@ -50,7 +46,7 @@ async fn input_is_hello_world() -> anyhow::Result<()> {
             "test_input_is_hello_world",
             "test_bindings_input_is_hello_world",
         ],
-        MemTree::File(b"Hello World!"),
+        b"Hello World!",
         |_, _, _| async { Ok(()) },
     )
     .await
@@ -60,7 +56,7 @@ async fn input_is_hello_world() -> anyhow::Result<()> {
 async fn output_is_hello_world() -> anyhow::Result<()> {
     verify_guests(
         &["test_output_is_hello_world"],
-        MemTree::File(b""),
+        b"",
         |mut dagio, _, attestation| async move {
             let output = dagio.read_file(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
@@ -74,16 +70,16 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
 async fn reverse_contents() -> anyhow::Result<()> {
     verify_guests(
         &["test_reverse_contents"],
-        MemTree::Dir(&[
-            ("alpha", MemTree::File(b"alpha file")),
+        [
+            ("alpha", MemTree::from(b"alpha file")),
             (
                 "beta",
-                MemTree::Dir(&[
-                    ("fruit", MemTree::File(b"banana")),
-                    ("creature", MemTree::File(b"barnacle")),
+                MemTree::from([
+                    ("fruit", MemTree::from(b"banana")),
+                    ("creature", MemTree::from(b"barnacle")),
                 ]),
             ),
-        ]),
+        ],
         |mut dagio, _, attestation| async move {
             let mut top: Directory<_> = dagio.read(&attestation.output).await?;
 
@@ -109,13 +105,14 @@ async fn reverse_contents() -> anyhow::Result<()> {
     )
     .await
 }
-async fn verify_guests<F, Fut>(guests: &[&str], content: MemTree, verify: F) -> anyhow::Result<()>
+async fn verify_guests<M, F, Fut>(guests: &[&str], content: M, verify: F) -> anyhow::Result<()>
 where
+    MemTree: From<M>,
     F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     dagwasm_log::test_init();
-    let r = verify_guests_inner(guests, content, verify).await;
+    let r = verify_guests_inner(guests, MemTree::from(content), verify).await;
     if let Some(e) = r.as_ref().err() {
         eprintln!("{e:#}");
     }
