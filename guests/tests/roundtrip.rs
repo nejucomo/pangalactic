@@ -2,20 +2,28 @@ use dagwasm_dagio::{Dagio, LinkFor};
 use dagwasm_memstore::MemStore;
 use dagwasm_schemata::{Attestation, Plan};
 
+mod memtree;
+use self::memtree::MemTree;
+
 #[tokio::test]
-async fn gzip_gunzip_round_trip() -> anyhow::Result<()> {
-    const INPUT: &[u8] = b"Hello World!";
-
+async fn gzip_gunzip() -> anyhow::Result<()> {
     dagwasm_log::test_init();
+    run_round_trip("gzip", "gunzip", b"Hello World!").await
+}
 
-    let mut dagio = Dagio::from(MemStore::default());
+async fn run_round_trip<M>(exec_in: &str, exec_out: &str, input: M) -> anyhow::Result<()>
+where
+    MemTree: From<M>,
+{
+    let intree = MemTree::from(input);
+    let mut dagio: Dagio<MemStore> = Dagio::from(MemStore::default());
+    let expected = intree.clone();
+    let link_in = dagio.commit(intree).await?;
+    let (dagio, att_in) = run_phase(dagio, exec_in, link_in).await?;
+    let (mut dagio, att_out) = run_phase(dagio, exec_out, att_in.output).await?;
+    let output: MemTree = dagio.read(&att_out.output).await?;
 
-    let input = dagio.write_file(INPUT).await?;
-    let (dagio, att_gzip) = run_phase(dagio, "gzip", input).await?;
-    let (mut dagio, att_gunzip) = run_phase(dagio, "gunzip", att_gzip.output).await?;
-    let outbytes = dagio.read_file(&att_gunzip.output).await?;
-
-    assert_eq!(outbytes, INPUT);
+    assert_eq!(output, expected);
     Ok(())
 }
 
