@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, ByteReader, ByteWriter, Link, Plan};
+use dagwasm_guest::{define_derive, log, unwrap, ByteReader, ByteWriter, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {
@@ -7,7 +7,7 @@ fn derive_impl(plan: Plan) -> Link {
 
     append_link(&mut builder, plan.input, "");
 
-    builder.into_inner().unwrap().commit()
+    unwrap!(Result builder.into_inner()).commit()
 }
 
 fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
@@ -17,7 +17,15 @@ fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
         File(r) => append_file(builder, r, path),
         Dir(d) => {
             for (name, link) in d {
-                append_link(builder, link, &format!("{}/{}", path, name));
+                append_link(
+                    builder,
+                    link,
+                    &(if path.is_empty() {
+                        name
+                    } else {
+                        format!("{}/{}", path, name)
+                    }),
+                );
             }
         }
     }
@@ -25,14 +33,16 @@ fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
 
 fn append_file(builder: &mut tar::Builder<ByteWriter>, file: ByteReader, path: &str) {
     let contents = file.read_to_vec();
+    unwrap!(Result
     builder
         .append(&make_header(&path, contents.len()), contents.as_slice())
-        .unwrap();
+    );
 }
 
 fn make_header(path: &str, length: usize) -> tar::Header {
     let mut header = tar::Header::new_gnu();
-    header.set_path(&path).unwrap();
+    log!("make_header({path:?})");
+    unwrap!(Result header.set_path(&path));
     header.set_size(u64::try_from(length).expect("usize->u64 conversion failure"));
     header.set_cksum();
     header

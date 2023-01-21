@@ -22,6 +22,27 @@ macro_rules! fail {
     }}
 }
 
+#[macro_export]
+macro_rules! unwrap {
+    ( Option $x:expr) => {
+        match $x {
+            Some(v) => v,
+            None => {
+                $crate::fail!("failed to unwrap {:?}", stringify!($x));
+            }
+        }
+    };
+
+    ( Result $x:expr) => {
+        match $x {
+            Ok(v) => v,
+            Err(error) => {
+                $crate::fail!("failed to unwrap {:?}: {error:?}", stringify!($x));
+            }
+        }
+    };
+}
+
 macro_rules! trace {
     ( $msg:expr ) => {
         $crate::log_str_inner(&std::fmt::format(format_args!($msg)));
