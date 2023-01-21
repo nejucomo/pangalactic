@@ -19,7 +19,6 @@ If Directories were implemented in guests, they may use different implementation
 
 - `derive` hostapi call.
   - introduce `sequence` std guest.
-- gzip & tar guests
 - attestation caching
 - planset concurrency support
 - ipfs store
