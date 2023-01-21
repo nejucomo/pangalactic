@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, fail, log, DirectoryWriter, Link, Plan};
+use dagwasm_guest::{define_derive, fail, log, unwrap, DirectoryWriter, Link, Plan};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -6,9 +6,9 @@ use std::path::Path;
 fn derive_impl(plan: Plan) -> Link {
     let mut dt = DirTree::new();
 
-    for entres in tar::Archive::new(plan.input.open_file()).entries().unwrap() {
-        let entry = entres.unwrap();
-        let path = entry.path().unwrap().into_owned();
+    for entres in unwrap!( Result tar::Archive::new(plan.input.open_file()).entries() ) {
+        let entry = unwrap!( Result entres );
+        let path = unwrap!( Result entry.path() ).into_owned();
         log!("unpacking entry path {:?}", &path);
 
         let link = dagwasm_guest::write_readable(entry);
@@ -48,7 +48,7 @@ impl DirTree {
     where
         I: Iterator<Item = &'a str>,
     {
-        let comp = path.next().unwrap();
+        let comp = unwrap!( Option path.next() );
         let slot = self.0.entry(comp.to_string()).or_insert(None);
         slot_insert(slot, path, link);
     }
@@ -58,7 +58,7 @@ impl DirTree {
         for (name, optdte) in self.0.into_iter() {
             use DTEntry::*;
 
-            match optdte.unwrap() {
+            match unwrap!( Option optdte ) {
                 File(link) => d.insert(&name, link),
                 Sub(sub) => d.insert(&name, sub.commit()),
             }

@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, Link, Plan};
+use dagwasm_guest::{define_derive, unwrap, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {
@@ -22,7 +22,7 @@ fn reverse_contents(link: Link) -> Link {
                 let mut bytes = name.into_bytes();
                 bytes.reverse();
                 // Note: Cannot handle non-ascii names:
-                let revname = String::from_utf8(bytes).unwrap();
+                let revname = unwrap!( Result String::from_utf8(bytes) );
                 let revchild = reverse_contents(child);
                 writer.insert(&revname, revchild);
             }
