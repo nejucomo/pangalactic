@@ -40,7 +40,7 @@ where
         &mut self,
         link: &LinkFor<S>,
     ) -> anyhow::Result<<S as Store>::Reader> {
-        let key = link.peek_key(File)?;
+        let key = link.peek_key_kind(File)?;
         self.0.open_reader(key).await
     }
 
@@ -53,7 +53,7 @@ where
     }
 
     pub async fn read_file(&mut self, link: &LinkFor<S>) -> anyhow::Result<Vec<u8>> {
-        let key = link.peek_key(File)?;
+        let key = link.peek_key_kind(File)?;
         self.0.read(key).await
     }
 

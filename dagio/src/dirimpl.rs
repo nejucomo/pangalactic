@@ -46,7 +46,7 @@ where
         use dagwasm_linkkind::LinkKind::{Dir, File};
         use dagwasm_serialization::AsyncDeserialize;
 
-        let key = link.peek_key(Dir)?;
+        let key = link.peek_key_kind(Dir)?;
         let r = dagio
             .open_file_reader(&Link::new(File, key.clone()))
             .await?;

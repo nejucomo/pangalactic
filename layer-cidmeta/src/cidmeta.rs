@@ -10,7 +10,7 @@ where
     S: Store,
 {
     pub(crate) cid: <S as Store>::CID,
-    pub(crate) size: u64,
+    pub(crate) node_size: u64,
 }
 
 impl<S> PartialEq for CidMeta<S>
@@ -18,7 +18,7 @@ where
     S: Store,
 {
     fn eq(&self, other: &Self) -> bool {
-        (self.cid == other.cid) && (self.size == other.size)
+        (self.cid == other.cid) && (self.node_size == other.node_size)
     }
 }
 
@@ -31,7 +31,7 @@ where
     fn clone(&self) -> Self {
         CidMeta {
             cid: self.cid.clone(),
-            size: self.size,
+            node_size: self.node_size,
         }
     }
 }
@@ -46,7 +46,7 @@ where
         W: AsyncWrite + Unpin + Send,
     {
         self.cid.write_into(&mut w).await?;
-        self.size.write_into(&mut w).await?;
+        self.node_size.write_into(&mut w).await?;
         Ok(())
     }
 }
@@ -61,7 +61,7 @@ where
         R: AsyncRead + Unpin + Send,
     {
         let cid = <S as Store>::CID::read_from(&mut r).await?;
-        let size = u64::read_from(&mut r).await?;
-        Ok(CidMeta { cid, size })
+        let node_size = u64::read_from(&mut r).await?;
+        Ok(CidMeta { cid, node_size })
     }
 }

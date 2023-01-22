@@ -30,7 +30,7 @@ where
         Writer { writer, written }: Self::Writer,
     ) -> anyhow::Result<Self::CID> {
         let cid = self.0.commit_writer(writer).await?;
-        let size = u64::try_from(written).expect("usize->u64 conversion failure");
-        Ok(CidMeta { cid, size })
+        let node_size = u64::try_from(written).expect("usize->u64 conversion failure");
+        Ok(CidMeta { cid, node_size })
     }
 }
