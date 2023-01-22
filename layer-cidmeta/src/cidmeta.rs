@@ -13,6 +13,17 @@ where
     pub(crate) size: u64,
 }
 
+impl<S> PartialEq for CidMeta<S>
+where
+    S: Store,
+{
+    fn eq(&self, other: &Self) -> bool {
+        (self.cid == other.cid) && (self.size == other.size)
+    }
+}
+
+impl<S> Eq for CidMeta<S> where S: Store {}
+
 impl<S> Clone for CidMeta<S>
 where
     S: Store,

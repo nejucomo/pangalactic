@@ -1,10 +1,22 @@
-use crate::{FromDag, LinkFor, ToDag};
+use crate::{FromDag, LinkFor, ToDag, WriterFor};
+use dagwasm_layer_cidmeta::CidMetaLayer;
 use dagwasm_link::Link;
 use dagwasm_linkkind::LinkKind::File;
 use dagwasm_store::Store;
 
-#[derive(Debug, derive_more::From)]
-pub struct Dagio<S>(S);
+#[derive(Debug)]
+pub struct Dagio<S>(CidMetaLayer<S>)
+where
+    S: Store;
+
+impl<S> From<S> for Dagio<S>
+where
+    S: Store,
+{
+    fn from(store: S) -> Self {
+        Dagio(CidMetaLayer::from(store))
+    }
+}
 
 impl<S> Dagio<S>
 where
@@ -32,14 +44,11 @@ where
         self.0.open_reader(key).await
     }
 
-    pub async fn open_file_writer(&mut self) -> anyhow::Result<<S as Store>::Writer> {
+    pub async fn open_file_writer(&mut self) -> anyhow::Result<WriterFor<S>> {
         self.0.open_writer().await
     }
 
-    pub async fn commit_file_writer(
-        &mut self,
-        w: <S as Store>::Writer,
-    ) -> anyhow::Result<LinkFor<S>> {
+    pub async fn commit_file_writer(&mut self, w: WriterFor<S>) -> anyhow::Result<LinkFor<S>> {
         self.0.commit_writer(w).await.map(|k| Link::new(File, k))
     }
 

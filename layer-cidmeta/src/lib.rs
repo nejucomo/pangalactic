@@ -4,4 +4,4 @@ mod writer;
 
 pub use self::cidmeta::CidMeta;
 pub use self::layer::CidMetaLayer;
-pub(crate) use self::writer::Writer;
+pub use self::writer::Writer;
