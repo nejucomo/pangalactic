@@ -13,14 +13,13 @@ where
         use dagwasm_linkkind::LinkKind::Dir;
         use dagwasm_serialization::AsyncSerialize;
 
-        let mut w = dagio.open_file_writer().await?;
+        let mut w = dagio.0.open_writer().await?;
         self.write_into(&mut w).await?;
         dagio
-            .commit_file_writer(w)
+            .0
+            .commit_writer(w)
             .await
-            // Transmute the file link into a dir link:
-            .map(Link::unwrap)
-            .map(|(_, key)| Link::new(Dir, key))
+            .map(|key| Link::new(Dir, key))
     }
 }
 

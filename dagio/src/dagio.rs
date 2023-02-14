@@ -5,7 +5,7 @@ use dagwasm_linkkind::LinkKind::File;
 use dagwasm_store::Store;
 
 #[derive(Debug)]
-pub struct Dagio<S>(CidMetaLayer<S>)
+pub struct Dagio<S>(pub(crate) CidMetaLayer<S>)
 where
     S: Store;
 
