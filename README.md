@@ -17,7 +17,6 @@ If Directories were implemented in guests, they may use different implementation
 
 ## Roadmap
 
-- introduce `…-prim` crate for shared host/guest type aliases; update hostapi
 - `derive` hostapi call.
   - introduce `sequence` std guest.
 - attestation caching
