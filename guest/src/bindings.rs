@@ -10,6 +10,7 @@ extern "C" {
 
     // Link methods:
     pub fn link_get_kind(link: HandleLink) -> LinkKind;
+    pub fn link_node_size(link: HandleLink) -> ByteLen;
     pub fn link_open_file_reader(link: HandleLink) -> HandleByteReader;
     pub fn link_open_directory_reader(link: HandleLink) -> HandleDirReader;
     pub fn link_close(link: HandleLink);

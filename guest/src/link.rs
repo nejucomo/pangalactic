@@ -10,6 +10,11 @@ impl Link {
         LinkKind::try_from(lkprim).unwrap()
     }
 
+    pub fn node_size(&self) -> usize {
+        let raw = unsafe { bindings::link_node_size(self.0) };
+        usize::try_from(raw).expect("u64->usize conversion failure")
+    }
+
     pub fn open(&self) -> Reader {
         use LinkKind::*;
 
