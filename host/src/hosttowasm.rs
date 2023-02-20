@@ -25,6 +25,14 @@ impl HostToWasm for () {
     fn into_wasm(self) {}
 }
 
+impl HostToWasm for u64 {
+    type WasmTy = u64;
+
+    fn into_wasm(self) -> u64 {
+        self
+    }
+}
+
 impl HostToWasm for bool {
     type WasmTy = u64;
 

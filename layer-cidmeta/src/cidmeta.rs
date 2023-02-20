@@ -13,6 +13,15 @@ where
     pub(crate) node_size: u64,
 }
 
+impl<S> CidMeta<S>
+where
+    S: Store,
+{
+    pub fn node_size(&self) -> u64 {
+        self.node_size
+    }
+}
+
 impl<S> PartialEq for CidMeta<S>
 where
     S: Store,
