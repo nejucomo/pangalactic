@@ -5,7 +5,7 @@ mod directory_writer;
 mod link;
 
 use crate::State;
-use dagwasm_store::Store;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Engine, Linker, Trap};
 
 pub(crate) fn instantiate_linker<S>(engine: &Engine) -> anyhow::Result<Linker<State<S>>>
@@ -56,7 +56,7 @@ where
         }
     }
 
-    // Method bindings should follow structure in `dagwasm_guest::bindings`:
+    // Method bindings should follow structure in `pangalactic_guest::bindings`:
 
     // Log:
     // Note "log" is the only hostapi that does not follow the `<type>_<method>` name convention,

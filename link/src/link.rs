@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use dagwasm_linkkind::LinkKind;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_linkkind::LinkKind;
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::fmt::Debug;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};

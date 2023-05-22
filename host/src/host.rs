@@ -1,6 +1,6 @@
 use crate::State;
-use dagwasm_dagio::{Dagio, LinkFor};
-use dagwasm_store::Store;
+use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module};
 
 pub(crate) struct Host<S>
@@ -21,7 +21,7 @@ where
         config
             // We rely on an async API:
             .async_support(true)
-            // DAGWASM is non-threaded for determinism:
+            // Pangalactic WASM is non-threaded for determinism:
             .wasm_threads(false)
             // NAN canonicalization is required for determinism:
             .cranelift_nan_canonicalization(true);
@@ -55,8 +55,8 @@ async fn load_exec_mod<S>(
 where
     S: Store,
 {
-    use dagwasm_dagio::FromDag;
-    use dagwasm_schemata::Plan;
+    use pangalactic_dagio::FromDag;
+    use pangalactic_schemata::Plan;
 
     let dagio = state.dagio_mut();
     let plan = Plan::from_dag(dagio, plan).await?;

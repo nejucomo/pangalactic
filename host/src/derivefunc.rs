@@ -1,7 +1,7 @@
 use crate::State;
-use dagwasm_dagio::{Dagio, LinkFor};
-use dagwasm_handle::Handle;
-use dagwasm_store::Store;
+use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_handle::Handle;
+use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module, TypedFunc};
 
 type RawLinkHandle = u64;
@@ -38,7 +38,7 @@ where
         mut self,
         plan: &LinkFor<S>,
     ) -> anyhow::Result<(Dagio<S>, LinkFor<S>)> {
-        use dagwasm_schemata::Attestation;
+        use pangalactic_schemata::Attestation;
 
         let derive_handle = self.store.data_mut().links_mut().insert(plan.clone());
         let derive_handle_raw = unsafe { derive_handle.peek() };

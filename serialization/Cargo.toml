@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-serialization"
+name = "pangalactic-serialization"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

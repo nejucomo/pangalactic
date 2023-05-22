@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use dagwasm_primitives::{self as prim, LINK_KIND_DIR, LINK_KIND_FILE};
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_primitives::{self as prim, LINK_KIND_DIR, LINK_KIND_FILE};
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 

@@ -3,7 +3,7 @@ use crate::prim::{
     HandleLink, LinkKind, PtrRead, PtrWrite,
 };
 
-#[link(wasm_import_module = "dagwasm-host")]
+#[link(wasm_import_module = "pangalactic-host")]
 extern "C" {
     // Log:
     pub fn log(ptr: PtrWrite, len: ByteLen);

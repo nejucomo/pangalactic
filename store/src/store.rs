@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::fmt::Debug;
 use tokio::io::{AsyncRead, AsyncWrite};
 

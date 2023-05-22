@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, log, Link, Plan};
+use pangalactic_guest::{define_derive, log, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {

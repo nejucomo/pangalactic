@@ -23,5 +23,5 @@ license = "MIT"
 libflate = "1.2.0"
 tar = "0.4.38"
 
-[workspace.dependencies.dagwasm-guest]
+[workspace.dependencies.pangalactic-guest]
 path = "../../guest"

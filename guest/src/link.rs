@@ -1,5 +1,5 @@
 use crate::{bindings, prim, ByteReader, DirectoryReader, Reader};
-use dagwasm_linkkind::LinkKind;
+use pangalactic_linkkind::LinkKind;
 
 #[derive(Debug)]
 pub struct Link(prim::HandleLink);

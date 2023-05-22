@@ -1,5 +1,5 @@
-use dagwasm_dir::Name;
-use dagwasm_store::Store;
+use pangalactic_dir::Name;
+use pangalactic_store::Store;
 use std::io::Cursor;
 use std::pin::Pin;
 use std::task::{Context, Poll};

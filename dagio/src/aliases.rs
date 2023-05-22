@@ -1,7 +1,7 @@
-use dagwasm_dir::HostDirectory;
-use dagwasm_layer_cidmeta::{CidMeta, Writer};
-use dagwasm_link::Link;
-use dagwasm_store::Store;
+use pangalactic_dir::HostDirectory;
+use pangalactic_layer_cidmeta::{CidMeta, Writer};
+use pangalactic_link::Link;
+use pangalactic_store::Store;
 
 pub type LinkFor<S> = Link<CidMeta<S>>;
 pub type DirectoryFor<S> = HostDirectory<CidMeta<S>>;

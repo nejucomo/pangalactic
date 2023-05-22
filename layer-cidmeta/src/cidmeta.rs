@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
-use dagwasm_store::Store;
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_store::Store;
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 

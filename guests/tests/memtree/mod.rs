@@ -1,6 +1,6 @@
-use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
-use dagwasm_dir::Directory;
-use dagwasm_store::Store;
+use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
+use pangalactic_dir::Directory;
+use pangalactic_store::Store;
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -55,7 +55,7 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        use dagwasm_linkkind::LinkKind as LK;
+        use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {
             LK::File => dagio.read_file(link).await.map(File),

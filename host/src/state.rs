@@ -1,7 +1,7 @@
 use crate::{ByteReader, DirectoryReader};
-use dagwasm_dagio::{Dagio, DirectoryFor, LinkFor, WriterFor};
-use dagwasm_store::Store;
-use dagwasm_table::Table;
+use pangalactic_dagio::{Dagio, DirectoryFor, LinkFor, WriterFor};
+use pangalactic_store::Store;
+use pangalactic_table::Table;
 
 pub struct State<S>
 where

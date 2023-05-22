@@ -1,4 +1,4 @@
-use dagwasm_dir::Directory;
+use pangalactic_dir::Directory;
 
 #[derive(Debug)]
 pub struct Attestation<L> {

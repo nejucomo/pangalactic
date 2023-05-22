@@ -1,5 +1,5 @@
-use dagwasm_guest::bindings::link_get_kind;
-use dagwasm_guest::prim::{HandleLink, LINK_KIND_DIR};
+use pangalactic_guest::bindings::link_get_kind;
+use pangalactic_guest::prim::{HandleLink, LINK_KIND_DIR};
 
 #[no_mangle]
 pub extern "C" fn prim_derive_impl(plan: HandleLink) -> HandleLink {

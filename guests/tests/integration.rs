@@ -1,6 +1,6 @@
-use dagwasm_dagio::{Dagio, LinkFor};
-use dagwasm_memstore::MemStore;
-use dagwasm_schemata::{Attestation, Plan};
+use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_memstore::MemStore;
+use pangalactic_schemata::{Attestation, Plan};
 use std::future::Future;
 
 mod memtree;
@@ -107,7 +107,7 @@ where
     F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
-    dagwasm_log::test_init();
+    pangalactic_log::test_init();
     let r = verify_guests_inner(guests, MemTree::from(content), verify).await;
     if let Some(e) = r.as_ref().err() {
         eprintln!("{e:#}");
@@ -140,7 +140,7 @@ where
     let plan = {
         // Set up plan:
         let exec = dagio
-            .write_file(dagwasm_guests::get_wasm_bytes(guest)?)
+            .write_file(pangalactic_guests::get_wasm_bytes(guest)?)
             .await?;
         let input = dagio.commit(content).await?;
 
@@ -148,7 +148,7 @@ where
     };
 
     // Execute derive:
-    let (mut dagio, attestation) = dagwasm_host::derive(dagio, &plan).await?;
+    let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
 
     let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
     let plan: Plan<LinkFor<MemStore>> = dagio.read(&att.plan).await?;

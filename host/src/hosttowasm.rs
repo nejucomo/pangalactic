@@ -1,5 +1,5 @@
-use dagwasm_handle::Handle;
-use dagwasm_linkkind::LinkKind;
+use pangalactic_handle::Handle;
+use pangalactic_linkkind::LinkKind;
 use wasmtime::{Trap, WasmRet};
 
 pub(crate) trait HostToWasm {

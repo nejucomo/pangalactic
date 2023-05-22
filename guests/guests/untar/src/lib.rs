@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, fail, log, unwrap, DirectoryWriter, Link, Plan};
+use pangalactic_guest::{define_derive, fail, log, unwrap, DirectoryWriter, Link, Plan};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -11,7 +11,7 @@ fn derive_impl(plan: Plan) -> Link {
         let path = unwrap!( Result entry.path() ).into_owned();
         log!("unpacking entry path {:?}", &path);
 
-        let link = dagwasm_guest::write_readable(entry);
+        let link = pangalactic_guest::write_readable(entry);
         dt.insert(&path, link);
     }
 

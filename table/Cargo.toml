@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-table"
+name = "pangalactic-table"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,6 +9,6 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 
-[dependencies.dagwasm-handle]
+[dependencies.pangalactic-handle]
 path = "../handle"
 version = "^0.1.0"

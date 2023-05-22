@@ -1,27 +1,27 @@
 [package]
-name = "dagwasm-guest"
+name = "pangalactic-guest"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies.dagwasm-dir]
+[dependencies.pangalactic-dir]
 path = "../dir"
 version = "^0.1.0"
 
-[dependencies.dagwasm-guest-procmacro]
+[dependencies.pangalactic-guest-procmacro]
 path = "../guest-procmacro"
 version = "^0.1.0"
 
-[dependencies.dagwasm-linkkind]
+[dependencies.pangalactic-linkkind]
 path = "../linkkind"
 version = "^0.1.0"
 
-[dependencies.dagwasm-primitives]
+[dependencies.pangalactic-primitives]
 path = "../primitives"
 version = "^0.1.0"
 
-[dependencies.dagwasm-schemata]
+[dependencies.pangalactic-schemata]
 path = "../schemata"
 version = "^0.1.0"

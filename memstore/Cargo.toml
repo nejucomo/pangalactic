@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-memstore"
+name = "pangalactic-memstore"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -11,10 +11,10 @@ anyhow.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
 
-[dependencies.dagwasm-store]
+[dependencies.pangalactic-store]
 path = "../store"
 version = "^0.1.0"
 
-[dependencies.dagwasm-hash]
+[dependencies.pangalactic-hash]
 path = "../hash"
 version = "^0.1.0"

@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, log, unwrap, ByteReader, ByteWriter, Link, Plan};
+use pangalactic_guest::{define_derive, log, unwrap, ByteReader, ByteWriter, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {
@@ -11,7 +11,7 @@ fn derive_impl(plan: Plan) -> Link {
 }
 
 fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
-    use dagwasm_guest::Reader::{Dir, File};
+    use pangalactic_guest::Reader::{Dir, File};
 
     match link.open() {
         File(r) => append_file(builder, r, path, link.node_size()),

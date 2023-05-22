@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-dir"
+name = "pangalactic-dir"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,8 +9,8 @@ license.workspace = true
 [features]
 host = [
   "async-trait",
-  "dagwasm-link",
-  "dagwasm-serialization",
+  "pangalactic-link",
+  "pangalactic-serialization",
   "tokio",
 ]
 
@@ -25,12 +25,12 @@ optional = true
 workspace = true
 optional = true
 
-[dependencies.dagwasm-link]
+[dependencies.pangalactic-link]
 path = "../link"
 version = "^0.1.0"
 optional = true
 
-[dependencies.dagwasm-serialization]
+[dependencies.pangalactic-serialization]
 path = "../serialization"
 version = "^0.1.0"
 optional = true
@@ -38,6 +38,6 @@ optional = true
 [dev-dependencies]
 test-case.workspace = true
 
-[dev-dependencies.dagwasm-linkkind]
+[dev-dependencies.pangalactic-linkkind]
 path = "../linkkind"
 version = "^0.1.0"

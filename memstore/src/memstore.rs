@@ -1,7 +1,7 @@
 use crate::Reader;
 use async_trait::async_trait;
-use dagwasm_hash::Hash;
-use dagwasm_store::Store;
+use pangalactic_hash::Hash;
+use pangalactic_store::Store;
 use std::collections::HashMap;
 use std::sync::Arc;
 

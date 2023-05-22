@@ -1,8 +1,8 @@
 use crate::{FromDag, LinkFor, ToDag, WriterFor};
-use dagwasm_layer_cidmeta::CidMetaLayer;
-use dagwasm_link::Link;
-use dagwasm_linkkind::LinkKind::File;
-use dagwasm_store::Store;
+use pangalactic_layer_cidmeta::CidMetaLayer;
+use pangalactic_link::Link;
+use pangalactic_linkkind::LinkKind::File;
+use pangalactic_store::Store;
 
 #[derive(Debug)]
 pub struct Dagio<S>(pub(crate) CidMetaLayer<S>)

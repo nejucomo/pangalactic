@@ -1,5 +1,5 @@
 use crate::State;
-use dagwasm_store::Store;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Memory};
 
 pub(crate) trait CallerIO<S>

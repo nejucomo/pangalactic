@@ -62,67 +62,8 @@ dependencies = [
 name = "create_tar"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "tar",
-]
-
-[[package]]
-name = "dagwasm-dir"
-version = "0.1.0"
-dependencies = [
- "anyhow",
-]
-
-[[package]]
-name = "dagwasm-guest"
-version = "0.1.0"
-dependencies = [
- "dagwasm-dir",
- "dagwasm-guest-procmacro",
- "dagwasm-linkkind",
- "dagwasm-primitives",
- "dagwasm-schemata",
-]
-
-[[package]]
-name = "dagwasm-guest-procmacro"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "dagwasm-linkkind"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "dagwasm-primitives",
- "dagwasm-serialization",
- "tokio",
-]
-
-[[package]]
-name = "dagwasm-primitives"
-version = "0.1.0"
-
-[[package]]
-name = "dagwasm-schemata"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "dagwasm-dir",
-]
-
-[[package]]
-name = "dagwasm-serialization"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "tokio",
 ]
 
 [[package]]
@@ -141,30 +82,30 @@ dependencies = [
 name = "get_plan"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "gunzip"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
  "libflate",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "gzip"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
  "libflate",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "identity"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
@@ -198,6 +139,65 @@ name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
+
+[[package]]
+name = "pangalactic-dir"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
+name = "pangalactic-guest"
+version = "0.1.0"
+dependencies = [
+ "pangalactic-dir",
+ "pangalactic-guest-procmacro",
+ "pangalactic-linkkind",
+ "pangalactic-primitives",
+ "pangalactic-schemata",
+]
+
+[[package]]
+name = "pangalactic-guest-procmacro"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "pangalactic-linkkind"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "pangalactic-primitives",
+ "pangalactic-serialization",
+ "tokio",
+]
+
+[[package]]
+name = "pangalactic-primitives"
+version = "0.1.0"
+
+[[package]]
+name = "pangalactic-schemata"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "pangalactic-dir",
+]
+
+[[package]]
+name = "pangalactic-serialization"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "tokio",
+]
 
 [[package]]
 name = "pin-project-lite"
@@ -264,42 +264,42 @@ dependencies = [
 name = "test_bindings_input_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_bindings_plan_is_dir"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_input_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_output_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_plan_is_dir"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_reverse_contents"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
@@ -337,7 +337,7 @@ checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
 name = "untar"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "tar",
 ]
 

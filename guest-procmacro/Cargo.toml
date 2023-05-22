@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-guest-procmacro"
+name = "pangalactic-guest-procmacro"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -1,6 +1,6 @@
 use crate::{Dagio, LinkFor};
 use async_trait::async_trait;
-use dagwasm_store::Store;
+use pangalactic_store::Store;
 
 #[async_trait]
 pub trait FromDag<S>: Sized

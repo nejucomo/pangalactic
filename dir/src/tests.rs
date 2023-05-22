@@ -1,9 +1,9 @@
 use crate::Directory;
 use async_trait::async_trait;
-use dagwasm_link::Link;
-use dagwasm_linkkind::LinkKind;
-use dagwasm_serialization::testutil::check_serialize_then_deserialize_equality;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_link::Link;
+use pangalactic_linkkind::LinkKind;
+use pangalactic_serialization::testutil::check_serialize_then_deserialize_equality;
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 

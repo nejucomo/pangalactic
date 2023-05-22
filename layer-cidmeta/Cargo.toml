@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-layer-cidmeta"
+name = "pangalactic-layer-cidmeta"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,14 +11,14 @@ async-trait.workspace = true
 derive_more.workspace = true
 tokio.workspace = true
 
-[dependencies.dagwasm-serialization]
+[dependencies.pangalactic-serialization]
 path = "../serialization"
 version = "^0.1.0"
 
-[dependencies.dagwasm-store]
+[dependencies.pangalactic-store]
 path = "../store"
 version = "^0.1.0"
 
-[dependencies.dagwasm-hash]
+[dependencies.pangalactic-hash]
 path = "../hash"
 version = "^0.1.0"

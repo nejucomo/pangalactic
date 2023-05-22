@@ -1,4 +1,4 @@
-use dagwasm_handle::Handle;
+use pangalactic_handle::Handle;
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
