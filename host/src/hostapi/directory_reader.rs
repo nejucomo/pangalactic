@@ -1,7 +1,7 @@
 use crate::{ByteReader, DirectoryReader, State};
-use dagwasm_dagio::LinkFor;
-use dagwasm_handle::Handle;
-use dagwasm_store::Store;
+use pangalactic_dagio::LinkFor;
+use pangalactic_handle::Handle;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn has_more_entries<S>(

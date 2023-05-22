@@ -1,12 +1,12 @@
 use crate::Link;
 
-pub type Attestation = dagwasm_schemata::Attestation<Link>;
-pub type Directory = dagwasm_dir::Directory<Link>;
-pub type Plan = dagwasm_schemata::Plan<Link>;
+pub type Attestation = pangalactic_schemata::Attestation<Link>;
+pub type Directory = pangalactic_dir::Directory<Link>;
+pub type Plan = pangalactic_schemata::Plan<Link>;
 
 impl From<Link> for Directory {
     fn from(link: Link) -> Self {
-        dagwasm_dir::Directory::from_iter(link.open_directory())
+        pangalactic_dir::Directory::from_iter(link.open_directory())
     }
 }
 

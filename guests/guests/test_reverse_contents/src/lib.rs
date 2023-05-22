@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, unwrap, Link, Plan};
+use pangalactic_guest::{define_derive, unwrap, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {
@@ -6,16 +6,16 @@ fn derive_impl(plan: Plan) -> Link {
 }
 
 fn reverse_contents(link: Link) -> Link {
-    use dagwasm_guest::Reader::*;
+    use pangalactic_guest::Reader::*;
 
     match link.open() {
         File(reader) => {
             let mut bytes = reader.read_to_vec();
             bytes.reverse();
-            dagwasm_guest::write_bytes(&bytes)
+            pangalactic_guest::write_bytes(&bytes)
         }
         Dir(reader) => {
-            use dagwasm_guest::DirectoryWriter;
+            use pangalactic_guest::DirectoryWriter;
 
             let writer = DirectoryWriter::open();
             for (name, child) in reader {

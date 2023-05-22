@@ -1,4 +1,4 @@
-# dagwasm
+# pangalactic
 
 ## Terminology
 

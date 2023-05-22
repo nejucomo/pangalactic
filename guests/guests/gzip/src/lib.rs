@@ -1,4 +1,4 @@
-use dagwasm_guest::{define_derive, log, unwrap, ByteWriter, Link, Plan};
+use pangalactic_guest::{define_derive, log, unwrap, ByteWriter, Link, Plan};
 use libflate::gzip::Encoder;
 
 #[define_derive]

@@ -62,30 +62,30 @@ dependencies = [
 name = "create_tar"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "tar",
 ]
 
 [[package]]
-name = "dagwasm-dir"
+name = "pangalactic-dir"
 version = "0.1.0"
 dependencies = [
  "anyhow",
 ]
 
 [[package]]
-name = "dagwasm-guest"
+name = "pangalactic-guest"
 version = "0.1.0"
 dependencies = [
- "dagwasm-dir",
- "dagwasm-guest-procmacro",
- "dagwasm-linkkind",
- "dagwasm-primitives",
- "dagwasm-schemata",
+ "pangalactic-dir",
+ "pangalactic-guest-procmacro",
+ "pangalactic-linkkind",
+ "pangalactic-primitives",
+ "pangalactic-schemata",
 ]
 
 [[package]]
-name = "dagwasm-guest-procmacro"
+name = "pangalactic-guest-procmacro"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
@@ -94,30 +94,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "dagwasm-linkkind"
+name = "pangalactic-linkkind"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "dagwasm-primitives",
- "dagwasm-serialization",
+ "pangalactic-primitives",
+ "pangalactic-serialization",
  "tokio",
 ]
 
 [[package]]
-name = "dagwasm-primitives"
+name = "pangalactic-primitives"
 version = "0.1.0"
 
 [[package]]
-name = "dagwasm-schemata"
+name = "pangalactic-schemata"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "dagwasm-dir",
+ "pangalactic-dir",
 ]
 
 [[package]]
-name = "dagwasm-serialization"
+name = "pangalactic-serialization"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -141,14 +141,14 @@ dependencies = [
 name = "get_plan"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "gunzip"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "libflate",
 ]
 
@@ -156,7 +156,7 @@ dependencies = [
 name = "gzip"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "libflate",
 ]
 
@@ -164,7 +164,7 @@ dependencies = [
 name = "identity"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
@@ -264,42 +264,42 @@ dependencies = [
 name = "test_bindings_input_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_bindings_plan_is_dir"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_input_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_output_is_hello_world"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_plan_is_dir"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_reverse_contents"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
 ]
 
 [[package]]
@@ -337,7 +337,7 @@ checksum = "84a22b9f218b40614adcb3f4ff08b703773ad44fa9423e4e0d346d5db86e4ebc"
 name = "untar"
 version = "0.1.0"
 dependencies = [
- "dagwasm-guest",
+ "pangalactic-guest",
  "tar",
 ]
 

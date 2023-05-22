@@ -1,7 +1,7 @@
 use crate::State;
-use dagwasm_dagio::{LinkFor, WriterFor};
-use dagwasm_handle::Handle;
-use dagwasm_store::Store;
+use pangalactic_dagio::{LinkFor, WriterFor};
+use pangalactic_handle::Handle;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn open<S>(mut caller: Caller<'_, State<S>>) -> Result<Handle<WriterFor<S>>, Trap>

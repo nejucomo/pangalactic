@@ -1,4 +1,4 @@
-use dagwasm_handle::Handle;
+use pangalactic_handle::Handle;
 
 pub(crate) trait WasmToHost<T> {
     fn into_host(self) -> T;

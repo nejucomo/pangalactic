@@ -1,19 +1,19 @@
-use dagwasm_dagio::{Dagio, LinkFor};
-use dagwasm_memstore::MemStore;
-use dagwasm_schemata::{Attestation, Plan};
+use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_memstore::MemStore;
+use pangalactic_schemata::{Attestation, Plan};
 
 mod memtree;
 use self::memtree::MemTree;
 
 #[tokio::test]
 async fn gzip_gunzip() -> anyhow::Result<()> {
-    dagwasm_log::test_init();
+    pangalactic_log::test_init();
     run_round_trip("gzip", "gunzip", b"Hello World!").await
 }
 
 #[tokio::test]
 async fn tar_untar() -> anyhow::Result<()> {
-    dagwasm_log::test_init();
+    pangalactic_log::test_init();
     run_round_trip(
         "create_tar",
         "untar",
@@ -53,10 +53,10 @@ async fn run_phase(
     input: LinkFor<MemStore>,
 ) -> anyhow::Result<(Dagio<MemStore>, Attestation<LinkFor<MemStore>>)> {
     let exec = dagio
-        .write_file(dagwasm_guests::get_wasm_bytes(execname)?)
+        .write_file(pangalactic_guests::get_wasm_bytes(execname)?)
         .await?;
     let plan = dagio.commit(Plan { exec, input }).await?;
-    let (mut dagio, attestation) = dagwasm_host::derive(dagio, &plan).await?;
+    let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
     let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
     Ok((dagio, att))
 }

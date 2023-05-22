@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-linkkind"
+name = "pangalactic-linkkind"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,10 +9,10 @@ async-trait.workspace = true
 anyhow.workspace = true
 tokio.workspace = true
 
-[dependencies.dagwasm-primitives]
+[dependencies.pangalactic-primitives]
 path = "../primitives"
 version = "^0.1.0"
 
-[dependencies.dagwasm-serialization]
+[dependencies.pangalactic-serialization]
 path = "../serialization"
 version = "^0.1.0"

@@ -1,8 +1,8 @@
 use crate::{Attestation, Plan};
 use async_trait::async_trait;
-use dagwasm_dagio::{Dagio, FromDag, LinkFor, ToDag};
-use dagwasm_dir::Directory;
-use dagwasm_store::Store;
+use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
+use pangalactic_dir::Directory;
+use pangalactic_store::Store;
 
 #[async_trait]
 impl<S> FromDag<S> for Attestation<LinkFor<S>>

@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-dagio"
+name = "pangalactic-dagio"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -11,33 +11,33 @@ anyhow.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
 
-[dependencies.dagwasm-dir]
+[dependencies.pangalactic-dir]
 path = "../dir"
 version = "^0.1.0"
 features = [
   "host",
 ]
 
-[dependencies.dagwasm-layer-cidmeta]
+[dependencies.pangalactic-layer-cidmeta]
 path = "../layer-cidmeta"
 version = "^0.1.0"
 
-[dependencies.dagwasm-link]
+[dependencies.pangalactic-link]
 path = "../link"
 version = "^0.1.0"
 
-[dependencies.dagwasm-linkkind]
+[dependencies.pangalactic-linkkind]
 path = "../linkkind"
 version = "^0.1.0"
 
-[dependencies.dagwasm-serialization]
+[dependencies.pangalactic-serialization]
 path = "../serialization"
 version = "^0.1.0"
 
-[dependencies.dagwasm-store]
+[dependencies.pangalactic-store]
 path = "../store"
 version = "^0.1.0"
 
-[dev-dependencies.dagwasm-memstore]
+[dev-dependencies.pangalactic-memstore]
 path = "../memstore"
 version = "^0.1.0"

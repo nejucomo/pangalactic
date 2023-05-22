@@ -1,9 +1,9 @@
-use dagwasm_guest::bindings::{
+use pangalactic_guest::bindings::{
     byte_reader_close, byte_reader_read, directory_reader_close, directory_reader_has_more_entries,
     directory_reader_load_link, directory_reader_next_entry, directory_reader_open_name_reader,
     link_get_kind, link_open_directory_reader, link_open_file_reader,
 };
-use dagwasm_guest::prim::{ByteLen, HandleLink, PtrRead, LINK_KIND_DIR, LINK_KIND_FILE, TRUE};
+use pangalactic_guest::prim::{ByteLen, HandleLink, PtrRead, LINK_KIND_DIR, LINK_KIND_FILE, TRUE};
 
 const LEN: usize = 16;
 

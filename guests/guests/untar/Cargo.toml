@@ -10,5 +10,5 @@ license.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-dagwasm-guest.workspace = true
+pangalactic-guest.workspace = true
 tar.workspace = true

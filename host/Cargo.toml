@@ -1,5 +1,5 @@
 [package]
-name = "dagwasm-host"
+name = "pangalactic-host"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -13,40 +13,40 @@ log.workspace = true
 tokio.workspace = true
 wasmtime.workspace = true
 
-[dependencies.dagwasm-store]
+[dependencies.pangalactic-store]
 path = "../store"
 version = "^0.1.0"
 
-[dependencies.dagwasm-dagio]
+[dependencies.pangalactic-dagio]
 path = "../dagio"
 version = "^0.1.0"
 
-[dependencies.dagwasm-schemata]
+[dependencies.pangalactic-schemata]
 path = "../schemata"
 version = "^0.1.0"
 features = [
   "dagio",
 ]
 
-[dependencies.dagwasm-dir]
+[dependencies.pangalactic-dir]
 path = "../dir"
 version = "^0.1.0"
 features = [
   "host",
 ]
 
-[dependencies.dagwasm-handle]
+[dependencies.pangalactic-handle]
 path = "../handle"
 version = "^0.1.0"
 
-[dependencies.dagwasm-linkkind]
+[dependencies.pangalactic-linkkind]
 path = "../linkkind"
 version = "^0.1.0"
 
-[dependencies.dagwasm-table]
+[dependencies.pangalactic-table]
 path = "../table"
 version = "^0.1.0"
 
-[dependencies.dagwasm-primitives]
+[dependencies.pangalactic-primitives]
 path = "../primitives"
 version = "^0.1.0"

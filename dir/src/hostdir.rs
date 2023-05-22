@@ -1,7 +1,7 @@
 use crate::{Directory, Name};
 use async_trait::async_trait;
-use dagwasm_link::Link;
-use dagwasm_serialization::{AsyncDeserialize, AsyncSerialize};
+use pangalactic_link::Link;
+use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::marker::Unpin;
 use tokio::io::{AsyncRead, AsyncWrite};
 

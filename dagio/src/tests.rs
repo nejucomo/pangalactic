@@ -1,6 +1,6 @@
 use crate::Dagio;
-use dagwasm_dir::Directory;
-use dagwasm_memstore::MemStore;
+use pangalactic_dir::Directory;
+use pangalactic_memstore::MemStore;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 #[tokio::test]

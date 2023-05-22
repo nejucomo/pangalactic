@@ -1,6 +1,6 @@
 use crate::{ByteReader, State};
-use dagwasm_handle::Handle;
-use dagwasm_store::Store;
+use pangalactic_handle::Handle;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn read<S>(

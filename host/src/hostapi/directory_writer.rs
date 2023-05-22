@@ -1,8 +1,8 @@
 use crate::State;
-use dagwasm_dagio::{DirectoryFor, LinkFor};
-use dagwasm_dir::Directory;
-use dagwasm_handle::Handle;
-use dagwasm_store::Store;
+use pangalactic_dagio::{DirectoryFor, LinkFor};
+use pangalactic_dir::Directory;
+use pangalactic_handle::Handle;
+use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn open<S>(
