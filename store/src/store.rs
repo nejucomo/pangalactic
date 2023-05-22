@@ -15,7 +15,7 @@ pub trait Store: Debug + Send {
     /// - A `CID` should be concise.
     ///
     /// Cryptographic hash functions over the content are assumed to meet these properties.
-    type CID: Clone + Debug + AsyncSerialize + AsyncDeserialize + Send + Sync;
+    type CID: Clone + Eq + Debug + AsyncSerialize + AsyncDeserialize + Send + Sync;
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;
 

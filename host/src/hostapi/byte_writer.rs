@@ -1,12 +1,10 @@
 use crate::State;
-use dagwasm_dagio::LinkFor;
+use dagwasm_dagio::{LinkFor, WriterFor};
 use dagwasm_handle::Handle;
 use dagwasm_store::Store;
 use wasmtime::{Caller, Trap};
 
-pub(super) async fn open<S>(
-    mut caller: Caller<'_, State<S>>,
-) -> Result<Handle<<S as Store>::Writer>, Trap>
+pub(super) async fn open<S>(mut caller: Caller<'_, State<S>>) -> Result<Handle<WriterFor<S>>, Trap>
 where
     S: Store,
 {
@@ -17,7 +15,7 @@ where
 
 pub(super) async fn write<S>(
     mut caller: Caller<'_, State<S>>,
-    h_bw: Handle<<S as Store>::Writer>,
+    h_bw: Handle<WriterFor<S>>,
     ptr: usize,
     len: usize,
 ) -> Result<(), Trap>
@@ -45,7 +43,7 @@ where
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
-    h_bw: Handle<<S as Store>::Writer>,
+    h_bw: Handle<WriterFor<S>>,
 ) -> Result<Handle<LinkFor<S>>, Trap>
 where
     S: Store,

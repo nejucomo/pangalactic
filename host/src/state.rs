@@ -1,5 +1,5 @@
 use crate::{ByteReader, DirectoryReader};
-use dagwasm_dagio::{Dagio, DirectoryFor, LinkFor};
+use dagwasm_dagio::{Dagio, DirectoryFor, LinkFor, WriterFor};
 use dagwasm_store::Store;
 use dagwasm_table::Table;
 
@@ -11,7 +11,7 @@ where
     links: Table<LinkFor<S>>,
     byte_readers: Table<ByteReader<S>>,
     dir_readers: Table<DirectoryReader<S>>,
-    byte_writers: Table<<S as Store>::Writer>,
+    byte_writers: Table<WriterFor<S>>,
     dir_writers: Table<DirectoryFor<S>>,
 }
 
@@ -58,7 +58,7 @@ where
         &mut self.dir_readers
     }
 
-    pub(crate) fn byte_writers_mut(&mut self) -> &mut Table<<S as Store>::Writer> {
+    pub(crate) fn byte_writers_mut(&mut self) -> &mut Table<WriterFor<S>> {
         &mut self.byte_writers
     }
 

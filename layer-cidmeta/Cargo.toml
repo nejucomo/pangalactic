@@ -1,0 +1,24 @@
+[package]
+name = "dagwasm-layer-cidmeta"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+derive_more.workspace = true
+tokio.workspace = true
+
+[dependencies.dagwasm-serialization]
+path = "../serialization"
+version = "^0.1.0"
+
+[dependencies.dagwasm-store]
+path = "../store"
+version = "^0.1.0"
+
+[dependencies.dagwasm-hash]
+path = "../hash"
+version = "^0.1.0"

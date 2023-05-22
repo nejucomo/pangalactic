@@ -14,7 +14,7 @@ fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
     use dagwasm_guest::Reader::{Dir, File};
 
     match link.open() {
-        File(r) => append_file(builder, r, path),
+        File(r) => append_file(builder, r, path, link.node_size()),
         Dir(d) => {
             for (name, link) in d {
                 append_link(
@@ -31,11 +31,11 @@ fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
     }
 }
 
-fn append_file(builder: &mut tar::Builder<ByteWriter>, file: ByteReader, path: &str) {
-    let contents = file.read_to_vec();
-    unwrap!(Result
-    builder
-        .append(&make_header(&path, contents.len()), contents.as_slice())
+fn append_file(builder: &mut tar::Builder<ByteWriter>, file: ByteReader, path: &str, size: usize) {
+    unwrap!(
+        Result
+        builder
+            .append(&make_header(&path, size), file)
     );
 }
 

@@ -71,6 +71,7 @@ where
 
     // Link methods:
     link_host_fn!(link, get_kind, link)?;
+    link_host_fn!(link, node_size, link)?;
     link_host_fn!(link, open_file_reader, link)?;
     link_host_fn!(link, open_directory_reader, link)?;
     link_host_fn!(link, close, link)?;

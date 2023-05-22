@@ -16,6 +16,17 @@ where
     Ok(link.kind())
 }
 
+pub(super) async fn node_size<S>(
+    caller: Caller<'_, State<S>>,
+    h_link: Handle<LinkFor<S>>,
+) -> Result<u64, Trap>
+where
+    S: Store,
+{
+    let link = caller.data().links().lookup(h_link)?;
+    Ok(link.peek_key().node_size())
+}
+
 pub(super) async fn open_file_reader<S>(
     mut caller: Caller<'_, State<S>>,
     h_link: Handle<LinkFor<S>>,
