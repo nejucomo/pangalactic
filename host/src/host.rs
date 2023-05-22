@@ -21,7 +21,7 @@ where
         config
             // We rely on an async API:
             .async_support(true)
-            // DAGWASM is non-threaded for determinism:
+            // Pangalactic WASM is non-threaded for determinism:
             .wasm_threads(false)
             // NAN canonicalization is required for determinism:
             .cranelift_nan_canonicalization(true);
