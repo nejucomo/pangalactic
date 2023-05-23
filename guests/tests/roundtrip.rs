@@ -1,6 +1,6 @@
 use pangalactic_dagio::{Dagio, LinkFor};
-use pangalactic_memstore::MemStore;
 use pangalactic_schemata::{Attestation, Plan};
+use pangalactic_store_mem::MemStore;
 
 mod memtree;
 use self::memtree::MemTree;

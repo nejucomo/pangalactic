@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-memstore"
+name = "pangalactic-store-mem"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

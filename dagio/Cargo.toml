@@ -38,6 +38,6 @@ version = "^0.1.0"
 path = "../store"
 version = "^0.1.0"
 
-[dev-dependencies.pangalactic-memstore]
+[dev-dependencies.pangalactic-store-mem]
 path = "../stores/mem"
 version = "^0.1.0"
