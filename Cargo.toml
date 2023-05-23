@@ -11,11 +11,11 @@ members = [
   "link",
   "linkkind",
   "log",
-  "memstore",
   "primitives",
   "schemata",
   "serialization",
   "store",
+  "stores/mem",
   "table",
 ]
 

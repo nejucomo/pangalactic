@@ -12,9 +12,9 @@ async-trait.workspace = true
 tokio.workspace = true
 
 [dependencies.pangalactic-store]
-path = "../store"
+path = "../../store"
 version = "^0.1.0"
 
 [dependencies.pangalactic-hash]
-path = "../hash"
+path = "../../hash"
 version = "^0.1.0"

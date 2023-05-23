@@ -39,5 +39,5 @@ path = "../store"
 version = "^0.1.0"
 
 [dev-dependencies.pangalactic-memstore]
-path = "../memstore"
+path = "../stores/mem"
 version = "^0.1.0"
