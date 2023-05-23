@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-store-mem"
+name = "pangalactic-store"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -11,10 +11,6 @@ anyhow.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
 
-[dependencies.pangalactic-store]
-path = "../../store"
-version = "^0.1.0"
-
-[dependencies.pangalactic-hash]
-path = "../../hash"
+[dependencies.pangalactic-serialization]
+path = "../../serialization"
 version = "^0.1.0"

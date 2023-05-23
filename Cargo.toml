@@ -14,8 +14,8 @@ members = [
   "primitives",
   "schemata",
   "serialization",
-  "store",
-  "stores/mem",
+  "store/trait",
+  "store/mem",
   "table",
 ]
 

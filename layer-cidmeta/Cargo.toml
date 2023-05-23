@@ -16,7 +16,7 @@ path = "../serialization"
 version = "^0.1.0"
 
 [dependencies.pangalactic-store]
-path = "../store"
+path = "../store/trait"
 version = "^0.1.0"
 
 [dependencies.pangalactic-hash]
