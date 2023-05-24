@@ -30,7 +30,7 @@ impl FlexIntEncoding {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for FlexIntEncoding {
     async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
     where
@@ -43,7 +43,7 @@ impl AsyncSerialize for FlexIntEncoding {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncDeserialize for FlexIntEncoding {
     async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
     where
