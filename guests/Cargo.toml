@@ -15,10 +15,6 @@ async-trait.workspace = true
 simple_logger.workspace = true
 tokio.workspace = true
 
-[dev-dependencies.pangalactic-store]
-path = "../store"
-version = "^0.1.0"
-
 [dev-dependencies.pangalactic-dagio]
 path = "../dagio"
 version = "^0.1.0"
@@ -38,8 +34,12 @@ features = [
 path = "../host"
 version = "^0.1.0"
 
-[dev-dependencies.pangalactic-memstore]
-path = "../memstore"
+[dev-dependencies.pangalactic-store]
+path = "../store/trait"
+version = "^0.1.0"
+
+[dev-dependencies.pangalactic-store-mem]
+path = "../store/mem"
 version = "^0.1.0"
 
 [dev-dependencies.pangalactic-log]
