@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use pangalactic_dir::Directory;
 use pangalactic_store::Store;
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl<S> ToDag<S> for DirectoryFor<S>
 where
     S: Store,
@@ -23,7 +23,7 @@ where
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl<const K: usize, S, N> ToDag<S> for [(N, LinkFor<S>); K]
 where
     S: Store,
@@ -35,7 +35,7 @@ where
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl<S> FromDag<S> for DirectoryFor<S>
 where
     S: Store,

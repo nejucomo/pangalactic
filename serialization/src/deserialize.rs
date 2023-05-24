@@ -3,14 +3,14 @@ use async_trait::async_trait;
 use std::marker::Unpin;
 use tokio::io::AsyncRead;
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 pub trait AsyncDeserialize: Sized {
     async fn read_from<R>(r: R) -> anyhow::Result<Self>
     where
         R: AsyncRead + Unpin + Send;
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncDeserialize for u64 {
     async fn read_from<R>(r: R) -> anyhow::Result<Self>
     where
@@ -22,7 +22,7 @@ impl AsyncDeserialize for u64 {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncDeserialize for usize {
     async fn read_from<R>(r: R) -> anyhow::Result<Self>
     where
@@ -34,7 +34,7 @@ impl AsyncDeserialize for usize {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl<const K: usize> AsyncDeserialize for [u8; K] {
     async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
     where
@@ -48,7 +48,7 @@ impl<const K: usize> AsyncDeserialize for [u8; K] {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncDeserialize for Vec<u8> {
     async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
     where
@@ -64,7 +64,7 @@ impl AsyncDeserialize for Vec<u8> {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncDeserialize for String {
     async fn read_from<R>(r: R) -> anyhow::Result<Self>
     where

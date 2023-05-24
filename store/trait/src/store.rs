@@ -3,7 +3,9 @@ use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use std::fmt::Debug;
 use tokio::io::{AsyncRead, AsyncWrite};
 
-#[async_trait]
+// Documentation readability hack; see https://github.com/dtolnay/async-trait/issues/213#issuecomment-1559690487
+#[cfg_attr(doc, feature(async_fn_in_trait))]
+#[cfg_attr(not(doc), async_trait)]
 pub trait Store: Debug + Send {
     /// An acronym for `Content IDentifier` required to have these properties beyond the type
     /// signature:

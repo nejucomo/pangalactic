@@ -3,14 +3,14 @@ use async_trait::async_trait;
 use std::marker::Unpin;
 use tokio::io::AsyncWrite;
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 pub trait AsyncSerialize {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
         W: AsyncWrite + Unpin + Send;
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for u64 {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
@@ -20,7 +20,7 @@ impl AsyncSerialize for u64 {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for usize {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
@@ -31,7 +31,7 @@ impl AsyncSerialize for usize {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for [u8] {
     async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
     where
@@ -45,7 +45,7 @@ impl AsyncSerialize for [u8] {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl<const K: usize> AsyncSerialize for [u8; K] {
     async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
     where
@@ -58,7 +58,7 @@ impl<const K: usize> AsyncSerialize for [u8; K] {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for str {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
@@ -68,7 +68,7 @@ impl AsyncSerialize for str {
     }
 }
 
-#[async_trait]
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for String {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
@@ -77,7 +77,8 @@ impl AsyncSerialize for String {
         self.as_str().write_into(w).await
     }
 }
-#[async_trait]
+
+#[cfg_attr(not(doc), async_trait)]
 impl AsyncSerialize for Vec<u8> {
     async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
     where
