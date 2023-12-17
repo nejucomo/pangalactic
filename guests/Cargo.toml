@@ -12,35 +12,16 @@ include_dir.workspace = true
 
 [dev-dependencies]
 async-trait.workspace = true
+pangalactic-dagio.workspace = true
+pangalactic-dir = { workspace = true, features = [ "host" ] }
+pangalactic-host.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-log.workspace = true
+pangalactic-schemata.workspace = true
+pangalactic-store-mem.workspace = true
+pangalactic-store.workspace = true
 simple_logger.workspace = true
 tokio.workspace = true
-
-[dev-dependencies.pangalactic-dagio]
-workspace = true
-
-[dev-dependencies.pangalactic-schemata]
-workspace = true
-
-[dev-dependencies.pangalactic-dir]
-workspace = true
-features = [
-  "host",
-]
-
-[dev-dependencies.pangalactic-host]
-workspace = true
-
-[dev-dependencies.pangalactic-store]
-workspace = true
-
-[dev-dependencies.pangalactic-store-mem]
-workspace = true
-
-[dev-dependencies.pangalactic-log]
-workspace = true
-
-[dev-dependencies.pangalactic-linkkind]
-workspace = true
 
 [build-dependencies]
 anyhow.workspace = true

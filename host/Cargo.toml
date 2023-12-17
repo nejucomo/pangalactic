@@ -10,35 +10,13 @@ license.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 log.workspace = true
+pangalactic-dagio.workspace = true
+pangalactic-dir = { workspace = true, features = [ "host" ] }
+pangalactic-handle.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-primitives.workspace = true
+pangalactic-schemata = { workspace = true, features = [ "dagio" ] }
+pangalactic-store.workspace = true
+pangalactic-table.workspace = true
 tokio.workspace = true
 wasmtime.workspace = true
-
-[dependencies.pangalactic-store]
-workspace = true
-
-[dependencies.pangalactic-dagio]
-workspace = true
-
-[dependencies.pangalactic-schemata]
-workspace = true
-features = [
-  "dagio",
-]
-
-[dependencies.pangalactic-dir]
-workspace = true
-features = [
-  "host",
-]
-
-[dependencies.pangalactic-handle]
-workspace = true
-
-[dependencies.pangalactic-linkkind]
-workspace = true
-
-[dependencies.pangalactic-table]
-workspace = true
-
-[dependencies.pangalactic-primitives]
-workspace = true

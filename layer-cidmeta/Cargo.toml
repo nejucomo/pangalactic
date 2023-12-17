@@ -9,13 +9,7 @@ edition = "2021"
 anyhow.workspace = true
 async-trait.workspace = true
 derive_more.workspace = true
+pangalactic-hash.workspace = true
+pangalactic-serialization.workspace = true
+pangalactic-store.workspace = true
 tokio.workspace = true
-
-[dependencies.pangalactic-serialization]
-workspace = true
-
-[dependencies.pangalactic-store]
-workspace = true
-
-[dependencies.pangalactic-hash]
-workspace = true

@@ -16,25 +16,12 @@ host = [
 
 [dependencies]
 anyhow.workspace = true
-
-[dependencies.async-trait]
-workspace = true
-optional = true
-
-[dependencies.tokio]
-workspace = true
-optional = true
-
-[dependencies.pangalactic-link]
-workspace = true
-optional = true
-
-[dependencies.pangalactic-serialization]
-workspace = true
-optional = true
+async-trait = { workspace = true, optional = true }
+pangalactic-link = { workspace = true, optional = true }
+pangalactic-serialization = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
 
 [dev-dependencies]
 test-case.workspace = true
+pangalactic-linkkind.workspace = true
 
-[dev-dependencies.pangalactic-linkkind]
-workspace = true

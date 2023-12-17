@@ -8,6 +8,4 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-
-[dependencies.pangalactic-handle]
-workspace = true
+pangalactic-handle.workspace = true

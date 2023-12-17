@@ -9,28 +9,13 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
+pangalactic-dir = { workspace = true, features = [ "host" ] }
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-link.workspace = true
+pangalactic-serialization.workspace = true
+pangalactic-store.workspace = true
 tokio.workspace = true
 
-[dependencies.pangalactic-dir]
-workspace = true
-features = [
-  "host",
-]
-
-[dependencies.pangalactic-layer-cidmeta]
-workspace = true
-
-[dependencies.pangalactic-link]
-workspace = true
-
-[dependencies.pangalactic-linkkind]
-workspace = true
-
-[dependencies.pangalactic-serialization]
-workspace = true
-
-[dependencies.pangalactic-store]
-workspace = true
-
-[dev-dependencies.pangalactic-store-mem]
-workspace = true
+[dev-dependencies]
+pangalactic-store-mem.workspace = true

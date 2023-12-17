@@ -6,17 +6,9 @@ license.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies.pangalactic-dir]
-workspace = true
-
-[dependencies.pangalactic-guest-procmacro]
-workspace = true
-
-[dependencies.pangalactic-linkkind]
-workspace = true
-
-[dependencies.pangalactic-primitives]
-workspace = true
-
-[dependencies.pangalactic-schemata]
-workspace = true
+[dependencies]
+pangalactic-dir.workspace = true
+pangalactic-guest-procmacro.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-primitives.workspace = true
+pangalactic-schemata.workspace = true
