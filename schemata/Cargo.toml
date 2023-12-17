@@ -17,19 +17,16 @@ dagio = [
 anyhow.workspace = true
 
 [dependencies.pangalactic-dir]
-path = "../dir"
-version = "^0.1.0"
+workspace = true
 
 [dependencies.async-trait]
 workspace = true
 optional = true
 
 [dependencies.pangalactic-store]
-path = "../store/trait"
-version = "^0.1.0"
+workspace = true
 optional = true
 
 [dependencies.pangalactic-dagio]
-path = "../dagio"
-version = "^0.1.0"
+workspace = true
 optional = true

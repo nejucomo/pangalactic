@@ -13,5 +13,4 @@ blake3.workspace = true
 tokio.workspace = true
 
 [dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"
+workspace = true

@@ -16,39 +16,31 @@ simple_logger.workspace = true
 tokio.workspace = true
 
 [dev-dependencies.pangalactic-dagio]
-path = "../dagio"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-schemata]
-path = "../schemata"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-dir]
-path = "../dir"
-version = "^0.1.0"
+workspace = true
 features = [
   "host",
 ]
 
 [dev-dependencies.pangalactic-host]
-path = "../host"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-store]
-path = "../store/trait"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-store-mem]
-path = "../store/mem"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-log]
-path = "../log"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies.pangalactic-linkkind]
-path = "../linkkind"
-version = "^0.1.0"
+workspace = true
 
 [build-dependencies]
 anyhow.workspace = true

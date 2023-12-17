@@ -12,13 +12,10 @@ derive_more.workspace = true
 tokio.workspace = true
 
 [dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"
+workspace = true
 
 [dependencies.pangalactic-store]
-path = "../store/trait"
-version = "^0.1.0"
+workspace = true
 
 [dependencies.pangalactic-hash]
-path = "../hash"
-version = "^0.1.0"
+workspace = true

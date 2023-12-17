@@ -10,5 +10,4 @@ license.workspace = true
 anyhow.workspace = true
 
 [dependencies.pangalactic-handle]
-path = "../handle"
-version = "^0.1.0"
+workspace = true

@@ -12,12 +12,10 @@ async-trait.workspace = true
 tokio.workspace = true
 
 [dependencies.pangalactic-linkkind]
-path = "../linkkind"
-version = "^0.1.0"
+workspace = true
 
 [dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"
+workspace = true
 
 [dev-dependencies]
 test-case.workspace = true
