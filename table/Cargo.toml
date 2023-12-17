@@ -8,7 +8,4 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-
-[dependencies.pangalactic-handle]
-path = "../handle"
-version = "^0.1.0"
+pangalactic-handle.workspace = true

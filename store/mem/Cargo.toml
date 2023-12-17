@@ -9,12 +9,6 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
+pangalactic-hash.workspace = true
+pangalactic-store.workspace = true
 tokio.workspace = true
-
-[dependencies.pangalactic-store]
-path = "../trait"
-version = "^0.1.0"
-
-[dependencies.pangalactic-hash]
-path = "../../hash"
-version = "^0.1.0"

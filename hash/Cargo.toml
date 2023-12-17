@@ -10,8 +10,5 @@ license.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 blake3.workspace = true
+pangalactic-serialization.workspace = true
 tokio.workspace = true
-
-[dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"

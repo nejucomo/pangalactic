@@ -9,15 +9,9 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-serialization.workspace = true
 tokio.workspace = true
-
-[dependencies.pangalactic-linkkind]
-path = "../linkkind"
-version = "^0.1.0"
-
-[dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"
 
 [dev-dependencies]
 test-case.workspace = true

@@ -23,6 +23,4 @@ license = "MIT"
 [workspace.dependencies]
 libflate = "1.2.0"
 tar = "0.4.38"
-
-[workspace.dependencies.pangalactic-guest]
-path = "../../guest"
+pangalactic-guest = { path = "../../guest" }

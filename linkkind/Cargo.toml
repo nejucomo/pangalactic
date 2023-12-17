@@ -5,14 +5,8 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-async-trait.workspace = true
 anyhow.workspace = true
+async-trait.workspace = true
+pangalactic-primitives.workspace = true
+pangalactic-serialization.workspace = true
 tokio.workspace = true
-
-[dependencies.pangalactic-primitives]
-path = "../primitives"
-version = "^0.1.0"
-
-[dependencies.pangalactic-serialization]
-path = "../serialization"
-version = "^0.1.0"
