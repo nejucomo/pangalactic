@@ -8,5 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
-pangalactic-store.workspace = true
+pangalactic-b64.workspace = true
+pangalactic-serialization.workspace = true
 pangalactic-store-mem.workspace = true
+pangalactic-store.workspace = true
