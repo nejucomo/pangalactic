@@ -1,7 +1,9 @@
 use async_trait::async_trait;
 use pangalactic_primitives::{self as prim, LINK_KIND_DIR, LINK_KIND_FILE};
 use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
+use std::fmt;
 use std::marker::Unpin;
+use std::str::FromStr;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -32,6 +34,32 @@ impl From<LinkKind> for prim::LinkKind {
             File => LINK_KIND_FILE,
             Dir => LINK_KIND_DIR,
         }
+    }
+}
+
+impl FromStr for LinkKind {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> anyhow::Result<Self> {
+        use LinkKind::*;
+
+        match s {
+            "file" => Ok(File),
+            "dir" => Ok(Dir),
+            other => Err(anyhow::anyhow!("unrecognized LinkKind {other:?}")),
+        }
+    }
+}
+
+impl fmt::Display for LinkKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use LinkKind::*;
+
+        match self {
+            File => "file",
+            Dir => "dir",
+        }
+        .fmt(f)
     }
 }
 

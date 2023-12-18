@@ -1,13 +1,14 @@
 [package]
-name = "pangalactic-hash"
+name = "pangalactic-cli"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
-blake3.workspace = true
+clap.workspace = true
+tokio = { workspace = true, features = [ "io-std" ] }
 pangalactic-b64.workspace = true
+pangalactic-dagio.workspace = true
 pangalactic-serialization.workspace = true
-tokio.workspace = true
+pangalactic-store-mem.workspace = true

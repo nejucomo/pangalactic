@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
+use std::fmt;
 use std::marker::Unpin;
+use std::str::FromStr;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
@@ -20,6 +22,25 @@ impl Hash {
 
     pub(crate) fn wrap(b3h: blake3::Hash) -> Self {
         Hash(b3h)
+    }
+}
+
+impl FromStr for Hash {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // TODO: perf: This copies twice. Can we do b64 -> [u8; K] in one pass?
+        let bytes = pangalactic_b64::decode(s)?;
+        let blen = bytes.len();
+        let buf = <[u8; blake3::OUT_LEN]>::try_from(bytes)
+            .map_err(|_| anyhow::anyhow!("found {blen} bytes, expected {}", blake3::OUT_LEN))?;
+        Ok(Hash(blake3::Hash::from(buf)))
+    }
+}
+
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        pangalactic_b64::encode(self.0.as_bytes()).fmt(f)
     }
 }
 

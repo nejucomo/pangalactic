@@ -1,9 +1,6 @@
-use async_trait::async_trait;
 use pangalactic_linkkind::LinkKind;
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
-use std::fmt::Debug;
-use std::marker::Unpin;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::fmt;
+use std::str::FromStr;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Link<K> {
@@ -26,7 +23,7 @@ impl<K> Link<K> {
 
     pub fn peek_key_kind(&self, kind: LinkKind) -> anyhow::Result<&K>
     where
-        K: Debug,
+        K: fmt::Debug,
     {
         if self.kind == kind {
             Ok(&self.key)
@@ -43,32 +40,30 @@ impl<K> Link<K> {
     }
 }
 
-#[async_trait]
-impl<K> AsyncSerialize for Link<K>
+impl<K> FromStr for Link<K>
 where
-    K: AsyncSerialize + Send + Sync,
+    K: FromStr<Err = anyhow::Error>,
 {
-    async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
-    where
-        W: AsyncWrite + Unpin + Send,
-    {
-        self.kind.write_into(&mut w).await?;
-        self.key.write_into(&mut w).await?;
-        Ok(())
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> anyhow::Result<Self> {
+        let (kindtext, suffix) = s
+            .split_once(':')
+            .ok_or_else(|| anyhow::anyhow!("missing ':'"))?;
+        let kind = kindtext.parse()?;
+        let key = suffix.parse()?;
+        Ok(Link::new(kind, key))
     }
 }
 
-#[async_trait]
-impl<K> AsyncDeserialize for Link<K>
+impl<K> fmt::Display for Link<K>
 where
-    K: AsyncDeserialize + Send + Sync,
+    K: fmt::Display,
 {
-    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
-    where
-        R: AsyncRead + Unpin + Send,
-    {
-        let kind = LinkKind::read_from(&mut r).await?;
-        let key = K::read_from(&mut r).await?;
-        Ok(Link { kind, key })
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.kind.fmt(f)?;
+        ':'.fmt(f)?;
+        self.key.fmt(f)?;
+        Ok(())
     }
 }
