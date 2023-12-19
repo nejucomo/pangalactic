@@ -11,4 +11,4 @@ tokio = { workspace = true, features = [ "io-std" ] }
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-serialization.workspace = true
-pangalactic-store-mem.workspace = true
+pangalactic-store-dirdb.workspace = true
