@@ -29,7 +29,6 @@ impl Writer {
 
     pub(crate) async fn commit(self) -> anyhow::Result<Hash> {
         use anyhow_std::PathAnyhow;
-        use std::io::ErrorKind::AlreadyExists;
 
         let Writer {
             spoolpath,
@@ -48,13 +47,8 @@ impl Writer {
         let dir = spoolpath.parent_anyhow()?;
         let destpath = dir.join(hash.to_string());
 
-        match renamore::rename_exclusive(spoolpath, destpath) {
-            Err(e) if e.kind() == AlreadyExists => {
-                // If the destination already exists, it already has the correct content:
-                Ok(())
-            }
-            other => other,
-        }?;
+        // If dest is overwritten atomically, both copies should be identical, so there is no problem other than performance issues.
+        spoolpath.rename_anyhow(destpath)?;
 
         Ok(hash)
     }

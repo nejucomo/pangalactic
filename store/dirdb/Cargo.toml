@@ -9,10 +9,10 @@ anyhow.workspace = true
 anyhow-std.workspace = true
 async-trait.workspace = true
 derive_more.workspace = true
+dirs.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-hash.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true
 rand.workspace = true
-renamore.workspace = true
 tokio = { workspace = true, features = [ "fs" ] }

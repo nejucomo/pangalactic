@@ -7,6 +7,14 @@ use std::path::PathBuf;
 #[derive(Debug, derive_more::From)]
 pub struct DirDbStore(PathBuf);
 
+impl Default for DirDbStore {
+    fn default() -> Self {
+        let d = crate::default_path();
+        std::fs::create_dir_all(&d).unwrap();
+        DirDbStore(d)
+    }
+}
+
 #[async_trait]
 impl Store for DirDbStore {
     type CID = Hash;

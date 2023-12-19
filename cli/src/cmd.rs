@@ -1,8 +1,8 @@
 use pangalactic_dagio::Dagio;
-use pangalactic_store_mem::MemStore;
+use pangalactic_store_dirdb::DirDbStore;
 
 pub async fn store_insert() -> anyhow::Result<()> {
-    let mut dagio = Dagio::from(MemStore::default());
+    let mut dagio = Dagio::from(DirDbStore::default());
     let mut r = tokio::io::stdin();
     let mut w = dagio.open_file_writer().await?;
     tokio::io::copy(&mut r, &mut w).await?;
