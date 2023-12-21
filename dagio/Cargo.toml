@@ -11,8 +11,8 @@ pangalactic-dir = { workspace = true, features = [ "host" ] }
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-link.workspace = true
-pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
+serde.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]

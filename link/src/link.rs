@@ -1,8 +1,9 @@
 use pangalactic_linkkind::LinkKind;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Link<K> {
     kind: LinkKind,
     key: K,

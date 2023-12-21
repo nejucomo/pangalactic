@@ -8,6 +8,6 @@ anyhow.workspace = true
 async-trait.workspace = true
 derive_more.workspace = true
 pangalactic-hash.workspace = true
-pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
+serde.workspace = true
 tokio.workspace = true

@@ -1,12 +1,9 @@
-use async_trait::async_trait;
 use pangalactic_primitives::{self as prim, LINK_KIND_DIR, LINK_KIND_FILE};
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
+use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::marker::Unpin;
 use std::str::FromStr;
-use tokio::io::{AsyncRead, AsyncWrite};
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum LinkKind {
     File,
     Dir,
@@ -60,26 +57,5 @@ impl fmt::Display for LinkKind {
             Dir => "dir",
         }
         .fmt(f)
-    }
-}
-
-#[async_trait]
-impl AsyncSerialize for LinkKind {
-    async fn write_into<W>(&self, w: W) -> anyhow::Result<()>
-    where
-        W: AsyncWrite + Unpin + Send,
-    {
-        prim::LinkKind::from(*self).write_into(w).await
-    }
-}
-
-#[async_trait]
-impl AsyncDeserialize for LinkKind {
-    async fn read_from<R>(r: R) -> anyhow::Result<Self>
-    where
-        R: AsyncRead + Unpin + Send,
-    {
-        let encoding = prim::LinkKind::read_from(r).await?;
-        LinkKind::try_from(encoding).map_err(anyhow::Error::msg)
     }
 }

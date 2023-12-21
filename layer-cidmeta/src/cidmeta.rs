@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use pangalactic_store::Store;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::marker::Unpin;
 use std::str::FromStr;

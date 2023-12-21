@@ -9,5 +9,5 @@ anyhow.workspace = true
 async-trait.workspace = true
 blake3.workspace = true
 pangalactic-b64.workspace = true
-pangalactic-serialization.workspace = true
+serde.workspace = true
 tokio.workspace = true

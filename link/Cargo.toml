@@ -8,7 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 pangalactic-linkkind.workspace = true
-pangalactic-serialization.workspace = true
+serde.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]

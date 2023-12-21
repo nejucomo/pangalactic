@@ -8,7 +8,7 @@ license.workspace = true
 host = [
   "async-trait",
   "pangalactic-link",
-  "pangalactic-serialization",
+  "serde",
   "tokio",
 ]
 
@@ -16,7 +16,7 @@ host = [
 anyhow.workspace = true
 async-trait = { workspace = true, optional = true }
 pangalactic-link = { workspace = true, optional = true }
-pangalactic-serialization = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 
 [dev-dependencies]

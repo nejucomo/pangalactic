@@ -1,63 +1,54 @@
-use crate::{Directory, Name};
-use async_trait::async_trait;
+use crate::Directory;
 use pangalactic_link::Link;
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
-use std::marker::Unpin;
-use tokio::io::{AsyncRead, AsyncWrite};
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(
+    try_from = "HostDirectorySerializationContainer<K>",
+    into = "HostDirectorySerializationContainer<K>"
+)]
+pub struct HostDirectory<K>(Directory<Link<K>>)
+where
+    K: Clone;
 
 const SERIALIZATION_VERSION: u64 = 0;
 
-pub type HostDirectory<K> = Directory<Link<K>>;
-
-#[async_trait]
-impl<K> AsyncSerialize for HostDirectory<K>
+impl<K> TryFrom<HostDirectorySerializationContainer<K>> for HostDirectory<K>
 where
-    K: AsyncSerialize + Send + Sync,
+    K: Clone,
 {
-    async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
-    where
-        W: AsyncWrite + Unpin + Send,
-    {
-        SERIALIZATION_VERSION.write_into(&mut w).await?;
-        self.0.len().write_into(&mut w).await?;
+    type Error = anyhow::Error;
 
-        // We want to do this, but then links don't live long enough for async `write_into`:
-        // for (name, link) in self.0.iter() {
-
-        let entries: Vec<(&'_ String, &'_ Link<K>)> = self.0.iter().collect();
-        for (name, link) in entries {
-            name.write_into(&mut w).await?;
-            link.write_into(&mut w).await?;
+    fn try_from(container: HostDirectorySerializationContainer<K>) -> Result<Self, Self::Error> {
+        if container.version == SERIALIZATION_VERSION {
+            Ok(container.hd)
+        } else {
+            anyhow::bail!(
+                "unknown serialization version {:?}; expected {:?}",
+                container.version,
+                SERIALIZATION_VERSION
+            );
         }
-
-        Ok(())
     }
 }
 
-#[async_trait]
-impl<K> AsyncDeserialize for HostDirectory<K>
+impl<K> From<HostDirectory<K>> for HostDirectorySerializationContainer<K>
 where
-    K: AsyncDeserialize + Send + Sync,
+    K: Clone,
 {
-    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
-    where
-        R: AsyncRead + Unpin + Send,
-    {
-        let version = u64::read_from(&mut r).await?;
-        if version != SERIALIZATION_VERSION {
-            return Err(anyhow::Error::msg(format!(
-                "expected serialization version {SERIALIZATION_VERSION}, found {version}"
-            )));
+    fn from(hd: HostDirectory<K>) -> Self {
+        HostDirectorySerializationContainer {
+            version: SERIALIZATION_VERSION,
+            hd,
         }
-
-        let mut d = Directory::default();
-        let entrycount = usize::read_from(&mut r).await?;
-        for _ in 0..entrycount {
-            let name = Name::read_from(&mut r).await?;
-            let link = Link::<K>::read_from(&mut r).await?;
-            d.insert(name, link)?;
-        }
-
-        Ok(d)
     }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct HostDirectorySerializationContainer<K>
+where
+    K: Clone,
+{
+    version: u64,
+    hd: HostDirectory<K>,
 }

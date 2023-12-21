@@ -1,5 +1,6 @@
 use async_trait::async_trait;
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use std::fmt::Debug;
 use tokio::io::{AsyncRead, AsyncWrite};
 
@@ -17,7 +18,7 @@ pub trait Store: Debug + Send {
     /// - A `CID` should be concise.
     ///
     /// Cryptographic hash functions over the content are assumed to meet these properties.
-    type CID: Clone + Eq + Debug + AsyncSerialize + AsyncDeserialize + Send + Sync;
+    type CID: Clone + Eq + Debug + Serialize + DeserializeOwned + Send + Sync;
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;
 
