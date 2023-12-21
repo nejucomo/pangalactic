@@ -1,9 +1,13 @@
 [package]
-name = "pangalactic-dir"
+name = "pangalactic-serialization"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+testutil = []
+
 [dependencies]
 anyhow.workspace = true
-serde = { workspace = true, optional = true }
+postcard.workspace = true
+serde.workspace = true

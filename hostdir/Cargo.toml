@@ -1,0 +1,17 @@
+[package]
+name = "pangalactic-hostdir"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+derive_more.workspace = true
+pangalactic-dir = { workspace = true, features = ["serde"] }
+pangalactic-link.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-serialization = { workspace = true, features = ["testutil"] }

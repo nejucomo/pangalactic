@@ -7,7 +7,7 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-pangalactic-dir = { workspace = true, features = [ "host" ] }
+pangalactic-hostdir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-link.workspace = true

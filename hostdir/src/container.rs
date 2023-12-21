@@ -1,15 +1,14 @@
-use crate::Directory;
-use pangalactic_link::Link;
+use crate::HostDirectory;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(
-    try_from = "HostDirectorySerializationContainer<K>",
-    into = "HostDirectorySerializationContainer<K>"
-)]
-pub struct HostDirectory<K>(Directory<Link<K>>)
+#[derive(Debug, Deserialize, Serialize)]
+pub(crate) struct HostDirectorySerializationContainer<K>
 where
-    K: Clone;
+    K: Clone,
+{
+    version: u64,
+    hd: HostDirectory<K>,
+}
 
 const SERIALIZATION_VERSION: u64 = 0;
 
@@ -42,13 +41,4 @@ where
             hd,
         }
     }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct HostDirectorySerializationContainer<K>
-where
-    K: Clone,
-{
-    version: u64,
-    hd: HostDirectory<K>,
 }
