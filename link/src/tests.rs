@@ -28,3 +28,13 @@ fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
     assert_eq!(input, output);
     Ok(())
 }
+
+#[test_case("file-AQhmYWtlLWtleQ", "file prefix on dir link")]
+#[test_case("dir-AAhmYWtlLWtleQ", "dir prefix on file link")]
+fn prefix_mismatch(input: &str, expected_suffix: &str) {
+    let emsg = format!("{:#}", input.parse::<FLink>().err().unwrap());
+    assert!(
+        emsg.ends_with(expected_suffix),
+        "error {emsg:?} does not have suffix {expected_suffix:?}"
+    );
+}
