@@ -43,7 +43,11 @@ impl FromStr for LinkKind {
         match s {
             "file" => Ok(File),
             "dir" => Ok(Dir),
-            other => Err(anyhow::anyhow!("unrecognized LinkKind {other:?}")),
+            other => Err(anyhow::anyhow!(
+                "unrecognized LinkKind {other:?}, expected one of: {:?}, {:?}",
+                File.to_string(),
+                Dir.to_string()
+            )),
         }
     }
 }

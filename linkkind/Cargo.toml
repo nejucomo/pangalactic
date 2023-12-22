@@ -6,7 +6,8 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
 pangalactic-primitives.workspace = true
 serde.workspace = true
-tokio.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true
