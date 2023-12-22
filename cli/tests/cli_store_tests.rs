@@ -2,12 +2,9 @@
 
 use test_case::test_case;
 
-fn run_pg(dataset: &str, args: &[&str], stdin: &str) -> anyhow::Result<String> {
+fn run_pg(testcasedir: &str, args: &[&str], stdin: &str) -> anyhow::Result<String> {
     use std::io::Write;
     use std::process::{Command, Stdio};
-
-    let testdatadir = env!("CARGO_TARGET_TMPDIR");
-    let testcasedir = format!("{testdatadir}/cli_store_tests_data/{dataset}");
 
     let mut cmd = Command::new(dbg!(env!("CARGO_BIN_EXE_pg")));
     cmd.args(args);
@@ -28,15 +25,35 @@ fn run_pg(dataset: &str, args: &[&str], stdin: &str) -> anyhow::Result<String> {
 #[test_case("")]
 #[test_case("Hello World!")]
 fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
-    let dataset = format!(
+    dbg!(std::process::id());
+
+    let testcasedir = get_test_case_dir(&format!(
         "put_get_round_trip-{}",
         input.replace(' ', "_").replace('!', "_")
-    );
+    ));
 
-    let rawlink = run_pg(&dataset, &["store", "put"], input)?;
+    std::fs::remove_dir_all(&testcasedir).or_else(|e| {
+        use std::io::ErrorKind::NotFound;
+
+        if e.kind() == NotFound {
+            // It's ok if the directory did not already exist:
+            Ok(())
+        } else {
+            Err(e)
+        }
+    })?;
+
+    let rawlink = run_pg(&testcasedir, &["store", "put"], input)?;
     let link = rawlink.trim();
 
-    let output = run_pg(&dataset, &["store", "get", link], "")?;
+    let output = run_pg(&testcasedir, &["store", "get", link], "")?;
     assert_eq!(input, output);
     Ok(())
+}
+
+fn get_test_case_dir(dataset: &str) -> String {
+    format!(
+        "{}/cli_store_tests_data/{dataset}",
+        env!("CARGO_TARGET_TMPDIR")
+    )
 }
