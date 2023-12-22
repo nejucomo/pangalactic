@@ -4,7 +4,7 @@ use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use pangalactic_store::Store;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Dagio<S>(pub(crate) CidMetaLayer<S>)
 where
     S: Store;
