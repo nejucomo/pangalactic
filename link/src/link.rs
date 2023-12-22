@@ -40,6 +40,28 @@ impl<K> Link<K> {
     pub fn unwrap(self) -> (LinkKind, K) {
         (self.kind, self.key)
     }
+
+    fn from_str_without_context(s: &str) -> anyhow::Result<Self>
+    where
+        K: serde::de::DeserializeOwned,
+    {
+        use pangalactic_serialization::deserialize;
+
+        let (kindtext, linkb64) = s
+            .split_once('-')
+            .ok_or_else(|| anyhow::anyhow!("missing '-'"))?;
+
+        let kind: LinkKind = kindtext.parse()?;
+        let bytes = b64::decode(linkb64)?;
+        let link: Self = deserialize(&bytes)?;
+
+        if kind == link.kind {
+            Ok(link)
+        } else {
+            let enc = link.kind;
+            anyhow::bail!("mismatched: {kind} prefix on {enc} link");
+        }
+    }
 }
 
 impl<K> FromStr for Link<K>
@@ -49,11 +71,9 @@ where
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
-        use pangalactic_serialization::deserialize;
+        use anyhow::Context;
 
-        let bytes = b64::decode(s)?;
-        let link = deserialize(&bytes)?;
-        Ok(link)
+        Link::from_str_without_context(s).with_context(|| format!("while parsing Link {s:?}"))
     }
 }
 
@@ -63,6 +83,9 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use pangalactic_serialization::serialize;
+
+        self.kind.fmt(f)?;
+        '-'.fmt(f)?;
 
         let bytes = serialize(self).map_err(|_| std::fmt::Error::default())?;
         let s = b64::encode(&bytes);
