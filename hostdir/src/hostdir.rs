@@ -9,6 +9,8 @@ use serde::{Deserialize, Serialize};
     try_from = "HostDirectorySerializationContainer<K>",
     into = "HostDirectorySerializationContainer<K>"
 )]
-pub struct HostDirectory<K>(Directory<Link<K>>)
+pub struct HostDirectory<K>(pub(crate) Inner<K>)
 where
     K: Clone;
+
+pub(crate) type Inner<K> = Directory<Link<K>>;

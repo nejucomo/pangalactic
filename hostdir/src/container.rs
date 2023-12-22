@@ -1,3 +1,4 @@
+use crate::hostdir::Inner;
 use crate::HostDirectory;
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +8,7 @@ where
     K: Clone,
 {
     version: u64,
-    hd: HostDirectory<K>,
+    inner: Inner<K>,
 }
 
 const SERIALIZATION_VERSION: u64 = 0;
@@ -20,7 +21,7 @@ where
 
     fn try_from(container: HostDirectorySerializationContainer<K>) -> Result<Self, Self::Error> {
         if container.version == SERIALIZATION_VERSION {
-            Ok(container.hd)
+            Ok(HostDirectory(container.inner))
         } else {
             anyhow::bail!(
                 "unknown serialization version {:?}; expected {:?}",
@@ -38,7 +39,7 @@ where
     fn from(hd: HostDirectory<K>) -> Self {
         HostDirectorySerializationContainer {
             version: SERIALIZATION_VERSION,
-            hd,
+            inner: hd.0,
         }
     }
 }
