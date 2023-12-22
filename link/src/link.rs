@@ -82,8 +82,8 @@ where
         self.kind.fmt(f)?;
         '-'.fmt(f)?;
 
-        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error::default())?;
-        let s = b64::encode(&bytes);
+        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error)?;
+        let s = b64::encode(bytes);
         s.fmt(f)
     }
 }
