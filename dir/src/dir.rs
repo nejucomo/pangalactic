@@ -1,7 +1,10 @@
 use crate::{Name, NameRef};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Directory<L>(pub(crate) BTreeMap<Name, L>);
 
 impl<L> Default for Directory<L> {

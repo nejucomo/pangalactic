@@ -4,22 +4,6 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
-[features]
-host = [
-  "async-trait",
-  "pangalactic-link",
-  "pangalactic-serialization",
-  "tokio",
-]
-
 [dependencies]
 anyhow.workspace = true
-async-trait = { workspace = true, optional = true }
-pangalactic-link = { workspace = true, optional = true }
-pangalactic-serialization = { workspace = true, optional = true }
-tokio = { workspace = true, optional = true }
-
-[dev-dependencies]
-test-case.workspace = true
-pangalactic-linkkind.workspace = true
-
+serde = { workspace = true, optional = true }

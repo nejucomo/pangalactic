@@ -7,7 +7,7 @@ mod dirimpl;
 mod fromdag;
 mod todag;
 
-pub use self::aliases::{DirectoryFor, LinkFor, WriterFor};
+pub use self::aliases::{HostDirectoryFor, LinkFor, WriterFor};
 pub use self::dagio::Dagio;
 pub use self::fromdag::FromDag;
 pub use self::todag::ToDag;

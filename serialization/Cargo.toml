@@ -4,10 +4,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+testutil = []
+
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
-tokio.workspace = true
-
-[dev-dependencies]
-test-case.workspace = true
+postcard.workspace = true
+serde.workspace = true

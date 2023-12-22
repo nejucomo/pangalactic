@@ -1,16 +1,14 @@
-use async_trait::async_trait;
-use pangalactic_serialization::{AsyncDeserialize, AsyncSerialize};
 use pangalactic_store::Store;
+use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::marker::Unpin;
 use std::str::FromStr;
-use tokio::io::{AsyncRead, AsyncWrite};
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CidMeta<S>
 where
     S: Store,
 {
+    #[serde(bound(deserialize = "S:", serialize = "S:"))]
     pub(crate) cid: <S as Store>::CID,
     pub(crate) node_size: u64,
 }
@@ -74,35 +72,5 @@ where
         ':'.fmt(f)?;
         self.node_size.fmt(f)?;
         Ok(())
-    }
-}
-
-#[async_trait]
-impl<S> AsyncSerialize for CidMeta<S>
-where
-    S: Store,
-{
-    async fn write_into<W>(&self, mut w: W) -> anyhow::Result<()>
-    where
-        W: AsyncWrite + Unpin + Send,
-    {
-        self.cid.write_into(&mut w).await?;
-        self.node_size.write_into(&mut w).await?;
-        Ok(())
-    }
-}
-
-#[async_trait]
-impl<S> AsyncDeserialize for CidMeta<S>
-where
-    S: Store,
-{
-    async fn read_from<R>(mut r: R) -> anyhow::Result<Self>
-    where
-        R: AsyncRead + Unpin + Send,
-    {
-        let cid = <S as Store>::CID::read_from(&mut r).await?;
-        let node_size = u64::read_from(&mut r).await?;
-        Ok(CidMeta { cid, node_size })
     }
 }

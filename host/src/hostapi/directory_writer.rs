@@ -1,25 +1,25 @@
 use crate::State;
-use pangalactic_dagio::{DirectoryFor, LinkFor};
-use pangalactic_dir::Directory;
+use pangalactic_dagio::{HostDirectoryFor, LinkFor};
 use pangalactic_handle::Handle;
+use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
 pub(super) async fn open<S>(
     mut caller: Caller<'_, State<S>>,
-) -> Result<Handle<DirectoryFor<S>>, Trap>
+) -> Result<Handle<HostDirectoryFor<S>>, Trap>
 where
     S: Store,
 {
     Ok(caller
         .data_mut()
         .directory_writers_mut()
-        .insert(Directory::default()))
+        .insert(HostDirectory::default()))
 }
 
 pub(super) async fn insert<S>(
     mut caller: Caller<'_, State<S>>,
-    h_dir: Handle<DirectoryFor<S>>,
+    h_dir: Handle<HostDirectoryFor<S>>,
     nameptr: usize,
     namelen: usize,
     link: Handle<LinkFor<S>>,
@@ -43,7 +43,7 @@ where
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
-    h_dir: Handle<DirectoryFor<S>>,
+    h_dir: Handle<HostDirectoryFor<S>>,
 ) -> Result<Handle<LinkFor<S>>, Trap>
 where
     S: Store,

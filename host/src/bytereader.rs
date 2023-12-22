@@ -1,4 +1,4 @@
-use pangalactic_dir::Name;
+use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
 use std::io::Cursor;
 use std::pin::Pin;

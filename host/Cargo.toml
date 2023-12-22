@@ -9,7 +9,7 @@ anyhow.workspace = true
 async-trait.workspace = true
 log.workspace = true
 pangalactic-dagio.workspace = true
-pangalactic-dir = { workspace = true, features = [ "host" ] }
+pangalactic-hostdir.workspace = true
 pangalactic-handle.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-primitives.workspace = true

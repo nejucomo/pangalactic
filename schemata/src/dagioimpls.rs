@@ -2,6 +2,7 @@ use crate::{Attestation, Plan};
 use async_trait::async_trait;
 use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
 use pangalactic_dir::Directory;
+use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 
 #[async_trait]
@@ -10,8 +11,8 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let dir = Directory::from_dag(dagio, link).await?;
-        Self::try_from(dir)
+        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+        Self::try_from(Directory::from(hostdir))
     }
 }
 
@@ -21,7 +22,9 @@ where
     S: Store,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        dagio.commit(Directory::from(self)).await
+        dagio
+            .commit(HostDirectory::from(Directory::from(self)))
+            .await
     }
 }
 
@@ -31,8 +34,8 @@ where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let dir = Directory::from_dag(dagio, link).await?;
-        Self::try_from(dir)
+        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+        Self::try_from(Directory::from(hostdir))
     }
 }
 
@@ -42,6 +45,8 @@ where
     S: Store,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        dagio.commit(Directory::from(self)).await
+        dagio
+            .commit(HostDirectory::from(Directory::from(self)))
+            .await
     }
 }
