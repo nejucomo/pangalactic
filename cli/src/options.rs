@@ -18,7 +18,7 @@ impl Options {
         use StoreCommand::*;
 
         match self.command.unwrap() {
-            Store(Insert) => cmd::store_insert().await,
+            Store(Put) => cmd::store_put().await,
         }
     }
 }
@@ -32,6 +32,6 @@ pub enum Command {
 /// Interact directly with the store
 #[derive(Debug, Subcommand)]
 pub enum StoreCommand {
-    /// Insert the file on stdin and print its key on stdout
-    Insert,
+    /// Put the file on stdin and print its key on stdout
+    Put,
 }

@@ -1,7 +1,7 @@
 use pangalactic_dagio::Dagio;
 use pangalactic_store_dirdb::DirDbStore;
 
-pub async fn store_insert() -> anyhow::Result<()> {
+pub async fn store_put() -> anyhow::Result<()> {
     let mut dagio = Dagio::from(DirDbStore::default());
     let mut r = tokio::io::stdin();
     let mut w = dagio.open_file_writer().await?;
