@@ -1,3 +1,4 @@
+use pangalactic_b64 as b64;
 use pangalactic_linkkind::LinkKind;
 use serde::{Deserialize, Serialize};
 use std::fmt;
@@ -43,28 +44,28 @@ impl<K> Link<K> {
 
 impl<K> FromStr for Link<K>
 where
-    K: FromStr<Err = anyhow::Error>,
+    K: serde::de::DeserializeOwned,
 {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
-        let (kindtext, suffix) = s
-            .split_once(':')
-            .ok_or_else(|| anyhow::anyhow!("missing ':'"))?;
-        let kind = kindtext.parse()?;
-        let key = suffix.parse()?;
-        Ok(Link::new(kind, key))
+        use pangalactic_serialization::deserialize;
+
+        let bytes = b64::decode(s)?;
+        let link = deserialize(&bytes)?;
+        Ok(link)
     }
 }
 
 impl<K> fmt::Display for Link<K>
 where
-    K: fmt::Display,
+    K: Serialize,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.kind.fmt(f)?;
-        ':'.fmt(f)?;
-        self.key.fmt(f)?;
-        Ok(())
+        use pangalactic_serialization::serialize;
+
+        let bytes = serialize(self).map_err(|_| std::fmt::Error::default())?;
+        let s = b64::encode(&bytes);
+        s.fmt(f)
     }
 }
