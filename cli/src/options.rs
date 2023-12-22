@@ -1,5 +1,6 @@
 use crate::cmd;
-use clap::{Parser, Subcommand};
+use crate::store::CliLink;
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -19,6 +20,7 @@ impl Options {
 
         match self.command.unwrap() {
             Store(Put) => cmd::store_put().await,
+            Store(Get(opts)) => cmd::store_get(&opts.link).await,
         }
     }
 }
@@ -32,6 +34,14 @@ pub enum Command {
 /// Interact directly with the store
 #[derive(Debug, Subcommand)]
 pub enum StoreCommand {
-    /// Put the file on stdin and print its key on stdout
+    /// Insert the file on stdin and print its key on stdout
     Put,
+    /// Send the given file to stdout
+    Get(StoreGetOptions),
+}
+
+#[derive(Debug, Args)]
+pub struct StoreGetOptions {
+    /// The link to get
+    link: CliLink,
 }
