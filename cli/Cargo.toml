@@ -12,3 +12,6 @@ pangalactic-dagio.workspace = true
 pangalactic-store-dirdb.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
+
+[dev-dependencies]
+test-case.workspace = true
