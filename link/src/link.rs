@@ -53,14 +53,9 @@ impl<K> Link<K> {
 
         let kind: LinkKind = kindtext.parse()?;
         let bytes = b64::decode(linkb64)?;
-        let link: Self = deserialize(&bytes)?;
+        let key: K = deserialize(&bytes)?;
 
-        if kind == link.kind {
-            Ok(link)
-        } else {
-            let enc = link.kind;
-            anyhow::bail!("mismatched: {kind} prefix on {enc} link");
-        }
+        Ok(Link::new(kind, key))
     }
 }
 
@@ -87,7 +82,7 @@ where
         self.kind.fmt(f)?;
         '-'.fmt(f)?;
 
-        let bytes = serialize(self).map_err(|_| std::fmt::Error::default())?;
+        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error::default())?;
         let s = b64::encode(&bytes);
         s.fmt(f)
     }

@@ -12,6 +12,13 @@ fn fakekey() -> FakeKey {
 
 type FLink = Link<FakeKey>;
 
+#[test_case(Link::new(File, fakekey()), "file-CGZha2Uta2V5")]
+#[test_case(Link::new(Dir, fakekey()), "dir-CGZha2Uta2V5")]
+fn display(input: FLink, expected: &str) {
+    let actual = input.to_string();
+    assert_eq!(actual, expected);
+}
+
 #[test_case(Link::new(File, fakekey()))]
 #[test_case(Link::new(Dir, fakekey()))]
 fn display_parse_roundtrip(input: FLink) -> anyhow::Result<()> {
@@ -20,21 +27,11 @@ fn display_parse_roundtrip(input: FLink) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_case("file-AAhmYWtlLWtleQ")]
-#[test_case("dir-AQhmYWtlLWtleQ")]
+#[test_case("file-CGZha2Uta2V5")]
+#[test_case("dir-CGZha2Uta2V5")]
 fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
     let flink: FLink = input.parse()?;
     let output = flink.to_string();
     assert_eq!(input, output);
     Ok(())
-}
-
-#[test_case("file-AQhmYWtlLWtleQ", "file prefix on dir link")]
-#[test_case("dir-AAhmYWtlLWtleQ", "dir prefix on file link")]
-fn prefix_mismatch(input: &str, expected_suffix: &str) {
-    let emsg = format!("{:#}", input.parse::<FLink>().err().unwrap());
-    assert!(
-        emsg.ends_with(expected_suffix),
-        "error {emsg:?} does not have suffix {expected_suffix:?}"
-    );
 }
