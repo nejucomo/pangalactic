@@ -1,12 +1,19 @@
-use pangalactic_dagio::Dagio;
-use pangalactic_store_dirdb::DirDbStore;
+use crate::store::{CliDagio, CliLink};
 
-pub async fn store_insert() -> anyhow::Result<()> {
-    let mut dagio = Dagio::from(DirDbStore::default());
+pub async fn store_put() -> anyhow::Result<()> {
+    let mut dagio = CliDagio::default();
     let mut r = tokio::io::stdin();
     let mut w = dagio.open_file_writer().await?;
     tokio::io::copy(&mut r, &mut w).await?;
     let link = dagio.commit_file_writer(w).await?;
     println!("{link}");
+    Ok(())
+}
+
+pub async fn store_get(link: &CliLink) -> anyhow::Result<()> {
+    let mut dagio = CliDagio::default();
+    let mut r = dagio.open_file_reader(link).await?;
+    let mut w = tokio::io::stdout();
+    tokio::io::copy(&mut r, &mut w).await?;
     Ok(())
 }
