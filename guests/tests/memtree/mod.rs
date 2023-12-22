@@ -1,5 +1,5 @@
 use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
-use pangalactic_dir::Directory;
+use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 use std::collections::BTreeMap;
 
@@ -38,7 +38,7 @@ where
         match self {
             File(bytes) => dagio.write_file(&bytes).await,
             Dir(entries) => {
-                let mut d = Directory::default();
+                let mut d = HostDirectory::default();
                 for (n, child) in entries {
                     let link = child.clone().into_dag(dagio).await?;
                     d.insert(n.to_string(), link)?;
@@ -61,7 +61,7 @@ where
             LK::File => dagio.read_file(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: Directory<_> = dagio.read(link).await?;
+                let d: HostDirectory<_> = dagio.read(link).await?;
                 for (n, sublink) in d {
                     let mt: MemTree = dagio.read(&sublink).await?;
                     map.insert(n, mt);

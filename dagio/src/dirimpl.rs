@@ -1,20 +1,22 @@
-use crate::{Dagio, DirectoryFor, FromDag, LinkFor, ToDag};
+use crate::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag};
 use async_trait::async_trait;
-use pangalactic_dir::Directory;
+use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> ToDag<S> for DirectoryFor<S>
+impl<S> ToDag<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::Dir;
-        use pangalactic_serialization::AsyncSerialize;
+        use pangalactic_serialization::serialize;
+        use tokio::io::AsyncWriteExt;
 
         let mut w = dagio.0.open_writer().await?;
-        self.write_into(&mut w).await?;
+        let buf = serialize(&self)?;
+        w.write_all(&buf).await?;
         dagio
             .0
             .commit_writer(w)
@@ -31,25 +33,29 @@ where
     String: From<N>,
 {
     async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        Directory::from_iter(self.into_iter()).into_dag(dagio).await
+        HostDirectory::from_iter(self.into_iter())
+            .into_dag(dagio)
+            .await
     }
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> FromDag<S> for DirectoryFor<S>
+impl<S> FromDag<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
     async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
-        use pangalactic_serialization::AsyncDeserialize;
+        use tokio::io::AsyncReadExt;
 
         let key = link.peek_key_kind(Dir)?;
-        let r = dagio
+        let mut r = dagio
             .open_file_reader(&Link::new(File, key.clone()))
             .await?;
-        let dir = Directory::read_from(r).await?;
+        let mut buf = vec![];
+        r.read_to_end(&mut buf).await?;
+        let dir = pangalactic_serialization::deserialize(&buf)?;
         Ok(dir)
     }
 }
