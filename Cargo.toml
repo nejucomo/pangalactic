@@ -23,6 +23,7 @@ members = [
   "store/mem",
   "store/trait",
   "table",
+  "unittest-utils",
 ]
 
 [workspace.package]
@@ -56,6 +57,7 @@ pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-table           = { path = "table"           }
+pangalactic-unittest-utils  = { path = "unittest-utils"  }
 
 # Dependencies external to this workspace:
 anyhow = "1.0.66"

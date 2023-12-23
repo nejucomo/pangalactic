@@ -1,21 +1,11 @@
 use crate::LinkKind::{self, Dir, File};
+use pangalactic_unittest_utils::check_display_parse_equivalence;
 use test_case::test_case;
 
-#[test_case(File)]
-#[test_case(Dir)]
-fn display_parse_roundtrip(input: LinkKind) -> anyhow::Result<()> {
-    let output: LinkKind = input.to_string().parse()?;
-    assert_eq!(input, output);
-    Ok(())
-}
-
-#[test_case("file")]
-#[test_case("dir")]
-fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
-    let val: LinkKind = input.parse()?;
-    let output = val.to_string();
-    assert_eq!(input, &output);
-    Ok(())
+#[test_case("file", File)]
+#[test_case("dir", Dir)]
+fn display_parse_equivalence(text: &str, value: LinkKind) -> anyhow::Result<()> {
+    check_display_parse_equivalence(text, value)
 }
 
 #[test_case(

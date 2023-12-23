@@ -11,3 +11,4 @@ serde.workspace = true
 
 [dev-dependencies]
 test-case.workspace = true
+pangalactic-unittest-utils.workspace = true
