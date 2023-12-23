@@ -12,5 +12,6 @@ pangalactic-dir.workspace = true
 serde.workspace = true
 
 [dev-dependencies]
-test-case.workspace = true
 pangalactic-link = { workspace = true, features = ["testutil"] }
+pangalactic-unittest-utils.workspace = true
+test-case.workspace = true

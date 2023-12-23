@@ -4,7 +4,7 @@ use pangalactic_linkkind::LinkKind::{Dir, File};
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StorePath<K> {
     FilePath(K),
     DirPath(K, Vec<Name>),
