@@ -15,6 +15,7 @@ members = [
   "link",
   "linkkind",
   "log",
+  "path",
   "primitives",
   "schemata",
   "serialization",
@@ -47,6 +48,7 @@ pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-link            = { path = "link"            }
 pangalactic-log             = { path = "log"             }
+pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }

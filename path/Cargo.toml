@@ -1,20 +1,16 @@
 [package]
-name = "pangalactic-link"
+name = "pangalactic-path"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
-[features]
-testutil = []
-
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
-pangalactic-b64.workspace = true
+pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
-pangalactic-serialization.workspace = true
+pangalactic-dir.workspace = true
 serde.workspace = true
-tokio.workspace = true
 
 [dev-dependencies]
 test-case.workspace = true
+pangalactic-link = { workspace = true, features = ["testutil"] }
