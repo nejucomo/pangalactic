@@ -73,7 +73,7 @@ where
     fn from_str(s: &str) -> anyhow::Result<Self> {
         use std::collections::VecDeque;
 
-        let (scheme, link_and_path) = dbg!(s)
+        let (scheme, link_and_path) = s
             .split_once("://")
             .ok_or_else(|| anyhow::anyhow!("missing '://'"))?;
 

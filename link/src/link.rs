@@ -48,7 +48,7 @@ impl<K> Link<K> {
     {
         use pangalactic_serialization::deserialize;
 
-        let (scheme, linkb64) = dbg!(s)
+        let (scheme, linkb64) = s
             .split_once("://")
             .ok_or_else(|| anyhow::anyhow!("missing '://'"))?;
 
