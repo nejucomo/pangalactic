@@ -1,5 +1,6 @@
 use pangalactic_b64 as b64;
 use pangalactic_linkkind::LinkKind;
+use pangalactic_store::StoreCid;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -43,25 +44,27 @@ impl<K> Link<K> {
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self>
     where
-        K: serde::de::DeserializeOwned,
+        K: StoreCid,
     {
         use pangalactic_serialization::deserialize;
 
-        let (kindtext, linkb64) = s
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("missing '-'"))?;
+        let (scheme, linkb64) = dbg!(s)
+            .split_once("://")
+            .ok_or_else(|| anyhow::anyhow!("missing '://'"))?;
 
-        let kind: LinkKind = kindtext.parse()?;
-        let bytes = b64::decode(linkb64)?;
-        let key: K = deserialize(&bytes)?;
-
-        Ok(Link::new(kind, key))
+        if scheme == K::SCHEME {
+            let bytes = b64::decode(linkb64)?;
+            let this: Self = deserialize(&bytes)?;
+            Ok(this)
+        } else {
+            anyhow::bail!("expected scheme {:?}, found {:?}", K::SCHEME, scheme);
+        }
     }
 }
 
 impl<K> FromStr for Link<K>
 where
-    K: serde::de::DeserializeOwned,
+    K: StoreCid,
 {
     type Err = anyhow::Error;
 
@@ -74,16 +77,14 @@ where
 
 impl<K> fmt::Display for Link<K>
 where
-    K: Serialize,
+    K: StoreCid,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use pangalactic_serialization::serialize;
 
-        self.kind.fmt(f)?;
-        '-'.fmt(f)?;
-
-        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error)?;
+        let bytes = serialize(self).map_err(|_| std::fmt::Error)?;
         let s = b64::encode(bytes);
-        s.fmt(f)
+
+        write!(f, "{}://{}", K::SCHEME, s)
     }
 }

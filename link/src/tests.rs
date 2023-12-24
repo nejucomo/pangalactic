@@ -5,8 +5,8 @@ use pangalactic_serialization::check_serialize_then_deserialize_equality;
 use pangalactic_unittest_utils::check_display_parse_equivalence;
 use test_case::test_case;
 
-#[test_case("file-CGZha2Uta2V5", File)]
-#[test_case("dir-CGZha2Uta2V5", Dir)]
+#[test_case("test-fake://AAhmYWtlLWtleQ", File)]
+#[test_case("test-fake://AQhmYWtlLWtleQ", Dir)]
 fn display_parse_equivalence(text: &str, kind: LinkKind) -> anyhow::Result<()> {
     check_display_parse_equivalence(text, Link::new(kind, fakekey()))
 }

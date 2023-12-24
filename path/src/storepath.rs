@@ -1,6 +1,7 @@
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::{Dir, File};
+use pangalactic_store::StoreCid;
 use std::fmt;
 use std::str::FromStr;
 
@@ -22,7 +23,7 @@ impl<K> From<StorePath<K>> for (Link<K>, Vec<Name>) {
 
 impl<K> TryFrom<(Link<K>, Vec<Name>)> for StorePath<K>
 where
-    K: fmt::Debug,
+    K: StoreCid,
 {
     type Error = anyhow::Error;
 
@@ -48,7 +49,7 @@ where
 
 impl<K> fmt::Display for StorePath<K>
 where
-    K: Clone + serde::Serialize,
+    K: StoreCid,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let (link, mut parts) = self.clone().into();
@@ -59,18 +60,22 @@ where
 
 impl<K> FromStr for StorePath<K>
 where
-    K: fmt::Debug + serde::de::DeserializeOwned,
+    K: StoreCid,
 {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
         use std::collections::VecDeque;
 
-        let mut q: VecDeque<&str> = s.split('/').collect();
+        let (scheme, link_and_path) = dbg!(s)
+            .split_once("://")
+            .ok_or_else(|| anyhow::anyhow!("missing '://'"))?;
+
+        let mut q: VecDeque<&str> = link_and_path.split('/').collect();
         let linktext = q
             .pop_front()
             .ok_or_else(|| anyhow::anyhow!("missing link"))?;
-        let link: Link<K> = linktext.parse()?;
+        let link: Link<K> = format!("{scheme}://{linktext}").parse()?;
         let parts = q.into_iter().map(|s| s.to_string()).collect();
 
         Self::try_from((link, parts))
