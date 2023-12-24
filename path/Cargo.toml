@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+derive_more.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-dir.workspace = true
