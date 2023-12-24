@@ -9,4 +9,5 @@ anyhow.workspace = true
 async-trait.workspace = true
 pangalactic-hash.workspace = true
 pangalactic-store.workspace = true
+serde.workspace = true
 tokio.workspace = true

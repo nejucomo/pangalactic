@@ -5,9 +5,9 @@ use pangalactic_serialization::check_serialize_then_deserialize_equality;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
-struct FakeCID;
+struct FakeCid;
 
-type FLDirectory = HostDirectory<FakeCID>;
+type FLDirectory = HostDirectory<FakeCid>;
 
 #[test]
 fn test_empty_directory() -> anyhow::Result<()> {
@@ -19,9 +19,9 @@ fn test_directory() -> anyhow::Result<()> {
     use LinkKind::*;
 
     let mut d: FLDirectory = FLDirectory::default();
-    d.insert("alpha".to_string(), Link::new(File, FakeCID))
+    d.insert("alpha".to_string(), Link::new(File, FakeCid))
         .unwrap();
-    d.insert("beta".to_string(), Link::new(Dir, FakeCID))
+    d.insert("beta".to_string(), Link::new(Dir, FakeCid))
         .unwrap();
 
     check_serialize_then_deserialize_equality(d)

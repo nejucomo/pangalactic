@@ -1,4 +1,4 @@
-use pangalactic_store::Store;
+use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -7,7 +7,7 @@ where
     S: Store,
 {
     #[serde(bound(deserialize = "S:", serialize = "S:"))]
-    pub(crate) cid: <S as Store>::CID,
+    pub(crate) cid: S::Cid,
     pub(crate) node_size: u64,
 }
 
@@ -18,6 +18,13 @@ where
     pub fn node_size(&self) -> u64 {
         self.node_size
     }
+}
+
+impl<S> StoreCid for CidMeta<S>
+where
+    S: Store,
+{
+    const SCHEME: &'static str = S::Cid::SCHEME;
 }
 
 impl<S> PartialEq for CidMeta<S>
