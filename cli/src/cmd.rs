@@ -1,4 +1,4 @@
-use crate::store::{CliDagio, CliLink};
+use crate::store::{CliDagio, CliLink, CliPath};
 
 pub async fn store_put() -> anyhow::Result<()> {
     let mut dagio = CliDagio::default();
@@ -16,4 +16,8 @@ pub async fn store_get(link: &CliLink) -> anyhow::Result<()> {
     let mut w = tokio::io::stdout();
     tokio::io::copy(&mut r, &mut w).await?;
     Ok(())
+}
+
+pub async fn store_copy(_source: CliPath, _dest: CliPath) -> anyhow::Result<()> {
+    todo!();
 }

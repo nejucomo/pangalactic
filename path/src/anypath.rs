@@ -4,8 +4,11 @@ use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-#[derive(Debug, derive_more::From)]
-pub enum AnyPath<K> {
+#[derive(Clone, Debug, derive_more::From)]
+pub enum AnyPath<K>
+where
+    K: StoreCid,
+{
     Host(PathBuf),
     Store(StorePath<K>),
 }

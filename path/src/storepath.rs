@@ -6,13 +6,19 @@ use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum StorePath<K> {
+pub enum StorePath<K>
+where
+    K: StoreCid,
+{
     FilePath(K),
     DirPath(K, Vec<Name>),
 }
 use StorePath::*;
 
-impl<K> From<StorePath<K>> for (Link<K>, Vec<Name>) {
+impl<K> From<StorePath<K>> for (Link<K>, Vec<Name>)
+where
+    K: StoreCid,
+{
     fn from(sp: StorePath<K>) -> Self {
         match sp {
             FilePath(key) => (Link::new(File, key), vec![]),

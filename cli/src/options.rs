@@ -1,5 +1,5 @@
 use crate::cmd;
-use crate::store::CliLink;
+use crate::store::{CliLink, CliPath};
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
@@ -21,6 +21,7 @@ impl Options {
         match self.command.unwrap() {
             Store(Put) => cmd::store_put().await,
             Store(Get(opts)) => cmd::store_get(&opts.link).await,
+            Store(Copy(opts)) => cmd::store_copy(opts.source, opts.dest).await,
         }
     }
 }
@@ -38,10 +39,20 @@ pub enum StoreCommand {
     Put,
     /// Send the given file to stdout
     Get(StoreGetOptions),
+    /// Copy files or directories within or across store or host
+    Copy(StoreCopyOptions),
 }
 
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The link to get
     link: CliLink,
+}
+
+#[derive(Debug, Args)]
+pub struct StoreCopyOptions {
+    /// The source path
+    source: CliPath,
+    /// The destination path
+    dest: CliPath,
 }
