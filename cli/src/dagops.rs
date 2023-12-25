@@ -64,6 +64,16 @@ impl DagOps {
         Ok(())
     }
 
+    pub async fn store_dir_list(&mut self, dir: &LinkDo) -> anyhow::Result<()> {
+        use pangalactic_dagio::{FromDag, HostDirectoryFor};
+
+        let hd = HostDirectoryFor::from_dag(&mut self.0, dir).await?;
+        for (name, link) in hd {
+            println!("{link} {name}");
+        }
+        Ok(())
+    }
+
     pub async fn store_copy(&mut self, source: AnyPathDo, dest: AnyPathDo) -> anyhow::Result<()> {
         use AnyPath::*;
         use Either::*;

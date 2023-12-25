@@ -32,6 +32,7 @@ impl Options {
                             .await
                     }
                     Dir(Unlink(opts)) => dops.store_dir_unlink(&opts.dir, &opts.name).await,
+                    Dir(List(opts)) => dops.store_dir_list(&opts.dir).await,
                     Copy(opts) => dops.store_copy(opts.source, opts.dest).await,
                 }
             }
@@ -71,21 +72,34 @@ pub enum StoreDirCommand {
     Empty,
     Link(StoreDirLinkOptions),
     Unlink(StoreDirUnlinkOptions),
+    List(StoreDirListOptions),
 }
 
 /// Set a link within a directory
 #[derive(Debug, Args)]
 pub struct StoreDirLinkOptions {
+    /// The directory to insert a link into
     dir: LinkDo,
+    /// The name of the link entry in `dir`
     name: Name,
+    /// The referent of the link entry in `dir`
     target: LinkDo,
 }
 
-/// Set a link within a directory
+/// Unlink a directory entry
 #[derive(Debug, Args)]
 pub struct StoreDirUnlinkOptions {
+    /// The directory to unlink an entry from
     dir: LinkDo,
+    /// The name of the link entry in `dir`
     name: Name,
+}
+
+/// List a directory's contents
+#[derive(Debug, Args)]
+pub struct StoreDirListOptions {
+    /// The directory to list
+    dir: LinkDo,
 }
 
 #[derive(Debug, Args)]
