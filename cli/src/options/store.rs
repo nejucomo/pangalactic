@@ -1,5 +1,6 @@
 pub mod dir;
 pub mod file;
+pub mod tree;
 
 use crate::dagops::AnyPathDo;
 use clap::{Args, Subcommand};
@@ -11,6 +12,8 @@ pub enum Command {
     File(self::file::Command),
     #[command(subcommand)]
     Dir(self::dir::Command),
+    #[command(subcommand)]
+    Tree(self::tree::Command),
     Copy(CopyOptions),
 }
 

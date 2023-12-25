@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use either::Either;
 use pangalactic_dagio::Dagio;
@@ -72,6 +72,18 @@ impl DagOps {
             println!("{link} {name}");
         }
         Ok(())
+    }
+
+    pub async fn store_tree_manifest(&mut self, root: &LinkDo) -> anyhow::Result<()> {
+        todo!("manifest {root}");
+    }
+
+    pub async fn store_tree_import(&mut self, source: &Path) -> anyhow::Result<()> {
+        todo!("import {:?}", source.display());
+    }
+
+    pub async fn store_tree_export(&mut self, root: &LinkDo, dest: &Path) -> anyhow::Result<()> {
+        todo!("export {root} -> {:?}", dest.display());
     }
 
     pub async fn store_copy(&mut self, source: AnyPathDo, dest: AnyPathDo) -> anyhow::Result<()> {
