@@ -39,6 +39,31 @@ impl DagOps {
         Ok(())
     }
 
+    pub async fn store_dir_link(
+        &mut self,
+        dir: &LinkDo,
+        name: &str,
+        target: &LinkDo,
+    ) -> anyhow::Result<()> {
+        use pangalactic_dagio::{FromDag, HostDirectoryFor, ToDag};
+
+        let mut hd = HostDirectoryFor::from_dag(&mut self.0, dir).await?;
+        hd.insert(name.to_string(), target.clone())?;
+        let link = hd.into_dag(&mut self.0).await?;
+        println!("{link}");
+        Ok(())
+    }
+
+    pub async fn store_dir_unlink(&mut self, dir: &LinkDo, name: &str) -> anyhow::Result<()> {
+        use pangalactic_dagio::{FromDag, HostDirectoryFor, ToDag};
+
+        let mut hd = HostDirectoryFor::from_dag(&mut self.0, dir).await?;
+        hd.remove_required(name)?;
+        let link = hd.into_dag(&mut self.0).await?;
+        println!("{link}");
+        Ok(())
+    }
+
     pub async fn store_copy(&mut self, source: AnyPathDo, dest: AnyPathDo) -> anyhow::Result<()> {
         use AnyPath::*;
         use Either::*;

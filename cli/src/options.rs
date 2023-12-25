@@ -1,5 +1,6 @@
 use crate::dagops::{AnyPathDo, DagOps, LinkDo};
 use clap::{Args, Parser, Subcommand};
+use pangalactic_dir::Name;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -26,6 +27,11 @@ impl Options {
                     File(Put) => dops.store_file_put().await,
                     File(Get(opts)) => dops.store_file_get(&opts.link).await,
                     Dir(Empty) => dops.store_dir_empty().await,
+                    Dir(Link(opts)) => {
+                        dops.store_dir_link(&opts.dir, &opts.name, &opts.target)
+                            .await
+                    }
+                    Dir(Unlink(opts)) => dops.store_dir_unlink(&opts.dir, &opts.name).await,
                     Copy(opts) => dops.store_copy(opts.source, opts.dest).await,
                 }
             }
@@ -63,6 +69,23 @@ pub enum StoreFileCommand {
 pub enum StoreDirCommand {
     /// Print the link for the empty directory
     Empty,
+    Link(StoreDirLinkOptions),
+    Unlink(StoreDirUnlinkOptions),
+}
+
+/// Set a link within a directory
+#[derive(Debug, Args)]
+pub struct StoreDirLinkOptions {
+    dir: LinkDo,
+    name: Name,
+    target: LinkDo,
+}
+
+/// Set a link within a directory
+#[derive(Debug, Args)]
+pub struct StoreDirUnlinkOptions {
+    dir: LinkDo,
+    name: Name,
 }
 
 #[derive(Debug, Args)]
