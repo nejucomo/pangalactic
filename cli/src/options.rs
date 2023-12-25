@@ -22,9 +22,9 @@ impl Options {
     }
 
     pub async fn run(self) -> anyhow::Result<()> {
+        use self::store::dir::Command::*;
+        use self::store::file::Command::*;
         use self::store::Command::*;
-        use self::store::DirCommand::*;
-        use self::store::FileCommand::*;
         use Command::*;
 
         match self.command.unwrap() {
