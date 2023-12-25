@@ -1,6 +1,7 @@
-use crate::dagops::{AnyPathDo, DagOps, LinkDo};
-use clap::{Args, Parser, Subcommand};
-use pangalactic_dir::Name;
+pub mod store;
+
+use crate::dagops::DagOps;
+use clap::{Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -9,16 +10,22 @@ pub struct Options {
     command: Option<Command>,
 }
 
+#[derive(Debug, Subcommand)]
+pub enum Command {
+    #[command(subcommand)]
+    Store(self::store::Command),
+}
+
 impl Options {
     pub fn parse() -> Self {
         <Self as Parser>::parse()
     }
 
     pub async fn run(self) -> anyhow::Result<()> {
+        use self::store::Command::*;
+        use self::store::DirCommand::*;
+        use self::store::FileCommand::*;
         use Command::*;
-        use StoreCommand::*;
-        use StoreDirCommand::*;
-        use StoreFileCommand::*;
 
         match self.command.unwrap() {
             Store(cmd) => {
@@ -38,81 +45,4 @@ impl Options {
             }
         }
     }
-}
-
-#[derive(Debug, Subcommand)]
-pub enum Command {
-    #[command(subcommand)]
-    Store(StoreCommand),
-}
-
-/// Interact directly with the store
-#[derive(Debug, Subcommand)]
-pub enum StoreCommand {
-    #[command(subcommand)]
-    File(StoreFileCommand),
-    #[command(subcommand)]
-    Dir(StoreDirCommand),
-    Copy(StoreCopyOptions),
-}
-
-/// Low-level file operations
-#[derive(Debug, Subcommand)]
-pub enum StoreFileCommand {
-    /// Insert the file on stdin and print its key on stdout
-    Put,
-    /// Send the given file to stdout
-    Get(StoreFileGetOptions),
-}
-
-/// Low-level dir operations
-#[derive(Debug, Subcommand)]
-pub enum StoreDirCommand {
-    /// Print the link for the empty directory
-    Empty,
-    Link(StoreDirLinkOptions),
-    Unlink(StoreDirUnlinkOptions),
-    List(StoreDirListOptions),
-}
-
-/// Set a link within a directory
-#[derive(Debug, Args)]
-pub struct StoreDirLinkOptions {
-    /// The directory to insert a link into
-    dir: LinkDo,
-    /// The name of the link entry in `dir`
-    name: Name,
-    /// The referent of the link entry in `dir`
-    target: LinkDo,
-}
-
-/// Unlink a directory entry
-#[derive(Debug, Args)]
-pub struct StoreDirUnlinkOptions {
-    /// The directory to unlink an entry from
-    dir: LinkDo,
-    /// The name of the link entry in `dir`
-    name: Name,
-}
-
-/// List a directory's contents
-#[derive(Debug, Args)]
-pub struct StoreDirListOptions {
-    /// The directory to list
-    dir: LinkDo,
-}
-
-#[derive(Debug, Args)]
-pub struct StoreFileGetOptions {
-    /// The link to get
-    link: LinkDo,
-}
-
-/// Copy files or directories within or across store or host
-#[derive(Debug, Args)]
-pub struct StoreCopyOptions {
-    /// The source path
-    source: AnyPathDo,
-    /// The destination path
-    dest: AnyPathDo,
 }
