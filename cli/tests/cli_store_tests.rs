@@ -43,10 +43,10 @@ fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
         }
     })?;
 
-    let rawlink = run_pg(&testcasedir, &["store", "put"], input)?;
+    let rawlink = run_pg(&testcasedir, &["store", "file", "put"], input)?;
     let link = rawlink.trim();
 
-    let output = run_pg(&testcasedir, &["store", "get", link], "")?;
+    let output = run_pg(&testcasedir, &["store", "file", "get", link], "")?;
     assert_eq!(input, output);
     Ok(())
 }

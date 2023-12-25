@@ -14,7 +14,7 @@ pub type AnyPathDo = AnyPath<CidMeta<DirDbStore>>;
 pub type LinkDo = Link<CidMeta<DirDbStore>>;
 
 impl DagOps {
-    pub async fn store_put(&mut self) -> anyhow::Result<()> {
+    pub async fn store_file_put(&mut self) -> anyhow::Result<()> {
         let mut r = tokio::io::stdin();
         let mut w = self.0.open_file_writer().await?;
         tokio::io::copy(&mut r, &mut w).await?;
@@ -23,10 +23,19 @@ impl DagOps {
         Ok(())
     }
 
-    pub async fn store_get(&mut self, link: &LinkDo) -> anyhow::Result<()> {
+    pub async fn store_file_get(&mut self, link: &LinkDo) -> anyhow::Result<()> {
         let mut r = self.0.open_file_reader(link).await?;
         let mut w = tokio::io::stdout();
         tokio::io::copy(&mut r, &mut w).await?;
+        Ok(())
+    }
+
+    pub async fn store_dir_empty(&mut self) -> anyhow::Result<()> {
+        use pangalactic_dagio::{HostDirectoryFor, ToDag};
+
+        let hd = HostDirectoryFor::default();
+        let link = hd.into_dag(&mut self.0).await?;
+        println!("{link}");
         Ok(())
     }
 

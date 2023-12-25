@@ -16,13 +16,16 @@ impl Options {
     pub async fn run(self) -> anyhow::Result<()> {
         use Command::*;
         use StoreCommand::*;
+        use StoreDirCommand::*;
+        use StoreFileCommand::*;
 
         match self.command.unwrap() {
             Store(cmd) => {
                 let mut dops = DagOps::default();
                 match cmd {
-                    Put => dops.store_put().await,
-                    Get(opts) => dops.store_get(&opts.link).await,
+                    File(Put) => dops.store_file_put().await,
+                    File(Get(opts)) => dops.store_file_get(&opts.link).await,
+                    Dir(Empty) => dops.store_dir_empty().await,
                     Copy(opts) => dops.store_copy(opts.source, opts.dest).await,
                 }
             }
@@ -39,20 +42,36 @@ pub enum Command {
 /// Interact directly with the store
 #[derive(Debug, Subcommand)]
 pub enum StoreCommand {
-    /// Insert the file on stdin and print its key on stdout
-    Put,
-    /// Send the given file to stdout
-    Get(StoreGetOptions),
-    /// Copy files or directories within or across store or host
+    #[command(subcommand)]
+    File(StoreFileCommand),
+    #[command(subcommand)]
+    Dir(StoreDirCommand),
     Copy(StoreCopyOptions),
 }
 
+/// Low-level file operations
+#[derive(Debug, Subcommand)]
+pub enum StoreFileCommand {
+    /// Insert the file on stdin and print its key on stdout
+    Put,
+    /// Send the given file to stdout
+    Get(StoreFileGetOptions),
+}
+
+/// Low-level dir operations
+#[derive(Debug, Subcommand)]
+pub enum StoreDirCommand {
+    /// Print the link for the empty directory
+    Empty,
+}
+
 #[derive(Debug, Args)]
-pub struct StoreGetOptions {
+pub struct StoreFileGetOptions {
     /// The link to get
     link: LinkDo,
 }
 
+/// Copy files or directories within or across store or host
 #[derive(Debug, Args)]
 pub struct StoreCopyOptions {
     /// The source path
