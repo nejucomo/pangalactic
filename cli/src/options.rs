@@ -1,5 +1,4 @@
-use crate::cmd;
-use crate::store::{CliLink, CliPath};
+use crate::dagops::{AnyPathDo, DagOps, LinkDo};
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
@@ -19,9 +18,14 @@ impl Options {
         use StoreCommand::*;
 
         match self.command.unwrap() {
-            Store(Put) => cmd::store_put().await,
-            Store(Get(opts)) => cmd::store_get(&opts.link).await,
-            Store(Copy(opts)) => cmd::store_copy(opts.source, opts.dest).await,
+            Store(cmd) => {
+                let mut dops = DagOps::default();
+                match cmd {
+                    Put => dops.store_put().await,
+                    Get(opts) => dops.store_get(&opts.link).await,
+                    Copy(opts) => dops.store_copy(opts.source, opts.dest).await,
+                }
+            }
         }
     }
 }
@@ -46,13 +50,13 @@ pub enum StoreCommand {
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The link to get
-    link: CliLink,
+    link: LinkDo,
 }
 
 #[derive(Debug, Args)]
 pub struct StoreCopyOptions {
     /// The source path
-    source: CliPath,
+    source: AnyPathDo,
     /// The destination path
-    dest: CliPath,
+    dest: AnyPathDo,
 }

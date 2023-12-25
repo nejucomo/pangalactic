@@ -7,9 +7,10 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 derive_more.workspace = true
-pangalactic-link.workspace = true
-pangalactic-linkkind.workspace = true
+pangalactic-dagio.workspace = true
 pangalactic-dir.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-link.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
 
