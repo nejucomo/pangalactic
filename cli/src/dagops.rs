@@ -4,8 +4,8 @@ use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, ToDag};
 use pangalactic_dir::Name;
 use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
-use pangalactic_path::AnyPath;
 use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_storepath::StorePath;
 use std::path::{Path, PathBuf};
 use tokio::io::{AsyncRead, AsyncWrite};
 
@@ -13,9 +13,9 @@ use tokio::io::{AsyncRead, AsyncWrite};
 pub struct DagOps(Dagio<DirDbStore>);
 
 pub type DagioDo = Dagio<DirDbStore>;
-pub type AnyPathDo = AnyPath<CidMeta<DirDbStore>>;
 pub type DirectoryDo = HostDirectoryFor<DirDbStore>;
 pub type LinkDo = Link<CidMeta<DirDbStore>>;
+pub type StorePathDo = StorePath<CidMeta<DirDbStore>>;
 
 impl DagOps {
     pub async fn store_file_put(&mut self) -> anyhow::Result<()> {
@@ -228,36 +228,28 @@ impl DagOps {
         Ok(())
     }
 
-    pub async fn store_copy(&mut self, source: AnyPathDo, dest: AnyPathDo) -> anyhow::Result<()> {
-        use AnyPath::*;
+    pub async fn store_copy(
+        &mut self,
+        source: StorePathDo,
+        dest: StorePathDo,
+    ) -> anyhow::Result<()> {
         use Either::*;
 
         let source = self.resolve(source).await?;
-        match (source, dest) {
-            (Left(hostsrc), Host(hostdst)) => {
-                tokio::fs::copy(hostsrc, hostdst).await?;
-                Ok(())
-            }
-            (Left(hostsrc), Store(storedst)) => todo!("import {hostsrc:?} -> {storedst:?}"),
-            (Right(storesrc), Host(hostdst)) => todo!("export {storesrc:?} -> {hostdst:?}"),
-            (Right(storesrc), Store(storedst)) => todo!("store copy {storesrc:?} -> {storedst:?}"),
+        match source {
+            Left(hostsrc) => todo!("import {hostsrc:?} -> {dest:?}"),
+            Right(storesrc) => todo!("store copy {storesrc:?} -> {dest:?}"),
         }
     }
 
-    async fn resolve(&mut self, path: AnyPathDo) -> anyhow::Result<Either<PathBuf, LinkDo>> {
+    async fn resolve(&mut self, path: StorePathDo) -> anyhow::Result<Either<PathBuf, LinkDo>> {
         use either::Either::*;
-        use AnyPath::*;
 
-        match path {
-            Host(path) => Ok(Left(path)),
-            Store(storepath) => {
-                let (mut link, pathparts) = storepath.into();
-                for part in pathparts {
-                    let mut hd = HostDirectoryFor::from_dag(&mut self.0, &link).await?;
-                    link = hd.remove_required(&part)?;
-                }
-                Ok(Right(link))
-            }
+        let (mut link, pathparts) = path.into();
+        for part in pathparts {
+            let mut hd = HostDirectoryFor::from_dag(&mut self.0, &link).await?;
+            link = hd.remove_required(&part)?;
         }
+        Ok(Right(link))
     }
 }

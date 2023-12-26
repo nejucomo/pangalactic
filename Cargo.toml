@@ -3,6 +3,7 @@ resolver = "2"
 members = [
   "b64",
   "cli",
+  "dagfs",
   "dagio",
   "dir",
   "guest",
@@ -15,12 +16,12 @@ members = [
   "link",
   "linkkind",
   "log",
-  "path",
   "primitives",
   "schemata",
   "serialization",
   "store/dirdb",
   "store/mem",
+  "storepath",
   "store/trait",
   "table",
   "unittest-utils",
@@ -36,6 +37,7 @@ license = "MIT"
 # Local crates with paths clarified:
 pangalactic-b64             = { path = "b64"             }
 pangalactic-cli             = { path = "cli"             }
+pangalactic-dagfs           = { path = "dagfs"           }
 pangalactic-dagio           = { path = "dagio"           }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
@@ -49,12 +51,12 @@ pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-link            = { path = "link"            }
 pangalactic-log             = { path = "log"             }
-pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
+pangalactic-storepath       = { path = "storepath"       }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-table           = { path = "table"           }
 pangalactic-unittest-utils  = { path = "unittest-utils"  }

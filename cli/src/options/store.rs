@@ -2,7 +2,7 @@ pub mod dir;
 pub mod file;
 pub mod tree;
 
-use crate::dagops::AnyPathDo;
+use crate::dagops::StorePathDo;
 use clap::{Args, Subcommand};
 
 /// Interact directly with the store
@@ -21,7 +21,7 @@ pub enum Command {
 #[derive(Debug, Args)]
 pub struct CopyOptions {
     /// The source path
-    pub source: AnyPathDo,
+    pub source: StorePathDo,
     /// The destination path
-    pub dest: AnyPathDo,
+    pub dest: StorePathDo,
 }

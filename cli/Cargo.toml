@@ -5,18 +5,18 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-anyhow.workspace = true
 anyhow-std.workspace = true
+anyhow.workspace = true
 clap.workspace = true
 either.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
-pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
-pangalactic-path.workspace = true
+pangalactic-link.workspace = true
 pangalactic-store-dirdb.workspace = true
+pangalactic-storepath.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
