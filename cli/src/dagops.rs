@@ -1,17 +1,18 @@
-use std::path::{Path, PathBuf};
-
-use async_recursion::async_recursion;
+use anyhow_std::{OsStrAnyhow, PathAnyhow};
 use either::Either;
 use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, ToDag};
+use pangalactic_dir::Name;
 use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
 use pangalactic_path::AnyPath;
 use pangalactic_store_dirdb::DirDbStore;
+use std::path::{Path, PathBuf};
 use tokio::io::AsyncRead;
 
 #[derive(Debug, Default)]
 pub struct DagOps(Dagio<DirDbStore>);
 
+pub type DagioDo = Dagio<DirDbStore>;
 pub type AnyPathDo = AnyPath<CidMeta<DirDbStore>>;
 pub type DirectoryDo = HostDirectoryFor<DirDbStore>;
 pub type LinkDo = Link<CidMeta<DirDbStore>>;
@@ -87,28 +88,71 @@ impl DagOps {
         Ok(())
     }
 
-    #[async_recursion(?Send)]
+    /// A stack-based (non-recursive) depth-first import routine
+    ///
+    /// Stack-based ensures resource usage does not bottleneck on the
+    /// call stack for large filesystems, as well as working with standard
+    /// async routines (rather than using `async-recursion` trait or other
+    /// work-arounds).
     async fn import_path(&mut self, p: &Path) -> anyhow::Result<LinkDo> {
+        use either::Either::*;
+
+        let mut stack: Vec<(Name, DirectoryDo, Vec<PathBuf>)> = vec![];
+
+        match self.import_process_path(p).await? {
+            Left((_, link)) => {
+                return Ok(link);
+            }
+            Right((name, children)) => {
+                stack.push((name, DirectoryDo::default(), children));
+            }
+        };
+
+        loop {
+            let (_, ddo, children) = stack.last_mut().expect("internal loop invariant failure");
+
+            if let Some(childpath) = children.pop() {
+                // Make progress on linking the current directory's children:
+                match self.import_process_path(&childpath).await? {
+                    Left((childname, link)) => ddo.insert(childname, link)?,
+                    Right((childname, gkids)) => {
+                        // The current child is a directory, so recurse-equivalent by pushing onto the stack:
+                        stack.push((childname, DirectoryDo::default(), gkids))
+                    }
+                }
+            } else {
+                let (name, ddo, _empty) = stack.pop().expect("internal loop invariant failure");
+                let link = ddo.into_dag(&mut self.0).await?;
+                if let Some((_, ddo, _)) = stack.last_mut() {
+                    ddo.insert(name, link)?;
+                } else {
+                    return Ok(link);
+                }
+            }
+        }
+    }
+
+    async fn import_process_path(
+        &mut self,
+        p: &Path,
+    ) -> anyhow::Result<Either<(Name, LinkDo), (Name, Vec<PathBuf>)>> {
+        use either::Either::*;
+
+        let name = p.file_name_anyhow()?.to_str_anyhow()?.to_string();
+
         if p.is_file() {
             let f = tokio::fs::File::open(p).await?;
-            self.file_put(f).await
+            let link = self.file_put(f).await?;
+            Ok(Left((name, link)))
         } else if p.is_dir() {
-            let mut dd = DirectoryDo::default();
-            let mut readdir = tokio::fs::read_dir(p).await?;
-            while let Some(entry) = readdir.next_entry().await? {
-                let childname_ostr = entry.file_name();
-                let childname = childname_ostr
-                    .to_str()
-                    .ok_or_else(|| anyhow::anyhow!("Cannot convert {childname_ostr:?} to utf8"))?;
-                let childlink = self.import_path(&entry.path()).await?;
-                dd.insert(childname.to_string(), childlink)?;
+            let mut children = vec![];
+            let mut rd = tokio::fs::read_dir(p).await?;
+            while let Some(dirent) = rd.next_entry().await? {
+                children.push(dirent.path());
             }
-            dd.into_dag(&mut self.0).await
+            Ok(Right((name, children)))
         } else {
-            anyhow::bail!(
-                "cannot convert {:?} which is neither file, nor dir",
-                p.display()
-            );
+            anyhow::bail!("path is neither file nor dir: {:?}", p.display());
         }
     }
 
