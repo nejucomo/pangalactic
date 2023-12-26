@@ -87,7 +87,45 @@ impl DagOps {
     }
 
     pub async fn store_tree_manifest(&mut self, root: &LinkDo) -> anyhow::Result<()> {
-        todo!("manifest {root}");
+        use pangalactic_linkkind::LinkKind::*;
+
+        println!("Manifest of {root}:");
+        let mut stack: Vec<(LinkDo, String)> = vec![(root.clone(), "".to_string())];
+        // Gather cells of rows independently for column alignment:
+        let mut rows = vec![];
+
+        while let Some((link, path)) = stack.pop() {
+            match link.kind() {
+                File => {
+                    let size = link.peek_key().node_size();
+                    rows.push((link.to_string(), size.to_string(), path));
+                }
+                Dir => {
+                    let ddo = DirectoryDo::from_dag(&mut self.0, &link).await?;
+                    for (childname, childlink) in ddo {
+                        let childpath = format!("{}/{}", path, childname);
+                        stack.push((childlink, childpath));
+                    }
+                }
+            }
+        }
+
+        // Calculate column sizes:
+        let mut width_link = 0;
+        let mut width_size = 0;
+        for (link, size, _) in rows.iter() {
+            width_link = std::cmp::max(width_link, link.len());
+            width_size = std::cmp::max(width_size, size.len());
+        }
+
+        // Sort:
+        rows.sort_by(|(_, _, a), (_, _, b)| a.cmp(b));
+
+        // Print column-aligned table:
+        for (link, size, path) in rows {
+            println!("{link:width_link$} {size:>width_size$} {path}");
+        }
+        Ok(())
     }
 
     pub async fn store_tree_import(&mut self, source: &Path) -> anyhow::Result<()> {
