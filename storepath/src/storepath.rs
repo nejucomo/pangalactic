@@ -19,6 +19,15 @@ impl<K> StorePath<K>
 where
     K: StoreCid,
 {
+    pub fn pop(&mut self) -> anyhow::Result<Name> {
+        match self {
+            FilePath(_) => Err(anyhow::anyhow!("expected a dir storepath")),
+            DirPath(_, suffix) => suffix.pop().ok_or_else(|| {
+                anyhow::anyhow!("expected at least one name component in storepath")
+            }),
+        }
+    }
+
     pub fn link_and_path_slice(&self) -> (Link<K>, &[Name]) {
         match self {
             FilePath(key) => (Link::new(File, key.clone()), &[]),
