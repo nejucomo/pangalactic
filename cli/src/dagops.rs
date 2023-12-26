@@ -7,7 +7,7 @@ use pangalactic_link::Link;
 use pangalactic_path::AnyPath;
 use pangalactic_store_dirdb::DirDbStore;
 use std::path::{Path, PathBuf};
-use tokio::io::AsyncRead;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, Default)]
 pub struct DagOps(Dagio<DirDbStore>);
@@ -36,10 +36,18 @@ impl DagOps {
     }
 
     pub async fn store_file_get(&mut self, link: &LinkDo) -> anyhow::Result<()> {
-        let mut r = self.0.open_file_reader(link).await?;
-        let mut w = tokio::io::stdout();
-        tokio::io::copy(&mut r, &mut w).await?;
+        self.file_read_into(link, tokio::io::stdout()).await?;
         Ok(())
+    }
+
+    async fn file_read_into<W>(&mut self, link: &LinkDo, w: W) -> anyhow::Result<u64>
+    where
+        W: AsyncWrite,
+    {
+        let mut pinw = std::pin::pin!(w);
+        let mut r = self.0.open_file_reader(link).await?;
+        let written = tokio::io::copy(&mut r, &mut pinw).await?;
+        Ok(written)
     }
 
     pub async fn store_dir_empty(&mut self) -> anyhow::Result<()> {
@@ -157,7 +165,29 @@ impl DagOps {
     }
 
     pub async fn store_tree_export(&mut self, root: &LinkDo, dest: &Path) -> anyhow::Result<()> {
-        todo!("export {root} -> {:?}", dest.display());
+        use pangalactic_linkkind::LinkKind::*;
+        use std::collections::VecDeque;
+
+        // Breadth-first export:
+        let mut queue = VecDeque::from([(root.clone(), dest.to_path_buf())]);
+        while let Some((link, path)) = queue.pop_front() {
+            match link.kind() {
+                File => {
+                    let f = tokio::fs::File::create(path).await?;
+                    self.file_read_into(&link, f).await?;
+                }
+                Dir => {
+                    tokio::fs::create_dir(&path).await?;
+                    let ddo = DirectoryDo::from_dag(&mut self.0, &link).await?;
+                    for (name, childlink) in ddo {
+                        let childpath = path.join(name);
+                        queue.push_back((childlink, childpath));
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 
     pub async fn store_copy(&mut self, source: AnyPathDo, dest: AnyPathDo) -> anyhow::Result<()> {

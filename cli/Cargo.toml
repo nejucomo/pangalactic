@@ -14,6 +14,7 @@ pangalactic-dagio.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
+pangalactic-linkkind.workspace = true
 pangalactic-path.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-store.workspace = true
