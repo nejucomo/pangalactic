@@ -15,6 +15,31 @@ where
 }
 use StorePath::*;
 
+impl<K> StorePath<K>
+where
+    K: StoreCid,
+{
+    pub fn link_and_path_slice(&self) -> (Link<K>, &[Name]) {
+        match self {
+            FilePath(key) => (Link::new(File, key.clone()), &[]),
+            DirPath(key, suffix) => (Link::new(Dir, key.clone()), suffix.as_slice()),
+        }
+    }
+
+    pub fn prefix_path(&self, components: usize) -> Self {
+        match self {
+            FilePath(key) => FilePath(key.clone()),
+            DirPath(key, suffix) => DirPath(
+                key.clone(),
+                suffix[..components]
+                    .iter()
+                    .map(|n| n.to_string())
+                    .collect::<Vec<_>>(),
+            ),
+        }
+    }
+}
+
 impl<K> From<StorePath<K>> for (Link<K>, Vec<Name>)
 where
     K: StoreCid,
