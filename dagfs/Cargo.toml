@@ -14,3 +14,4 @@ pangalactic-linkkind.workspace = true
 pangalactic-link.workspace = true
 pangalactic-storepath.workspace = true
 pangalactic-store.workspace = true
+tokio.workspace = true

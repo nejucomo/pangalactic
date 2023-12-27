@@ -1,53 +1,34 @@
 use anyhow_std::{OsStrAnyhow, PathAnyhow};
 use either::Either;
-use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, ToDag};
+use pangalactic_dagfs::Dagfs;
+use pangalactic_dagio::{FromDag, HostDirectoryFor, ToDag};
 use pangalactic_dir::Name;
 use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
 use pangalactic_store_dirdb::DirDbStore;
 use pangalactic_storepath::StorePath;
 use std::path::{Path, PathBuf};
-use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, Default)]
-pub struct DagOps(Dagio<DirDbStore>);
+pub struct DagOps(Dagfs<DirDbStore>);
 
-pub type DagioDo = Dagio<DirDbStore>;
+pub type DagfsDo = Dagfs<DirDbStore>;
 pub type DirectoryDo = HostDirectoryFor<DirDbStore>;
 pub type LinkDo = Link<CidMeta<DirDbStore>>;
 pub type StorePathDo = StorePath<CidMeta<DirDbStore>>;
 
 impl DagOps {
     pub async fn store_file_put(&mut self) -> anyhow::Result<()> {
-        let link = self.file_put(tokio::io::stdin()).await?;
+        let link = self.0.commit_file_from_reader(tokio::io::stdin()).await?;
         println!("{link}");
         Ok(())
     }
 
-    async fn file_put<R>(&mut self, r: R) -> anyhow::Result<LinkDo>
-    where
-        R: AsyncRead,
-    {
-        let mut pinr = std::pin::pin!(r);
-        let mut w = self.0.open_file_writer().await?;
-        tokio::io::copy(&mut pinr, &mut w).await?;
-        let link = self.0.commit_file_writer(w).await?;
-        Ok(link)
-    }
-
     pub async fn store_file_get(&mut self, link: &LinkDo) -> anyhow::Result<()> {
-        self.file_read_into(link, tokio::io::stdout()).await?;
+        self.0
+            .read_file_into_writer(link, tokio::io::stdout())
+            .await?;
         Ok(())
-    }
-
-    async fn file_read_into<W>(&mut self, link: &LinkDo, w: W) -> anyhow::Result<u64>
-    where
-        W: AsyncWrite,
-    {
-        let mut pinw = std::pin::pin!(w);
-        let mut r = self.0.open_file_reader(link).await?;
-        let written = tokio::io::copy(&mut r, &mut pinw).await?;
-        Ok(written)
     }
 
     pub async fn store_dir_empty(&mut self) -> anyhow::Result<()> {
@@ -188,7 +169,7 @@ impl DagOps {
 
         if p.is_file() {
             let f = tokio::fs::File::open(p).await?;
-            let link = self.file_put(f).await?;
+            let link = self.0.commit_file_from_reader(f).await?;
             Ok(Left((name, link)))
         } else if p.is_dir() {
             let mut children = vec![];
@@ -212,7 +193,7 @@ impl DagOps {
             match link.kind() {
                 File => {
                     let f = tokio::fs::File::create(path).await?;
-                    self.file_read_into(&link, f).await?;
+                    self.0.read_file_into_writer(&link, f).await?;
                 }
                 Dir => {
                     tokio::fs::create_dir(&path).await?;

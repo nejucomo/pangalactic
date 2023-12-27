@@ -3,6 +3,7 @@ use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use pangalactic_store::Store;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 #[derive(Debug, Default)]
 pub struct Dagio<S>(pub(crate) CidMetaLayer<S>)
@@ -50,6 +51,27 @@ where
 
     pub async fn commit_file_writer(&mut self, w: WriterFor<S>) -> anyhow::Result<LinkFor<S>> {
         self.0.commit_writer(w).await.map(|k| Link::new(File, k))
+    }
+
+    pub async fn read_file_into_writer<W>(&mut self, link: &LinkFor<S>, w: W) -> anyhow::Result<u64>
+    where
+        W: AsyncWrite,
+    {
+        let mut pinw = std::pin::pin!(w);
+        let mut r = self.open_file_reader(link).await?;
+        let written = tokio::io::copy(&mut r, &mut pinw).await?;
+        Ok(written)
+    }
+
+    pub async fn commit_file_from_reader<R>(&mut self, r: R) -> anyhow::Result<LinkFor<S>>
+    where
+        R: AsyncRead,
+    {
+        let mut pinr = std::pin::pin!(r);
+        let mut w = self.open_file_writer().await?;
+        tokio::io::copy(&mut pinr, &mut w).await?;
+        let link = self.commit_file_writer(w).await?;
+        Ok(link)
     }
 
     pub async fn read_file(&mut self, link: &LinkFor<S>) -> anyhow::Result<Vec<u8>> {

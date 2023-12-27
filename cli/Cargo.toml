@@ -10,6 +10,7 @@ anyhow.workspace = true
 clap.workspace = true
 either.workspace = true
 pangalactic-b64.workspace = true
+pangalactic-dagfs.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-layer-cidmeta.workspace = true

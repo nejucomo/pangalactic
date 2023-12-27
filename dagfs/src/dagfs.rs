@@ -1,8 +1,9 @@
-use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag};
+use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag, WriterFor};
 use pangalactic_dir::Name;
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 use pangalactic_storepath::StorePath;
+use tokio::io::AsyncRead;
 
 #[derive(Debug, Default, derive_more::Deref, derive_more::DerefMut)]
 pub struct Dagfs<S>(Dagio<S>)
@@ -25,13 +26,22 @@ impl<S> Dagfs<S>
 where
     S: Store,
 {
-    /// Read the object at `source`
+    /// Read the object from `source`
     pub async fn read_path<T>(&mut self, source: &DagfsPath<S>) -> anyhow::Result<T>
     where
         T: FromDag<S>,
     {
         let (_, link) = self.tree_components(source).await?;
         self.read(&link).await
+    }
+
+    /// Open a file reader from `source`
+    pub async fn open_path_file_reader(
+        &mut self,
+        source: &DagfsPath<S>,
+    ) -> anyhow::Result<S::Reader> {
+        let (_, link) = self.tree_components(source).await?;
+        self.open_file_reader(&link).await
     }
 
     /// Set `dest` to point to `object`
@@ -47,13 +57,43 @@ where
     where
         T: ToDag<S>,
     {
+        let link = self.commit(object).await?;
+        self.set_path(dest, link).await
+    }
+
+    pub async fn commit_file_from_reader_to_path<R>(
+        &mut self,
+        dest: &DagfsPath<S>,
+        r: R,
+    ) -> anyhow::Result<LinkFor<S>>
+    where
+        R: AsyncRead,
+    {
+        let link = self.commit_file_from_reader(r).await?;
+        self.set_path(dest, link).await
+    }
+
+    pub async fn commit_file_writer_to_path(
+        &mut self,
+        dest: &DagfsPath<S>,
+        w: WriterFor<S>,
+    ) -> anyhow::Result<LinkFor<S>> {
+        let link = self.commit_file_writer(w).await?;
+        self.set_path(dest, link).await
+    }
+
+    async fn set_path(
+        &mut self,
+        dest: &DagfsPath<S>,
+        link: LinkFor<S>,
+    ) -> anyhow::Result<LinkFor<S>> {
         // Scan down to the penultimate path component, saving tree structure and name path
         let mut parentpath = dest.clone();
         let lastname = parentpath.pop()?;
-        let (components, link) = self.tree_components(&parentpath).await?;
+        let (components, parentlink) = self.tree_components(&parentpath).await?;
 
         // Insert `object`:
-        let mut link = self.update_dir_link(&link, lastname, object).await?;
+        let mut link = self.update_dir_link(&parentlink, lastname, link).await?;
 
         // Rebuild the structure with the new object:
         for (d, parentname) in components.into_iter().rev() {
