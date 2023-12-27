@@ -12,6 +12,7 @@ members = [
   "handle",
   "host",
   "hostdir",
+  "hosttree",
   "layer-cidmeta",
   "link",
   "linkkind",
@@ -46,6 +47,7 @@ pangalactic-guests          = { path = "guests"          }
 pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-hostdir         = { path = "hostdir"         }
+pangalactic-hosttree        = { path = "hosttree"        }
 pangalactic-host            = { path = "host"            }
 pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }

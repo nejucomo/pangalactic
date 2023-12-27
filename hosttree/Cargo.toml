@@ -1,0 +1,16 @@
+[package]
+name = "pangalactic-hosttree"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+derive_more.workspace = true
+pangalactic-dagio.workspace = true
+pangalactic-dir.workspace = true
+pangalactic-hostdir.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-link.workspace = true
+pangalactic-store.workspace = true
