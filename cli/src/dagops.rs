@@ -1,3 +1,4 @@
+use crate::aliases::CliStoreDestination;
 use anyhow_std::{OsStrAnyhow, PathAnyhow};
 use either::Either;
 use pangalactic_dagfs::Dagfs;
@@ -18,8 +19,15 @@ pub type LinkDo = Link<CidMeta<DirDbStore>>;
 pub type StorePathDo = StorePath<CidMeta<DirDbStore>>;
 
 impl DagOps {
-    pub async fn store_file_put(&mut self) -> anyhow::Result<()> {
-        let link = self.0.commit_file_from_reader(tokio::io::stdin()).await?;
+    pub async fn store_file_put(
+        &mut self,
+        dest: Option<CliStoreDestination>,
+    ) -> anyhow::Result<()> {
+        let mut link = self.0.commit_file_from_reader(tokio::io::stdin()).await?;
+        if let Some(dest) = dest {
+            let dest = StorePath::from(dest); // FIXME
+            link = self.0.commit_path(&dest, link).await?;
+        }
         println!("{link}");
         Ok(())
     }

@@ -30,7 +30,7 @@ impl Options {
 
         let mut dops = DagOps::default();
         match self.command.unwrap() {
-            Store(File(Put)) => dops.store_file_put().await,
+            Store(File(Put(opts))) => dops.store_file_put(opts.dest).await,
             Store(File(Get(opts))) => dops.store_file_get(&opts.link).await,
             Store(Dir(Empty)) => dops.store_dir_empty().await,
             Store(Dir(Link(opts))) => {

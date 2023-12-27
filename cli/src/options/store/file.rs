@@ -1,13 +1,19 @@
-use crate::dagops::LinkDo;
+use crate::{aliases::CliStoreDestination, dagops::LinkDo};
 use clap::{Args, Subcommand};
 
 /// Low-level file operations
 #[derive(Debug, Subcommand)]
 pub enum Command {
     /// Insert the file on stdin and print its key on stdout
-    Put,
+    Put(PutOptions),
     /// Send the given file to stdout
     Get(GetOptions),
+}
+
+#[derive(Debug, Args)]
+pub struct PutOptions {
+    /// The destination
+    pub dest: Option<CliStoreDestination>,
 }
 
 #[derive(Debug, Args)]
