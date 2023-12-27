@@ -1,18 +1,53 @@
 use crate::StorePath::{self, DirPath};
-use pangalactic_dir::Name;
+use pangalactic_dir::{Name, NameRef};
+use pangalactic_link::Link;
 use pangalactic_store::StoreCid;
 use std::fmt;
 use std::str::FromStr;
 
-// TODO: Replace `intermediate/lastname` with NonEmptyVec
+// TODO: Replace `intermediates/lastname` with NonEmptyVec
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StoreDestination<K>
 where
     K: StoreCid,
 {
     key: K,
-    intermediate: Vec<Name>,
+    intermediates: Vec<Name>,
     lastname: Name,
+}
+
+impl<K> StoreDestination<K>
+where
+    K: StoreCid,
+{
+    pub fn link_intermediates_and_last_name(&self) -> (Link<K>, &[Name], &NameRef) {
+        use pangalactic_linkkind::LinkKind::Dir;
+
+        (
+            Link::new(Dir, self.key.clone()),
+            self.intermediates.as_slice(),
+            &self.lastname,
+        )
+    }
+
+    pub fn prefix_path(&self, components: usize) -> Self {
+        {
+            // BUG: assertion of undocumented precondition:
+            let intermediates = &self.intermediates;
+            assert!(
+                components <= self.intermediates.len(),
+                "{components:?} vs {intermediates:?}"
+            );
+        }
+        StoreDestination {
+            key: self.key.clone(),
+            intermediates: self.intermediates[..components]
+                .iter()
+                .map(|n| n.to_string())
+                .collect::<Vec<_>>(),
+            lastname: self.intermediates[components].to_string(),
+        }
+    }
 }
 
 impl<K> From<StoreDestination<K>> for StorePath<K>
@@ -22,11 +57,11 @@ where
     fn from(dest: StoreDestination<K>) -> Self {
         let StoreDestination {
             key,
-            mut intermediate,
+            mut intermediates,
             lastname,
         } = dest;
-        intermediate.push(lastname);
-        DirPath(key, intermediate)
+        intermediates.push(lastname);
+        DirPath(key, intermediates)
     }
 }
 
@@ -40,11 +75,11 @@ where
         use anyhow::bail;
 
         match sp {
-            DirPath(key, mut intermediate) => {
-                if let Some(lastname) = intermediate.pop() {
+            DirPath(key, mut intermediates) => {
+                if let Some(lastname) = intermediates.pop() {
                     Ok(StoreDestination {
                         key,
-                        intermediate,
+                        intermediates,
                         lastname,
                     })
                 } else {

@@ -25,7 +25,6 @@ impl DagOps {
     ) -> anyhow::Result<()> {
         let mut link = self.0.commit_file_from_reader(tokio::io::stdin()).await?;
         if let Some(dest) = dest {
-            let dest = StorePath::from(dest); // FIXME
             link = self.0.commit_path(&dest, link).await?;
         }
         println!("{link}");
@@ -40,8 +39,7 @@ impl DagOps {
     }
 
     pub async fn store_dir_empty(&mut self) -> anyhow::Result<()> {
-        let hd = DirectoryDo::default();
-        let link = hd.into_dag(&mut self.0).await?;
+        let link = self.0.commit(DirectoryDo::default()).await?;
         println!("{link}");
         Ok(())
     }

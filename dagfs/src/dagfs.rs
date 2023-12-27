@@ -2,7 +2,7 @@ use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag, Writer
 use pangalactic_dir::Name;
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
-use pangalactic_storepath::StorePath;
+use pangalactic_storepath::{StoreDestination, StorePath};
 use tokio::io::AsyncRead;
 
 #[derive(Debug, Default, derive_more::Deref, derive_more::DerefMut)]
@@ -11,6 +11,7 @@ where
     S: Store;
 
 pub type DagfsPath<S> = StorePath<<CidMetaLayer<S> as Store>::Cid>;
+pub type DagfsDestination<S> = StoreDestination<<CidMetaLayer<S> as Store>::Cid>;
 
 impl<S, D> From<D> for Dagfs<S>
 where
@@ -31,7 +32,7 @@ where
     where
         T: FromDag<S>,
     {
-        let (_, link) = self.tree_components(source).await?;
+        let link = self.resolve_path(source).await?;
         self.read(&link).await
     }
 
@@ -40,7 +41,7 @@ where
         &mut self,
         source: &DagfsPath<S>,
     ) -> anyhow::Result<S::Reader> {
-        let (_, link) = self.tree_components(source).await?;
+        let link = self.resolve_path(source).await?;
         self.open_file_reader(&link).await
     }
 
@@ -51,7 +52,7 @@ where
     /// The returned link points to a new root with equivalent tree structure as `dest`, with the new `object` linked at the new path.
     pub async fn commit_path<T>(
         &mut self,
-        dest: &DagfsPath<S>,
+        dest: &DagfsDestination<S>,
         object: T,
     ) -> anyhow::Result<LinkFor<S>>
     where
@@ -63,7 +64,7 @@ where
 
     pub async fn commit_file_from_reader_to_path<R>(
         &mut self,
-        dest: &DagfsPath<S>,
+        dest: &DagfsDestination<S>,
         r: R,
     ) -> anyhow::Result<LinkFor<S>>
     where
@@ -75,7 +76,7 @@ where
 
     pub async fn commit_file_writer_to_path(
         &mut self,
-        dest: &DagfsPath<S>,
+        dest: &DagfsDestination<S>,
         w: WriterFor<S>,
     ) -> anyhow::Result<LinkFor<S>> {
         let link = self.commit_file_writer(w).await?;
@@ -84,13 +85,11 @@ where
 
     async fn set_path(
         &mut self,
-        dest: &DagfsPath<S>,
+        dest: &DagfsDestination<S>,
         link: LinkFor<S>,
     ) -> anyhow::Result<LinkFor<S>> {
         // Scan down to the penultimate path component, saving tree structure and name path
-        let mut parentpath = dest.clone();
-        let lastname = parentpath.pop()?;
-        let (components, parentlink) = self.tree_components(&parentpath).await?;
+        let (components, parentlink, lastname) = self.dest_components(dest).await?;
 
         // Insert `object`:
         let mut link = self.update_dir_link(&parentlink, lastname, link).await?;
@@ -102,24 +101,45 @@ where
         Ok(link)
     }
 
-    async fn tree_components(
+    async fn resolve_path(&mut self, path: &DagfsPath<S>) -> anyhow::Result<LinkFor<S>> {
+        use pangalactic_linkkind::LinkKind::*;
+
+        let (mut link, names) = path.link_and_path_slice();
+        match link.kind() {
+            File => Ok(link),
+            Dir => {
+                for i in 0..names.len() {
+                    let d: HostDirectoryFor<S> = self.read(&link).await?;
+                    let name = &names[i];
+                    link = d.get(name).cloned().ok_or_else(|| {
+                        let subpath = path.prefix_path(i - 1);
+                        anyhow::anyhow!("link name {name:?} not found in {subpath}")
+                    })?;
+                }
+                Ok(link)
+            }
+        }
+    }
+
+    async fn dest_components(
         &mut self,
-        path: &DagfsPath<S>,
-    ) -> anyhow::Result<(Vec<(HostDirectoryFor<S>, Name)>, LinkFor<S>)> {
-        let (root, names) = path.link_and_path_slice();
+        dest: &DagfsDestination<S>,
+    ) -> anyhow::Result<(Vec<(HostDirectoryFor<S>, Name)>, LinkFor<S>, Name)> {
         let mut components = vec![];
+        let (root, intermediates, lastname) = dest.link_intermediates_and_last_name();
+
         let mut link = root;
-        for i in 0..names.len() {
+        for i in 0..intermediates.len() {
             let d: HostDirectoryFor<S> = self.read(&link).await?;
-            let name = &names[i];
+            let name = &intermediates[i];
             let nextlink = d.get(name).cloned().ok_or_else(|| {
-                let subpath = path.prefix_path(i - 1);
+                let subpath = dest.prefix_path(i - 1);
                 anyhow::anyhow!("link name {name:?} not found in {subpath}")
             })?;
             components.push((d, name.to_string()));
             link = nextlink;
         }
-        Ok((components, link))
+        Ok((components, link, lastname.to_string()))
     }
 
     async fn update_dir_link<T>(
