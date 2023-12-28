@@ -39,7 +39,7 @@ where
         &mut self,
         source: &DagfsPath<S>,
     ) -> anyhow::Result<S::Reader> {
-        let link = self.resolve_path(source).await?;
+        let link = HostTree::read_path(&mut self.0, source).await?;
         self.open_file_reader(&link).await
     }
 
@@ -97,26 +97,6 @@ where
             link = self.update_dir(d, parentname, link).await?;
         }
         Ok(link)
-    }
-
-    async fn resolve_path(&mut self, path: &DagfsPath<S>) -> anyhow::Result<LinkFor<S>> {
-        use pangalactic_linkkind::LinkKind::*;
-
-        let (mut link, names) = path.link_and_path_slice();
-        match link.kind() {
-            File => Ok(link),
-            Dir => {
-                for i in 0..names.len() {
-                    let d: HostDirectoryFor<S> = self.read(&link).await?;
-                    let name = &names[i];
-                    link = d.get(name).cloned().ok_or_else(|| {
-                        let subpath = path.prefix_path(i - 1);
-                        anyhow::anyhow!("link name {name:?} not found in {subpath}")
-                    })?;
-                }
-                Ok(link)
-            }
-        }
     }
 
     async fn dest_components(
