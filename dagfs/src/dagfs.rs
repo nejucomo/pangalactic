@@ -39,6 +39,7 @@ where
         &mut self,
         source: &DagfsPath<S>,
     ) -> anyhow::Result<S::Reader> {
+        // TODO: Can we make `Store::Reader` impl `FromDag` to remove the need for this category of methods throughout the stack?
         let link = HostTree::read_path(&mut self.0, source).await?;
         self.open_file_reader(&link).await
     }
@@ -56,8 +57,7 @@ where
     where
         T: ToDag<S>,
     {
-        let link = self.commit(object).await?;
-        self.set_path(dest, link).await
+        HostTree::set_path(&mut self.0, dest, object).await
     }
 
     pub async fn commit_file_from_reader_to_path<R>(
@@ -69,7 +69,7 @@ where
         R: AsyncRead,
     {
         let link = self.commit_file_from_reader(r).await?;
-        self.set_path(dest, link).await
+        HostTree::set_path(&mut self.0, dest, link).await
     }
 
     pub async fn commit_file_writer_to_path(
@@ -78,72 +78,6 @@ where
         w: WriterFor<S>,
     ) -> anyhow::Result<LinkFor<S>> {
         let link = self.commit_file_writer(w).await?;
-        self.set_path(dest, link).await
-    }
-
-    async fn set_path(
-        &mut self,
-        dest: &DagfsDestination<S>,
-        link: LinkFor<S>,
-    ) -> anyhow::Result<LinkFor<S>> {
-        // Scan down to the penultimate path component, saving tree structure and name path
-        let (components, parentlink, lastname) = self.dest_components(dest).await?;
-
-        // Insert `object`:
-        let mut link = self.update_dir_link(&parentlink, lastname, link).await?;
-
-        // Rebuild the structure with the new object:
-        for (d, parentname) in components.into_iter().rev() {
-            link = self.update_dir(d, parentname, link).await?;
-        }
-        Ok(link)
-    }
-
-    async fn dest_components(
-        &mut self,
-        dest: &DagfsDestination<S>,
-    ) -> anyhow::Result<(Vec<(HostDirectoryFor<S>, Name)>, LinkFor<S>, Name)> {
-        let mut components = vec![];
-        let (root, intermediates, lastname) = dest.link_intermediates_and_last_name();
-
-        let mut link = root;
-        for i in 0..intermediates.len() {
-            let d: HostDirectoryFor<S> = self.read(&link).await?;
-            let name = &intermediates[i];
-            let nextlink = d.get(name).cloned().ok_or_else(|| {
-                let subpath = dest.prefix_path(i - 1);
-                anyhow::anyhow!("link name {name:?} not found in {subpath}")
-            })?;
-            components.push((d, name.to_string()));
-            link = nextlink;
-        }
-        Ok((components, link, lastname.to_string()))
-    }
-
-    async fn update_dir_link<T>(
-        &mut self,
-        dir: &LinkFor<S>,
-        name: Name,
-        object: T,
-    ) -> anyhow::Result<LinkFor<S>>
-    where
-        T: ToDag<S>,
-    {
-        let hd = self.read(dir).await?;
-        self.update_dir(hd, name, object).await
-    }
-
-    async fn update_dir<T>(
-        &mut self,
-        mut dir: HostDirectoryFor<S>,
-        name: Name,
-        object: T,
-    ) -> anyhow::Result<LinkFor<S>>
-    where
-        T: ToDag<S>,
-    {
-        let link = self.commit(object).await?;
-        dir.insert(name, link)?;
-        self.commit(dir).await
+        HostTree::set_path(&mut self.0, dest, link).await
     }
 }
