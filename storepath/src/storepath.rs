@@ -28,7 +28,7 @@ where
         }
     }
 
-    pub fn link_and_path_slice(&self) -> (Link<K>, &[Name]) {
+    pub fn link_and_relpath(&self) -> (Link<K>, &[Name]) {
         match self {
             FilePath(key) => (Link::new(File, key.clone()), &[]),
             DirPath(key, suffix) => (Link::new(Dir, key.clone()), suffix.as_slice()),

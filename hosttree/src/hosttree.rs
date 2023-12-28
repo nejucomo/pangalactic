@@ -37,7 +37,7 @@ where
     where
         T: FromDag<S>,
     {
-        let (link, names) = source.link_and_path_slice();
+        let (link, names) = source.link_and_relpath();
         let mut ht = HostTree::from(link);
         ht.read_relpath(dagio, names).await
     }
@@ -50,15 +50,10 @@ where
     where
         T: ToDag<S>,
     {
-        let (link, intermediates, last) = path.link_intermediates_and_last_name();
-
-        // TODO: change `StoreDestination` to use `NonEmptyVec` to avoid this hack:
-        let mut intercopy: Vec<Name> = intermediates.iter().map(|n| n.to_string()).collect();
-        intercopy.push(last.to_string());
-        let neslice = NonEmptySlice::new(&intercopy).unwrap();
+        let (link, relpath) = path.link_and_relpath();
 
         let mut ht = HostTree::from(link);
-        ht.set_relpath(dagio, neslice, object).await?;
+        ht.set_relpath(dagio, relpath, object).await?;
         dagio.commit(ht).await
     }
 
@@ -72,7 +67,7 @@ where
     {
         let subtree = self.subtree_mut(dagio, relpath).await?;
         let link = subtree.load_link(dagio).await?;
-        dagio.read(&link).await
+        dagio.read(link).await
     }
 
     pub async fn set_relpath<T>(
@@ -122,7 +117,7 @@ where
     ) -> anyhow::Result<&mut HostTree<S>> {
         let mut node = self;
 
-        for (i, name) in relpath.into_iter().enumerate() {
+        for (i, name) in relpath.iter().enumerate() {
             let treedir = node.load_treedir(dagio).await?;
             node = treedir.get_mut(name).ok_or_else(|| {
                 let path = relpath[..=i].join("/");

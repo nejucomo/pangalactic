@@ -1,5 +1,4 @@
-use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag, WriterFor};
-use pangalactic_dir::Name;
+use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag, WriterFor};
 use pangalactic_hosttree::{HostTree, HostTreeDestination, HostTreePath};
 use pangalactic_store::Store;
 use tokio::io::AsyncRead;

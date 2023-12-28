@@ -1,5 +1,6 @@
 use crate::StorePath::{self, DirPath};
-use pangalactic_dir::{Name, NameRef};
+use not_empty::{NonEmptySlice, NonEmptyVec};
+use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_store::StoreCid;
 use std::fmt;
@@ -12,41 +13,35 @@ where
     K: StoreCid,
 {
     key: K,
-    intermediates: Vec<Name>,
-    lastname: Name,
+    relpath: NonEmptyVec<Name>,
 }
 
 impl<K> StoreDestination<K>
 where
     K: StoreCid,
 {
-    pub fn link_intermediates_and_last_name(&self) -> (Link<K>, &[Name], &NameRef) {
+    pub fn link_and_relpath(&self) -> (Link<K>, &NonEmptySlice<Name>) {
         use pangalactic_linkkind::LinkKind::Dir;
 
-        (
-            Link::new(Dir, self.key.clone()),
-            self.intermediates.as_slice(),
-            &self.lastname,
-        )
+        (Link::new(Dir, self.key.clone()), self.relpath.as_slice())
     }
 
-    pub fn prefix_path(&self, components: usize) -> Self {
+    pub fn prefix_path(&self, components: usize) -> StorePath<K> {
         {
             // BUG: assertion of undocumented precondition:
-            let intermediates = &self.intermediates;
+            let relpath = &self.relpath;
             assert!(
-                components <= self.intermediates.len(),
-                "{components:?} vs {intermediates:?}"
+                components <= usize::from(relpath.len()),
+                "{components:?} vs {relpath:?}"
             );
         }
-        StoreDestination {
-            key: self.key.clone(),
-            intermediates: self.intermediates[..components]
+        StorePath::DirPath(
+            self.key.clone(),
+            self.relpath[..components]
                 .iter()
                 .map(|n| n.to_string())
                 .collect::<Vec<_>>(),
-            lastname: self.intermediates[components].to_string(),
-        }
+        )
     }
 }
 
@@ -55,13 +50,8 @@ where
     K: StoreCid,
 {
     fn from(dest: StoreDestination<K>) -> Self {
-        let StoreDestination {
-            key,
-            mut intermediates,
-            lastname,
-        } = dest;
-        intermediates.push(lastname);
-        DirPath(key, intermediates)
+        let StoreDestination { key, relpath } = dest;
+        DirPath(key, Vec::from(relpath))
     }
 }
 
@@ -75,16 +65,9 @@ where
         use anyhow::bail;
 
         match sp {
-            DirPath(key, mut intermediates) => {
-                if let Some(lastname) = intermediates.pop() {
-                    Ok(StoreDestination {
-                        key,
-                        intermediates,
-                        lastname,
-                    })
-                } else {
-                    bail!("a dir StorePath must have at least one path name compone tto be a StoreDestination")
-                }
+            DirPath(key, relpath) => {
+                let relpath = NonEmptyVec::try_from(relpath)?;
+                Ok(StoreDestination { key, relpath })
             }
             _ => bail!("a file StorePath cannot be a StoreDestination"),
         }
