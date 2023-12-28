@@ -1,8 +1,7 @@
 use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag, WriterFor};
 use pangalactic_dir::Name;
-use pangalactic_layer_cidmeta::CidMetaLayer;
+use pangalactic_hosttree::{HostTreeDestination, HostTreePath};
 use pangalactic_store::Store;
-use pangalactic_storepath::{StoreDestination, StorePath};
 use tokio::io::AsyncRead;
 
 #[derive(Debug, Default, derive_more::Deref, derive_more::DerefMut)]
@@ -10,8 +9,8 @@ pub struct Dagfs<S>(Dagio<S>)
 where
     S: Store;
 
-pub type DagfsPath<S> = StorePath<<CidMetaLayer<S> as Store>::Cid>;
-pub type DagfsDestination<S> = StoreDestination<<CidMetaLayer<S> as Store>::Cid>;
+pub type DagfsPath<S> = HostTreePath<S>;
+pub type DagfsDestination<S> = HostTreeDestination<S>;
 
 impl<S, D> From<D> for Dagfs<S>
 where

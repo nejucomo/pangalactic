@@ -13,4 +13,6 @@ pangalactic-dir.workspace = true
 pangalactic-hostdir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
+pangalactic-storepath.workspace = true
 pangalactic-store.workspace = true
+not_empty.workspace = true

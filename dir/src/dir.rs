@@ -13,6 +13,54 @@ impl<L> Default for Directory<L> {
     }
 }
 
+impl<L> Directory<L> {
+    pub fn insert(&mut self, name: Name, link: L) -> anyhow::Result<()> {
+        let errname = name.clone();
+        if self.0.insert(name, link).is_none() {
+            Ok(())
+        } else {
+            Err(anyhow::Error::msg(format!(
+                "duplicate entry for {errname:?}"
+            )))
+        }
+    }
+
+    pub fn get(&self, name: &NameRef) -> Option<&L> {
+        self.0.get(name)
+    }
+
+    pub fn get_required(&self, name: &NameRef) -> anyhow::Result<&L> {
+        require_some(name, self.get(name))
+    }
+
+    pub fn get_mut(&mut self, name: &NameRef) -> Option<&mut L> {
+        self.0.get_mut(name)
+    }
+
+    pub fn remove(&mut self, name: &NameRef) -> Option<L> {
+        self.0.remove(name)
+    }
+
+    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<L> {
+        require_some(name, self.remove(name))
+    }
+
+    pub fn require_empty(self) -> anyhow::Result<()> {
+        if self.0.is_empty() {
+            Ok(())
+        } else {
+            Err(anyhow::Error::msg(format!(
+                "unexpected entries {:?}",
+                self.0.into_keys().collect::<Vec<Name>>()
+            )))
+        }
+    }
+}
+
+fn require_some<T>(name: &NameRef, opt: Option<T>) -> anyhow::Result<T> {
+    opt.ok_or_else(|| anyhow::anyhow!("missing required name {name:?}"))
+}
+
 impl<N, L> FromIterator<(N, L)> for Directory<L>
 where
     Name: From<N>,
@@ -33,42 +81,5 @@ impl<L> IntoIterator for Directory<L> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
-    }
-}
-
-impl<L> Directory<L> {
-    pub fn insert(&mut self, name: Name, link: L) -> anyhow::Result<()> {
-        let errname = name.clone();
-        if self.0.insert(name, link).is_none() {
-            Ok(())
-        } else {
-            Err(anyhow::Error::msg(format!(
-                "duplicate entry for {errname:?}"
-            )))
-        }
-    }
-
-    pub fn get(&self, name: &NameRef) -> Option<&L> {
-        self.0.get(name)
-    }
-
-    pub fn remove(&mut self, name: &NameRef) -> Option<L> {
-        self.0.remove(name)
-    }
-
-    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<L> {
-        self.remove(name)
-            .ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
-    }
-
-    pub fn require_empty(self) -> anyhow::Result<()> {
-        if self.0.is_empty() {
-            Ok(())
-        } else {
-            Err(anyhow::Error::msg(format!(
-                "unexpected entries {:?}",
-                self.0.into_keys().collect::<Vec<Name>>()
-            )))
-        }
     }
 }
