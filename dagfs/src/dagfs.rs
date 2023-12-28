@@ -1,6 +1,6 @@
 use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag, WriterFor};
 use pangalactic_dir::Name;
-use pangalactic_hosttree::{HostTreeDestination, HostTreePath};
+use pangalactic_hosttree::{HostTree, HostTreeDestination, HostTreePath};
 use pangalactic_store::Store;
 use tokio::io::AsyncRead;
 
@@ -31,8 +31,7 @@ where
     where
         T: FromDag<S>,
     {
-        let link = self.resolve_path(source).await?;
-        self.read(&link).await
+        HostTree::read_path(&mut self.0, source).await
     }
 
     /// Open a file reader from `source`
