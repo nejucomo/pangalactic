@@ -7,12 +7,14 @@ mod dirimpl;
 mod fromdag;
 mod reader;
 mod todag;
+mod writer;
 
-pub use self::aliases::{DagioHostDirectory, DagioLink, DagioWriter};
+pub use self::aliases::{DagioHostDirectory, DagioLink};
 pub use self::dagio::Dagio;
 pub use self::fromdag::DagioLoad;
 pub use self::reader::DagioReader;
 pub use self::todag::DagioCommit;
+pub use self::writer::DagioWriter;
 
 #[cfg(test)]
 mod tests;

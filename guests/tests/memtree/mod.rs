@@ -36,7 +36,7 @@ where
         use MemTree::*;
 
         match self {
-            File(bytes) => dagio.write_file(&bytes).await,
+            File(bytes) => dagio.commit(bytes).await,
             Dir(entries) => {
                 let mut d = HostDirectory::default();
                 for (n, child) in entries {
@@ -58,7 +58,7 @@ where
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {
-            LK::File => dagio.read_file(link).await.map(File),
+            LK::File => dagio.load(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
                 let d: HostDirectory<_> = dagio.load(link).await?;

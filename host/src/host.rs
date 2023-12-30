@@ -59,7 +59,7 @@ where
 
     let dagio = state.dagio_mut();
     let plan: Plan<_> = dagio.load(plan).await?;
-    let execbytes = dagio.read_file(&plan.exec).await?;
+    let execbytes: Vec<u8> = dagio.load(&plan.exec).await?;
     let execmod = Module::new(engine, execbytes)?;
     Ok(execmod)
 }

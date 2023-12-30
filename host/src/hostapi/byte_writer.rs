@@ -51,7 +51,7 @@ where
     S: Store,
 {
     let w = caller.data_mut().byte_writers_mut().remove(h_bw)?;
-    let link = caller.data_mut().dagio_mut().commit_file_writer(w).await?;
+    let link = caller.data_mut().dagio_mut().commit(w).await?;
     let h_link = caller.data_mut().links_mut().insert(link);
     Ok(h_link)
 }

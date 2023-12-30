@@ -57,7 +57,7 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
         &["test_output_is_hello_world"],
         b"",
         |mut dagio, _, attestation| async move {
-            let output = dagio.read_file(&attestation.output).await?;
+            let output: Vec<u8> = dagio.load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
         },
@@ -140,7 +140,7 @@ where
     let plan = {
         // Set up plan:
         let exec = dagio
-            .write_file(pangalactic_guests::get_wasm_bytes(guest)?)
+            .commit(pangalactic_guests::get_wasm_bytes(guest)?)
             .await?;
         let input = dagio.commit(content).await?;
 

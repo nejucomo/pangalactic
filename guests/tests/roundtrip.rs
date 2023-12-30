@@ -53,7 +53,7 @@ async fn run_phase(
     input: DagioLink<MemStore>,
 ) -> anyhow::Result<(Dagio<MemStore>, Attestation<DagioLink<MemStore>>)> {
     let exec = dagio
-        .write_file(pangalactic_guests::get_wasm_bytes(execname)?)
+        .commit(pangalactic_guests::get_wasm_bytes(execname)?)
         .await?;
     let plan = dagio.commit(Plan { exec, input }).await?;
     let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;

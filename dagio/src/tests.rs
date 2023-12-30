@@ -1,16 +1,13 @@
 use crate::Dagio;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store_mem::MemStore;
-use tokio::io::AsyncWriteExt;
 
 #[tokio::test]
 async fn insert_file_and_read_result() -> anyhow::Result<()> {
     let input = b"Hello World!";
 
     let mut dagio = Dagio::from(MemStore::default());
-    let mut w = dagio.open_file_writer().await?;
-    w.write_all(input).await?;
-    let link = dagio.commit_file_writer(w).await?;
+    let link = dagio.commit(input.as_slice()).await?;
     dbg!(&link);
 
     let output: Vec<u8> = dagio.load(&link).await?;
@@ -40,9 +37,7 @@ async fn insert_singleton_directory_and_read_result() -> anyhow::Result<()> {
 
     let mut dagio = Dagio::from(MemStore::default());
 
-    let mut w = dagio.open_file_writer().await?;
-    w.write_all(input_hw).await?;
-    let link_hw = dagio.commit_file_writer(w).await?;
+    let link_hw = dagio.commit(input_hw.as_slice()).await?;
     dbg!(&link_hw);
 
     let input_dir = HostDirectory::from_iter([("hello.txt", link_hw)]);
