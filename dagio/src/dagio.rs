@@ -1,4 +1,4 @@
-use crate::{DagioLoad, LinkFor, ToDag, WriterFor};
+use crate::{DagioCommit, DagioLoad, LinkFor, WriterFor};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
@@ -31,7 +31,7 @@ where
 
     pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<LinkFor<S>>
     where
-        T: ToDag<S>,
+        T: DagioCommit<S>,
     {
         object.into_dag(self).await
     }

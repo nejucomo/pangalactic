@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
-pub trait ToDag<S>
+pub trait DagioCommit<S>
 where
     S: Store,
 {
@@ -11,7 +11,7 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> ToDag<S> for LinkFor<S>
+impl<S> DagioCommit<S> for LinkFor<S>
 where
     S: Store,
     LinkFor<S>: Clone,

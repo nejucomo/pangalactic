@@ -1,6 +1,6 @@
 use crate::{Attestation, Plan};
 use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, DagioLoad, LinkFor, ToDag};
+use pangalactic_dagio::{Dagio, DagioCommit, DagioLoad, LinkFor};
 use pangalactic_dir::Directory;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
@@ -17,7 +17,7 @@ where
 }
 
 #[async_trait]
-impl<S> ToDag<S> for Attestation<LinkFor<S>>
+impl<S> DagioCommit<S> for Attestation<LinkFor<S>>
 where
     S: Store,
 {
@@ -40,7 +40,7 @@ where
 }
 
 #[async_trait]
-impl<S> ToDag<S> for Plan<LinkFor<S>>
+impl<S> DagioCommit<S> for Plan<LinkFor<S>>
 where
     S: Store,
 {
