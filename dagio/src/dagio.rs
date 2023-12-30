@@ -33,7 +33,7 @@ where
     where
         T: DagioCommit<S>,
     {
-        object.into_dag(self).await
+        object.commit_into_dagio(self).await
     }
 
     pub async fn open_file_reader(

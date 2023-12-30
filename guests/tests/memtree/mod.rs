@@ -32,7 +32,7 @@ impl<S> DagioCommit<S> for MemTree
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         use MemTree::*;
 
         match self {
@@ -40,10 +40,10 @@ where
             Dir(entries) => {
                 let mut d = HostDirectory::default();
                 for (n, child) in entries {
-                    let link = child.clone().into_dag(dagio).await?;
+                    let link = child.clone().commit_into_dagio(dagio).await?;
                     d.insert(n.to_string(), link)?;
                 }
-                d.into_dag(dagio).await
+                d.commit_into_dagio(dagio).await
             }
         }
     }

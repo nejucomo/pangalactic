@@ -7,7 +7,7 @@ pub trait DagioCommit<S>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>>;
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>>;
 }
 
 #[cfg_attr(not(doc), async_trait)]
@@ -16,7 +16,7 @@ where
     S: Store,
     LinkFor<S>: Clone,
 {
-    async fn into_dag(self, _: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, _: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         Ok(self)
     }
 }

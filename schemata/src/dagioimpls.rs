@@ -21,7 +21,7 @@ impl<S> DagioCommit<S> for Attestation<LinkFor<S>>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         dagio
             .commit(HostDirectory::from(Directory::from(self)))
             .await
@@ -44,7 +44,7 @@ impl<S> DagioCommit<S> for Plan<LinkFor<S>>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         dagio
             .commit(HostDirectory::from(Directory::from(self)))
             .await

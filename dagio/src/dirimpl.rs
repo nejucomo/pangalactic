@@ -8,7 +8,7 @@ impl<S> DagioCommit<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::Dir;
         use pangalactic_serialization::serialize;
@@ -32,9 +32,9 @@ where
     N: Send,
     String: From<N>,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
         HostDirectory::from_iter(self.into_iter())
-            .into_dag(dagio)
+            .commit_into_dagio(dagio)
             .await
     }
 }
