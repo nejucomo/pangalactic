@@ -5,4 +5,4 @@ use pangalactic_store::Store;
 
 pub type DagioLink<S> = Link<CidMeta<S>>;
 pub type DagioHostDirectory<S> = HostDirectory<CidMeta<S>>;
-pub type WriterFor<S> = Writer<<S as Store>::Writer>;
+pub type DagioWriter<S> = Writer<<S as Store>::Writer>;

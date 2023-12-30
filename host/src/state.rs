@@ -1,5 +1,5 @@
 use crate::{ByteReader, DirectoryReader};
-use pangalactic_dagio::{Dagio, DagioHostDirectory, DagioLink, WriterFor};
+use pangalactic_dagio::{Dagio, DagioHostDirectory, DagioLink, DagioWriter};
 use pangalactic_store::Store;
 use pangalactic_table::Table;
 
@@ -11,7 +11,7 @@ where
     links: Table<DagioLink<S>>,
     byte_readers: Table<ByteReader<S>>,
     dir_readers: Table<DirectoryReader<S>>,
-    byte_writers: Table<WriterFor<S>>,
+    byte_writers: Table<DagioWriter<S>>,
     dir_writers: Table<DagioHostDirectory<S>>,
 }
 
@@ -58,7 +58,7 @@ where
         &mut self.dir_readers
     }
 
-    pub(crate) fn byte_writers_mut(&mut self) -> &mut Table<WriterFor<S>> {
+    pub(crate) fn byte_writers_mut(&mut self) -> &mut Table<DagioWriter<S>> {
         &mut self.byte_writers
     }
 

@@ -1,10 +1,12 @@
 use crate::State;
-use pangalactic_dagio::{DagioLink, WriterFor};
+use pangalactic_dagio::{DagioLink, DagioWriter};
 use pangalactic_handle::Handle;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
-pub(super) async fn open<S>(mut caller: Caller<'_, State<S>>) -> Result<Handle<WriterFor<S>>, Trap>
+pub(super) async fn open<S>(
+    mut caller: Caller<'_, State<S>>,
+) -> Result<Handle<DagioWriter<S>>, Trap>
 where
     S: Store,
 {
@@ -15,7 +17,7 @@ where
 
 pub(super) async fn write<S>(
     mut caller: Caller<'_, State<S>>,
-    h_bw: Handle<WriterFor<S>>,
+    h_bw: Handle<DagioWriter<S>>,
     ptr: usize,
     len: usize,
 ) -> Result<(), Trap>
@@ -43,7 +45,7 @@ where
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
-    h_bw: Handle<WriterFor<S>>,
+    h_bw: Handle<DagioWriter<S>>,
 ) -> Result<Handle<DagioLink<S>>, Trap>
 where
     S: Store,

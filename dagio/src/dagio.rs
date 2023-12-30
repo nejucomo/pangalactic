@@ -1,4 +1,4 @@
-use crate::{DagioCommit, DagioLink, DagioLoad, WriterFor};
+use crate::{DagioCommit, DagioLink, DagioLoad, DagioWriter};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
@@ -44,11 +44,11 @@ where
         self.0.open_reader(key).await
     }
 
-    pub async fn open_file_writer(&mut self) -> anyhow::Result<WriterFor<S>> {
+    pub async fn open_file_writer(&mut self) -> anyhow::Result<DagioWriter<S>> {
         self.0.open_writer().await
     }
 
-    pub async fn commit_file_writer(&mut self, w: WriterFor<S>) -> anyhow::Result<DagioLink<S>> {
+    pub async fn commit_file_writer(&mut self, w: DagioWriter<S>) -> anyhow::Result<DagioLink<S>> {
         self.0.commit_writer(w).await.map(|k| Link::new(File, k))
     }
 
