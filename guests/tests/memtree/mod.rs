@@ -40,10 +40,10 @@ where
             Dir(entries) => {
                 let mut d = HostDirectory::default();
                 for (n, child) in entries {
-                    let link = child.clone().commit_into_dagio(dagio).await?;
+                    let link = dagio.commit(child.clone()).await?;
                     d.insert(n.to_string(), link)?;
                 }
-                d.commit_into_dagio(dagio).await
+                dagio.commit(d).await
             }
         }
     }

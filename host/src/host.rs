@@ -55,11 +55,10 @@ async fn load_exec_mod<S>(
 where
     S: Store,
 {
-    use pangalactic_dagio::DagioLoad;
     use pangalactic_schemata::Plan;
 
     let dagio = state.dagio_mut();
-    let plan = Plan::load_from_dagio(dagio, plan).await?;
+    let plan: Plan<_> = dagio.load(plan).await?;
     let execbytes = dagio.read_file(&plan.exec).await?;
     let execmod = Module::new(engine, execbytes)?;
     Ok(execmod)

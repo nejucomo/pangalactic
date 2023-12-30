@@ -11,7 +11,7 @@ where
     S: Store,
 {
     async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::load_from_dagio(dagio, link).await?;
+        let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }
@@ -34,7 +34,7 @@ where
     S: Store,
 {
     async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::load_from_dagio(dagio, link).await?;
+        let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }

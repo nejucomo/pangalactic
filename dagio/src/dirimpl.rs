@@ -33,8 +33,8 @@ where
     String: From<N>,
 {
     async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        HostDirectory::from_iter(self.into_iter())
-            .commit_into_dagio(dagio)
+        dagio
+            .commit(HostDirectory::from_iter(self.into_iter()))
             .await
     }
 }
