@@ -1,4 +1,4 @@
-use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
+use pangalactic_dagio::{Dagio, DagioLoad, LinkFor, ToDag};
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 use std::collections::BTreeMap;
@@ -50,7 +50,7 @@ where
 }
 
 #[async_trait::async_trait]
-impl<S> FromDag<S> for MemTree
+impl<S> DagioLoad<S> for MemTree
 where
     S: Store,
 {

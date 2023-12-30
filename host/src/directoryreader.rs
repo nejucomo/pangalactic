@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, FromDag, HostDirectoryFor, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLoad, HostDirectoryFor, LinkFor};
 use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
 
@@ -45,7 +45,7 @@ where
 }
 
 #[async_trait]
-impl<S> FromDag<S> for DirectoryReader<S>
+impl<S> DagioLoad<S> for DirectoryReader<S>
 where
     S: Store,
 {

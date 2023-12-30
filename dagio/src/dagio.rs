@@ -1,4 +1,4 @@
-use crate::{FromDag, LinkFor, ToDag, WriterFor};
+use crate::{DagioLoad, LinkFor, ToDag, WriterFor};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
@@ -24,7 +24,7 @@ where
 {
     pub async fn read<T>(&mut self, link: &LinkFor<S>) -> anyhow::Result<T>
     where
-        T: FromDag<S>,
+        T: DagioLoad<S>,
     {
         T::load_from_dagio(self, link).await
     }

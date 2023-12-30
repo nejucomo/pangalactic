@@ -55,7 +55,7 @@ async fn load_exec_mod<S>(
 where
     S: Store,
 {
-    use pangalactic_dagio::FromDag;
+    use pangalactic_dagio::DagioLoad;
     use pangalactic_schemata::Plan;
 
     let dagio = state.dagio_mut();

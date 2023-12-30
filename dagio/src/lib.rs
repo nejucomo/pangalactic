@@ -9,7 +9,7 @@ mod todag;
 
 pub use self::aliases::{HostDirectoryFor, LinkFor, WriterFor};
 pub use self::dagio::Dagio;
-pub use self::fromdag::FromDag;
+pub use self::fromdag::DagioLoad;
 pub use self::todag::ToDag;
 
 #[cfg(test)]

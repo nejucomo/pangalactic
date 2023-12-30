@@ -1,4 +1,4 @@
-use crate::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag};
+use crate::{Dagio, DagioLoad, HostDirectoryFor, LinkFor, ToDag};
 use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
@@ -40,7 +40,7 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> FromDag<S> for HostDirectoryFor<S>
+impl<S> DagioLoad<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
