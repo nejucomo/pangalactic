@@ -41,7 +41,7 @@ where
     let link_in = dagio.commit(intree).await?;
     let (dagio, att_in) = run_phase(dagio, exec_in, link_in).await?;
     let (mut dagio, att_out) = run_phase(dagio, exec_out, att_in.output).await?;
-    let output: MemTree = dagio.read(&att_out.output).await?;
+    let output: MemTree = dagio.load(&att_out.output).await?;
 
     assert_eq!(output, expected);
     Ok(())
@@ -57,6 +57,6 @@ async fn run_phase(
         .await?;
     let plan = dagio.commit(Plan { exec, input }).await?;
     let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
-    let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
+    let att: Attestation<LinkFor<MemStore>> = dagio.load(&attestation).await?;
     Ok((dagio, att))
 }

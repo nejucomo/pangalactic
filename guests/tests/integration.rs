@@ -80,7 +80,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
             ),
         ],
         |mut dagio, _, attestation| async move {
-            let output: MemTree = dagio.read(&attestation.output).await?;
+            let output: MemTree = dagio.load(&attestation.output).await?;
 
             assert_eq!(
                 output,
@@ -150,8 +150,8 @@ where
     // Execute derive:
     let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
 
-    let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
-    let plan: Plan<LinkFor<MemStore>> = dagio.read(&att.plan).await?;
+    let att: Attestation<LinkFor<MemStore>> = dagio.load(&attestation).await?;
+    let plan: Plan<LinkFor<MemStore>> = dagio.load(&att.plan).await?;
 
     // Verify
     verify(dagio, plan, att).await?;

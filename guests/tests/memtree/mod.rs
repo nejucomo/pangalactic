@@ -61,9 +61,9 @@ where
             LK::File => dagio.read_file(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: HostDirectory<_> = dagio.read(link).await?;
+                let d: HostDirectory<_> = dagio.load(link).await?;
                 for (n, sublink) in d {
-                    let mt: MemTree = dagio.read(&sublink).await?;
+                    let mt: MemTree = dagio.load(&sublink).await?;
                     map.insert(n, mt);
                 }
                 Ok(Dir(map))

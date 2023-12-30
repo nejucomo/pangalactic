@@ -50,7 +50,7 @@ where
     S: Store,
 {
     async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let dir: HostDirectoryFor<S> = dagio.read(link).await?;
+        let dir: HostDirectoryFor<S> = dagio.load(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

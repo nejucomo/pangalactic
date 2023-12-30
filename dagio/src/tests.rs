@@ -29,7 +29,7 @@ async fn insert_empty_directory_and_read_result() -> anyhow::Result<()> {
     let link = dagio.commit(input.clone()).await?;
     dbg!(&link);
 
-    let output: HostDirectory<_> = dagio.read(&link).await?;
+    let output: HostDirectory<_> = dagio.load(&link).await?;
     dbg!(&input, &output);
 
     assert_eq!(input, output);
@@ -50,7 +50,7 @@ async fn insert_singleton_directory_and_read_result() -> anyhow::Result<()> {
     let input_dir = HostDirectory::from_iter([("hello.txt", link_hw)]);
     let link_dir = dagio.commit(input_dir.clone()).await?;
 
-    let output_dir: HostDirectory<_> = dagio.read(&link_dir).await?;
+    let output_dir: HostDirectory<_> = dagio.load(&link_dir).await?;
     assert_eq!(input_dir, output_dir);
 
     let outlink_hw = output_dir.get("hello.txt").unwrap();

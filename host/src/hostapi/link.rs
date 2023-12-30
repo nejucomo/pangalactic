@@ -58,7 +58,7 @@ where
     S: Store,
 {
     let link = caller.data().links().lookup(h_link)?.clone();
-    let dr: DirectoryReader<S> = caller.data_mut().dagio_mut().read(&link).await?;
+    let dr: DirectoryReader<S> = caller.data_mut().dagio_mut().load(&link).await?;
     let h_dr = caller.data_mut().directory_readers_mut().insert(dr);
     Ok(h_dr)
 }
