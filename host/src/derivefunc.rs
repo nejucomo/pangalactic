@@ -1,5 +1,5 @@
 use crate::State;
-use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLink};
 use pangalactic_handle::Handle;
 use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module, TypedFunc};
@@ -36,8 +36,8 @@ where
 
     pub(crate) async fn call_async(
         mut self,
-        plan: &LinkFor<S>,
-    ) -> anyhow::Result<(Dagio<S>, LinkFor<S>)> {
+        plan: &DagioLink<S>,
+    ) -> anyhow::Result<(Dagio<S>, DagioLink<S>)> {
         use pangalactic_schemata::Attestation;
 
         let derive_handle = self.store.data_mut().links_mut().insert(plan.clone());

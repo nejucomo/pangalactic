@@ -1,8 +1,11 @@
 use crate::Host;
-use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLink};
 use pangalactic_store::Store;
 
-pub async fn derive<S>(dagio: Dagio<S>, plan: &LinkFor<S>) -> anyhow::Result<(Dagio<S>, LinkFor<S>)>
+pub async fn derive<S>(
+    dagio: Dagio<S>,
+    plan: &DagioLink<S>,
+) -> anyhow::Result<(Dagio<S>, DagioLink<S>)>
 where
     S: Store,
 {

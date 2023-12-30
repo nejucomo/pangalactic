@@ -1,5 +1,5 @@
 use crate::{ByteReader, DirectoryReader, State};
-use pangalactic_dagio::LinkFor;
+use pangalactic_dagio::DagioLink;
 use pangalactic_handle::Handle;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
@@ -18,7 +18,7 @@ where
 pub(super) async fn load_link<S>(
     mut caller: Caller<'_, State<S>>,
     h_dr: Handle<DirectoryReader<S>>,
-) -> Result<Handle<LinkFor<S>>, Trap>
+) -> Result<Handle<DagioLink<S>>, Trap>
 where
     S: Store,
 {

@@ -1,4 +1,4 @@
-use crate::{Dagio, DagioCommit, DagioLoad, HostDirectoryFor, LinkFor};
+use crate::{Dagio, DagioCommit, DagioLink, DagioLoad, HostDirectoryFor};
 use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
@@ -8,7 +8,7 @@ impl<S> DagioCommit<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::Dir;
         use pangalactic_serialization::serialize;
@@ -26,13 +26,13 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<const K: usize, S, N> DagioCommit<S> for [(N, LinkFor<S>); K]
+impl<const K: usize, S, N> DagioCommit<S> for [(N, DagioLink<S>); K]
 where
     S: Store,
     N: Send,
     String: From<N>,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         dagio
             .commit(HostDirectory::from_iter(self.into_iter()))
             .await
@@ -44,7 +44,7 @@ impl<S> DagioLoad<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
         use tokio::io::AsyncReadExt;

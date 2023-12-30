@@ -1,5 +1,5 @@
 use crate::{ByteReader, DirectoryReader, State};
-use pangalactic_dagio::LinkFor;
+use pangalactic_dagio::DagioLink;
 use pangalactic_handle::Handle;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::Store;
@@ -7,7 +7,7 @@ use wasmtime::{Caller, Trap};
 
 pub(super) async fn get_kind<S>(
     caller: Caller<'_, State<S>>,
-    h_link: Handle<LinkFor<S>>,
+    h_link: Handle<DagioLink<S>>,
 ) -> Result<LinkKind, Trap>
 where
     S: Store,
@@ -18,7 +18,7 @@ where
 
 pub(super) async fn node_size<S>(
     caller: Caller<'_, State<S>>,
-    h_link: Handle<LinkFor<S>>,
+    h_link: Handle<DagioLink<S>>,
 ) -> Result<u64, Trap>
 where
     S: Store,
@@ -29,7 +29,7 @@ where
 
 pub(super) async fn open_file_reader<S>(
     mut caller: Caller<'_, State<S>>,
-    h_link: Handle<LinkFor<S>>,
+    h_link: Handle<DagioLink<S>>,
 ) -> Result<Handle<ByteReader<S>>, Trap>
 where
     S: Store,
@@ -52,7 +52,7 @@ where
 
 pub(super) async fn open_directory_reader<S>(
     mut caller: Caller<'_, State<S>>,
-    h_link: Handle<LinkFor<S>>,
+    h_link: Handle<DagioLink<S>>,
 ) -> Result<Handle<DirectoryReader<S>>, Trap>
 where
     S: Store,
@@ -65,7 +65,7 @@ where
 
 pub(super) async fn close<S>(
     mut caller: Caller<'_, State<S>>,
-    link: Handle<LinkFor<S>>,
+    link: Handle<DagioLink<S>>,
 ) -> Result<(), Trap>
 where
     S: Store,

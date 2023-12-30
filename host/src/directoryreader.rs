@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, DagioLoad, HostDirectoryFor, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLink, DagioLoad, HostDirectoryFor};
 use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
 
@@ -10,7 +10,7 @@ where
 {
     iter: <HostDirectoryFor<S> as IntoIterator>::IntoIter,
     name: Option<Name>,
-    link: Option<LinkFor<S>>,
+    link: Option<DagioLink<S>>,
 }
 
 impl<S> DirectoryReader<S>
@@ -27,7 +27,7 @@ where
             .ok_or_else(|| anyhow::Error::msg("name already taken in DirectoryReader"))
     }
 
-    pub(crate) fn take_link(&mut self) -> anyhow::Result<LinkFor<S>> {
+    pub(crate) fn take_link(&mut self) -> anyhow::Result<DagioLink<S>> {
         self.link
             .take()
             .ok_or_else(|| anyhow::Error::msg("link already taken in DirectoryReader"))
@@ -49,7 +49,7 @@ impl<S> DagioLoad<S> for DirectoryReader<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         let dir: HostDirectoryFor<S> = dagio.load(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),

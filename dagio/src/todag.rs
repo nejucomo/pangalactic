@@ -1,4 +1,4 @@
-use crate::{Dagio, LinkFor};
+use crate::{Dagio, DagioLink};
 use async_trait::async_trait;
 use pangalactic_store::Store;
 
@@ -7,16 +7,16 @@ pub trait DagioCommit<S>
 where
     S: Store,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>>;
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>>;
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioCommit<S> for LinkFor<S>
+impl<S> DagioCommit<S> for DagioLink<S>
 where
     S: Store,
-    LinkFor<S>: Clone,
+    DagioLink<S>: Clone,
 {
-    async fn commit_into_dagio(self, _: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, _: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         Ok(self)
     }
 }

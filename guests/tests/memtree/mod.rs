@@ -1,4 +1,4 @@
-use pangalactic_dagio::{Dagio, DagioCommit, DagioLoad, LinkFor};
+use pangalactic_dagio::{Dagio, DagioCommit, DagioLink, DagioLoad};
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 use std::collections::BTreeMap;
@@ -32,7 +32,7 @@ impl<S> DagioCommit<S> for MemTree
 where
     S: Store,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         use MemTree::*;
 
         match self {
@@ -54,7 +54,7 @@ impl<S> DagioLoad<S> for MemTree
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {

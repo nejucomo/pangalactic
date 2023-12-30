@@ -1,5 +1,5 @@
 use crate::State;
-use pangalactic_dagio::{LinkFor, WriterFor};
+use pangalactic_dagio::{DagioLink, WriterFor};
 use pangalactic_handle::Handle;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
@@ -44,7 +44,7 @@ where
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
     h_bw: Handle<WriterFor<S>>,
-) -> Result<Handle<LinkFor<S>>, Trap>
+) -> Result<Handle<DagioLink<S>>, Trap>
 where
     S: Store,
 {
