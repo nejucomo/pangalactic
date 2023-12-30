@@ -7,7 +7,7 @@ pub trait FromDag<S>: Sized
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self>;
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self>;
 }
 
 #[cfg_attr(not(doc), async_trait)]
@@ -16,7 +16,7 @@ where
     S: Store,
     LinkFor<S>: Clone,
 {
-    async fn from_dag(_: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(_: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         Ok(link.clone())
     }
 }

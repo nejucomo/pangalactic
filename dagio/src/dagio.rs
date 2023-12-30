@@ -26,7 +26,7 @@ where
     where
         T: FromDag<S>,
     {
-        T::from_dag(self, link).await
+        T::load_from_dagio(self, link).await
     }
 
     pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<LinkFor<S>>

@@ -10,8 +10,8 @@ impl<S> FromDag<S> for Attestation<LinkFor<S>>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+        let hostdir = HostDirectory::load_from_dagio(dagio, link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }
@@ -33,8 +33,8 @@ impl<S> FromDag<S> for Plan<LinkFor<S>>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+        let hostdir = HostDirectory::load_from_dagio(dagio, link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }

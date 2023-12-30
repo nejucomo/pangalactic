@@ -54,7 +54,7 @@ impl<S> FromDag<S> for MemTree
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {

@@ -59,7 +59,7 @@ where
     use pangalactic_schemata::Plan;
 
     let dagio = state.dagio_mut();
-    let plan = Plan::from_dag(dagio, plan).await?;
+    let plan = Plan::load_from_dagio(dagio, plan).await?;
     let execbytes = dagio.read_file(&plan.exec).await?;
     let execmod = Module::new(engine, execbytes)?;
     Ok(execmod)

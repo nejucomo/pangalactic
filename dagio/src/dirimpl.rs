@@ -44,7 +44,7 @@ impl<S> FromDag<S> for HostDirectoryFor<S>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
         use tokio::io::AsyncReadExt;
