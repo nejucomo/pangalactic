@@ -47,15 +47,11 @@ where
     async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
-        use tokio::io::AsyncReadExt;
 
         let key = link.peek_key_kind(Dir)?;
-        let mut r = dagio
-            .open_file_reader(&Link::new(File, key.clone()))
-            .await?;
-        let mut buf = vec![];
-        r.read_to_end(&mut buf).await?;
-        let dir = pangalactic_serialization::deserialize(&buf)?;
+        let translink = Link::new(File, key.clone());
+        let bytes: Vec<u8> = dagio.load(&translink).await?;
+        let dir = pangalactic_serialization::deserialize(&bytes)?;
         Ok(dir)
     }
 }

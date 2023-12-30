@@ -34,13 +34,11 @@ pub(super) async fn open_file_reader<S>(
 where
     S: Store,
 {
+    use pangalactic_dagio::DagioReader;
+
     let link = caller.data().links().lookup(h_link)?.clone();
 
-    let fr = caller
-        .data_mut()
-        .dagio_mut()
-        .open_file_reader(&link)
-        .await?;
+    let fr: DagioReader<_> = caller.data_mut().dagio_mut().load(&link).await?;
 
     let h_fr = caller
         .data_mut()

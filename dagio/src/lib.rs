@@ -5,11 +5,13 @@ mod aliases;
 mod dagio;
 mod dirimpl;
 mod fromdag;
+mod reader;
 mod todag;
 
 pub use self::aliases::{DagioHostDirectory, DagioLink, DagioWriter};
 pub use self::dagio::Dagio;
 pub use self::fromdag::DagioLoad;
+pub use self::reader::DagioReader;
 pub use self::todag::DagioCommit;
 
 #[cfg(test)]

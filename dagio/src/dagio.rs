@@ -36,14 +36,6 @@ where
         object.commit_into_dagio(self).await
     }
 
-    pub async fn open_file_reader(
-        &mut self,
-        link: &DagioLink<S>,
-    ) -> anyhow::Result<<S as Store>::Reader> {
-        let key = link.peek_key_kind(File)?;
-        self.0.open_reader(key).await
-    }
-
     pub async fn open_file_writer(&mut self) -> anyhow::Result<DagioWriter<S>> {
         self.0.open_writer().await
     }

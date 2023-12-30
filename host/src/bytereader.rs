@@ -1,3 +1,4 @@
+use pangalactic_dagio::DagioReader;
 use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
 use std::io::Cursor;
@@ -10,7 +11,7 @@ where
     S: Store,
 {
     Buf(Cursor<Vec<u8>>),
-    Store(<S as Store>::Reader),
+    Store(DagioReader<S>),
 }
 
 impl<S> From<Name> for ByteReader<S>
