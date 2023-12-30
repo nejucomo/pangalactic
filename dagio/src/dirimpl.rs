@@ -1,10 +1,10 @@
-use crate::{Dagio, DagioCommit, DagioLink, DagioLoad, HostDirectoryFor};
+use crate::{Dagio, DagioCommit, DagioHostDirectory, DagioLink, DagioLoad};
 use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioCommit<S> for HostDirectoryFor<S>
+impl<S> DagioCommit<S> for DagioHostDirectory<S>
 where
     S: Store,
 {
@@ -40,7 +40,7 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioLoad<S> for HostDirectoryFor<S>
+impl<S> DagioLoad<S> for DagioHostDirectory<S>
 where
     S: Store,
 {

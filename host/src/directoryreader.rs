@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, DagioLink, DagioLoad, HostDirectoryFor};
+use pangalactic_dagio::{Dagio, DagioHostDirectory, DagioLink, DagioLoad};
 use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
 
@@ -8,7 +8,7 @@ pub(crate) struct DirectoryReader<S>
 where
     S: Store,
 {
-    iter: <HostDirectoryFor<S> as IntoIterator>::IntoIter,
+    iter: <DagioHostDirectory<S> as IntoIterator>::IntoIter,
     name: Option<Name>,
     link: Option<DagioLink<S>>,
 }
@@ -50,7 +50,7 @@ where
     S: Store,
 {
     async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
-        let dir: HostDirectoryFor<S> = dagio.load(link).await?;
+        let dir: DagioHostDirectory<S> = dagio.load(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,
