@@ -1,5 +1,5 @@
 use crate::State;
-use pangalactic_dagio::{HostDirectoryFor, LinkFor};
+use pangalactic_dagio::{DagioHostDirectory, DagioLink};
 use pangalactic_handle::Handle;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
@@ -7,7 +7,7 @@ use wasmtime::{Caller, Trap};
 
 pub(super) async fn open<S>(
     mut caller: Caller<'_, State<S>>,
-) -> Result<Handle<HostDirectoryFor<S>>, Trap>
+) -> Result<Handle<DagioHostDirectory<S>>, Trap>
 where
     S: Store,
 {
@@ -19,10 +19,10 @@ where
 
 pub(super) async fn insert<S>(
     mut caller: Caller<'_, State<S>>,
-    h_dir: Handle<HostDirectoryFor<S>>,
+    h_dir: Handle<DagioHostDirectory<S>>,
     nameptr: usize,
     namelen: usize,
-    link: Handle<LinkFor<S>>,
+    link: Handle<DagioLink<S>>,
 ) -> Result<(), Trap>
 where
     S: Store,
@@ -43,8 +43,8 @@ where
 
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
-    h_dir: Handle<HostDirectoryFor<S>>,
-) -> Result<Handle<LinkFor<S>>, Trap>
+    h_dir: Handle<DagioHostDirectory<S>>,
+) -> Result<Handle<DagioLink<S>>, Trap>
 where
     S: Store,
 {

@@ -1,4 +1,4 @@
-use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLink};
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store_mem::MemStore;
 
@@ -41,7 +41,7 @@ where
     let link_in = dagio.commit(intree).await?;
     let (dagio, att_in) = run_phase(dagio, exec_in, link_in).await?;
     let (mut dagio, att_out) = run_phase(dagio, exec_out, att_in.output).await?;
-    let output: MemTree = dagio.read(&att_out.output).await?;
+    let output: MemTree = dagio.load(&att_out.output).await?;
 
     assert_eq!(output, expected);
     Ok(())
@@ -50,13 +50,13 @@ where
 async fn run_phase(
     mut dagio: Dagio<MemStore>,
     execname: &str,
-    input: LinkFor<MemStore>,
-) -> anyhow::Result<(Dagio<MemStore>, Attestation<LinkFor<MemStore>>)> {
+    input: DagioLink<MemStore>,
+) -> anyhow::Result<(Dagio<MemStore>, Attestation<DagioLink<MemStore>>)> {
     let exec = dagio
-        .write_file(pangalactic_guests::get_wasm_bytes(execname)?)
+        .commit(pangalactic_guests::get_wasm_bytes(execname)?)
         .await?;
     let plan = dagio.commit(Plan { exec, input }).await?;
     let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
-    let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
+    let att: Attestation<DagioLink<MemStore>> = dagio.load(&attestation).await?;
     Ok((dagio, att))
 }

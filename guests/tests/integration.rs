@@ -1,4 +1,4 @@
-use pangalactic_dagio::{Dagio, LinkFor};
+use pangalactic_dagio::{Dagio, DagioLink};
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store_mem::MemStore;
 use std::future::Future;
@@ -57,7 +57,7 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
         &["test_output_is_hello_world"],
         b"",
         |mut dagio, _, attestation| async move {
-            let output = dagio.read_file(&attestation.output).await?;
+            let output: Vec<u8> = dagio.load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
         },
@@ -80,7 +80,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
             ),
         ],
         |mut dagio, _, attestation| async move {
-            let output: MemTree = dagio.read(&attestation.output).await?;
+            let output: MemTree = dagio.load(&attestation.output).await?;
 
             assert_eq!(
                 output,
@@ -104,7 +104,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
 async fn verify_guests<M, F, Fut>(guests: &[&str], content: M, verify: F) -> anyhow::Result<()>
 where
     MemTree: From<M>,
-    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     pangalactic_log::test_init();
@@ -121,7 +121,7 @@ async fn verify_guests_inner<F, Fut>(
     verify: F,
 ) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     for guest in guests {
@@ -132,7 +132,7 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, content: MemTree, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<LinkFor<MemStore>>, Attestation<LinkFor<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     let mut dagio = Dagio::from(MemStore::default());
@@ -140,7 +140,7 @@ where
     let plan = {
         // Set up plan:
         let exec = dagio
-            .write_file(pangalactic_guests::get_wasm_bytes(guest)?)
+            .commit(pangalactic_guests::get_wasm_bytes(guest)?)
             .await?;
         let input = dagio.commit(content).await?;
 
@@ -150,8 +150,8 @@ where
     // Execute derive:
     let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
 
-    let att: Attestation<LinkFor<MemStore>> = dagio.read(&attestation).await?;
-    let plan: Plan<LinkFor<MemStore>> = dagio.read(&att.plan).await?;
+    let att: Attestation<DagioLink<MemStore>> = dagio.load(&attestation).await?;
+    let plan: Plan<DagioLink<MemStore>> = dagio.load(&att.plan).await?;
 
     // Verify
     verify(dagio, plan, att).await?;

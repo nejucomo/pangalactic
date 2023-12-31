@@ -1,4 +1,4 @@
-use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
+use pangalactic_dagio::{Dagio, DagioCommit, DagioLink, DagioLoad};
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 use std::collections::BTreeMap;
@@ -28,42 +28,42 @@ impl<'a, const K: usize> From<[(&'a str, MemTree); K]> for MemTree {
 }
 
 #[async_trait::async_trait]
-impl<S> ToDag<S> for MemTree
+impl<S> DagioCommit<S> for MemTree
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         use MemTree::*;
 
         match self {
-            File(bytes) => dagio.write_file(&bytes).await,
+            File(bytes) => dagio.commit(bytes).await,
             Dir(entries) => {
                 let mut d = HostDirectory::default();
                 for (n, child) in entries {
-                    let link = child.clone().into_dag(dagio).await?;
+                    let link = dagio.commit(child.clone()).await?;
                     d.insert(n.to_string(), link)?;
                 }
-                d.into_dag(dagio).await
+                dagio.commit(d).await
             }
         }
     }
 }
 
 #[async_trait::async_trait]
-impl<S> FromDag<S> for MemTree
+impl<S> DagioLoad<S> for MemTree
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {
-            LK::File => dagio.read_file(link).await.map(File),
+            LK::File => dagio.load(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: HostDirectory<_> = dagio.read(link).await?;
+                let d: HostDirectory<_> = dagio.load(link).await?;
                 for (n, sublink) in d {
-                    let mt: MemTree = dagio.read(&sublink).await?;
+                    let mt: MemTree = dagio.load(&sublink).await?;
                     map.insert(n, mt);
                 }
                 Ok(Dir(map))

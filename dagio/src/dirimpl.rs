@@ -1,14 +1,14 @@
-use crate::{Dagio, FromDag, HostDirectoryFor, LinkFor, ToDag};
+use crate::{Dagio, DagioCommit, DagioHostDirectory, DagioLink, DagioLoad};
 use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> ToDag<S> for HostDirectoryFor<S>
+impl<S> DagioCommit<S> for DagioHostDirectory<S>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::Dir;
         use pangalactic_serialization::serialize;
@@ -26,36 +26,32 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<const K: usize, S, N> ToDag<S> for [(N, LinkFor<S>); K]
+impl<const K: usize, S, N> DagioCommit<S> for [(N, DagioLink<S>); K]
 where
     S: Store,
     N: Send,
     String: From<N>,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
-        HostDirectory::from_iter(self.into_iter())
-            .into_dag(dagio)
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+        dagio
+            .commit(HostDirectory::from_iter(self.into_iter()))
             .await
     }
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> FromDag<S> for HostDirectoryFor<S>
+impl<S> DagioLoad<S> for DagioHostDirectory<S>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
-        use tokio::io::AsyncReadExt;
 
         let key = link.peek_key_kind(Dir)?;
-        let mut r = dagio
-            .open_file_reader(&Link::new(File, key.clone()))
-            .await?;
-        let mut buf = vec![];
-        r.read_to_end(&mut buf).await?;
-        let dir = pangalactic_serialization::deserialize(&buf)?;
+        let translink = Link::new(File, key.clone());
+        let bytes: Vec<u8> = dagio.load(&translink).await?;
+        let dir = pangalactic_serialization::deserialize(&bytes)?;
         Ok(dir)
     }
 }

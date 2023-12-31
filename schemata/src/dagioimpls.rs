@@ -1,27 +1,27 @@
 use crate::{Attestation, Plan};
 use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, FromDag, LinkFor, ToDag};
+use pangalactic_dagio::{Dagio, DagioCommit, DagioLink, DagioLoad};
 use pangalactic_dir::Directory;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::Store;
 
 #[async_trait]
-impl<S> FromDag<S> for Attestation<LinkFor<S>>
+impl<S> DagioLoad<S> for Attestation<DagioLink<S>>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+        let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }
 
 #[async_trait]
-impl<S> ToDag<S> for Attestation<LinkFor<S>>
+impl<S> DagioCommit<S> for Attestation<DagioLink<S>>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         dagio
             .commit(HostDirectory::from(Directory::from(self)))
             .await
@@ -29,22 +29,22 @@ where
 }
 
 #[async_trait]
-impl<S> FromDag<S> for Plan<LinkFor<S>>
+impl<S> DagioLoad<S> for Plan<DagioLink<S>>
 where
     S: Store,
 {
-    async fn from_dag(dagio: &mut Dagio<S>, link: &LinkFor<S>) -> anyhow::Result<Self> {
-        let hostdir = HostDirectory::from_dag(dagio, link).await?;
+    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+        let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }
 }
 
 #[async_trait]
-impl<S> ToDag<S> for Plan<LinkFor<S>>
+impl<S> DagioCommit<S> for Plan<DagioLink<S>>
 where
     S: Store,
 {
-    async fn into_dag(self, dagio: &mut Dagio<S>) -> anyhow::Result<LinkFor<S>> {
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         dagio
             .commit(HostDirectory::from(Directory::from(self)))
             .await

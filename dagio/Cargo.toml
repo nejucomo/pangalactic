@@ -13,6 +13,7 @@ pangalactic-linkkind.workspace = true
 pangalactic-link.workspace = true
 pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
+pin-project.workspace = true
 serde.workspace = true
 tokio.workspace = true
 
