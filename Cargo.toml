@@ -20,6 +20,7 @@ members = [
   "serialization",
   "store/dirdb",
   "store/mem",
+  "storepath",
   "store/trait",
   "table",
 ]
@@ -52,6 +53,7 @@ pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
+pangalactic-storepath       = { path = "storepath"       }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-table           = { path = "table"           }
 

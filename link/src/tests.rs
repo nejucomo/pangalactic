@@ -1,28 +1,21 @@
+use crate::testutil::{fakekey, FakeKey};
 use crate::Link;
-use pangalactic_linkkind::LinkKind::*;
-use serde::{Deserialize, Serialize};
+use pangalactic_linkkind::LinkKind::{self, Dir, File};
 use test_case::test_case;
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
-struct FakeKey(String);
-
-fn fakekey() -> FakeKey {
-    FakeKey("fake-key".to_string())
-}
-
-type FLink = Link<FakeKey>;
-
-#[test_case(Link::new(File, fakekey()), "file-CGZha2Uta2V5")]
-#[test_case(Link::new(Dir, fakekey()), "dir-CGZha2Uta2V5")]
-fn display(input: FLink, expected: &str) {
-    let actual = input.to_string();
+#[test_case(File, "file-CGZha2Uta2V5")]
+#[test_case(Dir, "dir-CGZha2Uta2V5")]
+fn display(kind: LinkKind, expected: &str) {
+    let link = Link::new(kind, fakekey());
+    let actual = link.to_string();
     assert_eq!(actual, expected);
 }
 
-#[test_case(Link::new(File, fakekey()))]
-#[test_case(Link::new(Dir, fakekey()))]
-fn display_parse_roundtrip(input: FLink) -> anyhow::Result<()> {
-    let output: FLink = input.to_string().parse()?;
+#[test_case(File)]
+#[test_case(Dir)]
+fn display_parse_roundtrip(kind: LinkKind) -> anyhow::Result<()> {
+    let input = Link::new(kind, fakekey());
+    let output: Link<FakeKey> = input.to_string().parse()?;
     assert_eq!(input, output);
     Ok(())
 }
@@ -30,7 +23,7 @@ fn display_parse_roundtrip(input: FLink) -> anyhow::Result<()> {
 #[test_case("file-CGZha2Uta2V5")]
 #[test_case("dir-CGZha2Uta2V5")]
 fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
-    let flink: FLink = input.parse()?;
+    let flink: Link<FakeKey> = input.parse()?;
     let output = flink.to_string();
     assert_eq!(input, output);
     Ok(())
