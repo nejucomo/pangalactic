@@ -11,6 +11,7 @@ pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-dir.workspace = true
 serde.workspace = true
+not_empty.workspace = true
 
 [dev-dependencies]
 test-case.workspace = true

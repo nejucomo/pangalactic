@@ -49,14 +49,7 @@ where
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> anyhow::Result<Self> {
-        use std::collections::VecDeque;
-
-        let mut q: VecDeque<&str> = s.split('/').collect();
-        let linktext = q
-            .pop_front()
-            .ok_or_else(|| anyhow::anyhow!("missing link"))?;
-        let link: Link<K> = linktext.parse()?;
-        let parts = q.into_iter().map(|s| s.to_string()).collect();
+        let (link, parts) = crate::parser::parse_parts(s)?;
         Self::new(link, parts)
     }
 }

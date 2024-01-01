@@ -10,6 +10,8 @@ clap.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-store-dirdb.workspace = true
+pangalactic-store.workspace = true
+pangalactic-storepath.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
 
