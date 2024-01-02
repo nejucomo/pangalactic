@@ -1,22 +1,26 @@
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
+use pangalactic_store::Store;
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, derive_more::Deref)]
-pub struct StorePath<K> {
+#[derive(Debug, derive_more::Deref)]
+pub struct StorePath<S>
+where
+    S: Store,
+{
     #[deref]
-    link: Link<K>,
+    link: Link<S>,
     /// Invariant: if self.link.kind() == File then path.is_empty
     path: Vec<Name>,
 }
 
-impl<K> StorePath<K> {
-    pub fn new(link: Link<K>, path: Vec<Name>) -> anyhow::Result<Self>
-    where
-        K: fmt::Debug,
-    {
+impl<S> StorePath<S>
+where
+    S: Store,
+{
+    pub fn new(link: Link<S>, path: Vec<Name>) -> anyhow::Result<Self> {
         if link.kind() == File && !path.is_empty() {
             anyhow::bail!(
                 "file link {:?} cannot have path path {:?}",
@@ -29,9 +33,21 @@ impl<K> StorePath<K> {
     }
 }
 
-impl<K> fmt::Display for StorePath<K>
+impl<S> Clone for StorePath<S>
 where
-    K: Clone + serde::Serialize,
+    S: Store,
+{
+    fn clone(&self) -> Self {
+        StorePath {
+            link: self.link.clone(),
+            path: self.path.clone(),
+        }
+    }
+}
+
+impl<S> fmt::Display for StorePath<S>
+where
+    S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.path.is_empty() {
@@ -42,9 +58,9 @@ where
     }
 }
 
-impl<K> FromStr for StorePath<K>
+impl<S> FromStr for StorePath<S>
 where
-    K: fmt::Debug + serde::de::DeserializeOwned,
+    S: Store,
 {
     type Err = anyhow::Error;
 

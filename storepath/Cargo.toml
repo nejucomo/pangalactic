@@ -7,12 +7,13 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 derive_more.workspace = true
-pangalactic-link.workspace = true
-pangalactic-linkkind.workspace = true
-pangalactic-dir.workspace = true
-serde.workspace = true
 not_empty.workspace = true
+pangalactic-dir.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-link.workspace = true
+pangalactic-store.workspace = true
+serde.workspace = true
 
 [dev-dependencies]
-test-case.workspace = true
 pangalactic-link = { workspace = true, features = ["testutil"] }
+test-case.workspace = true

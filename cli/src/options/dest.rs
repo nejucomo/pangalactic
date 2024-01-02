@@ -1,15 +1,12 @@
+use crate::store::CliStoreDestination;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
-
-use pangalactic_storepath::StoreDestination;
-
-use crate::store::CliCid;
 
 #[derive(Clone, Debug)]
 pub enum Destination {
     Stdout,
     Host(PathBuf),
     StoreScheme,
-    Store(StoreDestination<CliCid>),
+    Store(CliStoreDestination),
 }
 use Destination::*;
 

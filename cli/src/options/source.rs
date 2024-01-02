@@ -1,14 +1,23 @@
-use crate::store::CliCid;
-use pangalactic_storepath::StorePath;
+use crate::store::CliStorePath;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum Source {
     Stdin,
     Host(PathBuf),
-    Store(StorePath<CliCid>),
+    Store(CliStorePath),
 }
 use Source::*;
+
+impl Clone for Source {
+    fn clone(&self) -> Self {
+        match self {
+            Stdin => Stdin,
+            Host(pb) => Host(pb.clone()),
+            Store(sp) => Store(sp.clone()),
+        }
+    }
+}
 
 impl Display for Source {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -28,7 +37,7 @@ impl FromStr for Source {
             Ok(Stdin)
         } else {
             // BUG: The encoding should not require us to do a trial parse:
-            match s.parse::<StorePath<_>>() {
+            match s.parse::<CliStorePath>() {
                 Ok(sp) => Ok(Store(sp)),
                 Err(_) => {
                     let pb = s.parse::<PathBuf>()?;
