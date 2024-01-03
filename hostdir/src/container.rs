@@ -1,25 +1,27 @@
 use crate::hostdir::Inner;
 use crate::HostDirectory;
+use pangalactic_store::Store;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct HostDirectorySerializationContainer<K>
+#[serde(bound = "S: Store")]
+pub(crate) struct HostDirectorySerializationContainer<S>
 where
-    K: Clone,
+    S: Store,
 {
     version: u64,
-    inner: Inner<K>,
+    inner: Inner<S>,
 }
 
 const SERIALIZATION_VERSION: u64 = 0;
 
-impl<K> TryFrom<HostDirectorySerializationContainer<K>> for HostDirectory<K>
+impl<S> TryFrom<HostDirectorySerializationContainer<S>> for HostDirectory<S>
 where
-    K: Clone,
+    S: Store,
 {
     type Error = anyhow::Error;
 
-    fn try_from(container: HostDirectorySerializationContainer<K>) -> Result<Self, Self::Error> {
+    fn try_from(container: HostDirectorySerializationContainer<S>) -> Result<Self, Self::Error> {
         if container.version == SERIALIZATION_VERSION {
             Ok(HostDirectory(container.inner))
         } else {
@@ -32,11 +34,11 @@ where
     }
 }
 
-impl<K> From<HostDirectory<K>> for HostDirectorySerializationContainer<K>
+impl<S> From<HostDirectory<S>> for HostDirectorySerializationContainer<S>
 where
-    K: Clone,
+    S: Store,
 {
-    fn from(hd: HostDirectory<K>) -> Self {
+    fn from(hd: HostDirectory<S>) -> Self {
         HostDirectorySerializationContainer {
             version: SERIALIZATION_VERSION,
             inner: hd.0,

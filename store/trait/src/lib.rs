@@ -3,6 +3,8 @@
 // Documentation readability hack; see https://github.com/dtolnay/async-trait/issues/213#issuecomment-1559690487
 #![cfg_attr(doc, feature(async_fn_in_trait))]
 
+mod cid;
 mod store;
 
+pub use self::cid::StoreCid;
 pub use self::store::Store;

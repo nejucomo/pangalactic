@@ -1,4 +1,6 @@
-use pangalactic_store::Store;
+use std::{fmt::Display, str::FromStr};
+
+use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -20,6 +22,20 @@ where
     }
 }
 
+impl<S> StoreCid for CidMeta<S> where S: Store {}
+
+impl<S> Clone for CidMeta<S>
+where
+    S: Store,
+{
+    fn clone(&self) -> Self {
+        CidMeta {
+            cid: self.cid.clone(),
+            node_size: self.node_size,
+        }
+    }
+}
+
 impl<S> PartialEq for CidMeta<S>
 where
     S: Store,
@@ -31,14 +47,35 @@ where
 
 impl<S> Eq for CidMeta<S> where S: Store {}
 
-impl<S> Clone for CidMeta<S>
+impl<S> FromStr for CidMeta<S>
 where
     S: Store,
 {
-    fn clone(&self) -> Self {
-        CidMeta {
-            cid: self.cid.clone(),
-            node_size: self.node_size,
-        }
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use pangalactic_b64 as b64;
+        use pangalactic_serialization::deserialize;
+
+        let (cidstr, metastr) = s
+            .split_once('-')
+            .ok_or_else(|| anyhow::anyhow!("expected '-'"))?;
+
+        let cid = cidstr.parse()?;
+        let node_size = deserialize(&b64::decode(metastr)?)?;
+        Ok(CidMeta { cid, node_size })
+    }
+}
+
+impl<S> Display for CidMeta<S>
+where
+    S: Store,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use pangalactic_b64 as b64;
+        use pangalactic_serialization::serialize;
+
+        let metastr = b64::encode(serialize(&self.node_size).unwrap());
+        write!(f, "{}-{}", &self.cid, metastr)
     }
 }

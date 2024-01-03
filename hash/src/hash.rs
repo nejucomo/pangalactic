@@ -1,3 +1,4 @@
+use pangalactic_store::StoreCid;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -22,6 +23,8 @@ impl Hash {
         Hash(b3h)
     }
 }
+
+impl StoreCid for Hash {}
 
 impl From<[u8; blake3::OUT_LEN]> for Hash {
     fn from(bytes: [u8; blake3::OUT_LEN]) -> Self {

@@ -1,17 +1,44 @@
-use pangalactic_b64 as b64;
 use pangalactic_linkkind::LinkKind;
+use pangalactic_store::Store;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct Link<K> {
+#[derive(Debug, Eq, Deserialize, Serialize)]
+pub struct Link<S>
+where
+    S: Store,
+{
     kind: LinkKind,
-    key: K,
+    key: S::CID,
 }
 
-impl<K> Link<K> {
-    pub fn new(kind: LinkKind, key: K) -> Self {
+impl<S> Clone for Link<S>
+where
+    S: Store,
+{
+    fn clone(&self) -> Self {
+        Link {
+            kind: self.kind,
+            key: self.key.clone(),
+        }
+    }
+}
+
+impl<S> PartialEq for Link<S>
+where
+    S: Store,
+{
+    fn eq(&self, other: &Self) -> bool {
+        (self.kind == other.kind) && (self.key == other.key)
+    }
+}
+
+impl<S> Link<S>
+where
+    S: Store,
+{
+    pub fn new(kind: LinkKind, key: S::CID) -> Self {
         Link { kind, key }
     }
 
@@ -19,14 +46,11 @@ impl<K> Link<K> {
         self.kind
     }
 
-    pub fn peek_key(&self) -> &K {
+    pub fn peek_key(&self) -> &S::CID {
         &self.key
     }
 
-    pub fn peek_key_kind(&self, kind: LinkKind) -> anyhow::Result<&K>
-    where
-        K: fmt::Debug,
-    {
+    pub fn peek_key_kind(&self, kind: LinkKind) -> anyhow::Result<&S::CID> {
         if self.kind == kind {
             Ok(&self.key)
         } else {
@@ -37,31 +61,30 @@ impl<K> Link<K> {
         }
     }
 
-    pub fn unwrap(self) -> (LinkKind, K) {
+    pub fn unwrap(self) -> (LinkKind, S::CID) {
         (self.kind, self.key)
     }
 
-    fn from_str_without_context(s: &str) -> anyhow::Result<Self>
-    where
-        K: serde::de::DeserializeOwned,
-    {
-        use pangalactic_serialization::deserialize;
+    fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
+        let prefix = format!("pg-{}://", S::SCHEME);
+        let linkstr = s
+            .strip_prefix(&prefix)
+            .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
 
-        let (kindtext, linkb64) = s
+        let (kindstr, keystr) = linkstr
             .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("missing '-'"))?;
+            .ok_or_else(|| anyhow::anyhow!("expected `<KIND>-<KEY>` encoding"))?;
 
-        let kind: LinkKind = kindtext.parse()?;
-        let bytes = b64::decode(linkb64)?;
-        let key: K = deserialize(&bytes)?;
+        let kind = kindstr.parse()?;
+        let key = keystr.parse()?;
 
-        Ok(Link::new(kind, key))
+        Ok(Link { kind, key })
     }
 }
 
-impl<K> FromStr for Link<K>
+impl<S> FromStr for Link<S>
 where
-    K: serde::de::DeserializeOwned,
+    S: Store,
 {
     type Err = anyhow::Error;
 
@@ -72,18 +95,11 @@ where
     }
 }
 
-impl<K> fmt::Display for Link<K>
+impl<S> fmt::Display for Link<S>
 where
-    K: Serialize,
+    S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use pangalactic_serialization::serialize;
-
-        self.kind.fmt(f)?;
-        '-'.fmt(f)?;
-
-        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error)?;
-        let s = b64::encode(bytes);
-        s.fmt(f)
+        write!(f, "pg-{}://{}-{}", S::SCHEME, self.kind, self.key)
     }
 }
