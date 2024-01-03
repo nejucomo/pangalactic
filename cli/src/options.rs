@@ -4,8 +4,7 @@ mod source;
 pub use self::dest::Destination;
 pub use self::source::Source;
 
-use crate::cmd;
-use crate::store::CliLink;
+use crate::cmd::{Commander, Link};
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
@@ -24,10 +23,14 @@ impl Options {
         use Command::*;
         use StoreCommand::*;
 
+        let mut cmdr = Commander::default();
+
         match self.command.unwrap() {
-            Store(Put) => cmd::store_put().await,
-            Store(Get(opts)) => cmd::store_get(&opts.link).await,
-            _ => unimplemented!("Fix link encodings for xfer"),
+            Store(Put) => cmdr.store_put().await,
+            Store(Get(StoreGetOptions { link })) => cmdr.store_get(&link).await,
+            Store(Xfer(StoreXferOptions { source, dest })) => {
+                unimplemented!("Fix link encodings for xfer: {:?}", (source, dest))
+            }
         }
     }
 }
@@ -44,19 +47,19 @@ pub enum StoreCommand {
     /// Insert the file on stdin and print its key on stdout
     Put,
     Get(StoreGetOptions),
-    Xfer(XferOptions),
+    Xfer(StoreXferOptions),
 }
 
 /// Send the given file to stdout
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The link to get
-    pub link: CliLink,
+    pub link: Link,
 }
 
 /// Send the given file to stdout
 #[derive(Debug, Args)]
-pub struct XferOptions {
+pub struct StoreXferOptions {
     pub source: Source,
     pub dest: Destination,
 }

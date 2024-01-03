@@ -1,4 +1,4 @@
-use crate::store::CliStoreDestination;
+use crate::cmd::StoreDestination;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Clone, Debug)]
@@ -6,7 +6,7 @@ pub enum Destination {
     Stdout,
     Host(PathBuf),
     StoreScheme,
-    Store(CliStoreDestination),
+    Store(StoreDestination),
 }
 use Destination::*;
 

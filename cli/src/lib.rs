@@ -4,6 +4,5 @@
 pub mod cmd;
 pub mod options;
 mod run;
-pub mod store;
 
 pub use self::run::run;

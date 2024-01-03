@@ -1,11 +1,11 @@
-use crate::store::CliStorePath;
+use crate::cmd::StorePath;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Debug)]
 pub enum Source {
     Stdin,
     Host(PathBuf),
-    Store(CliStorePath),
+    Store(StorePath),
 }
 use Source::*;
 
@@ -37,7 +37,7 @@ impl FromStr for Source {
             Ok(Stdin)
         } else {
             // BUG: The encoding should not require us to do a trial parse:
-            match s.parse::<CliStorePath>() {
+            match s.parse::<StorePath>() {
                 Ok(sp) => Ok(Store(sp)),
                 Err(_) => {
                     let pb = s.parse::<PathBuf>()?;
