@@ -20,6 +20,10 @@ impl<S> StorePath<S>
 where
     S: Store,
 {
+    pub fn link(&self) -> &Link<S> {
+        &self.link
+    }
+
     pub fn new(link: Link<S>, path: Vec<Name>) -> anyhow::Result<Self> {
         if link.kind() == File && !path.is_empty() {
             anyhow::bail!(

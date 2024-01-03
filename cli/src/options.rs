@@ -28,9 +28,7 @@ impl Options {
         match self.command.unwrap() {
             Store(Put) => cmdr.store_put().await,
             Store(Get(StoreGetOptions { link })) => cmdr.store_get(&link).await,
-            Store(Xfer(StoreXferOptions { source, dest })) => {
-                unimplemented!("Fix link encodings for xfer: {:?}", (source, dest))
-            }
+            Store(Xfer(StoreXferOptions { source, dest })) => cmdr.store_xfer(&source, &dest).await,
         }
     }
 }

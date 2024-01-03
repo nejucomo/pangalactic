@@ -1,12 +1,12 @@
 use crate::{Dagio, DagioLink, DagioLoad};
 use async_trait::async_trait;
+use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 use pin_project::pin_project;
 use tokio::io::AsyncRead;
 
-#[derive(Debug)]
 #[pin_project]
-pub struct DagioReader<S>(#[pin] S::Reader)
+pub struct DagioReader<S>(#[pin] <CidMetaLayer<S> as Store>::Reader)
 where
     S: Store;
 
