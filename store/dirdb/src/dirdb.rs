@@ -17,6 +17,8 @@ impl Default for DirDbStore {
 
 #[async_trait]
 impl Store for DirDbStore {
+    const SCHEME: &'static str = "dirdb";
+
     type CID = Hash;
     type Reader = tokio::fs::File;
     type Writer = Writer;

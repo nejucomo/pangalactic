@@ -1,6 +1,5 @@
+use crate::StoreCid;
 use async_trait::async_trait;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
 use std::fmt::Debug;
 use tokio::io::{AsyncRead, AsyncWrite};
 
@@ -8,6 +7,9 @@ use tokio::io::{AsyncRead, AsyncWrite};
 #[cfg_attr(doc, feature(async_fn_in_trait))]
 #[cfg_attr(not(doc), async_trait)]
 pub trait Store: Debug + Send {
+    /// The `SCHEME` determines the url-like prefix to links and store-paths:
+    const SCHEME: &'static str;
+
     /// An acronym for `Content IDentifier` required to have these properties beyond the type
     /// signature:
     ///
@@ -18,7 +20,7 @@ pub trait Store: Debug + Send {
     /// - A `CID` should be concise.
     ///
     /// Cryptographic hash functions over the content are assumed to meet these properties.
-    type CID: Clone + Eq + Debug + Serialize + DeserializeOwned + Send + Sync;
+    type CID: StoreCid;
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;
 

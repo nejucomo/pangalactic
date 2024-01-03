@@ -1,4 +1,3 @@
-use pangalactic_b64 as b64;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::Store;
 use serde::{Deserialize, Serialize};
@@ -67,17 +66,19 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        use pangalactic_serialization::deserialize;
+        let prefix = format!("pg-{}://", S::SCHEME);
+        let linkstr = s
+            .strip_prefix(&prefix)
+            .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
 
-        let (kindtext, linkb64) = s
+        let (kindstr, keystr) = linkstr
             .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("missing '-'"))?;
+            .ok_or_else(|| anyhow::anyhow!("expected `<KIND>-<KEY>` encoding"))?;
 
-        let kind: LinkKind = kindtext.parse()?;
-        let bytes = b64::decode(linkb64)?;
-        let key: S::CID = deserialize(&bytes)?;
+        let kind = kindstr.parse()?;
+        let key = keystr.parse()?;
 
-        Ok(Link::new(kind, key))
+        Ok(Link { kind, key })
     }
 }
 
@@ -99,13 +100,6 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use pangalactic_serialization::serialize;
-
-        self.kind.fmt(f)?;
-        '-'.fmt(f)?;
-
-        let bytes = serialize(&self.key).map_err(|_| std::fmt::Error)?;
-        let s = b64::encode(bytes);
-        s.fmt(f)
+        write!(f, "pg-{}://{}-{}", S::SCHEME, self.kind, self.key)
     }
 }

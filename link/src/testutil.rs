@@ -1,12 +1,30 @@
+use std::{fmt::Display, str::FromStr};
+
 use async_trait::async_trait;
-use pangalactic_store::Store;
+use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
-pub struct FakeKey(String);
+pub struct FakeKey;
 
-pub fn fakekey() -> FakeKey {
-    FakeKey("fake-key".to_string())
+impl StoreCid for FakeKey {}
+
+impl Display for FakeKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        "<FAKE-KEY>".fmt(f)
+    }
+}
+
+impl FromStr for FakeKey {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "<FAKE-KEY>" {
+            Ok(Self)
+        } else {
+            anyhow::bail!("expected `<FAKE-KEY>`")
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -14,6 +32,8 @@ pub struct FakeStore;
 
 #[async_trait]
 impl Store for FakeStore {
+    const SCHEME: &'static str = "FAKE";
+
     type CID = FakeKey;
     type Reader = tokio::io::Empty;
     type Writer = tokio::io::Sink;
