@@ -54,15 +54,14 @@ where
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use pangalactic_b64 as b64;
-        use pangalactic_serialization::deserialize;
+        use pangalactic_serialization::b64;
 
         let (cidstr, metastr) = s
             .split_once('-')
             .ok_or_else(|| anyhow::anyhow!("expected '-'"))?;
 
         let cid = cidstr.parse()?;
-        let node_size = deserialize(&b64::decode(metastr)?)?;
+        let node_size = b64::deserialize(metastr)?;
         Ok(CidMeta { cid, node_size })
     }
 }
@@ -72,10 +71,9 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use pangalactic_b64 as b64;
-        use pangalactic_serialization::serialize;
+        use pangalactic_serialization::b64;
 
-        let metastr = b64::encode(serialize(&self.node_size).unwrap());
+        let metastr = b64::serialize(&self.node_size).map_err(|_| std::fmt::Error)?;
         write!(f, "{}-{}", &self.cid, metastr)
     }
 }

@@ -51,7 +51,7 @@ where
         let key = link.peek_key_kind(Dir)?;
         let translink = Link::new(File, key.clone());
         let bytes: Vec<u8> = dagio.load(&translink).await?;
-        let dir = pangalactic_serialization::deserialize(&bytes)?;
+        let dir = pangalactic_serialization::deserialize(bytes)?;
         Ok(dir)
     }
 }
