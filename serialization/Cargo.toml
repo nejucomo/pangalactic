@@ -9,5 +9,6 @@ testutil = []
 
 [dependencies]
 anyhow.workspace = true
+pangalactic-b64.workspace = true
 postcard.workspace = true
 serde.workspace = true
