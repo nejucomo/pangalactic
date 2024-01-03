@@ -17,3 +17,5 @@ pangalactic-hash.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-serialization = { workspace = true, features = ["testutil"] }
 pangalactic-store-mem.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+tokio.workspace = true
