@@ -1,4 +1,7 @@
-use crate::{DagioCommit, DagioLink, DagioLoad, DagioWriter};
+use crate::{
+    DagioCommit, DagioHostDirectory, DagioLink, DagioLoad, DagioStoreDestination, DagioStorePath,
+    DagioWriter,
+};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 
@@ -20,6 +23,31 @@ impl<S> Dagio<S>
 where
     S: Store,
 {
+    pub async fn load_from<T>(&mut self, source: &DagioStorePath<S>) -> anyhow::Result<T>
+    where
+        T: DagioLoad<S>,
+    {
+        let mut link = source.link().clone();
+        for name in source.path() {
+            let mut d: DagioHostDirectory<S> = self.load(&link).await?;
+            link = d
+                .remove(name)
+                .ok_or_else(|| anyhow::anyhow!("missing {name:?} in {source}"))?;
+        }
+        self.load(&link).await
+    }
+
+    pub async fn commit_to<T>(
+        &mut self,
+        dest: &DagioStoreDestination<S>,
+        _value: T,
+    ) -> anyhow::Result<DagioLink<S>>
+    where
+        T: DagioCommit<S>,
+    {
+        todo!("{dest:?}")
+    }
+
     pub async fn load<T>(&mut self, link: &DagioLink<S>) -> anyhow::Result<T>
     where
         T: DagioLoad<S>,

@@ -6,13 +6,15 @@ mod commit;
 mod dagio;
 mod dirimpl;
 mod load;
+mod readcommitter;
 mod reader;
 mod writer;
 
-pub use self::aliases::{DagioHostDirectory, DagioLink};
+pub use self::aliases::{DagioHostDirectory, DagioLink, DagioStoreDestination, DagioStorePath};
 pub use self::commit::DagioCommit;
 pub use self::dagio::Dagio;
 pub use self::load::DagioLoad;
+pub use self::readcommitter::ReadCommitter;
 pub use self::reader::DagioReader;
 pub use self::writer::DagioWriter;
 

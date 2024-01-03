@@ -1,4 +1,4 @@
-use pangalactic_dir::Name;
+use pangalactic_dir::{Name, NameRef};
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use pangalactic_store::Store;
@@ -22,6 +22,10 @@ where
 {
     pub fn link(&self) -> &Link<S> {
         &self.link
+    }
+
+    pub fn path(&self) -> impl Iterator<Item = &NameRef> {
+        self.path.iter().map(|n| n.as_str())
     }
 
     pub fn new(link: Link<S>, path: Vec<Name>) -> anyhow::Result<Self> {

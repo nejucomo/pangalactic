@@ -1,8 +1,8 @@
-use pangalactic_dagio::{Dagio, DagioLink, DagioReader};
+use pangalactic_dagio::{Dagio, DagioLink, DagioReader, ReadCommitter};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
-use tokio::io::AsyncRead;
+use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::options::{Destination, Source};
 
@@ -61,10 +61,39 @@ impl Commander {
         }
     }
 
-    async fn xfer_from_stream<R>(&mut self, _r: R, _dest: &Destination) -> anyhow::Result<()>
+    async fn xfer_from_stream<R>(&mut self, r: R, dest: &Destination) -> anyhow::Result<()>
     where
-        R: AsyncRead,
+        R: AsyncRead + Send,
     {
-        todo!();
+        use Destination::*;
+
+        match dest {
+            Stdout => copy(r, tokio::io::stdout()).await,
+            Host(p) => {
+                let f = tokio::fs::File::create(p).await?;
+                copy(r, f).await
+            }
+            StoreScheme => {
+                let link = self.dagio.commit(ReadCommitter(r)).await?;
+                println!("{link}");
+                Ok(())
+            }
+            Store(sd) => {
+                let link = self.dagio.commit_to(sd, ReadCommitter(r)).await?;
+                println!("{link}");
+                Ok(())
+            }
+        }
     }
+}
+
+async fn copy<R, W>(r: R, w: W) -> anyhow::Result<()>
+where
+    R: AsyncRead,
+    W: AsyncWrite,
+{
+    let mut pinr = std::pin::pin!(r);
+    let mut pinw = std::pin::pin!(w);
+    tokio::io::copy(&mut pinr, &mut pinw).await?;
+    Ok(())
 }
