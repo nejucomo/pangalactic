@@ -1,5 +1,3 @@
-use std::{fmt::Display, str::FromStr};
-
 use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +20,31 @@ where
     }
 }
 
-impl<S> StoreCid for CidMeta<S> where S: Store {}
+impl<S> StoreCid for CidMeta<S>
+where
+    S: Store,
+{
+    fn encode_fields(&self, dest: &mut Vec<String>) {
+        use pangalactic_serialization::b64;
+
+        dest.push(b64::serialize(&self.node_size).unwrap());
+        self.cid.encode_fields(dest);
+    }
+
+    fn parse_fields<'a, I>(mut fields: I) -> anyhow::Result<Self>
+    where
+        I: Iterator<Item = &'a str>,
+    {
+        use pangalactic_serialization::b64;
+
+        let node_size_field = fields
+            .next()
+            .ok_or_else(|| anyhow::anyhow!("missing node size field"))?;
+        let node_size = b64::deserialize(node_size_field)?;
+        let cid = S::CID::parse_fields(fields)?;
+        Ok(CidMeta { cid, node_size })
+    }
+}
 
 impl<S> Clone for CidMeta<S>
 where
@@ -46,34 +68,3 @@ where
 }
 
 impl<S> Eq for CidMeta<S> where S: Store {}
-
-impl<S> FromStr for CidMeta<S>
-where
-    S: Store,
-{
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use pangalactic_serialization::b64;
-
-        let (cidstr, metastr) = s
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected '-'"))?;
-
-        let cid = cidstr.parse()?;
-        let node_size = b64::deserialize(metastr)?;
-        Ok(CidMeta { cid, node_size })
-    }
-}
-
-impl<S> Display for CidMeta<S>
-where
-    S: Store,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use pangalactic_serialization::b64;
-
-        let metastr = b64::serialize(&self.node_size).map_err(|_| std::fmt::Error)?;
-        write!(f, "{}-{}", &self.cid, metastr)
-    }
-}

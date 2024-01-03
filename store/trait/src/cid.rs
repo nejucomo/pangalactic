@@ -10,15 +10,33 @@ use std::str::FromStr;
 /// - A `CID` should be concise.
 ///
 /// Cryptographic hash functions over the content are assumed to meet these properties.
-pub trait StoreCid:
-    Clone
-    + Eq
-    + Debug
-    + Display
-    + FromStr<Err = anyhow::Error>
-    + Serialize
-    + DeserializeOwned
-    + Send
-    + Sync
+pub trait StoreCid: Clone + Eq + Debug + Serialize + DeserializeOwned + Send + Sync {
+    fn encode_fields(&self, dest: &mut Vec<String>);
+
+    fn parse_fields<'a, I>(fields: I) -> anyhow::Result<Self>
+    where
+        I: Iterator<Item = &'a str>;
+}
+
+pub fn cid_encode_fields_from_display<T>(v: &T, dest: &mut Vec<String>)
+where
+    T: Display,
 {
+    dest.push(v.to_string())
+}
+
+pub fn cid_decode_fields_fromstr<'a, T, I>(mut fields: I) -> anyhow::Result<T>
+where
+    T: FromStr<Err = anyhow::Error>,
+    I: Iterator<Item = &'a str>,
+{
+    let field = fields
+        .next()
+        .ok_or_else(|| anyhow::anyhow!("missing {} field", std::any::type_name::<T>()))?;
+
+    if let Some(f) = fields.next() {
+        anyhow::bail!("unexpected field: {f:?}");
+    } else {
+        field.parse()
+    }
 }

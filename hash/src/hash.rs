@@ -24,7 +24,18 @@ impl Hash {
     }
 }
 
-impl StoreCid for Hash {}
+impl StoreCid for Hash {
+    fn encode_fields(&self, dest: &mut Vec<String>) {
+        pangalactic_store::cid_encode_fields_from_display(self, dest);
+    }
+
+    fn parse_fields<'a, I>(fields: I) -> anyhow::Result<Self>
+    where
+        I: Iterator<Item = &'a str>,
+    {
+        pangalactic_store::cid_decode_fields_fromstr(fields)
+    }
+}
 
 impl From<[u8; blake3::OUT_LEN]> for Hash {
     fn from(bytes: [u8; blake3::OUT_LEN]) -> Self {

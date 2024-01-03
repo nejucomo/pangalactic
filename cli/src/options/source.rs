@@ -35,7 +35,7 @@ impl FromStr for Source {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s == "-" {
             Ok(Stdin)
-        } else if s.starts_with(&Link::prefix()) {
+        } else if s.starts_with(&format!("{}:", Link::SCHEME)) {
             let sp = s.parse()?;
             Ok(Store(sp))
         } else {

@@ -38,10 +38,7 @@ impl<S> Link<S>
 where
     S: Store,
 {
-    // TODO: const_format
-    pub fn prefix() -> String {
-        format!("{}://", S::SCHEME)
-    }
+    pub const SCHEME: &'static str = S::SCHEME;
 
     pub fn new(kind: LinkKind, key: S::CID) -> Self {
         Link { kind, key }
@@ -71,17 +68,24 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        let prefix = Self::prefix();
-        let linkstr = s
-            .strip_prefix(&prefix)
-            .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
+        use pangalactic_store::StoreCid;
 
-        let (kindstr, keystr) = linkstr
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected `<KIND>-<KEY>` encoding"))?;
+        let mut fields = s.split(':');
+
+        let prefix = fields
+            .next()
+            .ok_or_else(|| anyhow::anyhow!("missing schema"))?;
+        let expected = Self::SCHEME;
+        if prefix != expected {
+            anyhow::bail!("expected prefix {expected:?}, found {prefix:?}");
+        }
+
+        let kindstr = fields
+            .next()
+            .ok_or_else(|| anyhow::anyhow!("missing link kind"))?;
 
         let kind = kindstr.parse()?;
-        let key = keystr.parse()?;
+        let key = S::CID::parse_fields(fields)?;
 
         Ok(Link { kind, key })
     }
@@ -105,6 +109,10 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}{}-{}", Self::prefix(), self.kind, self.key)
+        use pangalactic_store::StoreCid;
+
+        let mut fields = vec![Self::SCHEME.to_string(), self.kind.to_string()];
+        self.key.encode_fields(&mut fields);
+        fields.join(":").fmt(f)
     }
 }

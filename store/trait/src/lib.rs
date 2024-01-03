@@ -6,5 +6,5 @@
 mod cid;
 mod store;
 
-pub use self::cid::StoreCid;
+pub use self::cid::{cid_decode_fields_fromstr, cid_encode_fields_from_display, StoreCid};
 pub use self::store::Store;

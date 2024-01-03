@@ -1,13 +1,26 @@
 use std::{fmt::Display, str::FromStr};
 
 use async_trait::async_trait;
-use pangalactic_store::{Store, StoreCid};
+use pangalactic_store::{
+    cid_decode_fields_fromstr, cid_encode_fields_from_display, Store, StoreCid,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub struct FakeKey;
 
-impl StoreCid for FakeKey {}
+impl StoreCid for FakeKey {
+    fn encode_fields(&self, dest: &mut Vec<String>) {
+        cid_encode_fields_from_display(self, dest);
+    }
+
+    fn parse_fields<'a, I>(fields: I) -> anyhow::Result<Self>
+    where
+        I: Iterator<Item = &'a str>,
+    {
+        cid_decode_fields_fromstr(fields)
+    }
+}
 
 impl Display for FakeKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -15,7 +15,7 @@ impl Display for Destination {
         match self {
             Stdout => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
-            StoreScheme => Link::prefix().fmt(f),
+            StoreScheme => Link::SCHEME.fmt(f),
             Store(sp) => sp.fmt(f),
         }
     }
@@ -25,7 +25,7 @@ impl FromStr for Destination {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let prefix = Link::prefix();
+        let prefix = format!("{}:", Link::SCHEME);
         if s == "-" {
             Ok(Stdout)
         } else if s == prefix {
