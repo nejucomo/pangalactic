@@ -1,4 +1,4 @@
-use crate::cmd::StorePath;
+use crate::cmd::{Link, StorePath};
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Debug)]
@@ -35,15 +35,12 @@ impl FromStr for Source {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s == "-" {
             Ok(Stdin)
+        } else if s.starts_with(&Link::prefix()) {
+            let sp = s.parse()?;
+            Ok(Store(sp))
         } else {
-            // BUG: The encoding should not require us to do a trial parse:
-            match s.parse::<StorePath>() {
-                Ok(sp) => Ok(Store(sp)),
-                Err(_) => {
-                    let pb = s.parse::<PathBuf>()?;
-                    Ok(Host(pb))
-                }
-            }
+            let pb = s.parse::<PathBuf>()?;
+            Ok(Host(pb))
         }
     }
 }

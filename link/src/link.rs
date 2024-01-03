@@ -38,6 +38,11 @@ impl<S> Link<S>
 where
     S: Store,
 {
+    // TODO: const_format
+    pub fn prefix() -> String {
+        format!("pg-{}://", S::SCHEME)
+    }
+
     pub fn new(kind: LinkKind, key: S::CID) -> Self {
         Link { kind, key }
     }
@@ -66,7 +71,7 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        let prefix = format!("pg-{}://", S::SCHEME);
+        let prefix = Self::prefix();
         let linkstr = s
             .strip_prefix(&prefix)
             .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
@@ -100,6 +105,6 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "pg-{}://{}-{}", S::SCHEME, self.kind, self.key)
+        write!(f, "{}{}-{}", Self::prefix(), self.kind, self.key)
     }
 }

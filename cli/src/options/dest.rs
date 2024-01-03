@@ -1,4 +1,4 @@
-use crate::cmd::StoreDestination;
+use crate::cmd::{Link, StoreDestination};
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Clone, Debug)]
@@ -15,7 +15,7 @@ impl Display for Destination {
         match self {
             Stdout => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
-            StoreScheme => unimplemented!("BUG: Change link encoding to be URL-like"),
+            StoreScheme => Link::prefix().fmt(f),
             Store(sp) => sp.fmt(f),
         }
     }
@@ -25,6 +25,17 @@ impl FromStr for Destination {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        unimplemented!("BUG: Change link encoding to be URL-like: {s:?}")
+        let prefix = Link::prefix();
+        if s == "-" {
+            Ok(Stdout)
+        } else if s == prefix {
+            Ok(StoreScheme)
+        } else if s.starts_with(&prefix) {
+            let sp = s.parse()?;
+            Ok(Store(sp))
+        } else {
+            let pb = s.parse::<PathBuf>()?;
+            Ok(Host(pb))
+        }
     }
 }
