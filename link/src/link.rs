@@ -40,7 +40,7 @@ where
 {
     // TODO: const_format
     pub fn prefix() -> String {
-        format!("pg-{}://", S::SCHEME)
+        format!("{}://", S::SCHEME)
     }
 
     pub fn new(kind: LinkKind, key: S::CID) -> Self {

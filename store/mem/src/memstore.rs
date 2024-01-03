@@ -10,7 +10,7 @@ pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
 
 #[async_trait]
 impl Store for MemStore {
-    const SCHEME: &'static str = "mem";
+    const SCHEME: &'static str = "pgm";
 
     type CID = Hash;
     type Reader = Reader;
