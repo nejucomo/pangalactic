@@ -40,12 +40,51 @@ where
     pub async fn commit_to<T>(
         &mut self,
         dest: &DagioStoreDestination<S>,
-        _value: T,
+        value: T,
     ) -> anyhow::Result<DagioLink<S>>
     where
         T: DagioCommit<S>,
     {
-        todo!("{dest:?}")
+        let (last, intermediates) = dest.path().split_last();
+        let mut link = dest.link().clone();
+        let mut d: DagioHostDirectory<S> = self.load(&link).await?;
+        let mut stack = vec![];
+        for name in intermediates {
+            link = d
+                .get(name)
+                .cloned()
+                .ok_or_else(|| anyhow::anyhow!("missing {name:?} in {dest}"))?;
+            stack.push((d, name.clone()));
+            d = self.load(&link).await?;
+        }
+
+        d = self.load(&link).await?;
+        link = self.commit(value).await?;
+        d.insert(last.to_string(), link)?;
+        link = self.commit(d).await?;
+
+        while let Some((mut d, name)) = stack.pop() {
+            d.overwrite(name, link);
+            link = self.commit(d).await?;
+        }
+
+        Ok(link)
+    }
+
+    pub async fn commit_to_opt<T>(
+        &mut self,
+        dest: Option<&DagioStoreDestination<S>>,
+        value: T,
+    ) -> anyhow::Result<DagioLink<S>>
+    where
+        T: DagioCommit<S>,
+    {
+        let link = self.commit(value).await?;
+        if let Some(sd) = dest {
+            self.commit_to(sd, link).await
+        } else {
+            Ok(link)
+        }
     }
 
     pub async fn load<T>(&mut self, link: &DagioLink<S>) -> anyhow::Result<T>

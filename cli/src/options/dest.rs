@@ -5,8 +5,8 @@ use std::{fmt::Display, path::PathBuf, str::FromStr};
 pub enum Destination {
     Stdout,
     Host(PathBuf),
-    StoreScheme,
-    Store(StoreDestination),
+    /// If no destination is present, the inbound file/dir is inserted unlinked to any containing directory:
+    Store(Option<StoreDestination>),
 }
 use Destination::*;
 
@@ -15,8 +15,13 @@ impl Display for Destination {
         match self {
             Stdout => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
-            StoreScheme => Link::SCHEME.fmt(f),
-            Store(sp) => sp.fmt(f),
+            Store(osp) => {
+                if let Some(sp) = osp {
+                    sp.fmt(f)
+                } else {
+                    Link::SCHEME.fmt(f)
+                }
+            }
         }
     }
 }
@@ -28,11 +33,13 @@ impl FromStr for Destination {
         let prefix = format!("{}:", Link::SCHEME);
         if s == "-" {
             Ok(Stdout)
-        } else if s == prefix {
-            Ok(StoreScheme)
         } else if s.starts_with(&prefix) {
-            let sp = s.parse()?;
-            Ok(Store(sp))
+            let osp = if s == prefix {
+                None
+            } else {
+                s.parse().map(Some)?
+            };
+            Ok(Store(osp))
         } else {
             let pb = s.parse::<PathBuf>()?;
             Ok(Host(pb))

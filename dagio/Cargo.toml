@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+anyhow-std.workspace = true
 async-trait.workspace = true
 pangalactic-hostdir.workspace = true
 pangalactic-layer-cidmeta.workspace = true

@@ -48,6 +48,10 @@ impl<L> Directory<L> {
         }
     }
 
+    pub fn overwrite(&mut self, name: Name, link: L) {
+        self.0.insert(name, link);
+    }
+
     pub fn get(&self, name: &NameRef) -> Option<&L> {
         self.0.get(name)
     }

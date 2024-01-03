@@ -1,4 +1,4 @@
-use not_empty::NonEmptyVec;
+use not_empty::{NonEmptySlice, NonEmptyVec};
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_store::Store;
@@ -19,6 +19,14 @@ impl<S> StoreDestination<S>
 where
     S: Store,
 {
+    pub fn link(&self) -> &Link<S> {
+        &self.link
+    }
+
+    pub fn path(&self) -> &NonEmptySlice<Name> {
+        self.path.as_slice()
+    }
+
     pub fn new<P>(link: Link<S>, path: P) -> anyhow::Result<Self>
     where
         NonEmptyVec<Name>: TryFrom<P>,

@@ -1,4 +1,4 @@
-use crate::{Dagio, DagioLink};
+use crate::{Dagio, DagioLink, DagioStorePath};
 use async_trait::async_trait;
 use pangalactic_store::Store;
 
@@ -42,5 +42,25 @@ where
 {
     async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
         dagio.commit(self.as_slice()).await
+    }
+}
+
+#[cfg_attr(not(doc), async_trait)]
+impl<S> DagioCommit<S> for DagioStorePath<S>
+where
+    S: Store,
+{
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+        dagio.commit(&self).await
+    }
+}
+
+#[cfg_attr(not(doc), async_trait)]
+impl<'a, S> DagioCommit<S> for &'a DagioStorePath<S>
+where
+    S: Store,
+{
+    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+        dagio.load_from(self).await
     }
 }

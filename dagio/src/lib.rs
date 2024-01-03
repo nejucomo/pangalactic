@@ -5,6 +5,7 @@ mod aliases;
 mod commit;
 mod dagio;
 mod dirimpl;
+mod hostfsimpl;
 mod load;
 mod readcommitter;
 mod reader;
