@@ -18,4 +18,6 @@ serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
 
 [dev-dependencies]
+anyhow-std.workspace = true
+pangalactic-hash.workspace = true
 test-case.workspace = true
