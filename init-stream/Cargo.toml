@@ -1,0 +1,9 @@
+[package]
+name = "pangalactic-init-stream"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pin-project.workspace = true
+tokio-stream.workspace = true
