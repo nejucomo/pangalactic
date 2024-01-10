@@ -6,3 +6,7 @@ license.workspace = true
 
 [dependencies]
 tokio-stream = { workspace = true, features = ["fs"] }
+
+[dev-dependencies]
+test-case.workspace = true
+tokio.workspace = true
