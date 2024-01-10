@@ -23,6 +23,7 @@ members = [
   "storepath",
   "store/trait",
   "table",
+  "traversal",
 ]
 
 [workspace.package]
@@ -36,6 +37,7 @@ license = "MIT"
 pangalactic-b64             = { path = "b64"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-dagio           = { path = "dagio"           }
+pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
@@ -80,5 +82,6 @@ serde = { version = "1.0.193", features = ["derive"] }
 simple_logger = "4.0.0"
 syn = { version = "1.0.107", features = ["full", "extra-traits"] }
 test-case = "2.2.2"
+tokio-stream = "0.1.14"
 tokio = { version = "1.24.1",  features = ["io-util", "rt", "macros"] }
 wasmtime = { version = "2.0.2", features = ["async"] }
