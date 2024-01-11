@@ -1,0 +1,20 @@
+[package]
+name = "pangalactic-dag-traversal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+futures.workspace = true
+pangalactic-init-stream.workspace = true
+pin-project.workspace = true
+tokio-stream = { workspace = true, features = ["fs"] }
+tokio.workspace = true
+
+[dev-dependencies]
+anyhow-std.workspace = true
+async-trait.workspace = true
+derive_more.workspace = true
+tempfile.workspace = true
+test-case.workspace = true

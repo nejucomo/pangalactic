@@ -11,6 +11,7 @@ members = [
   "handle",
   "host",
   "hostdir",
+  "init-stream",
   "layer-cidmeta",
   "link",
   "linkkind",
@@ -23,6 +24,7 @@ members = [
   "storepath",
   "store/trait",
   "table",
+  "traversal",
 ]
 
 [workspace.package]
@@ -36,6 +38,7 @@ license = "MIT"
 pangalactic-b64             = { path = "b64"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-dagio           = { path = "dagio"           }
+pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
@@ -44,6 +47,7 @@ pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-hostdir         = { path = "hostdir"         }
 pangalactic-host            = { path = "host"            }
+pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-link            = { path = "link"            }
@@ -58,14 +62,16 @@ pangalactic-store           = { path = "store/trait"     }
 pangalactic-table           = { path = "table"           }
 
 # Dependencies external to this workspace:
+# TODO: Push features into specific crates that consume them:
 anyhow = "1.0.66"
 anyhow-std = "0.1.4"
 async-trait = "0.1.58"
 base64 = "0.21.5"
 blake3 = "1.3.1"
-clap = { version = "4.4.11", features = ["derive", "unstable-doc" ] }
+clap = { version = "4.4.11", features = ["derive", "unstable-doc"] }
 derive_more = "0.99.17"
 dirs = "5.0.1"
+futures = "0.3.30"
 include_dir = "0.7.3"
 log = "0.4.17"
 not_empty = "0.1.3"
@@ -77,26 +83,9 @@ quote = "1.0.23"
 rand = "0.8.5"
 serde = { version = "1.0.193", features = ["derive"] }
 simple_logger = "4.0.0"
+syn = { version = "1.0.107", features = ["full", "extra-traits"] }
+tempfile = "3.9.0"
 test-case = "2.2.2"
-
-[workspace.dependencies.syn]
-version = "1.0.107"
-features = [
-  "full",
-  "extra-traits",
-]
-
-[workspace.dependencies.tokio]
-version = "1.24.1"
-# TODO: Push features into specific crates that consume them:
-features = [
-  "io-util",
-  "rt",
-  "macros",
-]
-
-[workspace.dependencies.wasmtime]
-version = "2.0.2"
-features = [
-  "async",
-]
+tokio-stream = "0.1.14"
+tokio = { version = "1.24.1",  features = ["io-util", "rt", "macros"] }
+wasmtime = { version = "2.0.2", features = ["async"] }
