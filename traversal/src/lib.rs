@@ -6,6 +6,7 @@
 mod bfs;
 mod childvisitor;
 mod dfs;
+mod pathimpl;
 mod traversable;
 
 pub use self::bfs::TraverseBreadthFirst;

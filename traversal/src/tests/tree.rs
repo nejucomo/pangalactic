@@ -5,7 +5,19 @@ use crate::TraversableDag;
 #[derive(Clone, Debug)]
 pub struct Tree {
     pub id: u64,
-    children: Vec<Tree>,
+    pub children: &'static [Tree],
+}
+
+impl Tree {
+    pub const fn node(id: u64) -> Self {
+        Tree { id, children: &[] }
+    }
+}
+
+impl From<Tree> for u64 {
+    fn from(t: Tree) -> Self {
+        t.id
+    }
 }
 
 impl TraversableDag for Tree {
@@ -22,51 +34,5 @@ impl TraversableDag for Tree {
                 .collect::<Vec<_>>()
                 .into_iter(),
         )))
-    }
-}
-
-pub trait TreeBuilder: Sized + std::fmt::Debug {
-    fn build_tree() -> Tree {
-        Self::build_tree_with_idgen(&mut IdGen(0))
-    }
-
-    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree;
-}
-
-pub struct IdGen(u64);
-
-impl IdGen {
-    fn next(&mut self) -> u64 {
-        let id = self.0;
-        self.0 += 1;
-        id
-    }
-}
-
-#[derive(Debug)]
-pub struct NodeMaker;
-
-impl TreeBuilder for NodeMaker {
-    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree {
-        Tree {
-            id: idgen.next(),
-            children: vec![],
-        }
-    }
-}
-
-impl<A, B> TreeBuilder for (A, B)
-where
-    A: TreeBuilder,
-    B: TreeBuilder,
-{
-    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree {
-        Tree {
-            id: idgen.next(),
-            children: vec![
-                A::build_tree_with_idgen(idgen),
-                B::build_tree_with_idgen(idgen),
-            ],
-        }
     }
 }
