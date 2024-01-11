@@ -1,51 +1,62 @@
 use crate::TraversableDag;
+use async_trait::async_trait;
+use std::fmt::Debug;
 use tokio_stream::Stream;
 
-pub struct Case<D, V>
+pub struct Case<D>
 where
-    D: TraversableDag,
-    D::Error: std::error::Error + Send + Sync + 'static,
-    V: PartialEq + From<D> + std::fmt::Debug + 'static,
+    D: DagCase,
+    <D as TraversableDag>::Error: Send + Sync + 'static,
 {
-    pub dag: D,
-    pub children: &'static [V],
-    pub bfs: &'static [V],
-    pub dfs: &'static [V],
+    pub dag: D::Ctr,
+    pub children: &'static [D::Verifier],
+    pub bfs: &'static [D::Verifier],
+    pub dfs: &'static [D::Verifier],
 }
 
-impl<D, V> Case<D, V>
+#[async_trait]
+pub trait DagCase: TraversableDag<Error = anyhow::Error> {
+    type Ctr;
+    type Verifier: From<Self> + PartialEq + Debug + 'static;
+
+    async fn setup(constructor: Self::Ctr) -> anyhow::Result<Self>;
+}
+
+impl<D> Case<D>
 where
-    D: TraversableDag,
-    D::Error: std::error::Error + Send + Sync + 'static,
-    V: PartialEq + From<D> + std::fmt::Debug + 'static,
+    D: DagCase,
+    <D as TraversableDag>::Error: Send + Sync + 'static,
 {
     pub async fn verify_children(self) -> anyhow::Result<()> {
-        let stream = self.dag.children().await?;
+        let dag = D::setup(self.dag).await?;
+        let stream = dag.children().await?;
         verify_stream(stream, self.children).await?;
         Ok(())
     }
 
     pub async fn verify_breadth_first_traversal(self) -> anyhow::Result<()> {
-        verify_stream(self.dag.traverse_breadth_first(), self.bfs).await?;
+        let dag = D::setup(self.dag).await?;
+        verify_stream(dag.traverse_breadth_first(), self.bfs).await?;
         Ok(())
     }
 
     pub async fn verify_depth_first_traversal(self) -> anyhow::Result<()> {
-        verify_stream(self.dag.traverse_depth_first(), self.dfs).await?;
+        let dag = D::setup(self.dag).await?;
+        verify_stream(dag.traverse_depth_first(), self.dfs).await?;
         Ok(())
     }
 }
 
-async fn verify_stream<S, V, D>(stream: S, expected: &[V]) -> anyhow::Result<()>
+async fn verify_stream<S, D>(stream: S, expected: &[D::Verifier]) -> anyhow::Result<()>
 where
-    S: Stream<Item = Result<D, D::Error>>,
-    V: PartialEq + From<D> + std::fmt::Debug + 'static,
-    D: TraversableDag,
-    D::Error: std::error::Error + Send + Sync + 'static,
+    S: Stream<Item = anyhow::Result<D>>,
+    D: DagCase,
+    <D as TraversableDag>::Error: Send + Sync + 'static,
 {
     use tokio_stream::StreamExt;
 
-    let actualres: Result<Vec<V>, D::Error> = stream.map(|res| res.map(V::from)).collect().await;
+    let actualres: Result<Vec<D::Verifier>, D::Error> =
+        stream.map(|res| res.map(D::Verifier::from)).collect().await;
     let actual = actualres?;
 
     assert_eq!(actual, expected);
