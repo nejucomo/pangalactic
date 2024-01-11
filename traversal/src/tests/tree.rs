@@ -26,11 +26,11 @@ impl TraversableDag for Tree {
 }
 
 pub trait TreeBuilder: Sized + std::fmt::Debug {
-    fn build_tree(self) -> Tree {
-        self.build_tree_with_idgen(&mut IdGen(0))
+    fn build_tree() -> Tree {
+        Self::build_tree_with_idgen(&mut IdGen(0))
     }
 
-    fn build_tree_with_idgen(self, idgen: &mut IdGen) -> Tree;
+    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree;
 }
 
 pub struct IdGen(u64);
@@ -47,7 +47,7 @@ impl IdGen {
 pub struct NodeMaker;
 
 impl TreeBuilder for NodeMaker {
-    fn build_tree_with_idgen(self, idgen: &mut IdGen) -> Tree {
+    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree {
         Tree {
             id: idgen.next(),
             children: vec![],
@@ -60,13 +60,12 @@ where
     A: TreeBuilder,
     B: TreeBuilder,
 {
-    fn build_tree_with_idgen(self, idgen: &mut IdGen) -> Tree {
-        let (a, b) = self;
+    fn build_tree_with_idgen(idgen: &mut IdGen) -> Tree {
         Tree {
             id: idgen.next(),
             children: vec![
-                a.build_tree_with_idgen(idgen),
-                b.build_tree_with_idgen(idgen),
+                A::build_tree_with_idgen(idgen),
+                B::build_tree_with_idgen(idgen),
             ],
         }
     }
