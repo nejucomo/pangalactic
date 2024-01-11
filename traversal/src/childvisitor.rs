@@ -27,12 +27,12 @@ impl<D> ChildVisitor<D>
 where
     D: TraversableDag,
 {
-    pub(super) fn new(node: D) -> Option<Pin<Box<Self>>> {
+    pub(super) fn new(node: D) -> Pin<Box<Self>> {
         let children = node.children();
-        Some(Box::pin(ChildVisitor {
+        Box::pin(ChildVisitor {
             node,
             children: Box::pin(FallibleInitStream::from(children)),
-        }))
+        })
     }
 
     pub(super) fn unwrap_node(self) -> D {

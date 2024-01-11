@@ -4,9 +4,13 @@
 #![deny(unsafe_code, missing_docs)]
 
 mod bfs;
+mod childvisitor;
+mod dfs;
 mod traversable;
 
 pub use self::bfs::TraverseBreadthFirst;
+pub(crate) use self::childvisitor::ChildVisitor;
+pub use self::dfs::TraverseDepthFirst;
 pub use self::traversable::TraversableDag;
 
 #[cfg(test)]

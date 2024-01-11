@@ -29,12 +29,17 @@ where
     stream_to_ids(dbg_build_tree(mktree).traverse_breadth_first()).await
 }
 
-/* Cases for left-biased depth-first traversal:
-#[test_case(N => Vec::<u64>::default() ; "singleton")]
-#[test_case((N, N) => vec![1, 2] ; "v-tree")]
-#[test_case(((N, N), N) => vec![2, 3, 4] ; "v-v-node")]
-#[test_case((N, (N, N)) => vec![2, 3, 4] ; "v-node-v")]
-*/
+#[test_case(N => vec![0] ; "singleton")]
+#[test_case((N, N) => vec![1, 2, 0] ; "v-tree")]
+#[test_case(((N, N), N) => vec![2, 3, 1, 4, 0] ; "v-v-node")]
+#[test_case((N, (N, N)) => vec![1, 3, 4, 2, 0] ; "v-node-v")]
+#[tokio::test]
+async fn dfs<T>(mktree: T) -> Vec<u64>
+where
+    T: TreeBuilder,
+{
+    stream_to_ids(dbg_build_tree(mktree).traverse_depth_first()).await
+}
 
 fn dbg_build_tree<T>(mktree: T) -> Tree
 where

@@ -1,6 +1,4 @@
-mod childvisitor;
-
-use self::childvisitor::ChildVisitor;
+use crate::ChildVisitor;
 use crate::TraversableDag;
 use pin_project::pin_project;
 use std::{
@@ -27,7 +25,7 @@ where
     pub(crate) fn new(dag: D) -> Self {
         TraverseBreadthFirst {
             queue: VecDeque::default(),
-            visiting: ChildVisitor::new(dag),
+            visiting: Some(ChildVisitor::new(dag)),
         }
     }
 }
@@ -82,7 +80,7 @@ where
                 Some(Ready(Some(Ok(node))))
             }
         } else if let Some(node) = self.queue.pop_front() {
-            *(self.visiting) = ChildVisitor::new(node);
+            *(self.visiting) = Some(ChildVisitor::new(node));
             None
         } else {
             Some(Ready(None))

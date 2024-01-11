@@ -1,7 +1,6 @@
+use crate::{TraverseBreadthFirst, TraverseDepthFirst};
 use std::future::Future;
 use tokio_stream::Stream;
-
-use crate::TraverseBreadthFirst;
 
 /// A Directed Acyclic Graph node which can be traversed fallibly and asynchronously
 pub trait TraversableDag: Sized {
@@ -20,5 +19,10 @@ pub trait TraversableDag: Sized {
     /// Traverse the entire sub-DAG from this node, breadth first
     fn traverse_breadth_first(self) -> TraverseBreadthFirst<Self> {
         TraverseBreadthFirst::new(self)
+    }
+
+    /// Traverse the entire sub-DAG from this node, depth first
+    fn traverse_depth_first(self) -> TraverseDepthFirst<Self> {
+        TraverseDepthFirst::new(self)
     }
 }
