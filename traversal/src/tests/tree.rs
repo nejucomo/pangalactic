@@ -28,6 +28,10 @@ impl DagCase for Tree {
     async fn setup(mt: MkTree) -> anyhow::Result<Tree> {
         Ok(mt.build(&mut 0))
     }
+
+    async fn cleanup(self) -> anyhow::Result<()> {
+        Ok(())
+    }
 }
 
 impl TraversableDag for Tree {

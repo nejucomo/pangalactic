@@ -15,11 +15,12 @@ where
 }
 
 #[async_trait]
-pub trait DagCase: TraversableDag<Error = anyhow::Error> {
+pub trait DagCase: Clone + TraversableDag<Error = anyhow::Error> {
     type Ctr;
     type Verifier: From<Self> + PartialEq + Debug + 'static;
 
     async fn setup(constructor: Self::Ctr) -> anyhow::Result<Self>;
+    async fn cleanup(self) -> anyhow::Result<()>;
 }
 
 impl<D> Case<D>
@@ -31,18 +32,21 @@ where
         let dag = D::setup(self.dag).await?;
         let stream = dag.children().await?;
         verify_stream(stream, self.children).await?;
+        dag.cleanup().await?;
         Ok(())
     }
 
     pub async fn verify_breadth_first_traversal(self) -> anyhow::Result<()> {
         let dag = D::setup(self.dag).await?;
-        verify_stream(dag.traverse_breadth_first(), self.bfs).await?;
+        verify_stream(dag.clone().traverse_breadth_first(), self.bfs).await?;
+        dag.cleanup().await?;
         Ok(())
     }
 
     pub async fn verify_depth_first_traversal(self) -> anyhow::Result<()> {
         let dag = D::setup(self.dag).await?;
-        verify_stream(dag.traverse_depth_first(), self.dfs).await?;
+        verify_stream(dag.clone().traverse_depth_first(), self.dfs).await?;
+        dag.cleanup().await?;
         Ok(())
     }
 }

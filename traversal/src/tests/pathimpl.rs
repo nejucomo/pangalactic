@@ -50,6 +50,11 @@ impl DagCase for PathBuf {
         }
         Ok(testdir)
     }
+
+    async fn cleanup(self) -> anyhow::Result<()> {
+        tokio::fs::remove_dir_all(self).await?;
+        Ok(())
+    }
 }
 
 impl From<PathBuf> for PathVerifier {
