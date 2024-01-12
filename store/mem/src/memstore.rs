@@ -16,7 +16,7 @@ impl Store for MemStore {
     type Reader = Reader;
     type Writer = Vec<u8>;
 
-    async fn open_reader(&mut self, key: &Hash) -> anyhow::Result<Self::Reader> {
+    async fn open_reader(&self, key: &Hash) -> anyhow::Result<Self::Reader> {
         self.0
             .get(key)
             .cloned()
@@ -24,7 +24,7 @@ impl Store for MemStore {
             .ok_or_else(|| anyhow::Error::msg(format!("missing entry {:?}", &key)))
     }
 
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         Ok(Vec::new())
     }
 

@@ -38,11 +38,11 @@ impl Store for FakeStore {
     type Reader = tokio::io::Empty;
     type Writer = tokio::io::Sink;
 
-    async fn open_reader(&mut self, _: &Self::CID) -> anyhow::Result<Self::Reader> {
+    async fn open_reader(&self, _: &Self::CID) -> anyhow::Result<Self::Reader> {
         unimplemented!("open_reader")
     }
 
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         unimplemented!("open_writer")
     }
 
