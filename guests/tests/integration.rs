@@ -56,7 +56,7 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
     verify_guests(
         &["test_output_is_hello_world"],
         b"",
-        |mut dagio, _, attestation| async move {
+        |dagio, _, attestation| async move {
             let output: Vec<u8> = dagio.load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
@@ -79,7 +79,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
                 ]),
             ),
         ],
-        |mut dagio, _, attestation| async move {
+        |dagio, _, attestation| async move {
             let output: MemTree = dagio.load(&attestation.output).await?;
 
             assert_eq!(
@@ -148,7 +148,7 @@ where
     };
 
     // Execute derive:
-    let (mut dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
+    let (dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
 
     let att: Attestation<DagioLink<MemStore>> = dagio.load(&attestation).await?;
     let plan: Plan<DagioLink<MemStore>> = dagio.load(&att.plan).await?;

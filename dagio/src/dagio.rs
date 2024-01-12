@@ -20,7 +20,7 @@ impl<S> Dagio<S>
 where
     S: Store,
 {
-    pub async fn load<T>(&mut self, link: &DagioLink<S>) -> anyhow::Result<T>
+    pub async fn load<T>(&self, link: &DagioLink<S>) -> anyhow::Result<T>
     where
         T: DagioLoad<S>,
     {

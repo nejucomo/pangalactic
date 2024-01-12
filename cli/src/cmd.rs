@@ -13,7 +13,7 @@ pub async fn store_put() -> anyhow::Result<()> {
 pub async fn store_get(link: &CliLink) -> anyhow::Result<()> {
     use crate::store::CliReader;
 
-    let mut dagio = CliDagio::default();
+    let dagio = CliDagio::default();
     let mut r: CliReader = dagio.load(link).await?;
     let mut w = tokio::io::stdout();
     tokio::io::copy(&mut r, &mut w).await?;

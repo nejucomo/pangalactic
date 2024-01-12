@@ -44,7 +44,7 @@ impl<S> DagioLoad<S> for DagioHostDirectory<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
 
