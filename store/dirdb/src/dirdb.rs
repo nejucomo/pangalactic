@@ -23,13 +23,13 @@ impl Store for DirDbStore {
     type Reader = tokio::fs::File;
     type Writer = Writer;
 
-    async fn open_reader(&mut self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
+    async fn open_reader(&self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
         let path = self.0.join(key.to_string());
         let f = tokio::fs::File::open(path).await?;
         Ok(f)
     }
 
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         Writer::init(&self.0).await
     }
 

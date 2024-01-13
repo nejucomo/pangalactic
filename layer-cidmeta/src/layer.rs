@@ -18,11 +18,11 @@ where
     type Reader = <S as Store>::Reader;
     type Writer = Writer<<S as Store>::Writer>;
 
-    async fn open_reader(&mut self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
+    async fn open_reader(&self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
         self.0.open_reader(&key.cid).await
     }
 
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         let writer = self.0.open_writer().await?;
         Ok(Writer { writer, written: 0 })
     }

@@ -6,7 +6,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 // Documentation readability hack; see https://github.com/dtolnay/async-trait/issues/213#issuecomment-1559690487
 #[cfg_attr(doc, feature(async_fn_in_trait))]
 #[cfg_attr(not(doc), async_trait)]
-pub trait Store: Debug + Send {
+pub trait Store: Debug + Send + Sync {
     /// The `SCHEME` determines the url-like prefix to links and store-paths:
     const SCHEME: &'static str;
 
@@ -24,11 +24,11 @@ pub trait Store: Debug + Send {
     type Reader: AsyncRead + Unpin + Send + Sync;
     type Writer: AsyncWrite + Unpin + Send + Sync;
 
-    async fn open_reader(&mut self, key: &Self::CID) -> anyhow::Result<Self::Reader>;
-    async fn open_writer(&mut self) -> anyhow::Result<Self::Writer>;
+    async fn open_reader(&self, key: &Self::CID) -> anyhow::Result<Self::Reader>;
+    async fn open_writer(&self) -> anyhow::Result<Self::Writer>;
     async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::CID>;
 
-    async fn read(&mut self, key: &Self::CID) -> anyhow::Result<Vec<u8>> {
+    async fn read(&self, key: &Self::CID) -> anyhow::Result<Vec<u8>> {
         use tokio::io::AsyncReadExt;
 
         let mut buf = vec![];

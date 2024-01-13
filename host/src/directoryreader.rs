@@ -49,7 +49,7 @@ impl<S> DagioLoad<S> for DirectoryReader<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         let dir: DagioHostDirectory<S> = dagio.load(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),

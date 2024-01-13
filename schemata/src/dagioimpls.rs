@@ -10,7 +10,7 @@ impl<S> DagioLoad<S> for Attestation<DagioLink<S>>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }
@@ -33,7 +33,7 @@ impl<S> DagioLoad<S> for Plan<DagioLink<S>>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         let hostdir: HostDirectory<_> = dagio.load(link).await?;
         Self::try_from(Directory::from(hostdir))
     }

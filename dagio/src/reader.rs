@@ -15,7 +15,7 @@ impl<S> DagioLoad<S> for DagioReader<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &mut Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind::File;
 
         let key = link.peek_key_kind(File)?;
