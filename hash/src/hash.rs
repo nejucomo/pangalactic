@@ -3,8 +3,10 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
 
+pub type HashBytes = [u8; blake3::OUT_LEN];
+
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Deserialize, Serialize)]
-#[serde(from = "[u8; blake3::OUT_LEN]", into = "[u8; blake3::OUT_LEN]")]
+#[serde(from = "HashBytes", into = "HashBytes")]
 pub struct Hash(blake3::Hash);
 
 impl Hash {
@@ -26,13 +28,13 @@ impl Hash {
 
 impl StoreCid for Hash {}
 
-impl From<[u8; blake3::OUT_LEN]> for Hash {
-    fn from(bytes: [u8; blake3::OUT_LEN]) -> Self {
+impl From<HashBytes> for Hash {
+    fn from(bytes: HashBytes) -> Self {
         Hash(blake3::Hash::from(bytes))
     }
 }
 
-impl From<Hash> for [u8; blake3::OUT_LEN] {
+impl From<Hash> for HashBytes {
     fn from(h: Hash) -> Self {
         h.0.into()
     }
@@ -45,7 +47,7 @@ impl FromStr for Hash {
         // TODO: perf: This copies twice. Can we do b64 -> [u8; K] in one pass?
         let bytes = pangalactic_b64::decode(s)?;
         let blen = bytes.len();
-        let buf = <[u8; blake3::OUT_LEN]>::try_from(bytes)
+        let buf = <HashBytes>::try_from(bytes)
             .map_err(|_| anyhow::anyhow!("found {blen} bytes, expected {}", blake3::OUT_LEN))?;
         Ok(Hash(blake3::Hash::from(buf)))
     }

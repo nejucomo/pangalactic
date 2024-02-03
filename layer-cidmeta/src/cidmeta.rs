@@ -1,5 +1,3 @@
-use std::{fmt::Display, str::FromStr};
-
 use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 
@@ -46,34 +44,3 @@ where
 }
 
 impl<S> Eq for CidMeta<S> where S: Store {}
-
-impl<S> FromStr for CidMeta<S>
-where
-    S: Store,
-{
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use pangalactic_serialization::b64;
-
-        let (cidstr, metastr) = s
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected '-'"))?;
-
-        let cid = cidstr.parse()?;
-        let node_size = b64::deserialize(metastr)?;
-        Ok(CidMeta { cid, node_size })
-    }
-}
-
-impl<S> Display for CidMeta<S>
-where
-    S: Store,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use pangalactic_serialization::b64;
-
-        let metastr = b64::serialize(&self.node_size).map_err(|_| std::fmt::Error)?;
-        write!(f, "{}-{}", &self.cid, metastr)
-    }
-}

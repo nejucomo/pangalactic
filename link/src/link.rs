@@ -1,8 +1,12 @@
+use pangalactic_chomper::Chomper;
 use pangalactic_linkkind::LinkKind;
+use pangalactic_serialization::b64;
 use pangalactic_store::Store;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
+
+use crate::SCHEME;
 
 #[derive(Debug, Eq, Deserialize, Serialize)]
 pub struct Link<S>
@@ -66,17 +70,13 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        let prefix = format!("pg-{}://", S::SCHEME);
-        let linkstr = s
-            .strip_prefix(&prefix)
-            .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
+        let mut chomper = Chomper::from(s);
+        chomper.require_prefix(":", SCHEME)?;
 
-        let (kindstr, keystr) = linkstr
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected `<KIND>-<KEY>` encoding"))?;
-
+        let kindstr = chomper.chomp_prefix("-")?;
         let kind = kindstr.parse()?;
-        let key = keystr.parse()?;
+        chomper.require_prefix("-", S::TAG)?;
+        let key = b64::deserialize(chomper)?;
 
         Ok(Link { kind, key })
     }
@@ -100,6 +100,9 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "pg-{}://{}-{}", S::SCHEME, self.kind, self.key)
+        let kind = self.kind;
+        let tag = S::TAG;
+        let cid = b64::serialize(&self.key).map_err(|_| fmt::Error)?;
+        write!(f, "{SCHEME}:{kind}-{tag}-{cid}")
     }
 }

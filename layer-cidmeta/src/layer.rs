@@ -12,7 +12,7 @@ impl<S> Store for CidMetaLayer<S>
 where
     S: Store,
 {
-    const SCHEME: &'static str = S::SCHEME;
+    const TAG: &'static str = S::TAG;
 
     type CID = CidMeta<S>;
     type Reader = <S as Store>::Reader;

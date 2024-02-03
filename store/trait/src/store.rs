@@ -7,8 +7,8 @@ use tokio::io::{AsyncRead, AsyncWrite};
 #[cfg_attr(doc, feature(async_fn_in_trait))]
 #[cfg_attr(not(doc), async_trait)]
 pub trait Store: Debug + Send + Sync {
-    /// The `SCHEME` determines the url-like prefix to links and store-paths:
-    const SCHEME: &'static str;
+    /// A unique identifying string for this store type
+    const TAG: &'static str;
 
     /// An acronym for `Content IDentifier` required to have these properties beyond the type
     /// signature:

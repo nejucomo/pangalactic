@@ -3,8 +3,8 @@ use crate::Link;
 use pangalactic_linkkind::LinkKind::{self, Dir, File};
 use test_case::test_case;
 
-#[test_case(File, "pg-FAKE://file-<FAKE-KEY>")]
-#[test_case(Dir, "pg-FAKE://dir-<FAKE-KEY>")]
+#[test_case(File, "pg:file-<FakeStore>-")]
+#[test_case(Dir, "pg:dir-<FakeStore>-")]
 fn display(kind: LinkKind, expected: &str) {
     let link: Link<FakeStore> = Link::new(kind, FakeKey);
     let actual = link.to_string();
@@ -20,8 +20,8 @@ fn display_parse_roundtrip(kind: LinkKind) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_case("pg-FAKE://file-<FAKE-KEY>")]
-#[test_case("pg-FAKE://dir-<FAKE-KEY>")]
+#[test_case("pg:file-<FakeStore>-")]
+#[test_case("pg:dir-<FakeStore>-")]
 fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
     let link: Link<FakeStore> = input.parse()?;
     let output = link.to_string();
