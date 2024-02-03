@@ -10,6 +10,8 @@ pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
 
 #[async_trait]
 impl Store for MemStore {
+    const TAG: &'static str = "mem";
+
     type CID = Hash;
     type Reader = Reader;
     type Writer = Vec<u8>;

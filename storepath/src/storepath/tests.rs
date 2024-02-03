@@ -4,10 +4,10 @@ use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::{self, Dir, File};
 use test_case::test_case;
 
-#[test_case(File, &[], "pg:file-<FakeKey>-")]
-#[test_case(Dir, &[], "pg:dir-<FakeKey>-")]
-#[test_case(Dir, &["foo"], "pg:dir-<FakeKey>-/foo")]
-#[test_case(Dir, &["foo", "bar"], "pg:dir-<FakeKey>-/foo/bar")]
+#[test_case(File, &[], "pg:file-<FakeStore>-")]
+#[test_case(Dir, &[], "pg:dir-<FakeStore>-")]
+#[test_case(Dir, &["foo"], "pg:dir-<FakeStore>-/foo")]
+#[test_case(Dir, &["foo", "bar"], "pg:dir-<FakeStore>-/foo/bar")]
 fn display(kind: LinkKind, suffix: &[&str], expected: &str) {
     let suffix: Vec<_> = suffix.into_iter().map(|s| s.to_string()).collect();
     let link: Link<FakeStore> = Link::new(kind, FakeKey);

@@ -20,14 +20,7 @@ where
     }
 }
 
-impl<S> StoreCid for CidMeta<S>
-where
-    S: Store,
-{
-    fn transport_scheme() -> String {
-        format!("meta{}", S::CID::transport_scheme())
-    }
-}
+impl<S> StoreCid for CidMeta<S> where S: Store {}
 
 impl<S> Clone for CidMeta<S>
 where

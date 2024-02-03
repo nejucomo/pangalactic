@@ -1,6 +1,7 @@
 use pangalactic_chomper::Chomper;
 use pangalactic_linkkind::LinkKind;
-use pangalactic_store::{Store, StoreCid};
+use pangalactic_serialization::b64;
+use pangalactic_store::Store;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -74,7 +75,8 @@ where
 
         let kindstr = chomper.chomp_prefix("-")?;
         let kind = kindstr.parse()?;
-        let key = S::CID::transport_decode(chomper)?;
+        chomper.require_prefix("-", S::TAG)?;
+        let key = b64::deserialize(chomper)?;
 
         Ok(Link { kind, key })
     }
@@ -99,7 +101,8 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let kind = self.kind;
-        let cid = self.key.transport_encode().unwrap();
-        write!(f, "{SCHEME}:{kind}-{cid}")
+        let tag = S::TAG;
+        let cid = b64::serialize(&self.key).map_err(|_| fmt::Error)?;
+        write!(f, "{SCHEME}:{kind}-{tag}-{cid}")
     }
 }
