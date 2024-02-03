@@ -3,6 +3,17 @@ use pangalactic_hostdir::HostDirectory;
 use pangalactic_store_mem::MemStore;
 
 #[tokio::test]
+async fn check_empty_file_link_transport_encoding() -> anyhow::Result<()> {
+    let expected = "pg:file-metab3";
+    let mut dagio = Dagio::from(MemStore::default());
+    let link = dagio.commit(b"".as_slice()).await?;
+    let linktext = link.to_string();
+    let (found, _) = linktext.rsplit_once('-').unwrap();
+    assert_eq!(found, expected);
+    Ok(())
+}
+
+#[tokio::test]
 async fn insert_file_and_read_result() -> anyhow::Result<()> {
     let input = b"Hello World!";
 
