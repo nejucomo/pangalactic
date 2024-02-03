@@ -1,4 +1,5 @@
 use crate::store::CliStoreDestination;
+use pangalactic_link::SCHEME_PREFIX;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Clone, Debug)]
@@ -15,7 +16,7 @@ impl Display for Destination {
         match self {
             Stdout => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
-            StoreScheme => unimplemented!("BUG: Change link encoding to be URL-like"),
+            StoreScheme => SCHEME_PREFIX.fmt(f),
             Store(sp) => sp.fmt(f),
         }
     }
@@ -25,6 +26,14 @@ impl FromStr for Destination {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        unimplemented!("BUG: Change link encoding to be URL-like: {s:?}")
+        if s == "-" {
+            Ok(Stdout)
+        } else if s == SCHEME_PREFIX {
+            Ok(StoreScheme)
+        } else if s.starts_with(SCHEME_PREFIX) {
+            s.parse().map(Store)
+        } else {
+            s.parse().map(Host).map_err(anyhow::Error::from)
+        }
     }
 }

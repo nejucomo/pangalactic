@@ -27,7 +27,11 @@ impl Options {
         match self.command.unwrap() {
             Store(Put) => cmd::store_put().await,
             Store(Get(opts)) => cmd::store_get(&opts.link).await,
-            _ => unimplemented!("Fix link encodings for xfer"),
+            Store(Xfer(XferOptions { source, dest })) => {
+                dbg!(source);
+                dbg!(dest);
+                todo!()
+            }
         }
     }
 }
@@ -54,7 +58,7 @@ pub struct StoreGetOptions {
     pub link: CliLink,
 }
 
-/// Send the given file to stdout
+/// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct XferOptions {
     pub source: Source,

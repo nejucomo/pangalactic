@@ -1,8 +1,10 @@
 use pangalactic_linkkind::LinkKind;
-use pangalactic_store::Store;
+use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
+
+use crate::SCHEME;
 
 #[derive(Debug, Eq, Deserialize, Serialize)]
 pub struct Link<S>
@@ -66,17 +68,20 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        let prefix = format!("pg-{}://", S::SCHEME);
-        let linkstr = s
-            .strip_prefix(&prefix)
-            .ok_or_else(|| anyhow::anyhow!("missing expected prefix {prefix:?}"))?;
+        let (scheme, suffix) = s
+            .split_once(':')
+            .ok_or_else(|| anyhow::anyhow!("expected `{SCHEME}:<KIND>-<CID>` encoding"))?;
 
-        let (kindstr, keystr) = linkstr
+        if scheme != SCHEME {
+            anyhow::bail!("unknown scheme {scheme:?}");
+        }
+
+        let (kindstr, keystr) = suffix
             .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected `<KIND>-<KEY>` encoding"))?;
+            .ok_or_else(|| anyhow::anyhow!("expected `{SCHEME}:<KIND>-<CID>` encoding"))?;
 
         let kind = kindstr.parse()?;
-        let key = keystr.parse()?;
+        let key = S::CID::transport_decode(keystr)?;
 
         Ok(Link { kind, key })
     }
@@ -100,6 +105,8 @@ where
     S: Store,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "pg-{}://{}-{}", S::SCHEME, self.kind, self.key)
+        let kind = self.kind;
+        let cid = self.key.transport_encode().unwrap();
+        write!(f, "{SCHEME}:{kind}-{cid}")
     }
 }

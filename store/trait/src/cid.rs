@@ -1,7 +1,7 @@
+use pangalactic_serialization::b64;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use std::fmt::{Debug, Display};
-use std::str::FromStr;
+use std::fmt::Debug;
 
 /// `CID` is an acronym for `Content IDentifier` required to have these properties beyond the type signature:
 ///
@@ -10,15 +10,15 @@ use std::str::FromStr;
 /// - A `CID` should be concise.
 ///
 /// Cryptographic hash functions over the content are assumed to meet these properties.
-pub trait StoreCid:
-    Clone
-    + Eq
-    + Debug
-    + Display
-    + FromStr<Err = anyhow::Error>
-    + Serialize
-    + DeserializeOwned
-    + Send
-    + Sync
-{
+pub trait StoreCid: Clone + Eq + Debug + Serialize + DeserializeOwned + Send + Sync {
+    fn transport_encode(&self) -> anyhow::Result<String> {
+        b64::serialize(self)
+    }
+
+    fn transport_decode<S>(text: S) -> anyhow::Result<Self>
+    where
+        S: AsRef<[u8]>,
+    {
+        b64::deserialize(text)
+    }
 }
