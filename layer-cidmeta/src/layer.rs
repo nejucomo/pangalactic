@@ -12,8 +12,6 @@ impl<S> Store for CidMetaLayer<S>
 where
     S: Store,
 {
-    const SCHEME: &'static str = S::SCHEME;
-
     type CID = CidMeta<S>;
     type Reader = <S as Store>::Reader;
     type Writer = Writer<<S as Store>::Writer>;

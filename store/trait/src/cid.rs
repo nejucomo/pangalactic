@@ -1,3 +1,4 @@
+use pangalactic_chomper::Chomper;
 use pangalactic_serialization::b64;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -11,14 +12,21 @@ use std::fmt::Debug;
 ///
 /// Cryptographic hash functions over the content are assumed to meet these properties.
 pub trait StoreCid: Clone + Eq + Debug + Serialize + DeserializeOwned + Send + Sync {
+    fn transport_scheme() -> String;
+
     fn transport_encode(&self) -> anyhow::Result<String> {
-        b64::serialize(self)
+        let scheme = Self::transport_scheme();
+        let cid = b64::serialize(self)?;
+        Ok(format!("{scheme}-{cid}"))
     }
 
     fn transport_decode<S>(text: S) -> anyhow::Result<Self>
     where
-        S: AsRef<[u8]>,
+        S: AsRef<str>,
     {
-        b64::deserialize(text)
+        let scheme = Self::transport_scheme();
+        let mut chomper = Chomper::from(text.as_ref());
+        chomper.require_prefix("-", &scheme)?;
+        b64::deserialize(chomper)
     }
 }

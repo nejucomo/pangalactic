@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
   "b64",
+  "chomper",
   "cli",
   "dagio",
   "dir",
@@ -36,6 +37,7 @@ license = "MIT"
 
 # Local crates with paths clarified:
 pangalactic-b64             = { path = "b64"             }
+pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-dagio           = { path = "dagio"           }
 pangalactic-dag-traversal   = { path = "traversal"       }

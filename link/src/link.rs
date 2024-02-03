@@ -1,3 +1,4 @@
+use pangalactic_chomper::Chomper;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Store, StoreCid};
 use serde::{Deserialize, Serialize};
@@ -68,20 +69,12 @@ where
     }
 
     fn from_str_without_context(s: &str) -> anyhow::Result<Self> {
-        let (scheme, suffix) = s
-            .split_once(':')
-            .ok_or_else(|| anyhow::anyhow!("expected `{SCHEME}:<KIND>-<CID>` encoding"))?;
+        let mut chomper = Chomper::from(s);
+        chomper.require_prefix(":", SCHEME)?;
 
-        if scheme != SCHEME {
-            anyhow::bail!("unknown scheme {scheme:?}");
-        }
-
-        let (kindstr, keystr) = suffix
-            .split_once('-')
-            .ok_or_else(|| anyhow::anyhow!("expected `{SCHEME}:<KIND>-<CID>` encoding"))?;
-
+        let kindstr = chomper.chomp_prefix("-")?;
         let kind = kindstr.parse()?;
-        let key = S::CID::transport_decode(keystr)?;
+        let key = S::CID::transport_decode(chomper)?;
 
         Ok(Link { kind, key })
     }

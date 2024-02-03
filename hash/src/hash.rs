@@ -24,7 +24,11 @@ impl Hash {
     }
 }
 
-impl StoreCid for Hash {}
+impl StoreCid for Hash {
+    fn transport_scheme() -> String {
+        "b3".to_string()
+    }
+}
 
 impl From<[u8; blake3::OUT_LEN]> for Hash {
     fn from(bytes: [u8; blake3::OUT_LEN]) -> Self {

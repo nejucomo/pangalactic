@@ -5,15 +5,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub struct FakeKey;
 
-impl StoreCid for FakeKey {}
+impl StoreCid for FakeKey {
+    fn transport_scheme() -> String {
+        "<FakeKey>".to_string()
+    }
+}
 
 #[derive(Debug)]
 pub struct FakeStore;
 
 #[async_trait]
 impl Store for FakeStore {
-    const SCHEME: &'static str = "FAKE";
-
     type CID = FakeKey;
     type Reader = tokio::io::Empty;
     type Writer = tokio::io::Sink;
