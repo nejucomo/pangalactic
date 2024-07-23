@@ -88,7 +88,10 @@ impl StoreCommander {
                 Ok(Some(link))
             }
             Store(dest) => {
-                todo!("{dest:?}");
+                let mut w = self.0.open_file_writer().await?;
+                io::copy(&mut ssp, &mut w).await?;
+                let link = self.0.commit_into(w, dest).await?;
+                Ok(Some(link))
             }
         }
     }

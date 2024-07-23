@@ -10,5 +10,5 @@ pub type CliLink = DagioLink<DirDbStore>;
 pub type CliReader = DagioReader<DirDbStore>;
 pub type CliReadNode = DagioReadNode<DirDbStore>;
 pub type CliStoreDirectory = DagioHostDirectory<DirDbStore>;
-pub type CliStoreDestination = StoreDestination<DirDbStore>;
+pub type CliStoreDestination = StoreDestination<CidMetaLayer<DirDbStore>>;
 pub type CliStorePath = StorePath<CidMetaLayer<DirDbStore>>;
