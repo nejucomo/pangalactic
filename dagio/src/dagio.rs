@@ -1,4 +1,6 @@
-use crate::{DagioCommit, DagioLink, DagioLoad, DagioWriter};
+use std::borrow::Borrow;
+
+use crate::{DagioCommit, DagioLink, DagioLoad, DagioResolveLink, DagioWriter};
 use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 
@@ -20,11 +22,13 @@ impl<S> Dagio<S>
 where
     S: Store,
 {
-    pub async fn load<T>(&self, link: &DagioLink<S>) -> anyhow::Result<T>
+    pub async fn load<L, T>(&self, link: L) -> anyhow::Result<T>
     where
+        L: DagioResolveLink<S>,
         T: DagioLoad<S>,
     {
-        T::load_from_dagio(self, link).await
+        let linkproxy = link.resolve_link(self).await?;
+        T::load_from_dagio(self, linkproxy.borrow()).await
     }
 
     pub async fn commit<T>(&mut self, object: T) -> anyhow::Result<DagioLink<S>>

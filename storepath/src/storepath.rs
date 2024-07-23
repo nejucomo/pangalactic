@@ -31,6 +31,14 @@ where
 
         Ok(StorePath { link, path })
     }
+
+    pub fn link(&self) -> &Link<S> {
+        &self.link
+    }
+
+    pub fn path(&self) -> &[Name] {
+        self.path.as_slice()
+    }
 }
 
 impl<S> Clone for StorePath<S>

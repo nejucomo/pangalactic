@@ -1,10 +1,13 @@
 use std::{fmt::Debug, path::Path};
 
-use tokio::io::{self, AsyncRead};
+use tokio::{
+    fs::File,
+    io::{self, AsyncRead},
+};
 
 use crate::{
     options::{Destination, Source},
-    store::{CliDagio, CliLink, CliReadNode, CliStoreDirectory, CliStorePath},
+    store::{CliDagio, CliLink, CliStoreDirectory, CliStorePath},
 };
 
 #[derive(Debug, Default)]
@@ -35,7 +38,7 @@ impl StoreCommander {
             Source::Stdin => self.xfer_from_stream(io::stdin(), dest).await,
             Source::Host(hostpath) => {
                 if hostpath.is_file() {
-                    let r = tokio::fs::File::open(hostpath).await?;
+                    let r = File::open(hostpath).await?;
                     self.xfer_from_stream(r, dest).await
                 } else if hostpath.is_dir() {
                     self.xfer_from_hostdir(hostpath, dest).await
@@ -44,11 +47,12 @@ impl StoreCommander {
                 }
             }
             Source::Store(storepath) => {
-                let link = self.resolve_storepath(storepath).await?;
-                let readnode: CliReadNode = self.0.load(&link).await?;
+                use pangalactic_dagio::DagioReadNode::*;
+
+                let readnode = self.0.load(storepath).await?;
                 match readnode {
-                    CliReadNode::FileReader(r) => self.xfer_from_stream(r, dest).await,
-                    CliReadNode::Dir(d) => self.xfer_from_storedir(d, dest).await,
+                    FileReader(r) => self.xfer_from_stream(r, dest).await,
+                    Dir(d) => self.xfer_from_storedir(d, dest).await,
                 }
             }
         }
@@ -62,8 +66,31 @@ impl StoreCommander {
     where
         R: AsyncRead + Debug,
     {
-        dbg!(srcstream, dest);
-        todo!()
+        use std::pin::pin;
+        use Destination::*;
+
+        let mut ssp = pin!(srcstream);
+
+        match dest {
+            Stdout => {
+                io::copy(&mut ssp, &mut io::stdout()).await?;
+                Ok(None)
+            }
+            Host(path) => {
+                let mut w = File::create_new(path).await?;
+                io::copy(&mut ssp, &mut w).await?;
+                Ok(None)
+            }
+            StoreScheme => {
+                let mut w = self.0.open_file_writer().await?;
+                io::copy(&mut ssp, &mut w).await?;
+                let link = self.0.commit(w).await?;
+                Ok(Some(link))
+            }
+            Store(dest) => {
+                todo!("{dest:?}");
+            }
+        }
     }
 
     async fn xfer_from_hostdir(
@@ -82,10 +109,5 @@ impl StoreCommander {
     ) -> anyhow::Result<Option<CliLink>> {
         dbg!(srcdir, dest);
         todo!()
-    }
-
-    async fn resolve_storepath(&self, storepath: &CliStorePath) -> anyhow::Result<CliLink> {
-        dbg!(storepath);
-        todo!();
     }
 }
