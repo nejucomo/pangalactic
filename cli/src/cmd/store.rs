@@ -8,10 +8,29 @@ use crate::{
 };
 
 #[derive(Debug, Default)]
-pub struct StoreCmds(CliDagio);
+pub struct StoreCommander(CliDagio);
 
-impl StoreCmds {
-    pub async fn xfer(&mut self, source: &Source, dest: &Destination) -> anyhow::Result<()> {
+impl StoreCommander {
+    pub async fn put(&mut self) -> anyhow::Result<CliLink> {
+        let link = self
+            .xfer(&Source::Stdin, &Destination::StoreScheme)
+            .await?
+            .unwrap();
+        Ok(link)
+    }
+
+    pub async fn get(&mut self, link: &CliLink) -> anyhow::Result<()> {
+        let src = CliStorePath::new(link.clone(), vec![])?;
+        let none = self.xfer(&Source::Store(src), &Destination::Stdout).await?;
+        assert!(none.is_none());
+        Ok(())
+    }
+
+    pub async fn xfer(
+        &mut self,
+        source: &Source,
+        dest: &Destination,
+    ) -> anyhow::Result<Option<CliLink>> {
         match source {
             Source::Stdin => self.xfer_from_stream(io::stdin(), dest).await,
             Source::Host(hostpath) => {
@@ -35,7 +54,11 @@ impl StoreCmds {
         }
     }
 
-    async fn xfer_from_stream<R>(&mut self, srcstream: R, dest: &Destination) -> anyhow::Result<()>
+    async fn xfer_from_stream<R>(
+        &mut self,
+        srcstream: R,
+        dest: &Destination,
+    ) -> anyhow::Result<Option<CliLink>>
     where
         R: AsyncRead + Debug,
     {
@@ -43,7 +66,11 @@ impl StoreCmds {
         todo!()
     }
 
-    async fn xfer_from_hostdir(&mut self, srcdir: &Path, dest: &Destination) -> anyhow::Result<()> {
+    async fn xfer_from_hostdir(
+        &mut self,
+        srcdir: &Path,
+        dest: &Destination,
+    ) -> anyhow::Result<Option<CliLink>> {
         dbg!(srcdir, dest);
         todo!()
     }
@@ -52,7 +79,7 @@ impl StoreCmds {
         &mut self,
         srcdir: CliStoreDirectory,
         dest: &Destination,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<Option<CliLink>> {
         dbg!(srcdir, dest);
         todo!()
     }

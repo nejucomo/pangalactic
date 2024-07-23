@@ -1,4 +1,5 @@
 use pangalactic_dagio::{Dagio, DagioHostDirectory, DagioLink, DagioReadNode, DagioReader};
+use pangalactic_layer_cidmeta::CidMetaLayer;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 use pangalactic_storepath::{StoreDestination, StorePath};
@@ -10,4 +11,4 @@ pub type CliReader = DagioReader<DirDbStore>;
 pub type CliReadNode = DagioReadNode<DirDbStore>;
 pub type CliStoreDirectory = DagioHostDirectory<DirDbStore>;
 pub type CliStoreDestination = StoreDestination<DirDbStore>;
-pub type CliStorePath = StorePath<DirDbStore>;
+pub type CliStorePath = StorePath<CidMetaLayer<DirDbStore>>;

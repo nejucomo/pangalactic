@@ -9,6 +9,7 @@ anyhow.workspace = true
 clap.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
+pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-storepath.workspace = true

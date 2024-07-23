@@ -4,7 +4,7 @@ mod source;
 pub use self::dest::Destination;
 pub use self::source::Source;
 
-use crate::cmd;
+use crate::cmd::StoreCommander;
 use crate::store::CliLink;
 use clap::{Args, Parser, Subcommand};
 
@@ -22,12 +22,27 @@ impl Options {
 
     pub async fn run(self) -> anyhow::Result<()> {
         use Command::*;
-        use StoreCommand::*;
 
         match self.command.unwrap() {
-            Store(Put) => cmd::store_put().await,
-            Store(Get(StoreGetOptions { link })) => cmd::store_get(&link).await,
-            Store(Xfer(XferOptions { source, dest })) => cmd::store_xfer(&source, &dest).await,
+            Store(cmd) => {
+                use StoreCommand::*;
+
+                let mut sc = StoreCommander::default();
+                match cmd {
+                    Put => {
+                        let link = sc.put().await?;
+                        println!("{link}");
+                        Ok(())
+                    }
+                    Get(StoreGetOptions { link }) => sc.get(&link).await,
+                    Xfer(XferOptions { source, dest }) => {
+                        if let Some(link) = sc.xfer(&source, &dest).await? {
+                            println!("{link}");
+                        }
+                        Ok(())
+                    }
+                }
+            }
         }
     }
 }
