@@ -26,12 +26,8 @@ impl Options {
 
         match self.command.unwrap() {
             Store(Put) => cmd::store_put().await,
-            Store(Get(opts)) => cmd::store_get(&opts.link).await,
-            Store(Xfer(XferOptions { source, dest })) => {
-                dbg!(source);
-                dbg!(dest);
-                todo!()
-            }
+            Store(Get(StoreGetOptions { link })) => cmd::store_get(&link).await,
+            Store(Xfer(XferOptions { source, dest })) => cmd::store_xfer(&source, &dest).await,
         }
     }
 }

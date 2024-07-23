@@ -7,6 +7,7 @@ mod dagio;
 mod dirimpl;
 mod load;
 mod reader;
+mod readnode;
 mod writer;
 
 pub use self::aliases::{DagioHostDirectory, DagioLink};
@@ -14,6 +15,7 @@ pub use self::commit::DagioCommit;
 pub use self::dagio::Dagio;
 pub use self::load::DagioLoad;
 pub use self::reader::DagioReader;
+pub use self::readnode::DagioReadNode;
 pub use self::writer::DagioWriter;
 
 #[cfg(test)]
