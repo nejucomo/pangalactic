@@ -22,7 +22,7 @@ where
         F: FnOnce(&[u8]) -> R,
     {
         let mem = get_memory(self)?;
-        Ok(f(&mem.data(&self)[ptr..ptr + len]))
+        Ok(f(&mem.data(self)[ptr..ptr + len]))
     }
 
     fn guest_bytes_to_vec(&mut self, ptr: usize, len: usize) -> anyhow::Result<Vec<u8>> {
