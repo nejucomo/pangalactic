@@ -16,7 +16,7 @@ pub struct StoreCommander(CliDagio);
 impl StoreCommander {
     pub async fn put(&mut self) -> anyhow::Result<CliLink> {
         let link = self
-            .xfer(&Source::Stdin, &Destination::StoreScheme)
+            .xfer(&Source::Stdin, &Destination::Store(None))
             .await?
             .unwrap();
         Ok(link)
@@ -81,17 +81,16 @@ impl StoreCommander {
                 io::copy(&mut ssp, &mut w).await?;
                 Ok(None)
             }
-            StoreScheme => {
+            Store(optdest) => {
                 let mut w = self.0.open_file_writer().await?;
                 io::copy(&mut ssp, &mut w).await?;
-                let link = self.0.commit(w).await?;
-                Ok(Some(link))
-            }
-            Store(dest) => {
-                let mut w = self.0.open_file_writer().await?;
-                io::copy(&mut ssp, &mut w).await?;
-                let link = self.0.commit_into(w, dest).await?;
-                Ok(Some(link))
+
+                if let Some(dest) = optdest {
+                    self.0.commit_into(w, dest).await
+                } else {
+                    self.0.commit(w).await
+                }
+                .map(Some)
             }
         }
     }
