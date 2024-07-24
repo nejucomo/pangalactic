@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+async-trait.workspace = true
 clap.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
