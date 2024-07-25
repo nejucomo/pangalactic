@@ -33,7 +33,8 @@ mod consts {
 
     pub const MKSOURCE_FILE_CID: &'static str =
         "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
-    pub const MKSOURCE_DIR_CID: &'static str = "FIXME: MKSOURCE_DIR_CID";
+    pub const MKSOURCE_DIR_CID: &'static str =
+        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
     pub const MKSOURCE_FILE_STORE_PATH: &'static str = "FIXME: MKSOURCE_FILE_STORE_PATH";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str = "FIXME: MKSOURCE_DIR_STORE_PATH";
 
@@ -44,8 +45,6 @@ mod consts {
     pub const STDIN_TO_STORE_DEST: &'static str = "FIXME: STDIN_TO_STORE_DEST";
     pub const HOST_FILE_TO_STORE_BARE: &'static str =
         "pg:file-ddb-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
-    pub const HOST_DIR_TO_STORE_BARE: &'static str =
-        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
     pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
     pub const HOST_DIR_TO_STORE_DEST: &'static str = "FIXME: HOST_DIR_TO_STORE_DEST";
     pub const STORE_CID_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_BARE";
@@ -192,7 +191,7 @@ impl MkSource {
             (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
             (MkSource::Stdin, MkDest::StoreDest) => Some(consts::STDIN_TO_STORE_DEST),
             (MkSource::Host(File), MkDest::StoreBare) => Some(consts::HOST_FILE_TO_STORE_BARE),
-            (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::HOST_DIR_TO_STORE_BARE),
+            (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::MKSOURCE_DIR_CID),
             (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
             (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
             (MkSource::StoreCID(File), MkDest::StoreBare) => Some(consts::MKSOURCE_FILE_CID),
