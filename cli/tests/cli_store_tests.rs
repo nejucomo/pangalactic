@@ -46,7 +46,6 @@ mod consts {
         "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
     pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
     pub const HOST_DIR_TO_STORE_DEST: &'static str = "FIXME: HOST_DIR_TO_STORE_DEST";
-    pub const STORE_CID_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_BARE";
     pub const STORE_CID_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_BARE";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_DEST";
     pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_DEST";
@@ -194,9 +193,7 @@ impl MkSource {
             (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::HOST_DIR_TO_STORE_BARE),
             (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
             (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
-            (MkSource::StoreCID(File), MkDest::StoreBare) => {
-                Some(consts::STORE_CID_FILE_TO_STORE_BARE)
-            }
+            (MkSource::StoreCID(File), MkDest::StoreBare) => Some(consts::MKSOURCE_FILE_CID),
             (MkSource::StoreCID(Dir), MkDest::StoreBare) => {
                 Some(consts::STORE_CID_DIR_TO_STORE_BARE)
             }
