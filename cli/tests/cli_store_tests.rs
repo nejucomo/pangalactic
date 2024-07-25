@@ -27,7 +27,12 @@ fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
 }
 
 mod consts {
-    pub const MKSOURCE_FILE_CID: &'static str = "FIXME: MKSOURCE_FILE_CID";
+    pub const STDIN_CONTENTS: &'static str = "I am a stdin file.";
+    pub const HOST_FILE_CONTENTS: &'static str = "I am a host file.";
+    pub const STORE_FILE_CONTENTS: &'static str = "I am a store file.";
+
+    pub const MKSOURCE_FILE_CID: &'static str =
+        "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
     pub const MKSOURCE_DIR_CID: &'static str = "FIXME: MKSOURCE_DIR_CID";
     pub const MKSOURCE_FILE_STORE_PATH: &'static str = "FIXME: MKSOURCE_FILE_STORE_PATH";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str = "FIXME: MKSOURCE_DIR_STORE_PATH";
@@ -37,7 +42,8 @@ mod consts {
     pub const STDIN_TO_STORE_BARE: &'static str = "FIXME: STDIN_TO_STORE_BARE";
     pub const STDIN_TO_STORE_DEST: &'static str = "FIXME: STDIN_TO_STORE_DEST";
     pub const HOST_FILE_TO_STORE_BARE: &'static str = "FIXME: HOST_FILE_TO_STORE_BARE";
-    pub const HOST_DIR_TO_STORE_BARE: &'static str = "FIXME: HOST_DIR_TO_STORE_BARE";
+    pub const HOST_DIR_TO_STORE_BARE: &'static str =
+        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
     pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
     pub const HOST_DIR_TO_STORE_DEST: &'static str = "FIXME: HOST_DIR_TO_STORE_DEST";
     pub const STORE_CID_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_BARE";
@@ -95,7 +101,7 @@ impl MkSource {
             Host(File) => {
                 testcasedir
                     .join("srcfile")
-                    .write_anyhow("I am a host file.")?;
+                    .write_anyhow(consts::HOST_FILE_CONTENTS)?;
             }
             Host(Dir) => {
                 presetup_host_src_dir(&testcasedir.join("srcdir"))?;
@@ -104,7 +110,7 @@ impl MkSource {
                 let cidspace = run_pg_ok(
                     &testcasedir,
                     &["store", "xfer", "-", "pg:"],
-                    "I am a store file",
+                    consts::STORE_FILE_CONTENTS,
                 )?;
                 assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
             }
@@ -139,7 +145,7 @@ impl MkSource {
 
     fn stdin(self) -> &'static str {
         match self {
-            MkSource::Stdin => "Hello World!",
+            MkSource::Stdin => consts::STDIN_CONTENTS,
             _ => "",
         }
     }
@@ -177,9 +183,9 @@ impl MkSource {
             (MkSource::Stdin, MkDest::Stdout) => Some(MkSource::Stdin.stdin()),
 
             // cat
-            (MkSource::Host(File), MkDest::Stdout) => Some("I am a host file"),
-            (MkSource::StoreCID(File), MkDest::Stdout) => Some("I am a store file"),
-            (MkSource::StorePath(File), MkDest::Stdout) => Some("I am a store file"),
+            (MkSource::Host(File), MkDest::Stdout) => Some(consts::HOST_FILE_CONTENTS),
+            (MkSource::StoreCID(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
+            (MkSource::StorePath(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
 
             // All writes into the store output a CID:
             (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
@@ -229,7 +235,7 @@ impl MkSource {
 
                 StoreCID(File) | StorePath(File) => {
                     let p = testcasedir.join("_file_for_comparison");
-                    p.write_anyhow("I am a store file")?;
+                    p.write_anyhow(consts::STORE_FILE_CONTENTS)?;
                     p
                 }
 
