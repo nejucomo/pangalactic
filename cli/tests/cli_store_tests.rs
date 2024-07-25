@@ -47,7 +47,6 @@ mod consts {
         "pg:file-ddb-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
     pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
     pub const HOST_DIR_TO_STORE_DEST: &'static str = "FIXME: HOST_DIR_TO_STORE_DEST";
-    pub const STORE_CID_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_BARE";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_DEST";
     pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_DEST";
     pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_BARE";
@@ -194,10 +193,9 @@ impl MkSource {
             (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::MKSOURCE_DIR_CID),
             (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
             (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
-            (MkSource::StoreCID(File), MkDest::StoreBare) => Some(consts::MKSOURCE_FILE_CID),
-            (MkSource::StoreCID(Dir), MkDest::StoreBare) => {
-                Some(consts::STORE_CID_DIR_TO_STORE_BARE)
-            }
+
+            // Copying any cid to `pg:` is a no-op because it's a deduplicated store:
+            (MkSource::StoreCID(_), MkDest::StoreBare) => Some(self.to_arg()),
             (MkSource::StoreCID(File), MkDest::StoreDest) => {
                 Some(consts::STORE_CID_FILE_TO_STORE_DEST)
             }
