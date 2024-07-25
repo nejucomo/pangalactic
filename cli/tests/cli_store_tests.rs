@@ -41,7 +41,8 @@ mod consts {
 
     pub const STDIN_TO_STORE_BARE: &'static str = "FIXME: STDIN_TO_STORE_BARE";
     pub const STDIN_TO_STORE_DEST: &'static str = "FIXME: STDIN_TO_STORE_DEST";
-    pub const HOST_FILE_TO_STORE_BARE: &'static str = "FIXME: HOST_FILE_TO_STORE_BARE";
+    pub const HOST_FILE_TO_STORE_BARE: &'static str =
+        "pg:file-ddb-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
     pub const HOST_DIR_TO_STORE_BARE: &'static str =
         "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
     pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
