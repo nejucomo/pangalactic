@@ -1,6 +1,9 @@
 #![feature(exit_status_error)]
 
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    process::ExitStatus,
+};
 
 use anyhow_std::PathAnyhow;
 use test_case::test_case;
@@ -15,57 +18,283 @@ fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
         input.replace(' ', "_").replace('!', "_")
     ))?;
 
-    let rawlink = run_pg(&testcasedir, &["store", "put"], input)?;
+    let rawlink = run_pg_ok(&testcasedir, &["store", "put"], input)?;
     let link = rawlink.trim();
 
-    let output = run_pg(&testcasedir, &["store", "get", link], "")?;
+    let output = run_pg_ok(&testcasedir, &["store", "get", link], "")?;
     assert_eq!(input, output);
     Ok(())
 }
 
-#[test]
-fn xfer_tests() -> anyhow::Result<()> {
-    let testcasedir = setup_test_case_dir(&format!("xfer"))?;
+mod consts {
+    pub const MKSOURCE_FILE_CID: &'static str = "FIXME: MKSOURCE_FILE_CID";
+    pub const MKSOURCE_DIR_CID: &'static str = "FIXME: MKSOURCE_DIR_CID";
+    pub const MKSOURCE_FILE_STORE_PATH: &'static str = "FIXME: MKSOURCE_FILE_STORE_PATH";
+    pub const MKSOURCE_DIR_STORE_PATH: &'static str = "FIXME: MKSOURCE_DIR_STORE_PATH";
 
-    // Setup:
-    let hostsrcroot = testcasedir.join("src");
-    hostsrcroot.create_dir_anyhow()?;
-    hostsrcroot.join("file.txt").write_anyhow("Hello World!")?;
-    let subdir = hostsrcroot.join("subdir");
-    subdir.create_dir_anyhow()?;
-    subdir.join("a").write_anyhow("Hello World!")?;
-    subdir.join("b").write_anyhow("Hello")?;
-    subdir.join("c").write_anyhow(" World!")?;
+    pub const MKDEST_STORE_DEST: &'static str = "FIXME: MKDEST_STORE_DEST";
 
-    // # Test operations:
-    // ## Test Operation A: host to host
-    let srcstr = hostsrcroot.to_str_anyhow()?;
-    let dstdir = testcasedir.join("dst");
-    let dststr = dstdir.to_str_anyhow()?;
-    run_pg_no_out(&testcasedir, &["store", "xfer", srcstr, dststr], "")?;
-    check_paths_equal(&hostsrcroot, &dstdir)?;
+    pub const STDIN_TO_STORE_BARE: &'static str = "FIXME: STDIN_TO_STORE_BARE";
+    pub const STDIN_TO_STORE_DEST: &'static str = "FIXME: STDIN_TO_STORE_DEST";
+    pub const HOST_FILE_TO_STORE_BARE: &'static str = "FIXME: HOST_FILE_TO_STORE_BARE";
+    pub const HOST_DIR_TO_STORE_BARE: &'static str = "FIXME: HOST_DIR_TO_STORE_BARE";
+    pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
+    pub const HOST_DIR_TO_STORE_DEST: &'static str = "FIXME: HOST_DIR_TO_STORE_DEST";
+    pub const STORE_CID_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_BARE";
+    pub const STORE_CID_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_BARE";
+    pub const STORE_CID_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_DEST";
+    pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_DEST";
+    pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_BARE";
+    pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_DIR_TO_STORE_BARE";
+    pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_DEST";
+    pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_PATH_DIR_TO_STORE_DEST";
+}
 
-    // ## Test Operation B: two different hosts to same store CID:
-    let srccid = run_pg(&testcasedir, &["store", "xfer", srcstr, "pg:"], "")?
-        .trim_end()
-        .to_string();
-    dbg!(&srccid);
-    let dstcid = run_pg(&testcasedir, &["store", "xfer", dststr, "pg:"], "")?
-        .trim_end()
-        .to_string();
-    dbg!(&dstcid);
-    assert_eq!(srccid, dstcid);
+#[derive(Copy, Clone, Debug)]
+enum FoD {
+    File,
+    Dir,
+}
+use FoD::*;
 
-    // ## Test Operation C: store -> host equality
-    let s2h = testcasedir.join("s2h");
-    run_pg_no_out(
+/// I specify which `Source` to setup and xfer from
+#[derive(Copy, Clone, Debug)]
+enum MkSource {
+    Stdin,
+    Host(FoD),
+    StoreCID(FoD),
+    StorePath(FoD),
+}
+
+/// I specify which `Destination` to xfer to
+#[derive(Copy, Clone, Debug)]
+enum MkDest {
+    Stdout,
+    Host,
+    StoreBare,
+    StoreDest,
+}
+
+impl MkSource {
+    fn setup(self, testcasedir: &Path) -> anyhow::Result<()> {
+        fn presetup_host_src_dir(p: &Path) -> anyhow::Result<()> {
+            p.create_dir_anyhow()?;
+            p.join("file.txt").write_anyhow("Hello World!")?;
+            let subdir = p.join("subdir");
+            subdir.create_dir_anyhow()?;
+            subdir.join("a").write_anyhow("Hello World!")?;
+            subdir.join("b").write_anyhow("Hello")?;
+            subdir.join("c").write_anyhow(" World!")?;
+            Ok(())
+        }
+
+        use MkSource::*;
+
+        match self {
+            Stdin => {}
+            Host(File) => {
+                testcasedir
+                    .join("srcfile")
+                    .write_anyhow("I am a host file.")?;
+            }
+            Host(Dir) => {
+                presetup_host_src_dir(&testcasedir.join("srcdir"))?;
+            }
+            StoreCID(File) | StorePath(File) => {
+                let cidspace = run_pg_ok(
+                    &testcasedir,
+                    &["store", "xfer", "-", "pg:"],
+                    "I am a store file",
+                )?;
+                assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
+            }
+            StoreCID(Dir) | StorePath(Dir) => {
+                let predir = testcasedir.join("presetup_dir");
+                presetup_host_src_dir(&predir)?;
+                let cidspace = run_pg_ok(
+                    &testcasedir,
+                    &["store", "xfer", predir.to_str_anyhow()?, "pg:"],
+                    "",
+                )?;
+                assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
+            }
+        }
+
+        Ok(())
+    }
+
+    fn to_arg(self) -> &'static str {
+        use MkSource::*;
+
+        match self {
+            Stdin => "-",
+            Host(File) => "./srcfile",
+            Host(Dir) => "./srcdir",
+            StoreCID(File) => consts::MKSOURCE_FILE_CID,
+            StoreCID(Dir) => consts::MKSOURCE_DIR_CID,
+            StorePath(File) => consts::MKSOURCE_FILE_STORE_PATH,
+            StorePath(Dir) => consts::MKSOURCE_DIR_STORE_PATH,
+        }
+    }
+
+    fn stdin(self) -> &'static str {
+        match self {
+            MkSource::Stdin => "Hello World!",
+            _ => "",
+        }
+    }
+
+    fn verify_outcome(
+        self,
+        mkdest: MkDest,
+        testcasedir: &Path,
+        status: ExitStatus,
+        output: String,
+    ) -> anyhow::Result<()> {
+        if let Some(expected) = self.expected_output(mkdest) {
+            status.exit_ok()?;
+            assert_eq!(output.trim_end(), expected);
+            self.verify_host_dest(mkdest, testcasedir)?;
+        } else {
+            assert!(!status.success());
+        }
+
+        Ok(())
+    }
+
+    fn expected_output(self, mkdest: MkDest) -> Option<&'static str> {
+        // BUG: The error logic here ignores overwrite errors:
+        match (self, mkdest) {
+            // Any dir headed to stdout is an error:
+            (MkSource::Host(Dir), MkDest::Stdout)
+            | (MkSource::StoreCID(Dir), MkDest::Stdout)
+            | (MkSource::StorePath(Dir), MkDest::Stdout) => None,
+
+            // Anything headed to host produces empty output without error:
+            (_, MkDest::Host) => Some(""),
+
+            // echo
+            (MkSource::Stdin, MkDest::Stdout) => Some(MkSource::Stdin.stdin()),
+
+            // cat
+            (MkSource::Host(File), MkDest::Stdout) => Some("I am a host file"),
+            (MkSource::StoreCID(File), MkDest::Stdout) => Some("I am a store file"),
+            (MkSource::StorePath(File), MkDest::Stdout) => Some("I am a store file"),
+
+            // All writes into the store output a CID:
+            (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
+            (MkSource::Stdin, MkDest::StoreDest) => Some(consts::STDIN_TO_STORE_DEST),
+            (MkSource::Host(File), MkDest::StoreBare) => Some(consts::HOST_FILE_TO_STORE_BARE),
+            (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::HOST_DIR_TO_STORE_BARE),
+            (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
+            (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
+            (MkSource::StoreCID(File), MkDest::StoreBare) => {
+                Some(consts::STORE_CID_FILE_TO_STORE_BARE)
+            }
+            (MkSource::StoreCID(Dir), MkDest::StoreBare) => {
+                Some(consts::STORE_CID_DIR_TO_STORE_BARE)
+            }
+            (MkSource::StoreCID(File), MkDest::StoreDest) => {
+                Some(consts::STORE_CID_FILE_TO_STORE_DEST)
+            }
+            (MkSource::StoreCID(Dir), MkDest::StoreDest) => {
+                Some(consts::STORE_CID_DIR_TO_STORE_DEST)
+            }
+            (MkSource::StorePath(File), MkDest::StoreBare) => {
+                Some(consts::STORE_PATH_FILE_TO_STORE_BARE)
+            }
+            (MkSource::StorePath(Dir), MkDest::StoreBare) => {
+                Some(consts::STORE_PATH_DIR_TO_STORE_BARE)
+            }
+            (MkSource::StorePath(File), MkDest::StoreDest) => {
+                Some(consts::STORE_PATH_FILE_TO_STORE_DEST)
+            }
+            (MkSource::StorePath(Dir), MkDest::StoreDest) => {
+                Some(consts::STORE_PATH_DIR_TO_STORE_DEST)
+            }
+        }
+    }
+
+    fn verify_host_dest(self, mkdest: MkDest, testcasedir: &Path) -> anyhow::Result<()> {
+        if matches!(mkdest, MkDest::Host) {
+            use MkSource::*;
+            let destpath = testcasedir.join(mkdest.to_arg());
+
+            let expectedpath = match self {
+                Stdin => {
+                    let p = testcasedir.join("_file_for_comparison");
+                    p.write_anyhow(self.stdin())?;
+                    p
+                }
+
+                StoreCID(File) | StorePath(File) => {
+                    let p = testcasedir.join("_file_for_comparison");
+                    p.write_anyhow("I am a store file")?;
+                    p
+                }
+
+                Host(_) => testcasedir.join(self.to_arg()),
+                StoreCID(Dir) | StorePath(Dir) => testcasedir.join("presetup_dir"),
+            };
+
+            check_paths_equal(&expectedpath, &destpath)?;
+        }
+        Ok(())
+    }
+}
+
+impl MkDest {
+    fn to_arg(self) -> &'static str {
+        use MkDest::*;
+
+        match self {
+            Stdout => "-",
+            Host => "dest",
+            StoreBare => "pg:",
+            StoreDest => consts::MKDEST_STORE_DEST,
+        }
+    }
+}
+
+#[test_case(MkSource::Stdin, MkDest::Stdout)]
+#[test_case(MkSource::Stdin, MkDest::Host)]
+#[test_case(MkSource::Stdin, MkDest::StoreBare)]
+#[test_case(MkSource::Stdin, MkDest::StoreDest)]
+#[test_case(MkSource::Host(File), MkDest::Stdout)]
+#[test_case(MkSource::Host(Dir), MkDest::Stdout)]
+#[test_case(MkSource::Host(File), MkDest::Host)]
+#[test_case(MkSource::Host(Dir), MkDest::Host)]
+#[test_case(MkSource::Host(File), MkDest::StoreBare)]
+#[test_case(MkSource::Host(Dir), MkDest::StoreBare)]
+#[test_case(MkSource::Host(File), MkDest::StoreDest)]
+#[test_case(MkSource::Host(Dir), MkDest::StoreDest)]
+#[test_case(MkSource::StoreCID(File), MkDest::Stdout)]
+#[test_case(MkSource::StoreCID(Dir), MkDest::Stdout)]
+#[test_case(MkSource::StoreCID(File), MkDest::Host)]
+#[test_case(MkSource::StoreCID(Dir), MkDest::Host)]
+#[test_case(MkSource::StoreCID(File), MkDest::StoreBare)]
+#[test_case(MkSource::StoreCID(Dir), MkDest::StoreBare)]
+#[test_case(MkSource::StoreCID(File), MkDest::StoreDest)]
+#[test_case(MkSource::StoreCID(Dir), MkDest::StoreDest)]
+#[test_case(MkSource::StorePath(File), MkDest::Stdout)]
+#[test_case(MkSource::StorePath(Dir), MkDest::Stdout)]
+#[test_case(MkSource::StorePath(File), MkDest::Host)]
+#[test_case(MkSource::StorePath(Dir), MkDest::Host)]
+#[test_case(MkSource::StorePath(File), MkDest::StoreBare)]
+#[test_case(MkSource::StorePath(Dir), MkDest::StoreBare)]
+#[test_case(MkSource::StorePath(File), MkDest::StoreDest)]
+#[test_case(MkSource::StorePath(Dir), MkDest::StoreDest)]
+fn xfer(mksource: MkSource, mkdest: MkDest) -> anyhow::Result<()> {
+    let testcasedir = setup_test_case_dir(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
+
+    mksource.setup(&testcasedir)?;
+
+    let (status, output) = run_pg(
         &testcasedir,
-        &["store", "xfer", &srccid, s2h.to_str_anyhow()?],
-        "",
+        &["store", "xfer", &mksource.to_arg(), &mkdest.to_arg()],
+        &mksource.stdin(),
     )?;
-    check_paths_equal(&hostsrcroot, &s2h)?;
-
-    Ok(())
+    mksource.verify_outcome(mkdest, &testcasedir, status, output)
 }
 
 fn setup_test_case_dir(dataset: &str) -> anyhow::Result<PathBuf> {
@@ -80,7 +309,7 @@ fn setup_test_case_dir(dataset: &str) -> anyhow::Result<PathBuf> {
         }
     })?;
 
-    tcd.create_dir_anyhow()?;
+    tcd.create_dir_all_anyhow()?;
 
     Ok(PathBuf::from(tcd))
 }
@@ -92,13 +321,13 @@ fn get_test_case_dir(dataset: &str) -> String {
     )
 }
 
-fn run_pg_no_out(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<()> {
-    let output = run_pg(testcasedir, args, stdin)?;
-    assert!(output.is_empty(), "unexpected: {output:?}");
-    Ok(())
+fn run_pg_ok(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<String> {
+    let (status, output) = run_pg(testcasedir, args, stdin)?;
+    status.exit_ok()?;
+    Ok(output)
 }
 
-fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<String> {
+fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<(ExitStatus, String)> {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
@@ -113,9 +342,8 @@ fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<Stri
     child.stdin.as_ref().unwrap().write_all(stdin.as_bytes())?;
     let cmdout = dbg!(child.wait_with_output())?;
 
-    cmdout.status.exit_ok()?;
     let outtext = String::from_utf8(cmdout.stdout)?;
-    Ok(outtext)
+    Ok((cmdout.status, outtext))
 }
 
 fn check_paths_equal(src: &Path, dst: &Path) -> anyhow::Result<()> {
