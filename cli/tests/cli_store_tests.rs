@@ -334,6 +334,7 @@ fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<(Exi
     let mut cmd = Command::new(dbg!(env!("CARGO_BIN_EXE_pg")));
     cmd.args(args);
     cmd.env("XDG_DATA_HOME", testcasedir);
+    cmd.current_dir(testcasedir);
     cmd.stdin(Stdio::piped());
     cmd.stdout(Stdio::piped());
 
