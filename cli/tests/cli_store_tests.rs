@@ -33,12 +33,17 @@ mod consts {
 
     pub const MKSOURCE_FILE_CID: &'static str =
         "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
+
+    // Note: We wish we could evaluate this in const stage to remove redundancy:
+    // pub const MKSOURCE_DIR_CID: &'static str = MKDEST_STORE_DEST.split_once('/').unwrap().0;
     pub const MKSOURCE_DIR_CID: &'static str =
         "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
+
     pub const MKSOURCE_FILE_STORE_PATH: &'static str = "FIXME: MKSOURCE_FILE_STORE_PATH";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str = "FIXME: MKSOURCE_DIR_STORE_PATH";
 
-    pub const MKDEST_STORE_DEST: &'static str = "FIXME: MKDEST_STORE_DEST";
+    pub const MKDEST_STORE_DEST: &'static str =
+        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir/dest";
 
     pub const STDIN_TO_STORE_BARE: &'static str =
         "pg:file-ddb-QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
