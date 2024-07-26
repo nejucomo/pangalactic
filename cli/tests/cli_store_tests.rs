@@ -50,7 +50,8 @@ mod consts {
     pub const STDIN_TO_STORE_DEST: &'static str = "FIXME: STDIN_TO_STORE_DEST";
     pub const HOST_FILE_TO_STORE_BARE: &'static str =
         "pg:file-ddb-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
-    pub const HOST_FILE_TO_STORE_DEST: &'static str = "FIXME: HOST_FILE_TO_STORE_DEST";
+    pub const HOST_FILE_TO_STORE_DEST: &'static str =
+        "pg:dir-ddb-4nP5C6N6yUMoqSHUyFhg8-TWoUT9SPKodGRqTQcLTR9X";
     pub const HOST_DIR_TO_STORE_DEST: &'static str =
         "pg:dir-ddb-TJIMzefGhWzIPAR0AQGpDPBz9oBsZFnd3Jwzx19dy4JX";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_DEST";
@@ -88,28 +89,37 @@ enum MkDest {
 
 impl MkSource {
     fn setup(self, testcasedir: &Path) -> anyhow::Result<()> {
-        fn presetup_host_src_dir(p: &Path) -> anyhow::Result<()> {
-            p.create_dir_anyhow()?;
-            p.join("file.txt").write_anyhow("Hello World!")?;
-            let subdir = p.join("subdir");
+        use MkSource::*;
+
+        let predir = {
+            let predir = testcasedir.join("presetup_dir");
+            predir.create_dir_anyhow()?;
+            predir.join("file.txt").write_anyhow("Hello World!")?;
+            let subdir = predir.join("subdir");
             subdir.create_dir_anyhow()?;
             subdir.join("a").write_anyhow("Hello World!")?;
             subdir.join("b").write_anyhow("Hello")?;
             subdir.join("c").write_anyhow(" World!")?;
-            Ok(())
+            predir
+        };
+
+        {
+            let cidspace = run_pg_ok(
+                &testcasedir,
+                &["store", "xfer", predir.to_str_anyhow()?, "pg:"],
+                "",
+            )?;
+            assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
         }
 
-        use MkSource::*;
-
         match self {
-            Stdin => {}
             Host(File) => {
                 testcasedir
                     .join("srcfile")
                     .write_anyhow(consts::HOST_FILE_CONTENTS)?;
             }
             Host(Dir) => {
-                presetup_host_src_dir(&testcasedir.join("srcdir"))?;
+                predir.rename_anyhow(testcasedir.join("srcdir"))?;
             }
             StoreCID(File) | StorePath(File) => {
                 let cidspace = run_pg_ok(
@@ -119,16 +129,7 @@ impl MkSource {
                 )?;
                 assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
             }
-            StoreCID(Dir) | StorePath(Dir) => {
-                let predir = testcasedir.join("presetup_dir");
-                presetup_host_src_dir(&predir)?;
-                let cidspace = run_pg_ok(
-                    &testcasedir,
-                    &["store", "xfer", predir.to_str_anyhow()?, "pg:"],
-                    "",
-                )?;
-                assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
-            }
+            _ => {}
         }
 
         Ok(())
@@ -306,9 +307,10 @@ fn xfer(mksource: MkSource, mkdest: MkDest) -> anyhow::Result<()> {
 }
 
 fn setup_test_case_dir(dataset: &str) -> anyhow::Result<PathBuf> {
-    let tcd = PathBuf::from(get_test_case_dir(dataset));
+    let testcasedir = PathBuf::from(get_test_case_dir(dataset));
+    dbg!(&testcasedir);
 
-    tcd.remove_dir_all_anyhow().or_else(|e| {
+    testcasedir.remove_dir_all_anyhow().or_else(|e| {
         use std::io::ErrorKind::NotFound;
 
         match e.downcast_ref::<std::io::Error>() {
@@ -317,9 +319,9 @@ fn setup_test_case_dir(dataset: &str) -> anyhow::Result<PathBuf> {
         }
     })?;
 
-    tcd.create_dir_all_anyhow()?;
+    testcasedir.create_dir_all_anyhow()?;
 
-    Ok(PathBuf::from(tcd))
+    Ok(PathBuf::from(testcasedir))
 }
 
 fn get_test_case_dir(dataset: &str) -> String {
@@ -339,17 +341,20 @@ fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<(Exi
     use std::io::Write;
     use std::process::{Command, Stdio};
 
-    let mut cmd = Command::new(dbg!(env!("CARGO_BIN_EXE_pg")));
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_pg"));
     cmd.args(args);
     cmd.env("XDG_DATA_HOME", testcasedir);
     cmd.current_dir(testcasedir);
     cmd.stdin(Stdio::piped());
     cmd.stdout(Stdio::piped());
+    cmd.stderr(Stdio::piped());
 
-    let child = dbg!(cmd).spawn()?;
+    let child = cmd.spawn()?;
 
     child.stdin.as_ref().unwrap().write_all(stdin.as_bytes())?;
-    let cmdout = dbg!(child.wait_with_output())?;
+    let cmdout = child.wait_with_output()?;
+
+    println!("{}", String::from_utf8(cmdout.stderr)?);
 
     let outtext = String::from_utf8(cmdout.stdout)?;
     Ok((cmdout.status, outtext))
