@@ -35,12 +35,13 @@ mod consts {
         "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
 
     // Note: We wish we could evaluate this in const stage to remove redundancy:
-    // pub const MKSOURCE_DIR_CID: &'static str = MKDEST_STORE_DEST.split_once('/').unwrap().0;
+    // pub const MKSOURCE_DIR_CID: &'static str = MKSOURCE_DIR_STORE_PATH.split_once('/').unwrap().0;
     pub const MKSOURCE_DIR_CID: &'static str =
         "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
-
-    pub const MKSOURCE_FILE_STORE_PATH: &'static str = "FIXME: MKSOURCE_FILE_STORE_PATH";
-    pub const MKSOURCE_DIR_STORE_PATH: &'static str = "FIXME: MKSOURCE_DIR_STORE_PATH";
+    pub const MKSOURCE_FILE_STORE_PATH: &'static str =
+        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir/c";
+    pub const MKSOURCE_DIR_STORE_PATH: &'static str =
+        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir";
 
     pub const MKDEST_STORE_DEST: &'static str =
         "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir/dest";
@@ -91,19 +92,18 @@ enum MkDest {
 
 impl MkSource {
     fn setup(self, testcasedir: &Path) -> anyhow::Result<()> {
-        use MkSource::*;
-
-        let predir = {
-            let predir = testcasedir.join("presetup_dir");
-            predir.create_dir_anyhow()?;
-            predir.join("file.txt").write_anyhow("Hello World!")?;
-            let subdir = predir.join("subdir");
+        fn populate_host_dir(p: PathBuf) -> anyhow::Result<PathBuf> {
+            p.create_dir_anyhow()?;
+            p.join("file.txt").write_anyhow("Hello World!")?;
+            let subdir = p.join("subdir");
             subdir.create_dir_anyhow()?;
             subdir.join("a").write_anyhow("Hello World!")?;
             subdir.join("b").write_anyhow("Hello")?;
             subdir.join("c").write_anyhow(" World!")?;
-            predir
-        };
+            Ok(p)
+        }
+
+        let predir = populate_host_dir(testcasedir.join("presetup_dir"))?;
 
         {
             let cidspace = run_pg_ok(
@@ -114,6 +114,8 @@ impl MkSource {
             assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
         }
 
+        use MkSource::*;
+
         match self {
             Host(File) => {
                 testcasedir
@@ -121,7 +123,7 @@ impl MkSource {
                     .write_anyhow(consts::HOST_FILE_CONTENTS)?;
             }
             Host(Dir) => {
-                predir.rename_anyhow(testcasedir.join("srcdir"))?;
+                populate_host_dir(testcasedir.join("srcdir"))?;
             }
             StoreCID(File) | StorePath(File) => {
                 let cidspace = run_pg_ok(
@@ -245,7 +247,8 @@ impl MkSource {
                 }
 
                 Host(_) => testcasedir.join(self.to_arg()),
-                StoreCID(Dir) | StorePath(Dir) => testcasedir.join("presetup_dir"),
+                StoreCID(Dir) => testcasedir.join("presetup_dir"),
+                StorePath(Dir) => testcasedir.join("presetup_dir").join("subdir"),
             };
 
             check_paths_equal(&expectedpath, &destpath)?;
@@ -411,11 +414,11 @@ fn check_paths_equal_inner(src: &Path, dst: &Path) -> anyhow::Result<()> {
             for entres in dst.read_dir_anyhow()? {
                 let dstpath = entres?.path();
                 let suffix = dstpath.strip_prefix_anyhow(dst)?;
+                let srcpath = src.join(suffix);
                 if visitedsrc.remove(suffix) {
-                    let srcpath = src.join(suffix);
                     check_paths_equal_inner(&srcpath, &dstpath)?;
                 } else {
-                    anyhow::bail!("missing");
+                    anyhow::bail!("missing: {:?}", srcpath.display());
                 }
             }
 
