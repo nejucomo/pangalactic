@@ -56,7 +56,7 @@ mod consts {
     pub const HOST_DIR_TO_STORE_DEST: &'static str =
         "pg:dir-ddb-TJIMzefGhWzIPAR0AQGpDPBz9oBsZFnd3Jwzx19dy4JX";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_FILE_TO_STORE_DEST";
-    pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_CID_DIR_TO_STORE_DEST";
+    pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = HOST_DIR_TO_STORE_DEST;
     pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_BARE";
     pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_DIR_TO_STORE_BARE";
     pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_DEST";
