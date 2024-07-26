@@ -45,18 +45,23 @@ where
     ) -> anyhow::Result<DagioLink<S>> {
         let mut dirlink = self.link().clone();
         let mut stack = vec![];
+        let (last, intermediate) = self.path().split_last();
 
-        for name in self.path() {
+        for name in intermediate {
             let d: DagioHostDirectory<S> = dagio.load(&dirlink).await?;
             dirlink = d.get_required(name)?.clone();
             stack.push((d, name));
         }
 
-        for (mut d, name) in stack.into_iter().rev() {
-            d.overwrite(name.clone(), link);
+        let mut d: DagioHostDirectory<S> = dagio.load(&dirlink).await?;
+        d.insert(last.clone(), link)?;
+
+        for (mut prevd, name) in stack.into_iter().rev() {
             link = dagio.commit(d).await?;
+            prevd.overwrite(name.clone(), link);
+            d = prevd;
         }
 
-        Ok(link)
+        dagio.commit(d).await
     }
 }
