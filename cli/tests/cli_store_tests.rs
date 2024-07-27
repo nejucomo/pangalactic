@@ -65,7 +65,7 @@ mod consts {
     pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
         "pg:dir-ddb-3gDWUth4yjb8jCRXsqK8KpAdxFug2-v9T6iT7ujcentu";
     pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-ljk3P8m108QpNGfiPiqwGGFdyFrJvLa75GxSdA3VURhX";
+        "pg:dir-ddb--UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX";
     pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
         "pg:dir-ddb-IKGMKBnunjldHVcu_fgtkOIg8F3sTTnyLGC0iSHWwbxX";
 }
@@ -240,23 +240,23 @@ impl MkSource {
             use MkSource::*;
             let destpath = testcasedir.join(mkdest.to_arg());
 
-            let expectedpath = match self {
-                Stdin => {
-                    let p = testcasedir.join("_file_for_comparison");
-                    p.write_anyhow(self.stdin())?;
-                    p
-                }
+            let (expectedname, optcontents) = match self {
+                Stdin => ("_stdin_for_comparison", Some(self.stdin())),
+                StoreCID(File) => ("_cidfile_for_comparison", Some(consts::STORE_FILE_CONTENTS)),
+                StorePath(File) => (
+                    "_cidpathfile_for_comparison",
+                    Some(consts::STORE_FILE_CONTENTS_2),
+                ),
 
-                StoreCID(File) | StorePath(File) => {
-                    let p = testcasedir.join("_file_for_comparison");
-                    p.write_anyhow(consts::STORE_FILE_CONTENTS)?;
-                    p
-                }
-
-                Host(_) => testcasedir.join(self.to_arg()),
-                StoreCID(Dir) => testcasedir.join("presetup_dir"),
-                StorePath(Dir) => testcasedir.join("presetup_dir").join("subdir"),
+                Host(_) => (self.to_arg(), None),
+                StoreCID(Dir) => ("presetup_dir", None),
+                StorePath(Dir) => ("presetup_dir/subdir", None),
             };
+
+            let expectedpath = testcasedir.join(expectedname);
+            if let Some(contents) = optcontents {
+                expectedpath.write_anyhow(contents)?;
+            }
 
             check_paths_equal(&expectedpath, &destpath)?;
         }
