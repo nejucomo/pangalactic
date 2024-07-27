@@ -1,9 +1,11 @@
 use crate::options::Options;
 
 pub async fn run() -> anyhow::Result<()> {
-    let opts = Options::parse();
     init_logging()?;
-    tracing::debug!(options = ?opts);
+    let logargs = std::env::args().collect::<Vec<_>>();
+    tracing::debug!(?logargs);
+    let opts = Options::parse();
+    tracing::debug!(?opts);
     opts.run().await
 }
 

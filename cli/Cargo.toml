@@ -6,9 +6,11 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+async-trait.workspace = true
 clap.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
+pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-storepath.workspace = true
@@ -19,4 +21,5 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 
 [dev-dependencies]
+anyhow-std.workspace = true
 test-case.workspace = true

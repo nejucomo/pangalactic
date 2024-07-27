@@ -9,6 +9,24 @@ pub enum LinkKind {
     Dir,
 }
 
+impl LinkKind {
+    pub fn require_kind(self, other: LinkKind) -> anyhow::Result<()> {
+        if self == other {
+            Ok(())
+        } else {
+            anyhow::bail!("{self} not supported; expecting {other}");
+        }
+    }
+
+    pub fn require_file(self) -> anyhow::Result<()> {
+        self.require_kind(LinkKind::File)
+    }
+
+    pub fn require_dir(self) -> anyhow::Result<()> {
+        self.require_kind(LinkKind::Dir)
+    }
+}
+
 impl TryFrom<prim::LinkKind> for LinkKind {
     type Error = String;
 

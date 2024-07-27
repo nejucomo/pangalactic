@@ -6,8 +6,7 @@ use std::{fmt::Display, path::PathBuf, str::FromStr};
 pub enum Destination {
     Stdout,
     Host(PathBuf),
-    StoreScheme,
-    Store(CliStoreDestination),
+    Store(Option<CliStoreDestination>),
 }
 use Destination::*;
 
@@ -16,8 +15,8 @@ impl Display for Destination {
         match self {
             Stdout => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
-            StoreScheme => SCHEME_PREFIX.fmt(f),
-            Store(sp) => sp.fmt(f),
+            Store(None) => SCHEME_PREFIX.fmt(f),
+            Store(Some(sp)) => sp.fmt(f),
         }
     }
 }
@@ -29,9 +28,9 @@ impl FromStr for Destination {
         if s == "-" {
             Ok(Stdout)
         } else if s == SCHEME_PREFIX {
-            Ok(StoreScheme)
+            Ok(Store(None))
         } else if s.starts_with(SCHEME_PREFIX) {
-            s.parse().map(Store)
+            s.parse().map(Some).map(Store)
         } else {
             s.parse().map(Host).map_err(anyhow::Error::from)
         }

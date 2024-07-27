@@ -40,6 +40,25 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
+impl<S> DagioCommit<S> for tokio::fs::ReadDir
+where
+    S: Store,
+{
+    async fn commit_into_dagio(mut self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+        use anyhow_std::OsStrAnyhow;
+
+        let mut hd = HostDirectory::default();
+        while let Some(dirent) = self.next_entry().await? {
+            let name = dirent.file_name().to_str_anyhow()?.to_string();
+            let link = dagio.commit(dirent.path().as_path()).await?;
+            hd.insert(name, link)?;
+        }
+
+        dagio.commit(hd).await
+    }
+}
+
+#[cfg_attr(not(doc), async_trait)]
 impl<S> DagioLoad<S> for DagioHostDirectory<S>
 where
     S: Store,

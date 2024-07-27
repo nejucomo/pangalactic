@@ -48,8 +48,16 @@ impl<L> Directory<L> {
         }
     }
 
+    pub fn overwrite(&mut self, name: Name, link: L) {
+        self.0.insert(name, link);
+    }
+
     pub fn get(&self, name: &NameRef) -> Option<&L> {
         self.0.get(name)
+    }
+
+    pub fn get_required(&self, name: &NameRef) -> anyhow::Result<&L> {
+        require(name, self.get(name))
     }
 
     pub fn remove(&mut self, name: &NameRef) -> Option<L> {
@@ -57,8 +65,7 @@ impl<L> Directory<L> {
     }
 
     pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<L> {
-        self.remove(name)
-            .ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
+        require(name, self.remove(name))
     }
 
     pub fn require_empty(self) -> anyhow::Result<()> {
@@ -71,4 +78,8 @@ impl<L> Directory<L> {
             )))
         }
     }
+}
+
+fn require<T>(name: &NameRef, opt: Option<T>) -> anyhow::Result<T> {
+    opt.ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
 }
