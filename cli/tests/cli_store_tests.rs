@@ -30,6 +30,7 @@ mod consts {
     pub const STDIN_CONTENTS: &'static str = "I am a stdin file.";
     pub const HOST_FILE_CONTENTS: &'static str = "I am a host file.";
     pub const STORE_FILE_CONTENTS: &'static str = "I am a store file.";
+    pub const STORE_FILE_CONTENTS_2: &'static str = "I am also a store file.";
 
     pub const MKSOURCE_FILE_CID: &'static str =
         "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
@@ -37,14 +38,14 @@ mod consts {
     // Note: We wish we could evaluate this in const stage to remove redundancy:
     // pub const MKSOURCE_DIR_CID: &'static str = MKSOURCE_DIR_STORE_PATH.split_once('/').unwrap().0;
     pub const MKSOURCE_DIR_CID: &'static str =
-        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW";
+        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
     pub const MKSOURCE_FILE_STORE_PATH: &'static str =
-        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir/c";
+        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str =
-        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir";
+        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
     pub const MKDEST_STORE_DEST: &'static str =
-        "pg:dir-ddb-JjrtLJOopyiSsShyvhj5ge-BdCHHj9KKYOGP_oGgvFFW/subdir/dest";
+        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
 
     pub const STDIN_TO_STORE_BARE: &'static str =
         "pg:file-ddb-QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
@@ -59,10 +60,14 @@ mod consts {
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str =
         "pg:dir-ddb-bLD97RTbRAyskhdUUMcr6sUC5gBOPvtizIThf_OrGdlX";
     pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = HOST_DIR_TO_STORE_DEST;
-    pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_BARE";
-    pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str = "FIXME: STORE_PATH_DIR_TO_STORE_BARE";
-    pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str = "FIXME: STORE_PATH_FILE_TO_STORE_DEST";
-    pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str = "FIXME: STORE_PATH_DIR_TO_STORE_DEST";
+    pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str =
+        "pg:file-ddb-Xa9wCPsESdgkQqjXt8MusilmIPAWH6QhQ3x5eB5HsPEH";
+    pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
+        "pg:dir-ddb-3gDWUth4yjb8jCRXsqK8KpAdxFug2-v9T6iT7ujcentu";
+    pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
+        "pg:dir-ddb-ljk3P8m108QpNGfiPiqwGGFdyFrJvLa75GxSdA3VURhX";
+    pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
+        "pg:dir-ddb-IKGMKBnunjldHVcu_fgtkOIg8F3sTTnyLGC0iSHWwbxX";
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -98,8 +103,10 @@ impl MkSource {
             let subdir = p.join("subdir");
             subdir.create_dir_anyhow()?;
             subdir.join("a").write_anyhow("Hello World!")?;
-            subdir.join("b").write_anyhow("Hello")?;
-            subdir.join("c").write_anyhow(" World!")?;
+            subdir.join("b").write_anyhow("Honeybee")?;
+            subdir
+                .join("c")
+                .write_anyhow(consts::STORE_FILE_CONTENTS_2)?;
             Ok(p)
         }
 
@@ -195,7 +202,7 @@ impl MkSource {
             // cat
             (MkSource::Host(File), MkDest::Stdout) => Some(consts::HOST_FILE_CONTENTS),
             (MkSource::StoreCID(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
-            (MkSource::StorePath(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
+            (MkSource::StorePath(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS_2),
 
             // All writes into the store output a CID:
             (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
