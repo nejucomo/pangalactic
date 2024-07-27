@@ -1,4 +1,5 @@
 use crate::options::Options;
+use crate::Runnable;
 
 pub async fn run() -> anyhow::Result<()> {
     init_logging()?;
