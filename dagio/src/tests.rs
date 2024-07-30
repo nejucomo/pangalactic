@@ -4,7 +4,7 @@ use pangalactic_store_mem::MemStore;
 
 #[tokio::test]
 async fn check_empty_file_link_transport_encoding() -> anyhow::Result<()> {
-    let expected = "pg:file-mem";
+    let expected = "pg:file";
     let mut dagio = Dagio::from(MemStore::default());
     let link = dagio.commit(b"".as_slice()).await?;
     let linktext = link.to_string();

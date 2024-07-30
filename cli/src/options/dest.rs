@@ -1,12 +1,14 @@
-use crate::store::CliStoreDestination;
+use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::SCHEME_PREFIX;
+use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_storepath::StoreDestination;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 #[derive(Clone, Debug)]
 pub enum Destination {
     Stdout,
     Host(PathBuf),
-    Store(Option<CliStoreDestination>),
+    Store(Option<StoreDestination<CidMeta<<DirDbStore as pangalactic_store::Store>::CID>>>),
 }
 use Destination::*;
 

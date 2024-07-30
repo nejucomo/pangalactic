@@ -1,22 +1,26 @@
 use std::borrow::Borrow;
 
 use async_trait::async_trait;
+use pangalactic_hostdir::HostDirectory;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
+use pangalactic_storepath::StorePath;
 
-use crate::{Dagio, DagioHostDirectory, DagioLink, DagioStorePath};
+use crate::Dagio;
 
 #[cfg_attr(not(doc), async_trait)]
 pub trait DagioResolveLink<S>
 where
     S: Store,
 {
-    type Proxy: Borrow<DagioLink<S>>;
+    type Proxy: Borrow<Link<CidMeta<S::CID>>>;
 
     async fn resolve_link(self, dagio: &Dagio<S>) -> anyhow::Result<Self::Proxy>;
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<'a, S> DagioResolveLink<S> for &'a DagioLink<S>
+impl<'a, S> DagioResolveLink<S> for &'a Link<CidMeta<S::CID>>
 where
     S: Store,
 {
@@ -28,7 +32,7 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioResolveLink<S> for DagioLink<S>
+impl<S> DagioResolveLink<S> for Link<CidMeta<S::CID>>
 where
     S: Store,
 {
@@ -40,16 +44,16 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<'a, S> DagioResolveLink<S> for &'a DagioStorePath<S>
+impl<'a, S> DagioResolveLink<S> for &'a StorePath<CidMeta<S::CID>>
 where
     S: Store,
 {
-    type Proxy = DagioLink<S>;
+    type Proxy = Link<CidMeta<S::CID>>;
 
-    async fn resolve_link(self, dagio: &Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+    async fn resolve_link(self, dagio: &Dagio<S>) -> anyhow::Result<Link<CidMeta<S::CID>>> {
         let mut link = self.link().clone();
         for name in self.path() {
-            let mut d: DagioHostDirectory<S> = dagio.load(link).await?;
+            let mut d: HostDirectory<S::CID> = dagio.load(link).await?;
             link = d.remove_required(name)?;
         }
         Ok(link)

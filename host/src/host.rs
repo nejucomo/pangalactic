@@ -1,5 +1,7 @@
 use crate::State;
-use pangalactic_dagio::{Dagio, DagioLink};
+use pangalactic_dagio::Dagio;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module};
 
@@ -35,8 +37,8 @@ where
     pub async fn execute(
         &mut self,
         dagio: Dagio<S>,
-        plan: &DagioLink<S>,
-    ) -> anyhow::Result<(Dagio<S>, DagioLink<S>)> {
+        plan: &Link<CidMeta<S::CID>>,
+    ) -> anyhow::Result<(Dagio<S>, Link<CidMeta<S::CID>>)> {
         use crate::DeriveFunc;
 
         let mut state = State::new(dagio);
@@ -50,7 +52,7 @@ where
 async fn load_exec_mod<S>(
     state: &mut State<S>,
     engine: &Engine,
-    plan: &DagioLink<S>,
+    plan: &Link<CidMeta<S::CID>>,
 ) -> anyhow::Result<Module>
 where
     S: Store,

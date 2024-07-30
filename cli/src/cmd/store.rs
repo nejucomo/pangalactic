@@ -2,18 +2,22 @@ mod xfer;
 
 use std::fmt::Debug;
 
-use crate::{
-    options::{Destination, Source},
-    store::{CliDagio, CliLink, CliStorePath},
-};
+use pangalactic_dagio::Dagio;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
+use pangalactic_store::Store;
+use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_storepath::StorePath;
+
+use crate::options::{Destination, Source};
 
 use self::xfer::XferInto;
 
 #[derive(Debug, Default)]
-pub struct StoreCommander(CliDagio);
+pub struct StoreCommander(Dagio<DirDbStore>);
 
 impl StoreCommander {
-    pub async fn put(&mut self) -> anyhow::Result<CliLink> {
+    pub async fn put(&mut self) -> anyhow::Result<Link<CidMeta<<DirDbStore as Store>::CID>>> {
         let link = self
             .xfer(&Source::Stdin, &Destination::Store(None))
             .await?
@@ -21,8 +25,11 @@ impl StoreCommander {
         Ok(link)
     }
 
-    pub async fn get(&mut self, link: &CliLink) -> anyhow::Result<()> {
-        let src = CliStorePath::new(link.clone(), vec![])?;
+    pub async fn get(
+        &mut self,
+        link: &Link<CidMeta<<DirDbStore as Store>::CID>>,
+    ) -> anyhow::Result<()> {
+        let src = StorePath::<CidMeta<<DirDbStore as Store>::CID>>::new(link.clone(), vec![])?;
         let none = self.xfer(&Source::Store(src), &Destination::Stdout).await?;
         assert!(none.is_none());
         Ok(())
@@ -32,7 +39,7 @@ impl StoreCommander {
         &mut self,
         source: &Source,
         dest: &Destination,
-    ) -> anyhow::Result<Option<CliLink>> {
+    ) -> anyhow::Result<Option<Link<CidMeta<<DirDbStore as Store>::CID>>>> {
         source.xfer_into(&mut self.0, dest).await
     }
 
@@ -41,7 +48,7 @@ impl StoreCommander {
         &mut self,
         srcdir: &Path,
         dest: &Destination,
-    ) -> anyhow::Result<Option<CliLink>> {
+    ) -> anyhow::Result<Option<Link<CidMeta<<DirDbStore as Store>::CID>>>> {
         use Destination::*;
 
         match dest {
@@ -57,7 +64,7 @@ impl StoreCommander {
         &mut self,
         srcdir: CliStoreDirectory,
         dest: &Destination,
-    ) -> anyhow::Result<Option<CliLink>> {
+    ) -> anyhow::Result<Option<Link<CidMeta<<DirDbStore as Store>::CID>>>> {
         dbg!(srcdir, dest);
         todo!()
     }

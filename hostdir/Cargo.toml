@@ -8,6 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 derive_more.workspace = true
 pangalactic-dir = { workspace = true, features = ["serde"] }
+pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true

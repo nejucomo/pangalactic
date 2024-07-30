@@ -33,41 +33,41 @@ mod consts {
     pub const STORE_FILE_CONTENTS_2: &'static str = "I am also a store file.";
 
     pub const MKSOURCE_FILE_CID: &'static str =
-        "pg:file-ddb--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
+        "pg:file--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
 
     // Note: We wish we could evaluate this in const stage to remove redundancy:
     // pub const MKSOURCE_DIR_CID: &'static str = MKSOURCE_DIR_STORE_PATH.split_once('/').unwrap().0;
     pub const MKSOURCE_DIR_CID: &'static str =
-        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
+        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
     pub const MKSOURCE_FILE_STORE_PATH: &'static str =
-        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
+        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str =
-        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
+        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
     pub const MKDEST_STORE_DEST: &'static str =
-        "pg:dir-ddb-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
+        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
 
     pub const STDIN_TO_STORE_BARE: &'static str =
-        "pg:file-ddb-QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
+        "pg:file-QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
     pub const STDIN_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-E14qcnMPIy0hrURgpxygXDv628fgKtVeJtrNQB9Z_4RX";
+        "pg:dir-E14qcnMPIy0hrURgpxygXDv628fgKtVeJtrNQB9Z_4RX";
     pub const HOST_FILE_TO_STORE_BARE: &'static str =
-        "pg:file-ddb-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
+        "pg:file-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
     pub const HOST_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-2FTxXVthHGe0DZxQXkIB27wGRd20H-F9-aUHcLXtamBX";
+        "pg:dir-2FTxXVthHGe0DZxQXkIB27wGRd20H-F9-aUHcLXtamBX";
     pub const HOST_DIR_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-GlR2nsXYF7oiQSgHAEQAb_TMBGkfQB7ZvNvwjMLSC3ZX";
+        "pg:dir-GlR2nsXYF7oiQSgHAEQAb_TMBGkfQB7ZvNvwjMLSC3ZX";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-AQSwJQ7qQsi58KESmz6izCd_DQDHv8-aUu3uwIxIUlRX";
+        "pg:dir-AQSwJQ7qQsi58KESmz6izCd_DQDHv8-aUu3uwIxIUlRX";
     pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = HOST_DIR_TO_STORE_DEST;
     pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str =
-        "pg:file-ddb-9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
+        "pg:file-9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
     pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
-        "pg:dir-ddb-JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
+        "pg:dir-JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
     pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb--UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX";
+        "pg:dir--UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX";
     pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
-        "pg:dir-ddb-Da29BWShEVjO74u6mYjxZumeuBsu_whlSxi_z1ZDNENX";
+        "pg:dir-Da29BWShEVjO74u6mYjxZumeuBsu_whlSxi_z1ZDNENX";
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -174,9 +174,13 @@ impl MkSource {
         status: ExitStatus,
         output: String,
     ) -> anyhow::Result<()> {
-        if let Some(expected) = self.expected_output(mkdest) {
+        if let Some((constname, expected)) = self.expected_output(mkdest) {
             status.exit_ok()?;
-            assert_eq!(output.trim_end(), expected);
+            assert_eq!(
+                output.trim_end(),
+                expected,
+                "mismatched const {constname:?}"
+            );
             self.verify_host_dest(mkdest, testcasedir)?;
         } else {
             assert!(!status.success());
@@ -185,7 +189,13 @@ impl MkSource {
         Ok(())
     }
 
-    fn expected_output(self, mkdest: MkDest) -> Option<&'static str> {
+    fn expected_output(self, mkdest: MkDest) -> Option<(&'static str, &'static str)> {
+        macro_rules! named_const {
+            ( $constname:ident ) => {
+                Some((stringify!($constname), consts::$constname))
+            };
+        }
+
         // BUG: The error logic here ignores overwrite errors:
         match (self, mkdest) {
             // Any dir headed to stdout is an error:
@@ -194,43 +204,42 @@ impl MkSource {
             | (MkSource::StorePath(Dir), MkDest::Stdout) => None,
 
             // Anything headed to host produces empty output without error:
-            (_, MkDest::Host) => Some(""),
+            (_, MkDest::Host) => Some(("(empty)", "")),
 
             // echo
-            (MkSource::Stdin, MkDest::Stdout) => Some(MkSource::Stdin.stdin()),
+            (MkSource::Stdin, MkDest::Stdout) => named_const!(STDIN_CONTENTS),
 
             // cat
-            (MkSource::Host(File), MkDest::Stdout) => Some(consts::HOST_FILE_CONTENTS),
-            (MkSource::StoreCID(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
-            (MkSource::StorePath(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS_2),
+            (MkSource::Host(File), MkDest::Stdout) => named_const!(HOST_FILE_CONTENTS),
+            (MkSource::StoreCID(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS),
+            (MkSource::StorePath(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
 
             // All writes into the store output a CID:
-            (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
-            (MkSource::Stdin, MkDest::StoreDest) => Some(consts::STDIN_TO_STORE_DEST),
-            (MkSource::Host(File), MkDest::StoreBare) => Some(consts::HOST_FILE_TO_STORE_BARE),
-            (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::MKSOURCE_DIR_CID),
-            (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
-            (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
-
-            // Copying any cid to `pg:` is a no-op because it's a deduplicated store:
-            (MkSource::StoreCID(_), MkDest::StoreBare) => Some(self.to_arg()),
+            (MkSource::Stdin, MkDest::StoreBare) => named_const!(STDIN_TO_STORE_BARE),
+            (MkSource::Stdin, MkDest::StoreDest) => named_const!(STDIN_TO_STORE_DEST),
+            (MkSource::Host(File), MkDest::StoreBare) => named_const!(HOST_FILE_TO_STORE_BARE),
+            (MkSource::Host(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
+            (MkSource::Host(File), MkDest::StoreDest) => named_const!(HOST_FILE_TO_STORE_DEST),
+            (MkSource::Host(Dir), MkDest::StoreDest) => named_const!(HOST_DIR_TO_STORE_DEST),
+            (MkSource::StoreCID(File), MkDest::StoreBare) => named_const!(MKSOURCE_FILE_CID),
+            (MkSource::StoreCID(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
             (MkSource::StoreCID(File), MkDest::StoreDest) => {
-                Some(consts::STORE_CID_FILE_TO_STORE_DEST)
+                named_const!(STORE_CID_FILE_TO_STORE_DEST)
             }
             (MkSource::StoreCID(Dir), MkDest::StoreDest) => {
-                Some(consts::STORE_CID_DIR_TO_STORE_DEST)
+                named_const!(STORE_CID_DIR_TO_STORE_DEST)
             }
             (MkSource::StorePath(File), MkDest::StoreBare) => {
-                Some(consts::STORE_PATH_FILE_TO_STORE_BARE)
+                named_const!(STORE_PATH_FILE_TO_STORE_BARE)
             }
             (MkSource::StorePath(Dir), MkDest::StoreBare) => {
-                Some(consts::STORE_PATH_DIR_TO_STORE_BARE)
+                named_const!(STORE_PATH_DIR_TO_STORE_BARE)
             }
             (MkSource::StorePath(File), MkDest::StoreDest) => {
-                Some(consts::STORE_PATH_FILE_TO_STORE_DEST)
+                named_const!(STORE_PATH_FILE_TO_STORE_DEST)
             }
             (MkSource::StorePath(Dir), MkDest::StoreDest) => {
-                Some(consts::STORE_PATH_DIR_TO_STORE_DEST)
+                named_const!(STORE_PATH_DIR_TO_STORE_DEST)
             }
         }
     }

@@ -1,10 +1,15 @@
-use pangalactic_dagio::{Dagio, DagioLink};
+use pangalactic_dagio::Dagio;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_schemata::{Attestation, Plan};
+use pangalactic_store::Store;
 use pangalactic_store_mem::MemStore;
 use std::future::Future;
 
 mod memtree;
 use self::memtree::MemTree;
+
+type TestLink = Link<CidMeta<<MemStore as Store>::CID>>;
 
 #[tokio::test]
 async fn plan_is_dir() -> anyhow::Result<()> {
@@ -104,7 +109,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
 async fn verify_guests<M, F, Fut>(guests: &[&str], content: M, verify: F) -> anyhow::Result<()>
 where
     MemTree: From<M>,
-    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     pangalactic_log::test_init();
@@ -121,7 +126,7 @@ async fn verify_guests_inner<F, Fut>(
     verify: F,
 ) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     for guest in guests {
@@ -132,7 +137,7 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, content: MemTree, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<DagioLink<MemStore>>, Attestation<DagioLink<MemStore>>) -> Fut,
+    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     let mut dagio = Dagio::from(MemStore::default());
@@ -150,8 +155,8 @@ where
     // Execute derive:
     let (dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
 
-    let att: Attestation<DagioLink<MemStore>> = dagio.load(&attestation).await?;
-    let plan: Plan<DagioLink<MemStore>> = dagio.load(&att.plan).await?;
+    let att: Attestation<TestLink> = dagio.load(&attestation).await?;
+    let plan: Plan<TestLink> = dagio.load(&att.plan).await?;
 
     // Verify
     verify(dagio, plan, att).await?;

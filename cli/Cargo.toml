@@ -11,6 +11,7 @@ clap.workspace = true
 enum_dispatch.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-dagio.workspace = true
+pangalactic-hostdir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store-dirdb.workspace = true

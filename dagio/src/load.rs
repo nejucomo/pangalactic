@@ -1,5 +1,7 @@
-use crate::{Dagio, DagioLink, DagioReader};
+use crate::{Dagio, DagioReader};
 use async_trait::async_trait;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
@@ -7,16 +9,19 @@ pub trait DagioLoad<S>: Sized
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self>;
+    async fn load_from_dagio(
+        dagio: &Dagio<S>,
+        link: &Link<CidMeta<S::CID>>,
+    ) -> anyhow::Result<Self>;
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioLoad<S> for DagioLink<S>
+impl<S> DagioLoad<S> for Link<CidMeta<S::CID>>
 where
     S: Store,
-    DagioLink<S>: Clone,
+    Link<CidMeta<S::CID>>: Clone,
 {
-    async fn load_from_dagio(_: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(_: &Dagio<S>, link: &Link<CidMeta<S::CID>>) -> anyhow::Result<Self> {
         Ok(link.clone())
     }
 }
@@ -26,7 +31,10 @@ impl<S> DagioLoad<S> for Vec<u8>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(
+        dagio: &Dagio<S>,
+        link: &Link<CidMeta<S::CID>>,
+    ) -> anyhow::Result<Self> {
         use tokio::io::AsyncReadExt;
 
         let mut r: DagioReader<S> = dagio.load(link).await?;

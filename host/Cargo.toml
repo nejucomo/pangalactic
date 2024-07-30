@@ -11,6 +11,8 @@ log.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-hostdir.workspace = true
 pangalactic-handle.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-primitives.workspace = true
 pangalactic-schemata = { workspace = true, features = [ "dagio" ] }
