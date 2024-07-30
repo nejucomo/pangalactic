@@ -1,11 +1,13 @@
 use crate::Host;
-use pangalactic_dagio::{Dagio, DagioLink};
+use pangalactic_dagio::Dagio;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 
 pub async fn derive<S>(
     dagio: Dagio<S>,
-    plan: &DagioLink<S>,
-) -> anyhow::Result<(Dagio<S>, DagioLink<S>)>
+    plan: &Link<CidMeta<S::CID>>,
+) -> anyhow::Result<(Dagio<S>, Link<CidMeta<S::CID>>)>
 where
     S: Store,
 {

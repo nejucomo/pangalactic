@@ -1,5 +1,8 @@
 use crate::{ByteReader, DirectoryReader};
-use pangalactic_dagio::{Dagio, DagioHostDirectory, DagioLink, DagioWriter};
+use pangalactic_dagio::{Dagio, DagioWriter};
+use pangalactic_hostdir::HostDirectory;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use pangalactic_table::Table;
 
@@ -8,11 +11,11 @@ where
     S: Store,
 {
     dagio: Dagio<S>,
-    links: Table<DagioLink<S>>,
+    links: Table<Link<CidMeta<S::CID>>>,
     byte_readers: Table<ByteReader<S>>,
     dir_readers: Table<DirectoryReader<S>>,
     byte_writers: Table<DagioWriter<S>>,
-    dir_writers: Table<DagioHostDirectory<S>>,
+    dir_writers: Table<HostDirectory<S::CID>>,
 }
 
 impl<S> State<S>
@@ -38,11 +41,11 @@ where
         &mut self.dagio
     }
 
-    pub(crate) fn links(&self) -> &Table<DagioLink<S>> {
+    pub(crate) fn links(&self) -> &Table<Link<CidMeta<S::CID>>> {
         &self.links
     }
 
-    pub(crate) fn links_mut(&mut self) -> &mut Table<DagioLink<S>> {
+    pub(crate) fn links_mut(&mut self) -> &mut Table<Link<CidMeta<S::CID>>> {
         &mut self.links
     }
 
@@ -62,7 +65,7 @@ where
         &mut self.byte_writers
     }
 
-    pub(crate) fn directory_writers_mut(&mut self) -> &mut Table<DagioHostDirectory<S>> {
+    pub(crate) fn directory_writers_mut(&mut self) -> &mut Table<HostDirectory<S::CID>> {
         &mut self.dir_writers
     }
 }

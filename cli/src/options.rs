@@ -7,8 +7,12 @@ pub use self::source::Source;
 use async_trait::async_trait;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
+use pangalactic_store::Store;
+use pangalactic_store_dirdb::DirDbStore;
 
-use crate::{cmd::StoreCommander, store::CliLink};
+use crate::cmd::StoreCommander;
 
 #[cfg_attr(not(doc), async_trait)]
 #[enum_dispatch]
@@ -70,7 +74,7 @@ impl Runnable for StorePutOptions {
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The link to get
-    pub link: CliLink,
+    pub link: Link<CidMeta<<DirDbStore as Store>::CID>>,
 }
 
 #[cfg_attr(not(doc), async_trait)]

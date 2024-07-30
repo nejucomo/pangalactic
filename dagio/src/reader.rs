@@ -1,5 +1,7 @@
-use crate::{Dagio, DagioLink, DagioLoad};
+use crate::{Dagio, DagioLoad};
 use async_trait::async_trait;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use pin_project::pin_project;
 use tokio::io::AsyncRead;
@@ -15,11 +17,14 @@ impl<S> DagioLoad<S> for DagioReader<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(
+        dagio: &Dagio<S>,
+        link: &Link<CidMeta<S::CID>>,
+    ) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind::File;
 
-        let key = link.peek_key_kind(File)?;
-        dagio.0.open_reader(key).await.map(DagioReader)
+        let cid = link.peek_cid_kind(File)?;
+        dagio.0.open_reader(cid).await.map(DagioReader)
     }
 }
 

@@ -1,6 +1,7 @@
-use crate::{Dagio, DagioCommit, DagioLink};
+use crate::{Dagio, DagioCommit};
 use async_trait::async_trait;
-use pangalactic_layer_cidmeta::CidMetaLayer;
+use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use pin_project::pin_project;
 use tokio::io::AsyncWrite;
@@ -24,7 +25,10 @@ impl<S> DagioCommit<S> for DagioWriter<S>
 where
     S: Store,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+    async fn commit_into_dagio(
+        self,
+        dagio: &mut Dagio<S>,
+    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::File;
 

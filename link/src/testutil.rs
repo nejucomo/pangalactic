@@ -12,8 +12,6 @@ pub struct FakeStore;
 
 #[async_trait]
 impl Store for FakeStore {
-    const TAG: &'static str = "<FakeStore>";
-
     type CID = FakeKey;
     type Reader = tokio::io::Empty;
     type Writer = tokio::io::Sink;

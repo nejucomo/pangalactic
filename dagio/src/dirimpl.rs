@@ -1,14 +1,19 @@
-use crate::{Dagio, DagioCommit, DagioHostDirectory, DagioLink, DagioLoad};
+use crate::{Dagio, DagioCommit, DagioLoad};
 use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioCommit<S> for DagioHostDirectory<S>
+impl<S> DagioCommit<S> for HostDirectory<S::CID>
 where
     S: Store,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+    async fn commit_into_dagio(
+        self,
+        dagio: &mut Dagio<S>,
+    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::Dir;
         use pangalactic_serialization::serialize;
@@ -26,13 +31,16 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<const K: usize, S, N> DagioCommit<S> for [(N, DagioLink<S>); K]
+impl<const K: usize, S, N> DagioCommit<S> for [(N, Link<CidMeta<S::CID>>); K]
 where
     S: Store,
     N: Send,
     String: From<N>,
 {
-    async fn commit_into_dagio(self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+    async fn commit_into_dagio(
+        self,
+        dagio: &mut Dagio<S>,
+    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
         dagio
             .commit(HostDirectory::from_iter(self.into_iter()))
             .await
@@ -44,7 +52,10 @@ impl<S> DagioCommit<S> for tokio::fs::ReadDir
 where
     S: Store,
 {
-    async fn commit_into_dagio(mut self, dagio: &mut Dagio<S>) -> anyhow::Result<DagioLink<S>> {
+    async fn commit_into_dagio(
+        mut self,
+        dagio: &mut Dagio<S>,
+    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
         use anyhow_std::OsStrAnyhow;
 
         let mut hd = HostDirectory::default();
@@ -59,16 +70,19 @@ where
 }
 
 #[cfg_attr(not(doc), async_trait)]
-impl<S> DagioLoad<S> for DagioHostDirectory<S>
+impl<S> DagioLoad<S> for HostDirectory<S::CID>
 where
     S: Store,
 {
-    async fn load_from_dagio(dagio: &Dagio<S>, link: &DagioLink<S>) -> anyhow::Result<Self> {
+    async fn load_from_dagio(
+        dagio: &Dagio<S>,
+        link: &Link<CidMeta<S::CID>>,
+    ) -> anyhow::Result<Self> {
         use pangalactic_link::Link;
         use pangalactic_linkkind::LinkKind::{Dir, File};
 
-        let key = link.peek_key_kind(Dir)?;
-        let translink = Link::new(File, key.clone());
+        let cid = link.peek_cid_kind(Dir)?;
+        let translink = Link::new(File, cid.clone());
         let bytes: Vec<u8> = dagio.load(&translink).await?;
         let dir = pangalactic_serialization::deserialize(bytes)?;
         Ok(dir)

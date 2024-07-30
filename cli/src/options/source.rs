@@ -1,13 +1,16 @@
-use crate::store::CliStorePath;
-use pangalactic_link::SCHEME_PREFIX;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
+
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::SCHEME_PREFIX;
 
 #[derive(Debug)]
 pub enum Source {
     Stdin,
     Host(PathBuf),
-    Store(CliStorePath),
+    Store(StorePath<CidMeta<<DirDbStore as pangalactic_store::Store>::CID>>),
 }
+use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_storepath::StorePath;
 use Source::*;
 
 impl Clone for Source {

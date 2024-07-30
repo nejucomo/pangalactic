@@ -1,9 +1,14 @@
-use pangalactic_dagio::{Dagio, DagioLink};
+use pangalactic_dagio::Dagio;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_schemata::{Attestation, Plan};
+use pangalactic_store::Store;
 use pangalactic_store_mem::MemStore;
 
 mod memtree;
 use self::memtree::MemTree;
+
+type TestLink = Link<CidMeta<<MemStore as Store>::CID>>;
 
 #[tokio::test]
 async fn gzip_gunzip() -> anyhow::Result<()> {
@@ -50,13 +55,13 @@ where
 async fn run_phase(
     mut dagio: Dagio<MemStore>,
     execname: &str,
-    input: DagioLink<MemStore>,
-) -> anyhow::Result<(Dagio<MemStore>, Attestation<DagioLink<MemStore>>)> {
+    input: TestLink,
+) -> anyhow::Result<(Dagio<MemStore>, Attestation<TestLink>)> {
     let exec = dagio
         .commit(pangalactic_guests::get_wasm_bytes(execname)?)
         .await?;
     let plan = dagio.commit(Plan { exec, input }).await?;
     let (dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
-    let att: Attestation<DagioLink<MemStore>> = dagio.load(&attestation).await?;
+    let att: Attestation<TestLink> = dagio.load(&attestation).await?;
     Ok((dagio, att))
 }

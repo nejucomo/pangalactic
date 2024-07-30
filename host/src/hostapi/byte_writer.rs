@@ -1,6 +1,8 @@
 use crate::State;
-use pangalactic_dagio::{DagioLink, DagioWriter};
+use pangalactic_dagio::DagioWriter;
 use pangalactic_handle::Handle;
+use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
@@ -46,7 +48,7 @@ where
 pub(super) async fn commit<S>(
     mut caller: Caller<'_, State<S>>,
     h_bw: Handle<DagioWriter<S>>,
-) -> Result<Handle<DagioLink<S>>, Trap>
+) -> Result<Handle<Link<CidMeta<S::CID>>>, Trap>
 where
     S: Store,
 {
