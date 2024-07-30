@@ -174,9 +174,13 @@ impl MkSource {
         status: ExitStatus,
         output: String,
     ) -> anyhow::Result<()> {
-        if let Some(expected) = self.expected_output(mkdest) {
+        if let Some((constname, expected)) = self.expected_output(mkdest) {
             status.exit_ok()?;
-            assert_eq!(output.trim_end(), expected);
+            assert_eq!(
+                output.trim_end(),
+                expected,
+                "mismatched const {constname:?}"
+            );
             self.verify_host_dest(mkdest, testcasedir)?;
         } else {
             assert!(!status.success());
@@ -185,7 +189,13 @@ impl MkSource {
         Ok(())
     }
 
-    fn expected_output(self, mkdest: MkDest) -> Option<&'static str> {
+    fn expected_output(self, mkdest: MkDest) -> Option<(&'static str, &'static str)> {
+        macro_rules! named_const {
+            ( $constname:ident ) => {
+                Some((stringify!($constname), consts::$constname))
+            };
+        }
+
         // BUG: The error logic here ignores overwrite errors:
         match (self, mkdest) {
             // Any dir headed to stdout is an error:
@@ -194,43 +204,42 @@ impl MkSource {
             | (MkSource::StorePath(Dir), MkDest::Stdout) => None,
 
             // Anything headed to host produces empty output without error:
-            (_, MkDest::Host) => Some(""),
+            (_, MkDest::Host) => Some(("(empty)", "")),
 
             // echo
-            (MkSource::Stdin, MkDest::Stdout) => Some(MkSource::Stdin.stdin()),
+            (MkSource::Stdin, MkDest::Stdout) => named_const!(STDIN_CONTENTS),
 
             // cat
-            (MkSource::Host(File), MkDest::Stdout) => Some(consts::HOST_FILE_CONTENTS),
-            (MkSource::StoreCID(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS),
-            (MkSource::StorePath(File), MkDest::Stdout) => Some(consts::STORE_FILE_CONTENTS_2),
+            (MkSource::Host(File), MkDest::Stdout) => named_const!(HOST_FILE_CONTENTS),
+            (MkSource::StoreCID(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS),
+            (MkSource::StorePath(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
 
             // All writes into the store output a CID:
-            (MkSource::Stdin, MkDest::StoreBare) => Some(consts::STDIN_TO_STORE_BARE),
-            (MkSource::Stdin, MkDest::StoreDest) => Some(consts::STDIN_TO_STORE_DEST),
-            (MkSource::Host(File), MkDest::StoreBare) => Some(consts::HOST_FILE_TO_STORE_BARE),
-            (MkSource::Host(Dir), MkDest::StoreBare) => Some(consts::MKSOURCE_DIR_CID),
-            (MkSource::Host(File), MkDest::StoreDest) => Some(consts::HOST_FILE_TO_STORE_DEST),
-            (MkSource::Host(Dir), MkDest::StoreDest) => Some(consts::HOST_DIR_TO_STORE_DEST),
-
-            // Copying any cid to `pg:` is a no-op because it's a deduplicated store:
-            (MkSource::StoreCID(_), MkDest::StoreBare) => Some(self.to_arg()),
+            (MkSource::Stdin, MkDest::StoreBare) => named_const!(STDIN_TO_STORE_BARE),
+            (MkSource::Stdin, MkDest::StoreDest) => named_const!(STDIN_TO_STORE_DEST),
+            (MkSource::Host(File), MkDest::StoreBare) => named_const!(HOST_FILE_TO_STORE_BARE),
+            (MkSource::Host(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
+            (MkSource::Host(File), MkDest::StoreDest) => named_const!(HOST_FILE_TO_STORE_DEST),
+            (MkSource::Host(Dir), MkDest::StoreDest) => named_const!(HOST_DIR_TO_STORE_DEST),
+            (MkSource::StoreCID(File), MkDest::StoreBare) => named_const!(MKSOURCE_FILE_CID),
+            (MkSource::StoreCID(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
             (MkSource::StoreCID(File), MkDest::StoreDest) => {
-                Some(consts::STORE_CID_FILE_TO_STORE_DEST)
+                named_const!(STORE_CID_FILE_TO_STORE_DEST)
             }
             (MkSource::StoreCID(Dir), MkDest::StoreDest) => {
-                Some(consts::STORE_CID_DIR_TO_STORE_DEST)
+                named_const!(STORE_CID_DIR_TO_STORE_DEST)
             }
             (MkSource::StorePath(File), MkDest::StoreBare) => {
-                Some(consts::STORE_PATH_FILE_TO_STORE_BARE)
+                named_const!(STORE_PATH_FILE_TO_STORE_BARE)
             }
             (MkSource::StorePath(Dir), MkDest::StoreBare) => {
-                Some(consts::STORE_PATH_DIR_TO_STORE_BARE)
+                named_const!(STORE_PATH_DIR_TO_STORE_BARE)
             }
             (MkSource::StorePath(File), MkDest::StoreDest) => {
-                Some(consts::STORE_PATH_FILE_TO_STORE_DEST)
+                named_const!(STORE_PATH_FILE_TO_STORE_DEST)
             }
             (MkSource::StorePath(Dir), MkDest::StoreDest) => {
-                Some(consts::STORE_PATH_DIR_TO_STORE_DEST)
+                named_const!(STORE_PATH_DIR_TO_STORE_DEST)
             }
         }
     }
