@@ -10,5 +10,6 @@ async-trait.workspace = true
 blake3.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-cid.workspace = true
+pin-project.workspace = true
 serde.workspace = true
 tokio.workspace = true
