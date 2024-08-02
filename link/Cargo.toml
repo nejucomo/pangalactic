@@ -13,10 +13,10 @@ async-trait.workspace = true
 pangalactic-chomper.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-serialization.workspace = true
-pangalactic-store.workspace = true
 serde.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]
 async-trait.workspace = true
+pangalactic-store.workspace = true
 test-case.workspace = true

@@ -1,25 +1,16 @@
 use std::fmt::Debug;
 
 use async_trait::async_trait;
+use pangalactic_cid::ContentIdentifier;
 use tokio::io::{AsyncRead, AsyncWrite};
 
-use crate::{Commit, Load, StoreCid};
+use crate::{Commit, Load};
 
 // Documentation readability hack; see https://github.com/dtolnay/async-trait/issues/213#issuecomment-1559690487
 #[cfg_attr(doc, feature(async_fn_in_trait))]
 #[cfg_attr(not(doc), async_trait)]
 pub trait Store: Sized + Debug + Send + Sync {
-    /// An acronym for `Content IDentifier` required to have these properties beyond the type
-    /// signature:
-    ///
-    /// - Inserting the same bytes sequence into a store multiple times produces the same `CID` on
-    ///   any host.
-    /// - Two distinct byte sequences never produce the same `CID` upon insertion into the store on
-    ///   any host.
-    /// - A `CID` should be concise.
-    ///
-    /// Cryptographic hash functions over the content are assumed to meet these properties.
-    type CID: StoreCid;
+    type CID: ContentIdentifier;
     type Reader: Load<Self> + AsyncRead + Unpin + Send + Sync;
     type Writer: Commit<Self> + AsyncWrite + Unpin + Send + Sync;
 
