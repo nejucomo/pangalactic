@@ -1,11 +1,11 @@
 use async_trait::async_trait;
-use pangalactic_store::{Store, StoreCid};
+use pangalactic_store::{ContentIdentifier, Store};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub struct FakeKey;
 
-impl StoreCid for FakeKey {}
+impl ContentIdentifier for FakeKey {}
 
 #[derive(Debug)]
 pub struct FakeStore;

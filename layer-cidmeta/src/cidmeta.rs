@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use pangalactic_store::StoreCid;
+use pangalactic_cid::ContentIdentifier;
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
@@ -16,7 +16,7 @@ impl<C> CidMeta<C> {
     }
 }
 
-impl<C> StoreCid for CidMeta<C> where
+impl<C> ContentIdentifier for CidMeta<C> where
     C: Clone + Debug + Eq + Send + Sync + Serialize + DeserializeOwned
 {
 }
