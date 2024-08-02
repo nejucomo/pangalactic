@@ -5,6 +5,25 @@ use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
 use pangalactic_store::Store;
 
+// FIXME: This should go with HostDirectory impl crate:
+#[cfg_attr(not(doc), async_trait)]
+impl<'a, S> Commit<S> for &'a Path
+where
+    S: Store,
+{
+    async fn commit_into_store(self, store: &mut S) -> anyhow::Result<S::CID> {
+        if self.is_file() {
+            let f = tokio::fs::File::open(self).await?;
+            store.commit(f).await
+        } else if self.is_dir() {
+            let rd = tokio::fs::read_dir(self).await?;
+            store.commit(rd).await
+        } else {
+            anyhow::bail!("Unknown host fs node type: {:?}", self.display())
+        }
+    }
+}
+
 #[cfg_attr(not(doc), async_trait)]
 impl<S> DagioCommit<S> for HostDirectory<S::CID>
 where
