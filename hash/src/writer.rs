@@ -10,30 +10,30 @@ use crate::{Hash, Hasher};
 
 #[derive(Debug)]
 #[pin_project]
-pub struct Writer<W> {
+pub struct HashWriter<W> {
     #[pin]
     inner: W,
     hasher: Hasher,
 }
 
-impl<W> Writer<W> {
+impl<W> HashWriter<W> {
     pub fn unwrap(self) -> (W, Hash) {
-        let Writer { inner, hasher } = self;
+        let HashWriter { inner, hasher } = self;
         let hash = hasher.finalize();
         (inner, hash)
     }
 }
 
-impl<W> From<W> for Writer<W> {
+impl<W> From<W> for HashWriter<W> {
     fn from(inner: W) -> Self {
-        Writer {
+        HashWriter {
             inner,
             hasher: Hasher::default(),
         }
     }
 }
 
-impl<W> AsyncWrite for Writer<W>
+impl<W> AsyncWrite for HashWriter<W>
 where
     W: AsyncWrite,
 {

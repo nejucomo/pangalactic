@@ -2,8 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use pangalactic_hash::Hash;
-use pangalactic_hash::Writer as HashWriter;
+use pangalactic_hash::{Hash, HashWriter};
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::Reader;
