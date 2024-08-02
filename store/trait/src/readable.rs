@@ -8,35 +8,6 @@ use crate::{Commit, Load, Store};
 #[pin_project]
 pub struct Readable<R>(#[pin] pub R);
 
-// #[cfg_attr(not(doc), async_trait)]
-// impl<S> DagioLoad<S> for Readable<S>
-// where
-//     S: Store,
-// {
-//     async fn load_from_dagio(
-//         dagio: &Dagio<S>,
-//         link: &Link<CidMeta<S::CID>>,
-//     ) -> anyhow::Result<Self> {
-//         use pangalactic_linkkind::LinkKind::File;
-
-//         let cid = link.peek_cid_kind(File)?;
-//         dagio.0.open_reader(cid).await.map(Readable)
-//     }
-// }
-
-impl<R> AsyncRead for Readable<R>
-where
-    R: AsyncRead,
-{
-    fn poll_read(
-        self: std::pin::Pin<&mut Self>,
-        cx: &mut std::task::Context<'_>,
-        buf: &mut tokio::io::ReadBuf<'_>,
-    ) -> std::task::Poll<std::io::Result<()>> {
-        self.project().0.poll_read(cx, buf)
-    }
-}
-
 #[cfg_attr(not(doc), async_trait)]
 impl<S, R> Commit<S> for Readable<R>
 where
@@ -61,5 +32,18 @@ where
     async fn load_from_store(store: &S, cid: &S::CID) -> anyhow::Result<Self> {
         let inner: S::Reader = store.load(cid).await?;
         Ok(Readable(inner))
+    }
+}
+
+impl<R> AsyncRead for Readable<R>
+where
+    R: AsyncRead,
+{
+    fn poll_read(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        self.project().0.poll_read(cx, buf)
     }
 }

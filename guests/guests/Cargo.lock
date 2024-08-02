@@ -30,6 +30,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 
 [[package]]
+name = "anyhow-std"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96300d1be6730904cd40cbc191155459af2815b238a325cdb75b543cb42ab840"
+dependencies = [
+ "anyhow",
+ "derive_more",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -329,6 +339,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-cid"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "pangalactic-dir"
 version = "0.1.0"
 dependencies = [
@@ -362,8 +379,10 @@ dependencies = [
  "anyhow",
  "async-trait",
  "derive_more",
+ "pangalactic-cid",
  "pangalactic-serialization",
  "pangalactic-store",
+ "pin-project",
  "serde",
  "tokio",
 ]
@@ -377,7 +396,6 @@ dependencies = [
  "pangalactic-chomper",
  "pangalactic-linkkind",
  "pangalactic-serialization",
- "pangalactic-store",
  "serde",
  "tokio",
 ]
@@ -420,11 +438,34 @@ name = "pangalactic-store"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "anyhow-std",
  "async-trait",
  "pangalactic-chomper",
+ "pangalactic-cid",
  "pangalactic-serialization",
+ "pin-project",
  "serde",
  "tokio",
+]
+
+[[package]]
+name = "pin-project"
+version = "1.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6bf43b791c5b9e34c3d182969b4abb522f9343702850a2e57f460d00d09b4b3"
+dependencies = [
+ "pin-project-internal",
+]
+
+[[package]]
+name = "pin-project-internal"
+version = "1.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f38a4412a78282e09a2cf38d195ea5420d15ba0602cb375210efbc877243965"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.41",
 ]
 
 [[package]]

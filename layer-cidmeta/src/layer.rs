@@ -1,9 +1,10 @@
-use crate::{CidMeta, Writer};
 use async_trait::async_trait;
 use pangalactic_store::Store;
 
+use crate::{CidMeta, Reader, Writer};
+
 #[derive(Debug, Default, derive_more::From)]
-pub struct CidMetaLayer<S>(S)
+pub struct CidMetaLayer<S>(pub(crate) S)
 where
     S: Store;
 
@@ -13,24 +14,11 @@ where
     S: Store,
 {
     type CID = CidMeta<S::CID>;
-    type Reader = <S as Store>::Reader;
+    type Reader = Reader<S::Reader>;
     type Writer = Writer<<S as Store>::Writer>;
-
-    async fn open_reader(&self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
-        self.0.open_reader(&key.cid).await
-    }
 
     async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         let writer = self.0.open_writer().await?;
         Ok(Writer { writer, written: 0 })
-    }
-
-    async fn commit_writer(
-        &mut self,
-        Writer { writer, written }: Self::Writer,
-    ) -> anyhow::Result<Self::CID> {
-        let cid = self.0.commit_writer(writer).await?;
-        let node_size = u64::try_from(written).expect("usize->u64 conversion failure");
-        Ok(CidMeta { cid, node_size })
     }
 }
