@@ -1,51 +1,47 @@
-use std::marker::Unpin;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
 use async_trait::async_trait;
 use pangalactic_store::{Commit, Store};
+use pin_project::pin_project;
 use tokio::io::AsyncWrite;
 
 use crate::{CidMeta, CidMetaLayer};
 
 #[derive(Debug)]
+#[pin_project]
 pub struct Writer<W>
 where
-    W: AsyncWrite + Unpin,
+    W: AsyncWrite,
 {
+    #[pin]
     pub(crate) writer: W,
     pub(crate) written: usize,
 }
 
 impl<W> AsyncWrite for Writer<W>
 where
-    // BUG: Replace `Unpin` bound with `pin_project`
-    W: AsyncWrite + Unpin,
+    W: AsyncWrite,
 {
     fn poll_write(
         self: Pin<&mut Self>,
         cx: &mut Context<'_>,
         buf: &[u8],
     ) -> Poll<std::io::Result<usize>> {
-        let mutself = Pin::get_mut(self);
-        let pininner = Pin::new(&mut mutself.writer);
-        let poll = AsyncWrite::poll_write(pininner, cx, buf);
+        let proj = self.project();
+        let poll = proj.writer.poll_write(cx, buf);
         if let Poll::Ready(Ok(written)) = &poll {
-            mutself.written += *written;
+            *proj.written += *written;
         }
         poll
     }
 
     fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-        let mutself = Pin::get_mut(self);
-        let pininner = Pin::new(&mut mutself.writer);
-        AsyncWrite::poll_flush(pininner, cx)
+        self.project().writer.poll_flush(cx)
     }
 
     fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-        let mutself = Pin::get_mut(self);
-        let pininner = Pin::new(&mut mutself.writer);
-        AsyncWrite::poll_shutdown(pininner, cx)
+        self.project().writer.poll_shutdown(cx)
     }
 }
 
