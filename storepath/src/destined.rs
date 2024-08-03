@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use pangalactic_hostdir::HostDirectory;
 use pangalactic_store::{Commit, Store};
 
-use crate::{PathLayer, StoreDestination, StorePath, ViaPath};
+use crate::{PathLayer, StoreDestination, StorePath};
 
 #[derive(Debug)]
 pub struct Destined<'a, C, T> {
@@ -36,20 +36,20 @@ where
         let (last, intermediate) = dest.path().split_last();
 
         for name in intermediate {
-            let ViaPath(d): ViaPath<HostDirectory<S::CID>> = store.load(&dirlink).await?;
+            let d: HostDirectory<S::CID> = store.load(&dirlink).await?;
             dirlink = StorePath::from(d.get_required(name)?.clone());
             stack.push((d, name));
         }
 
-        let ViaPath(mut d): ViaPath<HostDirectory<S::CID>> = store.load(&dirlink).await?;
+        let mut d: HostDirectory<S::CID> = store.load(&dirlink).await?;
         d.insert(last.clone(), link)?;
 
         for (mut prevd, name) in stack.into_iter().rev() {
-            link = store.commit(ViaPath(d)).await?.unwrap_pathless_link()?;
+            link = store.commit(d).await?.unwrap_pathless_link()?;
             prevd.overwrite(name.clone(), link);
             d = prevd;
         }
 
-        store.commit(ViaPath(d)).await
+        store.commit(d).await
     }
 }
