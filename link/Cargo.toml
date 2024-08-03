@@ -5,7 +5,9 @@ edition.workspace = true
 license.workspace = true
 
 [features]
-testutil = []
+testutil = [
+  "pangalactic-store",
+]
 
 [dependencies]
 anyhow.workspace = true
@@ -14,6 +16,7 @@ pangalactic-chomper.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-serialization.workspace = true
+pangalactic-store = { workspace = true, optional = true }
 serde.workspace = true
 tokio.workspace = true
 
