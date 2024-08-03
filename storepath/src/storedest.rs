@@ -4,6 +4,8 @@ use pangalactic_link::Link;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
 
+use crate::Destined;
+
 #[derive(Clone, Debug, derive_more::Deref)]
 pub struct StoreDestination<C> {
     /// Invariant: self.link.kind() == Dir
@@ -31,6 +33,10 @@ impl<C> StoreDestination<C> {
 
     pub fn path(&self) -> &NonEmptySlice<Name> {
         self.path.as_slice()
+    }
+
+    pub fn bind<T>(&self, value: T) -> Destined<C, T> {
+        Destined::new(self, value)
     }
 }
 

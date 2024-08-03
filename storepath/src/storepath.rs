@@ -43,6 +43,18 @@ impl<C> StorePath<C> {
     pub fn path(&self) -> &[Name] {
         self.path.as_slice()
     }
+
+    pub fn unwrap_pathless_link(self) -> anyhow::Result<Link<C>>
+    where
+        C: fmt::Debug,
+    {
+        if self.path.is_empty() {
+            Ok(self.link)
+        } else {
+            Err(anyhow::anyhow!("expected bare link with no path segments")
+                .context(format!("{self:?}")))
+        }
+    }
 }
 
 impl<C> From<Link<C>> for StorePath<C> {
