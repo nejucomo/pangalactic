@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+anyhow-std.workspace = true
 async-trait.workspace = true
 derive_more.workspace = true
 pangalactic-dir = { workspace = true, features = ["serde"] }
@@ -16,7 +17,7 @@ pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true
 serde.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = [ "fs" ] }
 
 [dev-dependencies]
 pangalactic-hash.workspace = true

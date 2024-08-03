@@ -1,5 +1,6 @@
 mod container;
 mod dirnode;
+mod fsimpls;
 mod hostdir;
 mod layer;
 mod reader;
