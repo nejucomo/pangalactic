@@ -394,6 +394,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "pangalactic-chomper",
+ "pangalactic-cid",
  "pangalactic-linkkind",
  "pangalactic-serialization",
  "serde",

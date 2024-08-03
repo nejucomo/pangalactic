@@ -1,25 +1,32 @@
 use async_trait::async_trait;
+use pangalactic_link::Link;
+use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Load, Store};
 use pin_project::pin_project;
 use tokio::io::AsyncRead;
 
-use crate::{CidMeta, CidMetaLayer};
+use crate::HostDirectoryLayer;
 
 #[pin_project]
 #[derive(Debug)]
 pub struct Reader<R>(#[pin] R);
 
+impl<R> Reader<R> {
+    pub(crate) fn new(r: R) -> Self {
+        Reader(r)
+    }
+}
+
 #[async_trait]
-impl<S> Load<CidMetaLayer<S>> for Reader<S::Reader>
+impl<S> Load<HostDirectoryLayer<S>> for Reader<S::Reader>
 where
     S: Store,
 {
     async fn load_from_store(
-        store: &CidMetaLayer<S>,
-        cid: &CidMeta<S::CID>,
+        store: &HostDirectoryLayer<S>,
+        link: &Link<S::CID>,
     ) -> anyhow::Result<Self> {
-        let inner: S::Reader = store.0.load(&cid.cid).await?;
-        Ok(Reader(inner))
+        store.open_kind_reader(link, LinkKind::File).await
     }
 }
 

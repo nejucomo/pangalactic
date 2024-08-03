@@ -11,6 +11,7 @@ testutil = []
 anyhow.workspace = true
 async-trait.workspace = true
 pangalactic-chomper.workspace = true
+pangalactic-cid.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-serialization.workspace = true
 serde.workspace = true

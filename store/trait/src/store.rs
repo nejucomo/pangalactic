@@ -30,5 +30,6 @@ pub trait Store: Sized + Debug + Send + Sync {
     }
 
     /// Implementors must provide these:
+    // TODO: Move to a distinct inherited trait, eg `StoreProvider`?
     async fn open_writer(&self) -> anyhow::Result<Self::Writer>;
 }

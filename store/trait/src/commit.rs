@@ -41,12 +41,13 @@ where
     }
 }
 
-#[cfg_attr(not(doc), async_trait)]
-impl<S> Commit<S> for tokio::fs::File
-where
-    S: Store,
-{
-    async fn commit_into_store(mut self, store: &mut S) -> anyhow::Result<S::CID> {
-        store.commit(Readable(self)).await
-    }
-}
+// TODO: tokio::fs breaks wasm.
+// #[cfg_attr(not(doc), async_trait)]
+// impl<S> Commit<S> for tokio::fs::File
+// where
+//     S: Store,
+// {
+//     async fn commit_into_store(mut self, store: &mut S) -> anyhow::Result<S::CID> {
+//         store.commit(Readable(self)).await
+//     }
+// }
