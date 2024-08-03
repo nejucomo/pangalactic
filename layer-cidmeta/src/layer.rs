@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use pangalactic_store::Store;
+use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{CidMeta, Reader, Writer};
 
@@ -12,6 +13,7 @@ where
 impl<S> Store for CidMetaLayer<S>
 where
     S: Store,
+    S::CID: Serialize + DeserializeOwned,
 {
     type CID = CidMeta<S::CID>;
     type Reader = Reader<S::Reader>;

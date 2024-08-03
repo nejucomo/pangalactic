@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use pangalactic_store::{Load, Store};
 use pin_project::pin_project;
+use serde::{de::DeserializeOwned, Serialize};
 use tokio::io::AsyncRead;
 
 use crate::{CidMeta, CidMetaLayer};
@@ -13,6 +14,7 @@ pub struct Reader<R>(#[pin] R);
 impl<S> Load<CidMetaLayer<S>> for Reader<S::Reader>
 where
     S: Store,
+    S::CID: Serialize + DeserializeOwned,
 {
     async fn load_from_store(
         store: &CidMetaLayer<S>,

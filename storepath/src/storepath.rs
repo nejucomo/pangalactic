@@ -1,3 +1,4 @@
+use pangalactic_cid::ContentIdentifier;
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
@@ -13,6 +14,8 @@ pub struct StorePath<C> {
     /// Invariant: if self.link.kind() == File then path.is_empty
     path: Vec<Name>,
 }
+
+impl<C> ContentIdentifier for StorePath<C> {}
 
 impl<C> StorePath<C> {
     pub fn new(link: Link<C>, path: Vec<Name>) -> anyhow::Result<Self>

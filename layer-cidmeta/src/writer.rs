@@ -4,6 +4,8 @@ use std::task::{Context, Poll};
 use async_trait::async_trait;
 use pangalactic_store::{Commit, Store};
 use pin_project::pin_project;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tokio::io::AsyncWrite;
 
 use crate::{CidMeta, CidMetaLayer};
@@ -23,6 +25,7 @@ where
 impl<S> Commit<CidMetaLayer<S>> for Writer<S::Writer>
 where
     S: Store,
+    S::CID: Serialize + DeserializeOwned,
 {
     async fn commit_into_store(
         self,
