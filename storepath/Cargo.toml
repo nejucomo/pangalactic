@@ -15,7 +15,9 @@ pangalactic-hostdir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-store.workspace = true
+pin-project.workspace = true
 serde.workspace = true
+tokio.workspace = true
 
 [dev-dependencies]
 pangalactic-link = { workspace = true, features = ["testutil"] }

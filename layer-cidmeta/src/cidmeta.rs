@@ -25,7 +25,7 @@ impl<C> ContentIdentifier for CidMeta<C> where
 {
 }
 
-const STRINGIFIED_PREFIX: &'static str = "rawcidmeta";
+const STRINGIFIED_PREFIX: &str = "rawcidmeta";
 
 impl<C> Display for CidMeta<C>
 where

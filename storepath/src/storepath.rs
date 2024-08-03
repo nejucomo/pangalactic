@@ -1,21 +1,24 @@
+use std::fmt;
+use std::str::FromStr;
+
 use pangalactic_cid::ContentIdentifier;
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
-use std::fmt;
-use std::str::FromStr;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, derive_more::Deref)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct StorePath<C> {
-    #[deref]
     link: Link<C>,
     /// Invariant: if self.link.kind() == File then path.is_empty
     path: Vec<Name>,
 }
 
-impl<C> ContentIdentifier for StorePath<C> {}
+impl<C> ContentIdentifier for StorePath<C> where
+    C: Clone + fmt::Debug + Eq + PartialEq + DeserializeOwned + Serialize + Send + Sync
+{
+}
 
 impl<C> StorePath<C> {
     pub fn new(link: Link<C>, path: Vec<Name>) -> anyhow::Result<Self>
@@ -39,6 +42,12 @@ impl<C> StorePath<C> {
 
     pub fn path(&self) -> &[Name] {
         self.path.as_slice()
+    }
+}
+
+impl<C> From<Link<C>> for StorePath<C> {
+    fn from(link: Link<C>) -> Self {
+        StorePath { link, path: vec![] }
     }
 }
 
