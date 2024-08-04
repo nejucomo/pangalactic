@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+use pangalactic_bindref::BindRef;
 use pangalactic_hostdir::{HostDirectory, HostDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 
-use crate::{StorePath, ViaPath};
+use crate::{StoreDestination, StorePath, ViaPath};
 
 #[derive(Debug, Default, derive_more::From)]
 pub struct PathLayer<S>(HostDirectoryLayer<S>)
@@ -66,5 +67,43 @@ where
         let link = store.resolve_path(path).await?;
         let inner = store.0.load(&link).await?;
         Ok(ViaPath(inner))
+    }
+}
+
+#[async_trait]
+impl<'a, S, V> Commit<PathLayer<S>> for BindRef<'a, StoreDestination<S::CID>, V>
+where
+    S: Store,
+    V: Commit<PathLayer<S>> + Send,
+{
+    async fn commit_into_store(
+        self,
+        store: &mut PathLayer<S>,
+    ) -> anyhow::Result<StorePath<S::CID>> {
+        let BindRef { bound, value } = self;
+
+        let valpath = store.commit(value).await?;
+        let mut link = valpath.unwrap_pathless_link()?;
+
+        let mut dirlink = StorePath::from(bound.link().clone());
+        let mut stack = vec![];
+        let (last, intermediate) = bound.path().split_last();
+
+        for name in intermediate {
+            let d: HostDirectory<S::CID> = store.load(&dirlink).await?;
+            dirlink = StorePath::from(d.get_required(name)?.clone());
+            stack.push((d, name));
+        }
+
+        let mut d: HostDirectory<S::CID> = store.load(&dirlink).await?;
+        d.insert(last.clone(), link)?;
+
+        for (mut prevd, name) in stack.into_iter().rev() {
+            link = store.commit(d).await?.unwrap_pathless_link()?;
+            prevd.overwrite(name.clone(), link);
+            d = prevd;
+        }
+
+        store.commit(d).await
     }
 }

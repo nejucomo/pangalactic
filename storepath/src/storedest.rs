@@ -1,10 +1,9 @@
 use not_empty::{NonEmptySlice, NonEmptyVec};
+use pangalactic_bindref::Bindable;
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
-
-use crate::Destined;
 
 #[derive(Clone, Debug, derive_more::Deref)]
 pub struct StoreDestination<C> {
@@ -13,6 +12,8 @@ pub struct StoreDestination<C> {
     link: Link<C>,
     path: NonEmptyVec<Name>,
 }
+
+impl<C> Bindable for StoreDestination<C> {}
 
 impl<C> StoreDestination<C> {
     pub fn new<P>(link: Link<C>, path: P) -> anyhow::Result<Self>
@@ -33,10 +34,6 @@ impl<C> StoreDestination<C> {
 
     pub fn path(&self) -> &NonEmptySlice<Name> {
         self.path.as_slice()
-    }
-
-    pub fn bind<T>(&self, value: T) -> Destined<C, T> {
-        Destined::new(self, value)
     }
 }
 
