@@ -1,12 +1,16 @@
 use std::fmt;
 use std::str::FromStr;
 
+use async_trait::async_trait;
 use pangalactic_cid::ContentIdentifier;
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
+use pangalactic_store::{Commit, Store};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+
+use crate::PathLayer;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct StorePath<C> {
@@ -85,6 +89,32 @@ where
     fn from_str(s: &str) -> anyhow::Result<Self> {
         let (link, parts) = crate::parser::parse_parts(s)?;
         Self::new(link, parts)
+    }
+}
+
+#[async_trait]
+impl<S> Commit<PathLayer<S>> for StorePath<S::CID>
+where
+    S: Store,
+{
+    async fn commit_into_store(
+        self,
+        store: &mut PathLayer<S>,
+    ) -> anyhow::Result<StorePath<S::CID>> {
+        store.commit(&self).await
+    }
+}
+
+#[async_trait]
+impl<'a, S> Commit<PathLayer<S>> for &'a StorePath<S::CID>
+where
+    S: Store,
+{
+    async fn commit_into_store(
+        self,
+        store: &mut PathLayer<S>,
+    ) -> anyhow::Result<StorePath<S::CID>> {
+        store.resolve_path(self).await.map(StorePath::from)
     }
 }
 
