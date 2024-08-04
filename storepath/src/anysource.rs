@@ -8,14 +8,14 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::{PathLayer, StorePath};
 
 #[derive(Debug, Clone)]
-pub enum Source<C> {
+pub enum AnySource<C> {
     Stdin,
     Host(PathBuf),
     Store(StorePath<C>),
 }
-use Source::*;
+use AnySource::*;
 
-impl<C> Display for Source<C>
+impl<C> Display for AnySource<C>
 where
     C: Serialize,
 {
@@ -28,7 +28,7 @@ where
     }
 }
 
-impl<C> FromStr for Source<C>
+impl<C> FromStr for AnySource<C>
 where
     C: std::fmt::Debug + DeserializeOwned,
 {
@@ -46,7 +46,7 @@ where
 }
 
 #[async_trait]
-impl<S> Commit<PathLayer<S>> for Source<S::CID>
+impl<S> Commit<PathLayer<S>> for AnySource<S::CID>
 where
     S: Store,
 {
@@ -57,7 +57,7 @@ where
         match self {
             Stdin => store.commit(Readable(tokio::io::stdin())).await,
             Host(p) => store.commit(p).await,
-            Source::Store(sp) => store.commit(sp).await,
+            AnySource::Store(sp) => store.commit(sp).await,
         }
     }
 }

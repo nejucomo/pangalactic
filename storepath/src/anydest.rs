@@ -1,18 +1,22 @@
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::SCHEME_PREFIX;
-use pangalactic_store_dirdb::DirDbStore;
-use pangalactic_storepath::StoreDestination;
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
+use pangalactic_link::SCHEME_PREFIX;
+use serde::{de::DeserializeOwned, Serialize};
+
+use crate::StoreDestination;
+
 #[derive(Clone, Debug)]
-pub enum Destination {
+pub enum AnyDestination<C> {
     Stdout,
     Host(PathBuf),
-    Store(Option<StoreDestination<CidMeta<<DirDbStore as pangalactic_store::Store>::CID>>>),
+    Store(Option<StoreDestination<C>>),
 }
-use Destination::*;
+use AnyDestination::*;
 
-impl Display for Destination {
+impl<C> Display for AnyDestination<C>
+where
+    C: Serialize,
+{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Stdout => '-'.fmt(f),
@@ -23,7 +27,10 @@ impl Display for Destination {
     }
 }
 
-impl FromStr for Destination {
+impl<C> FromStr for AnyDestination<C>
+where
+    C: DeserializeOwned,
+{
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
