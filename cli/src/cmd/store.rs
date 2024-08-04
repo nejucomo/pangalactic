@@ -7,7 +7,7 @@ use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
-use pangalactic_storepath::StorePath;
+use pangalactic_path::StorePath;
 
 use crate::options::{Destination, Source};
 

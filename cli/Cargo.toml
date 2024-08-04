@@ -16,7 +16,7 @@ pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-store.workspace = true
-pangalactic-storepath.workspace = true
+pangalactic-path.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
 tracing-subscriber.workspace = true

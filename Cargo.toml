@@ -19,12 +19,12 @@ members = [
   "link",
   "linkkind",
 #   "log",
+  "path",
   "primitives",
 #   "schemata",
   "serialization",
   "store/dirdb",
   "store/mem",
-  "storepath",
   "store/trait",
 #   "table",
   "traversal",
@@ -58,12 +58,12 @@ pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-link            = { path = "link"            }
 # pangalactic-log             = { path = "log"             }
+pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 # pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
-pangalactic-storepath       = { path = "storepath"       }
 pangalactic-store           = { path = "store/trait"     }
 # pangalactic-table           = { path = "table"           }
 
