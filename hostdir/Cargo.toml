@@ -13,6 +13,7 @@ pangalactic-dir = { workspace = true, features = ["serde"] }
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-iowrappers.workspace = true
 pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true

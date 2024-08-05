@@ -1,0 +1,14 @@
+[package]
+name = "pangalactic-transfer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+pangalactic-bindref.workspace = true
+pangalactic-hostdir.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-path.workspace = true
+pangalactic-store.workspace = true
+tokio = { workspace = true, features = [ "fs", "io-std" ] }

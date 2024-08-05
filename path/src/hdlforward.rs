@@ -44,3 +44,4 @@ forward_impl!(Load pangalactic_hostdir::DirNodeReader<S>);
 forward_impl!(Commit std::path::PathBuf);
 forward_impl!(Commit &'a std::path::Path);
 forward_impl!(Commit tokio::fs::File);
+forward_impl!(Commit tokio::fs::ReadDir);

@@ -13,6 +13,7 @@ pangalactic-bindref.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-hostdir.workspace = true
+pangalactic-iowrappers.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-store.workspace = true

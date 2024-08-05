@@ -15,6 +15,10 @@ impl<R> Reader<R> {
     pub(crate) fn new(r: R) -> Self {
         Reader(r)
     }
+
+    pub fn unwrap(self) -> R {
+        self.0
+    }
 }
 
 #[async_trait]

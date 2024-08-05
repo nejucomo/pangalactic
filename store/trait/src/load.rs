@@ -1,4 +1,4 @@
-use crate::{Readable, Store};
+use crate::Store;
 use async_trait::async_trait;
 
 #[cfg_attr(not(doc), async_trait)]
@@ -18,7 +18,6 @@ where
 //     async fn load_from_store(_: &S, cid: &S::CID) -> anyhow::Result<Self> {
 //         Ok(cid.clone())
 //     }
-// }
 
 #[cfg_attr(not(doc), async_trait)]
 impl<S> Load<S> for Vec<u8>
@@ -28,7 +27,7 @@ where
     async fn load_from_store(store: &S, cid: &S::CID) -> anyhow::Result<Self> {
         use tokio::io::AsyncReadExt;
 
-        let mut r: Readable<S::Reader> = store.load(cid).await?;
+        let mut r: S::Reader = store.load(cid).await?;
         let mut buf = vec![];
         r.read_to_end(&mut buf).await?;
         Ok(buf)

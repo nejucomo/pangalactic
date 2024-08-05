@@ -5,10 +5,8 @@
 
 mod commit;
 mod load;
-mod readable;
 mod store;
 
 pub use self::commit::Commit;
 pub use self::load::Load;
-pub use self::readable::Readable;
 pub use self::store::Store;

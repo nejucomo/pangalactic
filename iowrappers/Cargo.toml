@@ -1,0 +1,9 @@
+[package]
+name = "pangalactic-iowrappers"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pin-project.workspace = true
+tokio.workspace = true

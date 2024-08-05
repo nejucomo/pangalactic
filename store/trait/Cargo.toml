@@ -8,10 +8,11 @@ license.workspace = true
 anyhow.workspace = true
 anyhow-std.workspace = true
 async-trait.workspace = true
+pangalactic-bindref.workspace = true
 pangalactic-chomper.workspace = true
 pangalactic-cid.workspace = true
+pangalactic-iowrappers.workspace = true
 pangalactic-serialization.workspace = true
 pin-project.workspace = true
 serde.workspace = true
-# tokio = { workspace = true, features=["fs"] }
-tokio.workspace = true # FIXME: Feature fs breaks wasm guests
+tokio.workspace = true

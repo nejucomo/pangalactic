@@ -1,8 +1,9 @@
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 use async_trait::async_trait;
+use pangalactic_iowrappers::Readable;
 use pangalactic_link::SCHEME_PREFIX;
-use pangalactic_store::{Commit, Readable, Store};
+use pangalactic_store::{Commit, Store};
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{PathLayer, StorePath};

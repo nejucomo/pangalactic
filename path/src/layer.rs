@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use pangalactic_bindref::BindRef;
+use pangalactic_bindref::{BindRef, Bindable};
 use pangalactic_hostdir::{HostDirectory, HostDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
@@ -10,6 +10,8 @@ use crate::{StoreDestination, StorePath, ViaPath};
 pub struct PathLayer<S>(HostDirectoryLayer<S>)
 where
     S: Store;
+
+impl<S> Bindable for PathLayer<S> where S: Store {}
 
 impl<S> PathLayer<S>
 where
