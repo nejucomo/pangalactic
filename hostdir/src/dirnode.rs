@@ -1,16 +1,17 @@
 use async_trait::async_trait;
+use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Load, Store};
 
-use crate::{HostDirectory, HostDirectoryLayer, Reader};
+use crate::{HostDirectory, HostDirectoryLayer};
 
 #[derive(Debug)]
 pub enum DirNodeReader<S>
 where
     S: Store,
 {
-    File(Reader<S::Reader>),
+    File(Readable<S::Reader>),
     Dir(HostDirectory<S::CID>),
 }
 

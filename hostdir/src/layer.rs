@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
-use pangalactic_store::{Commit, Store};
+use pangalactic_store::{Commit, Load, Store};
 
-use crate::{Reader, Writer};
+use crate::Writer;
 
 #[derive(Debug, Default, derive_more::From)]
 pub struct HostDirectoryLayer<S>(S)
@@ -16,7 +17,7 @@ where
     S: Store,
 {
     type CID = Link<S::CID>;
-    type Reader = Reader<S::Reader>;
+    type Reader = Readable<S::Reader>;
     type Writer = Writer<S::Writer>;
 
     async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
@@ -52,7 +53,7 @@ where
         &self,
         link: &Link<S::CID>,
         expected: LinkKind,
-    ) -> anyhow::Result<Reader<S::Reader>> {
+    ) -> anyhow::Result<Readable<S::Reader>> {
         let (kind, reader) = self.open_any_reader(link).await?;
         kind.require_kind(expected)?;
         Ok(reader)
@@ -61,9 +62,22 @@ where
     pub(crate) async fn open_any_reader(
         &self,
         link: &Link<S::CID>,
-    ) -> anyhow::Result<(LinkKind, Reader<S::Reader>)> {
+    ) -> anyhow::Result<(LinkKind, Readable<S::Reader>)> {
         let kind = link.kind();
         let inner: S::Reader = self.0.load(link.peek_cid()).await?;
-        Ok((kind, Reader::new(inner)))
+        Ok((kind, Readable(inner)))
+    }
+}
+
+#[async_trait]
+impl<S> Load<HostDirectoryLayer<S>> for Readable<S::Reader>
+where
+    S: Store,
+{
+    async fn load_from_store(
+        store: &HostDirectoryLayer<S>,
+        link: &Link<S::CID>,
+    ) -> anyhow::Result<Self> {
+        store.open_kind_reader(link, LinkKind::File).await
     }
 }

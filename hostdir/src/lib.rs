@@ -3,13 +3,11 @@ mod dirnode;
 mod fsimpls;
 mod hostdir;
 mod layer;
-mod reader;
 mod writer;
 
 pub use self::dirnode::DirNodeReader;
 pub use self::hostdir::HostDirectory;
 pub use self::layer::HostDirectoryLayer;
-pub use self::reader::Reader;
 pub use self::writer::Writer;
 pub use pangalactic_dir::{Name, NameRef};
 

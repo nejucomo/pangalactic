@@ -21,6 +21,15 @@ where
     pub(crate) written: usize,
 }
 
+impl<W> From<W> for Writer<W>
+where
+    W: AsyncWrite,
+{
+    fn from(writer: W) -> Self {
+        Writer { writer, written: 0 }
+    }
+}
+
 #[async_trait]
 impl<S> Commit<CidMetaLayer<S>> for Writer<S::Writer>
 where

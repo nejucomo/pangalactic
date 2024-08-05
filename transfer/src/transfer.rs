@@ -244,19 +244,6 @@ where
     }
 }
 
-impl<S, D> TransferInto<S, D> for pangalactic_hostdir::Reader<S::Reader>
-where
-    S: Store,
-    D: Destination,
-    Readable<S::Reader>: TransferInto<S, D>,
-{
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID> {
-        Readable(self.unwrap())
-            .transfer_into(store, destination)
-            .await
-    }
-}
-
 async fn transfer_to_any_destination<T, S>(
     source: T,
     store: &mut PathLayer<S>,
