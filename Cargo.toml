@@ -5,7 +5,7 @@ members = [
   "bindref",
   "chomper",
   "cid",
-#   "cli",
+  "cli",
 #   "dagio",
   "dir",
 #   "guest",
@@ -45,7 +45,7 @@ pangalactic-b64             = { path = "b64"             }
 pangalactic-bindref         = { path = "bindref"         }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
-# pangalactic-cli             = { path = "cli"             }
+pangalactic-cli             = { path = "cli"             }
 pangalactic-dag-traversal   = { path = "traversal"       }
 # pangalactic-dagio             = { path = "dagio"             }
 pangalactic-dir             = { path = "dir"             }

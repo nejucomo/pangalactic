@@ -1,23 +1,17 @@
-mod dest;
-mod source;
-
-pub use self::dest::Destination;
-pub use self::source::Source;
-
+use anyhow::Result;
 use async_trait::async_trait;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
-use pangalactic_store::Store;
-use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_path::{AnyDestination, AnySource};
+use pangalactic_stdstore::{
+    StandardAnyDestination, StandardAnySource, StandardPath, StandardStore,
+};
+use pangalactic_transfer::Transferor;
 
-use crate::cmd::StoreCommander;
-
-#[cfg_attr(not(doc), async_trait)]
+#[async_trait]
 #[enum_dispatch]
 pub trait Runnable {
-    async fn run(self) -> anyhow::Result<()>;
+    async fn run(self) -> Result<Option<StandardPath>>;
 }
 
 #[derive(Debug, Parser)]
@@ -33,9 +27,9 @@ impl Options {
     }
 }
 
-#[cfg_attr(not(doc), async_trait)]
+#[async_trait]
 impl Runnable for Options {
-    async fn run(self) -> anyhow::Result<()> {
+    async fn run(self) -> Result<Option<StandardPath>> {
         self.command.unwrap().run().await
     }
 }
@@ -60,45 +54,43 @@ pub enum StoreCommand {
 #[derive(Debug, Args)]
 pub struct StorePutOptions {}
 
-#[cfg_attr(not(doc), async_trait)]
+#[async_trait]
 impl Runnable for StorePutOptions {
-    async fn run(self) -> anyhow::Result<()> {
-        let mut sc = StoreCommander::default();
-        let link = sc.put().await?;
-        println!("{link}");
-        Ok(())
+    async fn run(self) -> Result<Option<StandardPath>> {
+        let mut store = StandardStore::default();
+        store
+            .transfer(AnySource::Stdin, AnyDestination::Store(None))
+            .await
     }
 }
 
 /// Send the given file to stdout
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
-    /// The link to get
-    pub link: Link<CidMeta<<DirDbStore as Store>::CID>>,
+    /// The source to get
+    pub source: StandardAnySource,
 }
 
-#[cfg_attr(not(doc), async_trait)]
+#[async_trait]
 impl Runnable for StoreGetOptions {
-    async fn run(self) -> anyhow::Result<()> {
-        let mut sc = StoreCommander::default();
-        sc.get(&self.link).await
+    async fn run(self) -> Result<Option<StandardPath>> {
+        let mut store = StandardStore::default();
+        store.transfer(self.source, AnyDestination::Stdout).await?;
+        Ok(None)
     }
 }
 
 /// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct StoreXferOptions {
-    pub source: Source,
-    pub dest: Destination,
+    pub source: StandardAnySource,
+    pub dest: StandardAnyDestination,
 }
 
-#[cfg_attr(not(doc), async_trait)]
+#[async_trait]
 impl Runnable for StoreXferOptions {
-    async fn run(self) -> anyhow::Result<()> {
-        let mut sc = StoreCommander::default();
-        if let Some(link) = sc.xfer(&self.source, &self.dest).await? {
-            println!("{link}");
-        }
-        Ok(())
+    async fn run(self) -> Result<Option<StandardPath>> {
+        let mut store = StandardStore::default();
+        store.transfer(self.source, self.dest).await
     }
 }

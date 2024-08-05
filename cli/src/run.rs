@@ -6,7 +6,10 @@ pub async fn run() -> anyhow::Result<()> {
     tracing::debug!(?logargs);
     let opts = Options::parse();
     tracing::debug!(?opts);
-    opts.run().await
+    if let Some(path) = opts.run().await? {
+        println!("{path}");
+    }
+    Ok(())
 }
 
 fn init_logging() -> anyhow::Result<()> {
