@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
@@ -15,7 +14,6 @@ where
     Dir(HostDirectory<S::CID>),
 }
 
-#[async_trait]
 impl<S> Load<HostDirectoryLayer<S>> for DirNodeReader<S>
 where
     S: Store,

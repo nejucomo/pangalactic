@@ -1,6 +1,5 @@
 use std::{fmt::Display, path::PathBuf, str::FromStr};
 
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::SCHEME_PREFIX;
 use pangalactic_store::{Commit, Store};
@@ -46,7 +45,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Commit<PathLayer<S>> for AnySource<S::CID>
 where
     S: Store,

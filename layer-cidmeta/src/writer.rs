@@ -1,7 +1,6 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use async_trait::async_trait;
 use pangalactic_store::{Commit, Store};
 use pin_project::pin_project;
 use serde::de::DeserializeOwned;
@@ -30,7 +29,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Commit<CidMetaLayer<S>> for Writer<S::Writer>
 where
     S: Store,

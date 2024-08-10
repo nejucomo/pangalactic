@@ -1,14 +1,10 @@
 use std::fmt::Debug;
 
-use async_trait::async_trait;
 use pangalactic_cid::ContentIdentifier;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 use crate::{Commit, Load};
 
-// Documentation readability hack; see https://github.com/dtolnay/async-trait/issues/213#issuecomment-1559690487
-#[cfg_attr(doc, feature(async_fn_in_trait))]
-#[cfg_attr(not(doc), async_trait)]
 pub trait Store: Sized + Debug + Send + Sync {
     type CID: ContentIdentifier;
     type Reader: Load<Self> + AsyncRead + Unpin + Send + Sync;

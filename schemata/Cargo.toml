@@ -6,7 +6,6 @@ license.workspace = true
 
 [features]
 dagio = [
-  "async-trait",
   "pangalactic-dagio",
   "pangalactic-hostdir",
   "pangalactic-store",
@@ -14,7 +13,6 @@ dagio = [
 
 [dependencies]
 anyhow.workspace = true
-async-trait = { workspace = true, optional = true }
 pangalactic-dagio = { workspace = true, optional = true }
 pangalactic-dir.workspace = true
 pangalactic-hostdir = { workspace = true, optional = true }

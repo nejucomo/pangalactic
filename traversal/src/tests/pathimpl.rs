@@ -1,6 +1,5 @@
 use crate::tests::dagcase::DagCase;
 use anyhow_std::PathAnyhow;
-use async_trait::async_trait;
 use std::{
     borrow::Cow,
     path::{Path, PathBuf},
@@ -17,7 +16,6 @@ fn tempdir_name_prefix() -> String {
     format!("{}_testdata.", env!("CARGO_PKG_NAME"))
 }
 
-#[async_trait]
 impl DagCase for PathBuf {
     type Ctr = &'static [&'static str];
     type Verifier = PathVerifier;

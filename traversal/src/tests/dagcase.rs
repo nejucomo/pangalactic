@@ -1,5 +1,4 @@
 use crate::TraversableDag;
-use async_trait::async_trait;
 use std::fmt::Debug;
 use tokio_stream::Stream;
 
@@ -14,7 +13,6 @@ where
     pub dfs: &'static [D::Verifier],
 }
 
-#[async_trait]
 pub trait DagCase: Clone + TraversableDag<Error = anyhow::Error> {
     type Ctr;
     type Verifier: From<Self> + PartialEq + Debug + 'static;

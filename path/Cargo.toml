@@ -6,7 +6,6 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
 derive_more.workspace = true
 not_empty.workspace = true
 pangalactic-bindref.workspace = true

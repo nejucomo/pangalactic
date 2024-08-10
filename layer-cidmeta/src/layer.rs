@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use pangalactic_store::{Load, Store};
 use serde::{de::DeserializeOwned, Serialize};
@@ -10,7 +9,6 @@ pub struct CidMetaLayer<S>(pub(crate) S)
 where
     S: Store;
 
-#[async_trait]
 impl<S> Store for CidMetaLayer<S>
 where
     S: Store,
@@ -25,7 +23,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Load<CidMetaLayer<S>> for Readable<S::Reader>
 where
     S: Store,

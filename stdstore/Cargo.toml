@@ -6,7 +6,6 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
 pangalactic-hash.workspace = true
 pangalactic-hostdir.workspace = true
 pangalactic-iowrappers.workspace = true
