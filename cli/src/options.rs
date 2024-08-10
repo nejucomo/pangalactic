@@ -6,7 +6,6 @@ use pangalactic_path::{AnyDestination, AnySource};
 use pangalactic_stdstore::{
     StandardAnyDestination, StandardAnySource, StandardPath, StandardStore,
 };
-use pangalactic_transfer::Transferor;
 
 #[async_trait]
 #[enum_dispatch]

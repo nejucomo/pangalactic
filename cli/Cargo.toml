@@ -15,7 +15,6 @@ pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-stdstore.workspace = true
 pangalactic-store.workspace = true
-pangalactic-transfer.workspace = true
 pangalactic-path.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
