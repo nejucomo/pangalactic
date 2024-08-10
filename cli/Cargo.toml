@@ -9,12 +9,12 @@ anyhow.workspace = true
 clap.workspace = true
 enum_dispatch.workspace = true
 pangalactic-b64.workspace = true
-pangalactic-hostdir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
+pangalactic-path.workspace = true
 pangalactic-stdstore.workspace = true
 pangalactic-store.workspace = true
-pangalactic-path.workspace = true
+pangalactic-storedir.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
 tracing-subscriber.workspace = true

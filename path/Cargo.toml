@@ -11,11 +11,11 @@ not_empty.workspace = true
 pangalactic-bindref.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dir.workspace = true
-pangalactic-hostdir.workspace = true
 pangalactic-iowrappers.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-store.workspace = true
+pangalactic-storedir.workspace = true
 pin-project.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }

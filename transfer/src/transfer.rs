@@ -2,10 +2,10 @@ use std::{path::PathBuf, pin::pin};
 
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
-use pangalactic_hostdir::{DirNodeReader, HostDirectory};
 use pangalactic_iowrappers::{Readable, Writable};
 use pangalactic_path::{AnyDestination, AnySource, PathLayer, StoreDestination, StorePath};
 use pangalactic_store::{Commit, Store};
+use pangalactic_storedir::{DirNodeReader, HostDirectory};
 use tokio::{
     fs::{File, ReadDir},
     io::{AsyncRead, AsyncWrite, Stdin, Stdout},

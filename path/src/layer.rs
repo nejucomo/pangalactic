@@ -1,7 +1,7 @@
 use pangalactic_bindref::{BindRef, Bindable};
-use pangalactic_hostdir::{HostDirectory, HostDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
+use pangalactic_storedir::{HostDirectory, HostDirectoryLayer};
 
 use crate::{StoreDestination, StorePath, ViaPath};
 
