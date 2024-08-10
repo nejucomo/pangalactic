@@ -64,7 +64,7 @@ where
         let dnr: DirNodeReader<_> = store.load(&self).await?;
         match dnr {
             DirNodeReader::File(r) => r.transfer_into(store, destination).await,
-            DirNodeReader::Dir(hd) => hd.transfer_into(store, destination).await,
+            DirNodeReader::Dir(hd) => Box::pin(hd.transfer_into(store, destination)).await,
         }
     }
 }
