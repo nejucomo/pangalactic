@@ -1,8 +1,9 @@
-use pangalactic_hash::{Hash, Hasher};
-use pin_project::pin_project;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::task::{Context, Poll};
+
+use pangalactic_hash::{Hash, HashWriter};
+use pin_project::pin_project;
 use tokio::io::AsyncWrite;
 
 #[pin_project]
@@ -10,20 +11,18 @@ use tokio::io::AsyncWrite;
 pub struct Writer {
     spoolpath: PathBuf,
     #[pin]
-    f: tokio::fs::File,
-    hasher: Hasher,
+    downstream: HashWriter<tokio::fs::File>,
 }
 
 impl Writer {
     pub(crate) async fn init(dir: &Path) -> anyhow::Result<Self> {
         let spoolpath = dir.join(get_spool_name());
         let f = tokio::fs::File::create(&spoolpath).await?;
-        let hasher = Hasher::default();
+        let downstream = HashWriter::from(f);
 
         Ok(Writer {
-            f,
             spoolpath,
-            hasher,
+            downstream,
         })
     }
 
@@ -32,12 +31,11 @@ impl Writer {
 
         let Writer {
             spoolpath,
-            f,
-            hasher,
+            downstream,
         } = self;
 
+        let (f, hash) = downstream.unwrap();
         f.sync_all().await?;
-        let hash = hasher.finalize();
 
         // Change completed spool file to read-only:
         let mut perms = f.metadata().await?.permissions();
@@ -60,31 +58,18 @@ impl AsyncWrite for Writer {
         cx: &mut Context<'_>,
         buf: &[u8],
     ) -> Poll<Result<usize, std::io::Error>> {
-        use Poll::Ready;
-
-        let this = self.project();
-        match this.f.poll_write(cx, buf) {
-            Ready(Ok(cnt)) => {
-                use std::io::Write;
-
-                this.hasher.write_all(&buf[..cnt])?;
-
-                Ready(Ok(cnt))
-            }
-
-            other => other,
-        }
+        self.project().downstream.poll_write(cx, buf)
     }
 
     fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), std::io::Error>> {
-        self.project().f.poll_flush(cx)
+        self.project().downstream.poll_flush(cx)
     }
 
     fn poll_shutdown(
         self: Pin<&mut Self>,
         cx: &mut Context<'_>,
     ) -> Poll<Result<(), std::io::Error>> {
-        self.project().f.poll_shutdown(cx)
+        self.project().downstream.poll_shutdown(cx)
     }
 }
 

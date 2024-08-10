@@ -2,29 +2,34 @@
 resolver = "2"
 members = [
   "b64",
+  "bindref",
   "chomper",
+  "cid",
   "cli",
-  "dagio",
+#   "dagio",
   "dir",
-  "guest",
-  "guest-procmacro",
-  "guests",
-  "handle",
-  "host",
+#   "guest",
+#   "guest-procmacro",
+#   "guests",
+#   "handle",
+#   "host",
   "hostdir",
   "init-stream",
+  "iowrappers",
   "layer-cidmeta",
   "link",
   "linkkind",
-  "log",
+#   "log",
+  "path",
   "primitives",
-  "schemata",
+#   "schemata",
   "serialization",
+  "stdstore",
   "store/dirdb",
   "store/mem",
-  "storepath",
   "store/trait",
-  "table",
+#   "table",
+  "transfer",
   "traversal",
 ]
 
@@ -37,31 +42,36 @@ license = "MIT"
 
 # Local crates with paths clarified:
 pangalactic-b64             = { path = "b64"             }
+pangalactic-bindref         = { path = "bindref"         }
 pangalactic-chomper         = { path = "chomper"         }
+pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
-pangalactic-dagio           = { path = "dagio"           }
 pangalactic-dag-traversal   = { path = "traversal"       }
+# pangalactic-dagio             = { path = "dagio"             }
 pangalactic-dir             = { path = "dir"             }
-pangalactic-guest           = { path = "guest"           }
-pangalactic-guest-procmacro = { path = "guest-procmacro" }
-pangalactic-guests          = { path = "guests"          }
-pangalactic-handle          = { path = "handle"          }
+# pangalactic-guest           = { path = "guest"           }
+# pangalactic-guest-procmacro = { path = "guest-procmacro" }
+# pangalactic-guests          = { path = "guests"          }
+# pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-hostdir         = { path = "hostdir"         }
-pangalactic-host            = { path = "host"            }
+# pangalactic-host            = { path = "host"            }
 pangalactic-init-stream     = { path = "init-stream"     }
+pangalactic-iowrappers      = { path = "iowrappers"      }
 pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-link            = { path = "link"            }
-pangalactic-log             = { path = "log"             }
+# pangalactic-log             = { path = "log"             }
+pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
-pangalactic-schemata        = { path = "schemata"        }
+# pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
+pangalactic-stdstore        = { path = "stdstore"        }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
-pangalactic-storepath       = { path = "storepath"       }
 pangalactic-store           = { path = "store/trait"     }
-pangalactic-table           = { path = "table"           }
+# pangalactic-table           = { path = "table"           }
+pangalactic-transfer        = { path = "transfer"        }
 
 # Dependencies external to this workspace:
 # TODO: Push features into specific crates that consume them:

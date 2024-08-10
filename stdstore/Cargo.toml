@@ -1,0 +1,18 @@
+[package]
+name = "pangalactic-stdstore"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+pangalactic-hash.workspace = true
+pangalactic-hostdir.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-path.workspace = true
+pangalactic-store-dirdb.workspace = true
+pangalactic-store.workspace = true
+pangalactic-transfer.workspace = true
+tokio = { workspace = true, features = ["fs"] }

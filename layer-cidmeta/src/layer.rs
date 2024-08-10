@@ -1,9 +1,12 @@
-use crate::{CidMeta, Writer};
 use async_trait::async_trait;
-use pangalactic_store::Store;
+use pangalactic_iowrappers::Readable;
+use pangalactic_store::{Load, Store};
+use serde::{de::DeserializeOwned, Serialize};
+
+use crate::{CidMeta, Writer};
 
 #[derive(Debug, Default, derive_more::From)]
-pub struct CidMetaLayer<S>(S)
+pub struct CidMetaLayer<S>(pub(crate) S)
 where
     S: Store;
 
@@ -11,26 +14,27 @@ where
 impl<S> Store for CidMetaLayer<S>
 where
     S: Store,
+    S::CID: Serialize + DeserializeOwned,
 {
     type CID = CidMeta<S::CID>;
-    type Reader = <S as Store>::Reader;
-    type Writer = Writer<<S as Store>::Writer>;
-
-    async fn open_reader(&self, key: &Self::CID) -> anyhow::Result<Self::Reader> {
-        self.0.open_reader(&key.cid).await
-    }
+    type Reader = Readable<S::Reader>;
+    type Writer = Writer<S::Writer>;
 
     async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
-        let writer = self.0.open_writer().await?;
-        Ok(Writer { writer, written: 0 })
+        self.0.open_writer().await.map(Writer::from)
     }
+}
 
-    async fn commit_writer(
-        &mut self,
-        Writer { writer, written }: Self::Writer,
-    ) -> anyhow::Result<Self::CID> {
-        let cid = self.0.commit_writer(writer).await?;
-        let node_size = u64::try_from(written).expect("usize->u64 conversion failure");
-        Ok(CidMeta { cid, node_size })
+#[async_trait]
+impl<S> Load<CidMetaLayer<S>> for Readable<S::Reader>
+where
+    S: Store,
+    S::CID: Serialize + DeserializeOwned,
+{
+    async fn load_from_store(
+        store: &CidMetaLayer<S>,
+        cid: &CidMeta<S::CID>,
+    ) -> anyhow::Result<Self> {
+        store.0.load(&cid.cid).await.map(Readable)
     }
 }

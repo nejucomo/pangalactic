@@ -1,4 +1,4 @@
-use pangalactic_store::StoreCid;
+use pangalactic_cid::ContentIdentifier;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -26,7 +26,7 @@ impl Hash {
     }
 }
 
-impl StoreCid for Hash {}
+impl ContentIdentifier for Hash {}
 
 impl From<HashBytes> for Hash {
     fn from(bytes: HashBytes) -> Self {

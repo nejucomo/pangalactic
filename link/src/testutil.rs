@@ -1,30 +1,27 @@
-use async_trait::async_trait;
-use pangalactic_store::{Store, StoreCid};
+use std::fmt;
+
+use pangalactic_cid::ContentIdentifier;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub struct FakeKey;
 
-impl StoreCid for FakeKey {}
+impl ContentIdentifier for FakeKey {}
 
-#[derive(Debug)]
-pub struct FakeStore;
-
-#[async_trait]
-impl Store for FakeStore {
-    type CID = FakeKey;
-    type Reader = tokio::io::Empty;
-    type Writer = tokio::io::Sink;
-
-    async fn open_reader(&self, _: &Self::CID) -> anyhow::Result<Self::Reader> {
-        unimplemented!("open_reader")
+impl fmt::Display for FakeKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<FakeKey>")
     }
+}
 
-    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
-        unimplemented!("open_writer")
-    }
+impl std::str::FromStr for FakeKey {
+    type Err = anyhow::Error;
 
-    async fn commit_writer(&mut self, _: Self::Writer) -> anyhow::Result<Self::CID> {
-        unimplemented!("commit_writer")
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s == "<FakeKey>" {
+            Ok(FakeKey)
+        } else {
+            anyhow::bail!("unexpected: {s:?}")
+        }
     }
 }

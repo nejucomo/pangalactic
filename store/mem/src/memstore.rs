@@ -1,9 +1,11 @@
-use crate::Reader;
-use async_trait::async_trait;
-use pangalactic_hash::Hash;
-use pangalactic_store::Store;
 use std::collections::HashMap;
 use std::sync::Arc;
+
+use async_trait::async_trait;
+use pangalactic_hash::{Hash, HashWriter};
+use pangalactic_store::{Commit, Load, Store};
+
+use crate::Reader;
 
 #[derive(Debug, Default)]
 pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
@@ -12,23 +14,30 @@ pub struct MemStore(HashMap<Hash, Arc<Vec<u8>>>);
 impl Store for MemStore {
     type CID = Hash;
     type Reader = Reader;
-    type Writer = Vec<u8>;
-
-    async fn open_reader(&self, key: &Hash) -> anyhow::Result<Self::Reader> {
-        self.0
-            .get(key)
-            .cloned()
-            .map(Reader::new)
-            .ok_or_else(|| anyhow::Error::msg(format!("missing entry {:?}", &key)))
-    }
+    type Writer = HashWriter<Vec<u8>>;
 
     async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
-        Ok(Vec::new())
+        Ok(HashWriter::from(Vec::new()))
     }
+}
 
-    async fn commit_writer(&mut self, w: Self::Writer) -> anyhow::Result<Self::CID> {
-        let key = Hash::of(&w);
-        self.0.insert(key.clone(), Arc::new(w));
-        Ok(key)
+#[async_trait]
+impl Load<MemStore> for Reader {
+    async fn load_from_store(store: &MemStore, cid: &Hash) -> anyhow::Result<Self> {
+        store
+            .0
+            .get(cid)
+            .cloned()
+            .map(Reader::new)
+            .ok_or_else(|| anyhow::Error::msg(format!("missing entry {:?}", &cid)))
+    }
+}
+
+#[async_trait]
+impl Commit<MemStore> for HashWriter<Vec<u8>> {
+    async fn commit_into_store(self, store: &mut MemStore) -> anyhow::Result<Hash> {
+        let (vec, hash) = self.unwrap();
+        store.0.insert(hash.clone(), Arc::new(vec));
+        Ok(hash)
     }
 }

@@ -1,10 +1,12 @@
+use std::fmt;
+use std::str::FromStr;
+
 use pangalactic_chomper::Chomper;
+use pangalactic_cid::ContentIdentifier;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_serialization::b64;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::fmt;
-use std::str::FromStr;
 
 use crate::SCHEME;
 
@@ -12,6 +14,11 @@ use crate::SCHEME;
 pub struct Link<C> {
     kind: LinkKind,
     cid: C,
+}
+
+impl<C> ContentIdentifier for Link<C> where
+    C: Clone + fmt::Debug + Eq + PartialEq + DeserializeOwned + Serialize + Send + Sync
+{
 }
 
 impl<C> Link<C> {

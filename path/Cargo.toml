@@ -1,0 +1,26 @@
+[package]
+name = "pangalactic-path"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+derive_more.workspace = true
+not_empty.workspace = true
+pangalactic-bindref.workspace = true
+pangalactic-cid.workspace = true
+pangalactic-dir.workspace = true
+pangalactic-hostdir.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-link.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-store.workspace = true
+pin-project.workspace = true
+serde.workspace = true
+tokio = { workspace = true, features = [ "io-std" ] }
+
+[dev-dependencies]
+pangalactic-link = { workspace = true, features = ["testutil"] }
+test-case.workspace = true
