@@ -1,7 +1,6 @@
 use std::fmt;
 use std::str::FromStr;
 
-use async_trait::async_trait;
 use pangalactic_cid::ContentIdentifier;
 use pangalactic_dir::Name;
 use pangalactic_link::Link;
@@ -92,7 +91,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Commit<PathLayer<S>> for StorePath<S::CID>
 where
     S: Store,
@@ -105,7 +103,6 @@ where
     }
 }
 
-#[async_trait]
 impl<'a, S> Commit<PathLayer<S>> for &'a StorePath<S::CID>
 where
     S: Store,

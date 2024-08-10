@@ -3,7 +3,6 @@
 use std::path::{Path, PathBuf};
 
 use anyhow_std::OsStrAnyhow;
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Store};
@@ -11,7 +10,6 @@ use tokio::fs::{self, File, ReadDir};
 
 use crate::{HostDirectory, HostDirectoryLayer};
 
-#[async_trait]
 impl<S> Commit<HostDirectoryLayer<S>> for PathBuf
 where
     S: Store,
@@ -24,7 +22,6 @@ where
     }
 }
 
-#[async_trait]
 impl<'a, S> Commit<HostDirectoryLayer<S>> for &'a Path
 where
     S: Store,
@@ -38,14 +35,13 @@ where
             store.commit(f).await
         } else if self.is_dir() {
             let r = fs::read_dir(&self).await?;
-            store.commit(r).await
+            Box::pin(store.commit(r)).await
         } else {
             anyhow::bail!("unsupported fs node type: {:?}", self.display())
         }
     }
 }
 
-#[async_trait]
 impl<S> Commit<HostDirectoryLayer<S>> for ReadDir
 where
     S: Store,
@@ -65,13 +61,12 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Commit<HostDirectoryLayer<S>> for File
 where
     S: Store,
 {
     async fn commit_into_store(
-        mut self,
+        self,
         store: &mut HostDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         store.commit(Readable(self)).await

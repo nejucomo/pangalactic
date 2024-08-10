@@ -9,7 +9,6 @@ anyhow.workspace = true
 include_dir.workspace = true
 
 [dev-dependencies]
-async-trait.workspace = true
 pangalactic-dagio.workspace = true
 pangalactic-hostdir.workspace = true
 pangalactic-host.workspace = true

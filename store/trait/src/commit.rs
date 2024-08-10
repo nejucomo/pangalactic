@@ -1,12 +1,10 @@
 use std::pin::pin;
 
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use tokio::io::AsyncRead;
 
 use crate::Store;
 
-#[cfg_attr(not(doc), async_trait)]
 pub trait Commit<S>
 where
     S: Store,
@@ -25,7 +23,6 @@ where
 //     }
 // }
 
-#[cfg_attr(not(doc), async_trait)]
 impl<S, R> Commit<S> for Readable<R>
 where
     S: Store,
@@ -38,7 +35,6 @@ where
     }
 }
 
-#[cfg_attr(not(doc), async_trait)]
 impl<'a, S> Commit<S> for &'a [u8]
 where
     S: Store,
@@ -48,7 +44,6 @@ where
     }
 }
 
-#[cfg_attr(not(doc), async_trait)]
 impl<S> Commit<S> for Vec<u8>
 where
     S: Store,

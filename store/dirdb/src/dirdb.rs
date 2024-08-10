@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use async_trait::async_trait;
 use pangalactic_hash::Hash;
 use pangalactic_store::{Commit, Load, Store};
 
@@ -17,7 +16,6 @@ impl Default for DirDbStore {
     }
 }
 
-#[async_trait]
 impl Store for DirDbStore {
     type CID = Hash;
     type Reader = tokio::fs::File;
@@ -28,7 +26,6 @@ impl Store for DirDbStore {
     }
 }
 
-#[async_trait]
 impl Load<DirDbStore> for tokio::fs::File {
     async fn load_from_store(store: &DirDbStore, cid: &Hash) -> anyhow::Result<Self> {
         let path = store.0.join(cid.to_string());
@@ -37,7 +34,6 @@ impl Load<DirDbStore> for tokio::fs::File {
     }
 }
 
-#[async_trait]
 impl Commit<DirDbStore> for Writer {
     async fn commit_into_store(self, _: &mut DirDbStore) -> anyhow::Result<Hash> {
         self.commit().await

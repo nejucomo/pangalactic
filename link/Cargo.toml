@@ -11,7 +11,6 @@ testutil = [
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
 pangalactic-chomper.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-linkkind.workspace = true
@@ -21,6 +20,5 @@ serde.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]
-async-trait.workspace = true
 pangalactic-store.workspace = true
 test-case.workspace = true

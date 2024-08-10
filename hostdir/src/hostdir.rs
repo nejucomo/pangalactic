@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use derive_more::{Deref, DerefMut, From, Into};
 use pangalactic_dir::Directory;
 use pangalactic_link::Link;
@@ -62,7 +61,6 @@ impl<C> IntoIterator for HostDirectory<C> {
     }
 }
 
-#[async_trait]
 impl<S> Commit<HostDirectoryLayer<S>> for HostDirectory<S::CID>
 where
     S: Store,
@@ -81,7 +79,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Load<HostDirectoryLayer<S>> for HostDirectory<S::CID>
 where
     S: Store,

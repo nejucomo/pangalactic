@@ -1,7 +1,6 @@
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use async_trait::async_trait;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Commit, Store};
@@ -24,7 +23,6 @@ impl<T> Writer<T> {
     }
 }
 
-#[async_trait]
 impl<S> Commit<HostDirectoryLayer<S>> for Writer<S::Writer>
 where
     S: Store,

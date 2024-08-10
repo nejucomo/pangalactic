@@ -1,5 +1,6 @@
+use std::{future::Future, pin::Pin};
+
 use anyhow::Result;
-use async_trait::async_trait;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
 use pangalactic_path::{AnyDestination, AnySource};
@@ -7,10 +8,10 @@ use pangalactic_stdstore::{
     StandardAnyDestination, StandardAnySource, StandardPath, StandardStore,
 };
 
-#[async_trait]
+// Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
 pub trait Runnable {
-    async fn run(self) -> Result<Option<StandardPath>>;
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>>;
 }
 
 #[derive(Debug, Parser)]
@@ -26,10 +27,9 @@ impl Options {
     }
 }
 
-#[async_trait]
 impl Runnable for Options {
-    async fn run(self) -> Result<Option<StandardPath>> {
-        self.command.unwrap().run().await
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+        self.command.unwrap().run()
     }
 }
 
@@ -53,13 +53,14 @@ pub enum StoreCommand {
 #[derive(Debug, Args)]
 pub struct StorePutOptions {}
 
-#[async_trait]
 impl Runnable for StorePutOptions {
-    async fn run(self) -> Result<Option<StandardPath>> {
-        let mut store = StandardStore::default();
-        store
-            .transfer(AnySource::Stdin, AnyDestination::Store(None))
-            .await
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+        Box::pin(async {
+            let mut store = StandardStore::default();
+            store
+                .transfer(AnySource::Stdin, AnyDestination::Store(None))
+                .await
+        })
     }
 }
 
@@ -70,12 +71,13 @@ pub struct StoreGetOptions {
     pub source: StandardAnySource,
 }
 
-#[async_trait]
 impl Runnable for StoreGetOptions {
-    async fn run(self) -> Result<Option<StandardPath>> {
-        let mut store = StandardStore::default();
-        store.transfer(self.source, AnyDestination::Stdout).await?;
-        Ok(None)
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+        Box::pin(async {
+            let mut store = StandardStore::default();
+            store.transfer(self.source, AnyDestination::Stdout).await?;
+            Ok(None)
+        })
     }
 }
 
@@ -86,10 +88,11 @@ pub struct StoreXferOptions {
     pub dest: StandardAnyDestination,
 }
 
-#[async_trait]
 impl Runnable for StoreXferOptions {
-    async fn run(self) -> Result<Option<StandardPath>> {
-        let mut store = StandardStore::default();
-        store.transfer(self.source, self.dest).await
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+        Box::pin(async {
+            let mut store = StandardStore::default();
+            store.transfer(self.source, self.dest).await
+        })
     }
 }

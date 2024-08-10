@@ -7,7 +7,6 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 anyhow-std.workspace = true
-async-trait.workspace = true
 pangalactic-bindref.workspace = true
 pangalactic-chomper.workspace = true
 pangalactic-cid.workspace = true

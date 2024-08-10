@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
@@ -11,7 +10,6 @@ pub struct HostDirectoryLayer<S>(S)
 where
     S: Store;
 
-#[async_trait]
 impl<S> Store for HostDirectoryLayer<S>
 where
     S: Store,
@@ -69,7 +67,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Load<HostDirectoryLayer<S>> for Readable<S::Reader>
 where
     S: Store,

@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 anyhow.workspace = true
-async-trait.workspace = true
 derive_more.workspace = true
 pangalactic-chomper.workspace = true
 pangalactic-cid.workspace = true

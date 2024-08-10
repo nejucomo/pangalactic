@@ -1,14 +1,12 @@
 //! Forward implementations of [Commit] and [Load] from [HostDirectoryLayer](pangalactic_hostdir::HostDirectoryLayer) for convenience (all via [ViaPath])
 
-use async_trait::async_trait;
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::{PathLayer, StorePath, ViaPath};
 
 macro_rules! forward_impl {
     ( Commit $t:ty ) => {
-        #[async_trait]
-        impl<'a, S> Commit<PathLayer<S>> for $t
+        impl<S> Commit<PathLayer<S>> for $t
         where
             S: Store,
         {
@@ -22,7 +20,6 @@ macro_rules! forward_impl {
     };
 
     ( Load $t:ty ) => {
-        #[async_trait]
         impl<S> Load<PathLayer<S>> for $t
         where
             S: Store,
@@ -42,6 +39,6 @@ forward_impl!(Commit pangalactic_hostdir::HostDirectory<S::CID>);
 forward_impl!(Load pangalactic_hostdir::HostDirectory<S::CID>);
 forward_impl!(Load pangalactic_hostdir::DirNodeReader<S>);
 forward_impl!(Commit std::path::PathBuf);
-forward_impl!(Commit &'a std::path::Path);
+forward_impl!(Commit & std::path::Path);
 forward_impl!(Commit tokio::fs::File);
 forward_impl!(Commit tokio::fs::ReadDir);

@@ -1,6 +1,5 @@
 use crate::tests::dagcase::DagCase;
 use crate::TraversableDag;
-use async_trait::async_trait;
 
 #[derive(Clone, Debug)]
 pub struct Tree {
@@ -20,7 +19,6 @@ pub enum MkTree {
     Branch(&'static MkTree, &'static MkTree),
 }
 
-#[async_trait]
 impl DagCase for Tree {
     type Ctr = MkTree;
     type Verifier = u64;

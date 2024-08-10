@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use pangalactic_bindref::{BindRef, Bindable};
 use pangalactic_hostdir::{HostDirectory, HostDirectoryLayer};
 use pangalactic_link::Link;
@@ -27,7 +26,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S> Store for PathLayer<S>
 where
     S: Store,
@@ -41,7 +39,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S, T> Commit<PathLayer<S>> for ViaPath<T>
 where
     S: Store,
@@ -56,7 +53,6 @@ where
     }
 }
 
-#[async_trait]
 impl<S, T> Load<PathLayer<S>> for ViaPath<T>
 where
     S: Store,
@@ -72,7 +68,6 @@ where
     }
 }
 
-#[async_trait]
 impl<'a, S, V> Commit<PathLayer<S>> for BindRef<'a, StoreDestination<S::CID>, V>
 where
     S: Store,
