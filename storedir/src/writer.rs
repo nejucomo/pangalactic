@@ -7,7 +7,7 @@ use pangalactic_store::{Commit, Store};
 use pin_project::pin_project;
 use tokio::io::AsyncWrite;
 
-use crate::HostDirectoryLayer;
+use crate::StoreDirectoryLayer;
 
 #[pin_project]
 #[derive(Debug, derive_more::From)]
@@ -23,13 +23,13 @@ impl<T> Writer<T> {
     }
 }
 
-impl<S> Commit<HostDirectoryLayer<S>> for Writer<S::Writer>
+impl<S> Commit<StoreDirectoryLayer<S>> for Writer<S::Writer>
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         store.commit_inner(self.kind, self.inner).await
     }

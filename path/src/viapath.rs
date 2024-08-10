@@ -1,7 +1,7 @@
 use pin_project::pin_project;
 use tokio::io::{AsyncRead, AsyncWrite};
 
-/// A wrapper which enables commit/load to [PathLayer](crate::PathLayer) for anything which can commit/load to [HostDirectoryLayer](pangalactic_storedir::HostDirectoryLayer)
+/// A wrapper which enables commit/load to [PathLayer](crate::PathLayer) for anything which can commit/load to [StoreDirectoryLayer](pangalactic_storedir::StoreDirectoryLayer)
 #[pin_project]
 #[derive(Debug)]
 pub struct ViaPath<T>(#[pin] pub T);
