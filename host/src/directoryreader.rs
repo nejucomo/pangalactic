@@ -1,18 +1,16 @@
-use async_trait::async_trait;
-use pangalactic_dagio::{Dagio, DagioLoad};
-use pangalactic_hostdir::{HostDirectory, Name};
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
-use pangalactic_store::Store;
+use pangalactic_store::{Load, Store};
+use pangalactic_storedir::Name;
+
+use crate::store::{HostDir, HostLayer, HostLink};
 
 #[derive(Debug)]
 pub(crate) struct DirectoryReader<S>
 where
     S: Store,
 {
-    iter: <HostDirectory<S::CID> as IntoIterator>::IntoIter,
+    iter: <HostDir<S::CID> as IntoIterator>::IntoIter,
     name: Option<Name>,
-    link: Option<Link<CidMeta<S::CID>>>,
+    link: Option<HostLink<S::CID>>,
 }
 
 impl<S> DirectoryReader<S>
@@ -29,7 +27,7 @@ where
             .ok_or_else(|| anyhow::Error::msg("name already taken in DirectoryReader"))
     }
 
-    pub(crate) fn take_link(&mut self) -> anyhow::Result<Link<CidMeta<S::CID>>> {
+    pub(crate) fn take_link(&mut self) -> anyhow::Result<HostLink<S::CID>> {
         self.link
             .take()
             .ok_or_else(|| anyhow::Error::msg("link already taken in DirectoryReader"))
@@ -46,16 +44,15 @@ where
     }
 }
 
-#[async_trait]
-impl<S> DagioLoad<S> for DirectoryReader<S>
+impl<S> Load<HostLayer<S>> for DirectoryReader<S>
 where
     S: Store,
 {
-    async fn load_from_dagio(
-        dagio: &Dagio<S>,
-        link: &Link<CidMeta<S::CID>>,
+    async fn load_from_store(
+        store: &HostLayer<S>,
+        link: &HostLink<S::CID>,
     ) -> anyhow::Result<Self> {
-        let dir: HostDirectory<S::CID> = dagio.load(link).await?;
+        let dir: HostDir<S::CID> = store.load(link).await?;
         let mut dr = DirectoryReader {
             iter: dir.into_iter(),
             name: None,

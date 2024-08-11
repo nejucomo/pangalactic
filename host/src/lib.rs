@@ -8,6 +8,7 @@ mod host;
 pub(crate) mod hostapi;
 mod hosttowasm;
 mod state;
+pub(crate) mod store;
 mod wasmtohost;
 
 pub(crate) use self::bytereader::ByteReader;

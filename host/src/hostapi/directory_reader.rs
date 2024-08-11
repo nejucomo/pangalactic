@@ -1,7 +1,5 @@
-use crate::{ByteReader, DirectoryReader, State};
+use crate::{store::HostLink, ByteReader, DirectoryReader, State};
 use pangalactic_handle::Handle;
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
 use pangalactic_store::Store;
 use wasmtime::{Caller, Trap};
 
@@ -19,7 +17,7 @@ where
 pub(super) async fn load_link<S>(
     mut caller: Caller<'_, State<S>>,
     h_dr: Handle<DirectoryReader<S>>,
-) -> Result<Handle<Link<CidMeta<S::CID>>>, Trap>
+) -> Result<Handle<HostLink<S::CID>>, Trap>
 where
     S: Store,
 {
