@@ -1,12 +1,12 @@
 use pangalactic_bindref::{BindRef, Bindable};
-use pangalactic_hostdir::{HostDirectory, HostDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
+use pangalactic_storedir::{StoreDirectory, StoreDirectoryLayer};
 
 use crate::{StoreDestination, StorePath, ViaPath};
 
 #[derive(Debug, Default, derive_more::From)]
-pub struct PathLayer<S>(HostDirectoryLayer<S>)
+pub struct PathLayer<S>(StoreDirectoryLayer<S>)
 where
     S: Store;
 
@@ -19,7 +19,7 @@ where
     pub(crate) async fn resolve_path(&self, p: &StorePath<S::CID>) -> anyhow::Result<Link<S::CID>> {
         let mut link = p.link().clone();
         for name in p.path() {
-            let mut d: HostDirectory<S::CID> = self.0.load(&link).await?;
+            let mut d: StoreDirectory<S::CID> = self.0.load(&link).await?;
             link = d.remove_required(name)?;
         }
         Ok(link)
@@ -31,8 +31,8 @@ where
     S: Store,
 {
     type CID = StorePath<S::CID>;
-    type Reader = ViaPath<<HostDirectoryLayer<S> as Store>::Reader>;
-    type Writer = ViaPath<<HostDirectoryLayer<S> as Store>::Writer>;
+    type Reader = ViaPath<<StoreDirectoryLayer<S> as Store>::Reader>;
+    type Writer = ViaPath<<StoreDirectoryLayer<S> as Store>::Writer>;
 
     async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
         self.0.open_writer().await.map(ViaPath)
@@ -42,7 +42,7 @@ where
 impl<S, T> Commit<PathLayer<S>> for ViaPath<T>
 where
     S: Store,
-    T: Commit<HostDirectoryLayer<S>> + Send,
+    T: Commit<StoreDirectoryLayer<S>> + Send,
 {
     async fn commit_into_store(
         self,
@@ -56,7 +56,7 @@ where
 impl<S, T> Load<PathLayer<S>> for ViaPath<T>
 where
     S: Store,
-    T: Load<HostDirectoryLayer<S>>,
+    T: Load<StoreDirectoryLayer<S>>,
 {
     async fn load_from_store(
         store: &PathLayer<S>,
@@ -87,12 +87,12 @@ where
         let (last, intermediate) = bound.path().split_last();
 
         for name in intermediate {
-            let d: HostDirectory<S::CID> = store.load(&dirlink).await?;
+            let d: StoreDirectory<S::CID> = store.load(&dirlink).await?;
             dirlink = StorePath::from(d.get_required(name)?.clone());
             stack.push((d, name));
         }
 
-        let mut d: HostDirectory<S::CID> = store.load(&dirlink).await?;
+        let mut d: StoreDirectory<S::CID> = store.load(&dirlink).await?;
         d.insert(last.clone(), link)?;
 
         for (mut prevd, name) in stack.into_iter().rev() {

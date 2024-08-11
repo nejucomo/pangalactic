@@ -1,10 +1,10 @@
-use crate::HostDirectory;
+use crate::StoreDirectory;
 use pangalactic_hash::Hash;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_serialization::check_serialize_then_deserialize_equality;
 
-type FLDirectory = HostDirectory<Hash>;
+type FLDirectory = StoreDirectory<Hash>;
 
 #[test]
 fn test_empty_directory() -> anyhow::Result<()> {

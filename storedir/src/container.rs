@@ -1,21 +1,21 @@
-use crate::hostdir::Inner;
-use crate::HostDirectory;
+use crate::storedir::Inner;
+use crate::StoreDirectory;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct HostDirectorySerializationContainer<C> {
+pub(crate) struct StoreDirectorySerializationContainer<C> {
     version: u64,
     inner: Inner<C>,
 }
 
 const SERIALIZATION_VERSION: u64 = 0;
 
-impl<C> TryFrom<HostDirectorySerializationContainer<C>> for HostDirectory<C> {
+impl<C> TryFrom<StoreDirectorySerializationContainer<C>> for StoreDirectory<C> {
     type Error = anyhow::Error;
 
-    fn try_from(container: HostDirectorySerializationContainer<C>) -> Result<Self, Self::Error> {
+    fn try_from(container: StoreDirectorySerializationContainer<C>) -> Result<Self, Self::Error> {
         if container.version == SERIALIZATION_VERSION {
-            Ok(HostDirectory(container.inner))
+            Ok(StoreDirectory(container.inner))
         } else {
             anyhow::bail!(
                 "unknown serialization version {:?}; expected {:?}",
@@ -26,9 +26,9 @@ impl<C> TryFrom<HostDirectorySerializationContainer<C>> for HostDirectory<C> {
     }
 }
 
-impl<C> From<HostDirectory<C>> for HostDirectorySerializationContainer<C> {
-    fn from(hd: HostDirectory<C>) -> Self {
-        HostDirectorySerializationContainer {
+impl<C> From<StoreDirectory<C>> for StoreDirectorySerializationContainer<C> {
+    fn from(hd: StoreDirectory<C>) -> Self {
+        StoreDirectorySerializationContainer {
             version: SERIALIZATION_VERSION,
             inner: hd.0,
         }

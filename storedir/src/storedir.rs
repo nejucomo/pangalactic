@@ -7,17 +7,17 @@ use pangalactic_store::{Commit, Load, Store};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use tokio::io::AsyncRead;
 
-use crate::{HostDirectoryLayer, HostDirectorySerializationContainer, Name};
+use crate::{Name, StoreDirectoryLayer, StoreDirectorySerializationContainer};
 
 #[derive(Clone, Debug, Deref, DerefMut, From, Into, Deserialize, Serialize, PartialEq)]
 #[serde(
     bound = "C: Clone + DeserializeOwned + Serialize",
-    try_from = "HostDirectorySerializationContainer<C>",
-    into = "HostDirectorySerializationContainer<C>"
+    try_from = "StoreDirectorySerializationContainer<C>",
+    into = "StoreDirectorySerializationContainer<C>"
 )]
-pub struct HostDirectory<C>(pub(crate) Inner<C>);
+pub struct StoreDirectory<C>(pub(crate) Inner<C>);
 
-impl<C> HostDirectory<C> {
+impl<C> StoreDirectory<C> {
     pub(crate) async fn deserialize_from<R>(reader: R) -> anyhow::Result<Self>
     where
         C: Clone + Serialize + DeserializeOwned,
@@ -34,13 +34,13 @@ impl<C> HostDirectory<C> {
 
 pub(crate) type Inner<C> = Directory<Link<C>>;
 
-impl<C> Default for HostDirectory<C> {
+impl<C> Default for StoreDirectory<C> {
     fn default() -> Self {
-        HostDirectory(Directory::default())
+        StoreDirectory(Directory::default())
     }
 }
 
-impl<N, C> FromIterator<(N, Link<C>)> for HostDirectory<C>
+impl<N, C> FromIterator<(N, Link<C>)> for StoreDirectory<C>
 where
     Name: From<N>,
 {
@@ -48,11 +48,11 @@ where
     where
         T: IntoIterator<Item = (N, Link<C>)>,
     {
-        HostDirectory(Directory::from_iter(iter))
+        StoreDirectory(Directory::from_iter(iter))
     }
 }
 
-impl<C> IntoIterator for HostDirectory<C> {
+impl<C> IntoIterator for StoreDirectory<C> {
     type Item = (Name, Link<C>);
     type IntoIter = <Directory<Link<C>> as IntoIterator>::IntoIter;
 
@@ -61,13 +61,13 @@ impl<C> IntoIterator for HostDirectory<C> {
     }
 }
 
-impl<S> Commit<HostDirectoryLayer<S>> for HostDirectory<S::CID>
+impl<S> Commit<StoreDirectoryLayer<S>> for StoreDirectory<S::CID>
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         use tokio::io::AsyncWriteExt;
 
@@ -79,15 +79,15 @@ where
     }
 }
 
-impl<S> Load<HostDirectoryLayer<S>> for HostDirectory<S::CID>
+impl<S> Load<StoreDirectoryLayer<S>> for StoreDirectory<S::CID>
 where
     S: Store,
 {
     async fn load_from_store(
-        store: &HostDirectoryLayer<S>,
+        store: &StoreDirectoryLayer<S>,
         link: &Link<S::CID>,
     ) -> anyhow::Result<Self> {
         let reader = store.open_kind_reader(link, LinkKind::Dir).await?;
-        HostDirectory::deserialize_from(reader).await
+        StoreDirectory::deserialize_from(reader).await
     }
 }

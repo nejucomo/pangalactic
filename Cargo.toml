@@ -13,7 +13,6 @@ members = [
 #   "guests",
 #   "handle",
 #   "host",
-  "hostdir",
   "init-stream",
   "iowrappers",
   "layer-cidmeta",
@@ -28,6 +27,7 @@ members = [
   "store/dirdb",
   "store/mem",
   "store/trait",
+  "storedir",
 #   "table",
   "transfer",
   "traversal",
@@ -54,7 +54,6 @@ pangalactic-dir             = { path = "dir"             }
 # pangalactic-guests          = { path = "guests"          }
 # pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
-pangalactic-hostdir         = { path = "hostdir"         }
 # pangalactic-host            = { path = "host"            }
 pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-iowrappers      = { path = "iowrappers"      }
@@ -67,9 +66,10 @@ pangalactic-primitives      = { path = "primitives"      }
 # pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-stdstore        = { path = "stdstore"        }
+pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
-pangalactic-store           = { path = "store/trait"     }
+pangalactic-storedir        = { path = "storedir"        }
 # pangalactic-table           = { path = "table"           }
 pangalactic-transfer        = { path = "transfer"        }
 

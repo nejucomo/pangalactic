@@ -8,27 +8,27 @@ use pangalactic_link::Link;
 use pangalactic_store::{Commit, Store};
 use tokio::fs::{self, File, ReadDir};
 
-use crate::{HostDirectory, HostDirectoryLayer};
+use crate::{StoreDirectory, StoreDirectoryLayer};
 
-impl<S> Commit<HostDirectoryLayer<S>> for PathBuf
+impl<S> Commit<StoreDirectoryLayer<S>> for PathBuf
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         store.commit(self.as_path()).await
     }
 }
 
-impl<'a, S> Commit<HostDirectoryLayer<S>> for &'a Path
+impl<'a, S> Commit<StoreDirectoryLayer<S>> for &'a Path
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         if self.is_file() {
             let f = File::open(self).await?;
@@ -42,16 +42,16 @@ where
     }
 }
 
-impl<S> Commit<HostDirectoryLayer<S>> for ReadDir
+impl<S> Commit<StoreDirectoryLayer<S>> for ReadDir
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         let mut reader = self;
-        let mut d = HostDirectory::default();
+        let mut d = StoreDirectory::default();
         while let Some(entry) = reader.next_entry().await? {
             let name = entry.file_name().to_str_anyhow()?.to_string();
             let link = store.commit(entry.path()).await?;
@@ -61,13 +61,13 @@ where
     }
 }
 
-impl<S> Commit<HostDirectoryLayer<S>> for File
+impl<S> Commit<StoreDirectoryLayer<S>> for File
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut HostDirectoryLayer<S>,
+        store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         store.commit(Readable(self)).await
     }
