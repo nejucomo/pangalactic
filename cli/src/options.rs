@@ -102,15 +102,16 @@ impl Runnable for StoreXferOptions {
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
     /// The plan to derive
-    pub plan: StandardAnySource,
+    pub plan: StandardPath,
 }
 
 impl Runnable for DeriveOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
-        todo!()
-        // Box::pin(async {
-        //     let mut store = StandardStore::default();
-        //     store.transfer(self.source, self.dest).await
-        // })
+        Box::pin(async {
+            let mut store = StandardStore::default();
+            let attestation = store.derive(self.plan).await?;
+            tracing::info!("{attestation}");
+            Ok(None)
+        })
     }
 }
