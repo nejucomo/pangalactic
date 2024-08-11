@@ -38,6 +38,7 @@ impl Runnable for Options {
 pub enum Command {
     #[command(subcommand)]
     Store(StoreCommand),
+    Derive(DeriveOptions),
 }
 
 /// Interact directly with the store
@@ -94,5 +95,22 @@ impl Runnable for StoreXferOptions {
             let mut store = StandardStore::default();
             store.transfer(self.source, self.dest).await
         })
+    }
+}
+
+/// Derive a plan
+#[derive(Debug, Args)]
+pub struct DeriveOptions {
+    /// The plan to derive
+    pub plan: StandardAnySource,
+}
+
+impl Runnable for DeriveOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+        todo!()
+        // Box::pin(async {
+        //     let mut store = StandardStore::default();
+        //     store.transfer(self.source, self.dest).await
+        // })
     }
 }
