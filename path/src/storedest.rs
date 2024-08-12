@@ -5,7 +5,7 @@ use pangalactic_link::Link;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
 
-#[derive(Clone, Debug, derive_more::Deref)]
+#[derive(Clone, derive_more::Deref)]
 pub struct StoreDestination<C> {
     /// Invariant: self.link.kind() == Dir
     #[deref]
@@ -43,6 +43,15 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.link, self.path.join("/"))
+    }
+}
+
+impl<C> Debug for StoreDestination<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self}")
     }
 }
 

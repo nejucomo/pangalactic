@@ -1,4 +1,4 @@
-use std::{path::PathBuf, pin::pin};
+use std::{fmt::Debug, path::PathBuf, pin::pin};
 
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
@@ -12,17 +12,6 @@ use tokio::{
 };
 
 use crate::Destination;
-
-pub async fn transfer<S>(
-    store: &mut PathLayer<S>,
-    source: AnySource<S::CID>,
-    destination: AnyDestination<S::CID>,
-) -> Result<Option<StorePath<S::CID>>>
-where
-    S: Store,
-{
-    source.transfer_into(store, destination).await
-}
 
 pub trait TransferInto<S, D>
 where
@@ -41,6 +30,7 @@ where
     StorePath<S::CID>: TransferInto<S, D>,
 {
     async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID> {
+        tracing::debug!(source = ?&self, ?destination, "transferring");
         match self {
             AnySource::Stdin => {
                 Readable(tokio::io::stdin())
@@ -115,6 +105,7 @@ where
 impl<S, W> TransferInto<S, Writable<W>> for StoreDirectory<S::CID>
 where
     S: Store,
+    W: Debug,
 {
     async fn transfer_into(self, _: &mut PathLayer<S>, _: Writable<W>) -> Result<()> {
         anyhow::bail!("cannot transfer store directory into stream");
@@ -150,7 +141,7 @@ where
 impl<S, W> TransferInto<S, Writable<W>> for PathBuf
 where
     S: Store,
-    W: AsyncWrite,
+    W: AsyncWrite + Debug,
 {
     async fn transfer_into(self, store: &mut PathLayer<S>, destination: Writable<W>) -> Result<()> {
         let f = File::open(self).await?;
@@ -196,7 +187,7 @@ where
 impl<S, R> TransferInto<S, AnyDestination<S::CID>> for Readable<R>
 where
     S: Store,
-    R: AsyncRead + Send,
+    R: AsyncRead + Debug + Send,
 {
     async fn transfer_into(
         self,
@@ -235,7 +226,7 @@ where
 impl<S, W, R> TransferInto<S, Writable<W>> for Readable<R>
 where
     S: Store,
-    W: AsyncWrite,
+    W: AsyncWrite + Debug,
     R: AsyncRead + Send,
 {
     async fn transfer_into(self, _: &mut PathLayer<S>, destination: Writable<W>) -> Result<()> {

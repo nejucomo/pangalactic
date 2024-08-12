@@ -18,7 +18,9 @@ where
         self,
         store: &mut StoreDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
-        store.commit(self.as_path()).await
+        let link = store.commit(self.as_path()).await?;
+        tracing::debug!(path=?&self, ?link, "committed");
+        Ok(link)
     }
 }
 

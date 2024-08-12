@@ -6,7 +6,6 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-log.workspace = true
 pangalactic-handle.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
@@ -17,4 +16,5 @@ pangalactic-store.workspace = true
 pangalactic-storedir.workspace = true
 pangalactic-table.workspace = true
 tokio.workspace = true
+tracing.workspace = true
 wasmtime.workspace = true

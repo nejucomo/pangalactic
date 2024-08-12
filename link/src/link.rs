@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::SCHEME;
 
-#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct Link<C> {
     kind: LinkKind,
     cid: C,
@@ -85,5 +85,14 @@ where
         let kind = self.kind;
         let cid = b64::serialize(&self.cid).map_err(|_| fmt::Error)?;
         write!(f, "{SCHEME}:{kind}-{cid}")
+    }
+}
+
+impl<C> fmt::Debug for Link<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{self}")
     }
 }

@@ -18,6 +18,7 @@ pangalactic-store.workspace = true
 pin-project.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "fs" ] }
+tracing.workspace = true
 
 [dev-dependencies]
 pangalactic-hash.workspace = true

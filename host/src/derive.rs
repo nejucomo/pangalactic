@@ -12,8 +12,8 @@ where
     S: Store,
 {
     let mut host = Host::new()?;
-    log::debug!("deriving {:?}...", plan);
+    tracing::debug!(?plan, "deriving");
     let (store, attestation) = host.execute(store, plan).await?;
-    log::info!("attestation of {:?} -> {:?}", plan, &attestation);
+    tracing::info!(?plan, ?attestation, "derived");
     Ok((store, attestation))
 }

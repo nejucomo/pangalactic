@@ -102,14 +102,21 @@ impl Runnable for StoreXferOptions {
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
     /// The plan to derive
-    pub plan: StandardPath,
+    pub plan: StandardAnySource,
 }
 
 impl Runnable for DeriveOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
         Box::pin(async {
             let mut store = StandardStore::default();
-            let attestation = store.derive(self.plan).await?;
+            // Transfer any source into the store to get a store path:
+            // Assert: Final unwrap never fails because `AnyDestination::Store` always produces a path:
+            let plan = store
+                .transfer(self.plan, AnyDestination::Store(None))
+                .await?
+                .unwrap();
+
+            let attestation = store.derive(plan).await?;
             tracing::info!("{attestation}");
             Ok(None)
         })
