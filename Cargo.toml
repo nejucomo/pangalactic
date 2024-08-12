@@ -15,6 +15,7 @@ members = [
   "init-stream",
   "iowrappers",
   "layer/cidmeta",
+  "layer/host",
   "layer/path",
   "layer/storedir",
   "link",
@@ -56,6 +57,7 @@ pangalactic-host            = { path = "host"            }
 pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-iowrappers      = { path = "iowrappers"      }
 pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
+pangalactic-layer-host      = { path = "layer/host"      }
 pangalactic-layer-path      = { path = "layer/path"      }
 pangalactic-layer-storedir  = { path = "layer/storedir"  }
 pangalactic-link            = { path = "link"            }
