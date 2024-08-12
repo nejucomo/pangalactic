@@ -6,7 +6,6 @@ members = [
   "chomper",
   "cid",
   "cli",
-#   "dagio",
   "dir",
 #   "guest",
 #   "guest-procmacro",
@@ -15,21 +14,20 @@ members = [
   "host",
   "init-stream",
   "iowrappers",
-  "layer-cidmeta",
+  "layer/cidmeta",
+  "layer/host",
+  "layer/path",
+  "layer/storedir",
   "link",
   "linkkind",
-#   "log",
-  "path",
+  # "log",
   "primitives",
   "schemata",
   "serialization",
-  "stdstore",
   "store/dirdb",
   "store/mem",
   "store/trait",
-  "storedir",
   "table",
-  "transfer",
   "traversal",
 ]
 
@@ -47,7 +45,6 @@ pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-dag-traversal   = { path = "traversal"       }
-# pangalactic-dagio             = { path = "dagio"             }
 pangalactic-dir             = { path = "dir"             }
 # pangalactic-guest           = { path = "guest"           }
 # pangalactic-guest-procmacro = { path = "guest-procmacro" }
@@ -57,21 +54,20 @@ pangalactic-hash            = { path = "hash"            }
 pangalactic-host            = { path = "host"            }
 pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-iowrappers      = { path = "iowrappers"      }
-pangalactic-layer-cidmeta   = { path = "layer-cidmeta"   }
-pangalactic-linkkind        = { path = "linkkind"        }
+pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
+pangalactic-layer-host      = { path = "layer/host"      }
+pangalactic-layer-path      = { path = "layer/path"      }
+pangalactic-layer-storedir  = { path = "layer/storedir"  }
 pangalactic-link            = { path = "link"            }
+pangalactic-linkkind        = { path = "linkkind"        }
 # pangalactic-log             = { path = "log"             }
-pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
-pangalactic-stdstore        = { path = "stdstore"        }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
-pangalactic-storedir        = { path = "storedir"        }
 pangalactic-table           = { path = "table"           }
-pangalactic-transfer        = { path = "transfer"        }
 
 # Dependencies external to this workspace:
 # TODO: Push features into specific crates that consume them:

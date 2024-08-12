@@ -13,7 +13,7 @@ pangalactic-linkkind.workspace = true
 pangalactic-primitives.workspace = true
 pangalactic-schemata = { workspace = true, features = [ "store" ] }
 pangalactic-store.workspace = true
-pangalactic-storedir.workspace = true
+pangalactic-layer-storedir.workspace = true
 pangalactic-table.workspace = true
 tokio.workspace = true
 tracing.workspace = true

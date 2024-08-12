@@ -1,5 +1,5 @@
+use pangalactic_layer_storedir::Name;
 use pangalactic_store::Store;
-use pangalactic_storedir::Name;
 use std::io::Cursor;
 use std::pin::Pin;
 use std::task::{Context, Poll};

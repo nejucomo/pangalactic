@@ -1,9 +1,10 @@
+use anyhow::Result;
 use pangalactic_bindref::{BindRef, Bindable};
+use pangalactic_layer_storedir::{StoreDirectory, StoreDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
-use pangalactic_storedir::{StoreDirectory, StoreDirectoryLayer};
 
-use crate::{StoreDestination, StorePath, ViaPath};
+use crate::{AnyDestination, AnySource, StoreDestination, StorePath, ViaPath};
 
 #[derive(Debug, Default, derive_more::From, derive_more::Into)]
 pub struct PathLayer<S>(StoreDirectoryLayer<S>)
@@ -16,7 +17,17 @@ impl<S> PathLayer<S>
 where
     S: Store,
 {
-    pub async fn resolve_path(&self, p: &StorePath<S::CID>) -> anyhow::Result<Link<S::CID>> {
+    pub async fn transfer(
+        &mut self,
+        source: AnySource<S::CID>,
+        destination: AnyDestination<S::CID>,
+    ) -> Result<Option<StorePath<S::CID>>> {
+        use crate::transfer::TransferInto;
+
+        source.transfer_into(self, destination).await
+    }
+
+    pub async fn resolve_path(&self, p: &StorePath<S::CID>) -> Result<Link<S::CID>> {
         let mut link = p.link().clone();
         for name in p.path() {
             let mut d: StoreDirectory<S::CID> = self.0.load(&link).await?;
@@ -34,7 +45,7 @@ where
     type Reader = ViaPath<<StoreDirectoryLayer<S> as Store>::Reader>;
     type Writer = ViaPath<<StoreDirectoryLayer<S> as Store>::Writer>;
 
-    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> Result<Self::Writer> {
         self.0.open_writer().await.map(ViaPath)
     }
 }
@@ -44,10 +55,7 @@ where
     S: Store,
     T: Commit<StoreDirectoryLayer<S>> + Send,
 {
-    async fn commit_into_store(
-        self,
-        store: &mut PathLayer<S>,
-    ) -> anyhow::Result<StorePath<S::CID>> {
+    async fn commit_into_store(self, store: &mut PathLayer<S>) -> Result<StorePath<S::CID>> {
         let link = store.0.commit(self.0).await?;
         Ok(StorePath::from(link))
     }
@@ -58,10 +66,7 @@ where
     S: Store,
     T: Load<StoreDirectoryLayer<S>>,
 {
-    async fn load_from_store(
-        store: &PathLayer<S>,
-        path: &StorePath<S::CID>,
-    ) -> anyhow::Result<Self> {
+    async fn load_from_store(store: &PathLayer<S>, path: &StorePath<S::CID>) -> Result<Self> {
         let link = store.resolve_path(path).await?;
         let inner = store.0.load(&link).await?;
         Ok(ViaPath(inner))
@@ -73,10 +78,7 @@ where
     S: Store,
     V: Commit<PathLayer<S>> + Send,
 {
-    async fn commit_into_store(
-        self,
-        store: &mut PathLayer<S>,
-    ) -> anyhow::Result<StorePath<S::CID>> {
+    async fn commit_into_store(self, store: &mut PathLayer<S>) -> Result<StorePath<S::CID>> {
         let BindRef { bound, value } = self;
 
         let valpath = store.commit(value).await?;

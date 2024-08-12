@@ -1,3 +1,5 @@
+#![allow(async_fn_in_trait)]
+
 mod anydest;
 mod anysource;
 mod hdlforward;
@@ -5,6 +7,7 @@ mod layer;
 mod parser;
 mod storedest;
 mod storepath;
+pub mod transfer;
 mod viapath;
 
 pub use self::anydest::AnyDestination;
