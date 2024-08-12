@@ -3,7 +3,7 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use pangalactic_path::{AnyDestination, AnySource};
+use pangalactic_layer_path::{AnyDestination, AnySource};
 use pangalactic_stdstore::{
     StandardAnyDestination, StandardAnySource, StandardPath, StandardStore,
 };

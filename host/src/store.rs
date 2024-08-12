@@ -1,7 +1,7 @@
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
+use pangalactic_layer_storedir::{StoreDirectory, StoreDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::Store;
-use pangalactic_storedir::{StoreDirectory, StoreDirectoryLayer};
 
 pub type HostLayer<S> = StoreDirectoryLayer<CidMetaLayer<S>>;
 pub type HostLink<C> = Link<CidMeta<C>>;

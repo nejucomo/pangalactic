@@ -8,9 +8,9 @@ license.workspace = true
 anyhow.workspace = true
 pangalactic-bindref.workspace = true
 pangalactic-iowrappers.workspace = true
-pangalactic-path.workspace = true
+pangalactic-layer-path.workspace = true
+pangalactic-layer-storedir.workspace = true
 pangalactic-store.workspace = true
-pangalactic-storedir.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "fs", "io-std" ] }
 tracing.workspace = true

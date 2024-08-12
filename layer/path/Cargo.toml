@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-path"
+name = "pangalactic-layer-path"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -12,10 +12,10 @@ pangalactic-bindref.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-iowrappers.workspace = true
+pangalactic-layer-storedir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-store.workspace = true
-pangalactic-storedir.workspace = true
 pin-project.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }

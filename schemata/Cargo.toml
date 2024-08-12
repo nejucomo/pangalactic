@@ -7,7 +7,7 @@ license.workspace = true
 [features]
 store = [
   "pangalactic-store",
-  "pangalactic-storedir",
+  "pangalactic-layer-storedir",
 ]
 
 [dependencies]
@@ -16,4 +16,4 @@ pangalactic-dir.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store = { workspace = true, optional = true }
-pangalactic-storedir = { workspace = true, optional = true }
+pangalactic-layer-storedir = { workspace = true, optional = true }

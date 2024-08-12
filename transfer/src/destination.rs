@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use std::path::PathBuf;
 
 use pangalactic_iowrappers::Writable;
-use pangalactic_path::{AnyDestination, StoreDestination, StorePath};
+use pangalactic_layer_path::{AnyDestination, StoreDestination, StorePath};
 
 pub trait Destination: std::fmt::Debug {
     type CID;

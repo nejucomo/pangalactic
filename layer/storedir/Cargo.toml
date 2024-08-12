@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-storedir"
+name = "pangalactic-layer-storedir"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

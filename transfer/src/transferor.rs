@@ -1,5 +1,5 @@
 use anyhow::Result;
-use pangalactic_path::{AnyDestination, AnySource, PathLayer, StorePath};
+use pangalactic_layer_path::{AnyDestination, AnySource, PathLayer, StorePath};
 use pangalactic_store::Store;
 
 use crate::TransferInto;

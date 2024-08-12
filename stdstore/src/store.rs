@@ -1,7 +1,7 @@
 use anyhow::Result;
 use pangalactic_hash::Hash;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
-use pangalactic_path::{AnyDestination, AnySource, PathLayer, StorePath};
+use pangalactic_layer_path::{AnyDestination, AnySource, PathLayer, StorePath};
 use pangalactic_store_dirdb::DirDbStore;
 use pangalactic_transfer::Transferor;
 
