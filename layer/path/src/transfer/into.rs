@@ -3,7 +3,6 @@ use std::{fmt::Debug, path::PathBuf, pin::pin};
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
 use pangalactic_iowrappers::{Readable, Writable};
-use pangalactic_layer_path::{AnyDestination, AnySource, PathLayer, StoreDestination, StorePath};
 use pangalactic_layer_storedir::{DirNodeReader, StoreDirectory};
 use pangalactic_store::{Commit, Store};
 use tokio::{
@@ -11,7 +10,8 @@ use tokio::{
     io::{AsyncRead, AsyncWrite, Stdin, Stdout},
 };
 
-use crate::Destination;
+use crate::transfer::Destination;
+use crate::{AnyDestination, AnySource, PathLayer, StoreDestination, StorePath};
 
 pub trait TransferInto<S, D>
 where

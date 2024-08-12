@@ -19,6 +19,7 @@ pangalactic-store.workspace = true
 pin-project.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
+tracing.workspace = true
 
 [dev-dependencies]
 pangalactic-link = { workspace = true, features = ["testutil"] }

@@ -5,3 +5,9 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+pangalactic-host.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-layer-path.workspace = true
+pangalactic-store.workspace = true

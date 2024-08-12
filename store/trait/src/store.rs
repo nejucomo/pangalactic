@@ -8,10 +8,9 @@ use crate::{Commit, Load};
 
 pub trait Store: Sized + Debug + Send + Sync {
     type CID: ContentIdentifier;
-    type Reader: Load<Self> + AsyncRead + Unpin + Send + Sync;
-    type Writer: Commit<Self> + AsyncWrite + Unpin + Send + Sync;
+    type Reader: Load<Self> + AsyncRead + Debug + Unpin + Send + Sync;
+    type Writer: Commit<Self> + AsyncWrite + Debug + Unpin + Send + Sync;
 
-    /// Callers typically use these:
     fn commit<T>(&mut self, object: T) -> impl Future<Output = Result<Self::CID>> + Send
     where
         T: Commit<Self> + Send,
@@ -26,7 +25,5 @@ pub trait Store: Sized + Debug + Send + Sync {
         T::load_from_store(self, cid)
     }
 
-    /// Implementors must provide these:
-    // TODO: Move to a distinct inherited trait, eg `StoreProvider`?
     fn open_writer(&self) -> impl Future<Output = Result<Self::Writer>> + Send;
 }

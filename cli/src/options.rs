@@ -3,15 +3,19 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
+use pangalactic_layer_host::{HostAnyDestination, HostAnySource, HostLayer, HostStorePath};
 use pangalactic_layer_path::{AnyDestination, AnySource};
-use pangalactic_stdstore::{
-    StandardAnyDestination, StandardAnySource, StandardPath, StandardStore,
-};
+use pangalactic_store_dirdb::DirDbStore;
+
+type CliAnyDestination = HostAnyDestination<DirDbStore>;
+type CliAnySource = HostAnySource<DirDbStore>;
+type CliStore = HostLayer<DirDbStore>;
+type CliStorePath = HostStorePath<DirDbStore>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
 pub trait Runnable {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>>;
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>>;
 }
 
 #[derive(Debug, Parser)]
@@ -28,7 +32,7 @@ impl Options {
 }
 
 impl Runnable for Options {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         self.command.unwrap().run()
     }
 }
@@ -55,9 +59,9 @@ pub enum StoreCommand {
 pub struct StorePutOptions {}
 
 impl Runnable for StorePutOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            let mut store = StandardStore::default();
+            let mut store = CliStore::default();
             store
                 .transfer(AnySource::Stdin, AnyDestination::Store(None))
                 .await
@@ -69,13 +73,13 @@ impl Runnable for StorePutOptions {
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The source to get
-    pub source: StandardAnySource,
+    pub source: CliAnySource,
 }
 
 impl Runnable for StoreGetOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            let mut store = StandardStore::default();
+            let mut store = CliStore::default();
             store.transfer(self.source, AnyDestination::Stdout).await?;
             Ok(None)
         })
@@ -85,14 +89,14 @@ impl Runnable for StoreGetOptions {
 /// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct StoreXferOptions {
-    pub source: StandardAnySource,
-    pub dest: StandardAnyDestination,
+    pub source: CliAnySource,
+    pub dest: CliAnyDestination,
 }
 
 impl Runnable for StoreXferOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            let mut store = StandardStore::default();
+            let mut store = CliStore::default();
             store.transfer(self.source, self.dest).await
         })
     }
@@ -102,13 +106,13 @@ impl Runnable for StoreXferOptions {
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
     /// The plan to derive
-    pub plan: StandardAnySource,
+    pub plan: CliAnySource,
 }
 
 impl Runnable for DeriveOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<StandardPath>>>>> {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            let mut store = StandardStore::default();
+            let mut store = CliStore::default();
             // Transfer any source into the store to get a store path:
             // Assert: Final unwrap never fails because `AnyDestination::Store` always produces a path:
             let plan = store

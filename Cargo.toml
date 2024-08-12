@@ -24,12 +24,10 @@ members = [
   "primitives",
   "schemata",
   "serialization",
-  "stdstore",
   "store/dirdb",
   "store/mem",
   "store/trait",
   "table",
-  "transfer",
   "traversal",
 ]
 
@@ -66,12 +64,10 @@ pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
-pangalactic-stdstore        = { path = "stdstore"        }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
 pangalactic-table           = { path = "table"           }
-pangalactic-transfer        = { path = "transfer"        }
 
 # Dependencies external to this workspace:
 # TODO: Push features into specific crates that consume them:

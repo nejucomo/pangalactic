@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+mod inner;
+mod layer;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub use self::layer::HostLayer;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub type HostAnyDestination<S> = pangalactic_layer_path::AnyDestination<inner::Cid<S>>;
+pub type HostAnySource<S> = pangalactic_layer_path::AnySource<inner::Cid<S>>;
+pub type HostStorePath<S> = pangalactic_layer_path::StorePath<inner::Cid<S>>;
