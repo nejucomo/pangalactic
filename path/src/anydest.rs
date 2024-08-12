@@ -1,11 +1,11 @@
-use std::{fmt::Display, path::PathBuf, str::FromStr};
+use std::{fmt, path::PathBuf, str::FromStr};
 
 use pangalactic_link::SCHEME_PREFIX;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::StoreDestination;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum AnyDestination<C> {
     Stdout,
     Host(PathBuf),
@@ -13,7 +13,7 @@ pub enum AnyDestination<C> {
 }
 use AnyDestination::*;
 
-impl<C> Display for AnyDestination<C>
+impl<C> fmt::Display for AnyDestination<C>
 where
     C: Serialize,
 {
@@ -24,6 +24,15 @@ where
             Store(None) => SCHEME_PREFIX.fmt(f),
             Store(Some(sp)) => sp.fmt(f),
         }
+    }
+}
+
+impl<C> fmt::Debug for AnyDestination<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{self}")
     }
 }
 

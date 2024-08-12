@@ -1,3 +1,4 @@
 pub(crate) fn bytes(b: &[u8]) {
-    log::debug!("{}", String::from_utf8_lossy(b));
+    let guest_message = String::from_utf8_lossy(b);
+    tracing::debug!(?guest_message);
 }

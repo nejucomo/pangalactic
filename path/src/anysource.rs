@@ -1,4 +1,4 @@
-use std::{fmt::Display, path::PathBuf, str::FromStr};
+use std::{fmt, path::PathBuf, str::FromStr};
 
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::SCHEME_PREFIX;
@@ -7,7 +7,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{PathLayer, StorePath};
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Eq, PartialEq)]
 pub enum AnySource<C> {
     Stdin,
     Host(PathBuf),
@@ -15,11 +15,11 @@ pub enum AnySource<C> {
 }
 use AnySource::*;
 
-impl<C> Display for AnySource<C>
+impl<C> fmt::Display for AnySource<C>
 where
     C: Serialize,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Stdin => '-'.fmt(f),
             Host(pb) => pb.display().fmt(f),
@@ -28,9 +28,18 @@ where
     }
 }
 
+impl<C> fmt::Debug for AnySource<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{self}")
+    }
+}
+
 impl<C> FromStr for AnySource<C>
 where
-    C: std::fmt::Debug + DeserializeOwned,
+    C: Serialize + DeserializeOwned,
 {
     type Err = anyhow::Error;
 
@@ -60,3 +69,6 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

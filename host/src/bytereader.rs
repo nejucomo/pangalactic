@@ -1,17 +1,18 @@
-use pangalactic_dagio::DagioReader;
-use pangalactic_hostdir::Name;
 use pangalactic_store::Store;
+use pangalactic_storedir::Name;
 use std::io::Cursor;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 use tokio::io::{AsyncRead, ReadBuf};
+
+use crate::store::HostReader;
 
 pub(crate) enum ByteReader<S>
 where
     S: Store,
 {
     Buf(Cursor<Vec<u8>>),
-    Store(DagioReader<S>),
+    Store(HostReader<S>),
 }
 
 impl<S> From<Name> for ByteReader<S>

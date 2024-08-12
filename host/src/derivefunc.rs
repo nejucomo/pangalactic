@@ -1,8 +1,8 @@
-use crate::State;
-use pangalactic_dagio::Dagio;
+use crate::{
+    store::{HostLayer, HostLink},
+    State,
+};
 use pangalactic_handle::Handle;
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
 use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module, TypedFunc};
 
@@ -38,8 +38,8 @@ where
 
     pub(crate) async fn call_async(
         mut self,
-        plan: &Link<CidMeta<S::CID>>,
-    ) -> anyhow::Result<(Dagio<S>, Link<CidMeta<S::CID>>)> {
+        plan: &HostLink<S::CID>,
+    ) -> anyhow::Result<(HostLayer<S>, HostLink<S::CID>)> {
         use pangalactic_schemata::Attestation;
 
         let derive_handle = self.store.data_mut().links_mut().insert(plan.clone());
@@ -52,14 +52,14 @@ where
         let output_handle = unsafe { Handle::wrap(raw_output) };
         let output_link = self.store.data().links().lookup(output_handle).cloned()?;
 
-        let mut dagio = self.store.into_data().unwrap_dagio();
-        let attestation_link = dagio
+        let mut store = self.store.into_data().unwrap_store();
+        let attestation_link = store
             .commit(Attestation {
                 plan: plan.clone(),
                 output: output_link,
             })
             .await?;
 
-        Ok((dagio, attestation_link))
+        Ok((store, attestation_link))
     }
 }

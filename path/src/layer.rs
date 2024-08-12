@@ -5,7 +5,7 @@ use pangalactic_storedir::{StoreDirectory, StoreDirectoryLayer};
 
 use crate::{StoreDestination, StorePath, ViaPath};
 
-#[derive(Debug, Default, derive_more::From)]
+#[derive(Debug, Default, derive_more::From, derive_more::Into)]
 pub struct PathLayer<S>(StoreDirectoryLayer<S>)
 where
     S: Store;
@@ -16,7 +16,7 @@ impl<S> PathLayer<S>
 where
     S: Store,
 {
-    pub(crate) async fn resolve_path(&self, p: &StorePath<S::CID>) -> anyhow::Result<Link<S::CID>> {
+    pub async fn resolve_path(&self, p: &StorePath<S::CID>) -> anyhow::Result<Link<S::CID>> {
         let mut link = p.link().clone();
         for name in p.path() {
             let mut d: StoreDirectory<S::CID> = self.0.load(&link).await?;

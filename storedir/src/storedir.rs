@@ -9,7 +9,7 @@ use tokio::io::AsyncRead;
 
 use crate::{Name, StoreDirectoryLayer, StoreDirectorySerializationContainer};
 
-#[derive(Clone, Debug, Deref, DerefMut, From, Into, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Deref, DerefMut, From, Into, Deserialize, Serialize, PartialEq)]
 #[serde(
     bound = "C: Clone + DeserializeOwned + Serialize",
     try_from = "StoreDirectorySerializationContainer<C>",
@@ -89,5 +89,14 @@ where
     ) -> anyhow::Result<Self> {
         let reader = store.open_kind_reader(link, LinkKind::Dir).await?;
         StoreDirectory::deserialize_from(reader).await
+    }
+}
+
+impl<C> std::fmt::Debug for StoreDirectory<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
     }
 }

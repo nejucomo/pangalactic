@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::PathLayer;
 
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct StorePath<C> {
     link: Link<C>,
     /// Invariant: if self.link.kind() == File then path.is_empty
@@ -26,7 +26,7 @@ impl<C> ContentIdentifier for StorePath<C> where
 impl<C> StorePath<C> {
     pub fn new(link: Link<C>, path: Vec<Name>) -> anyhow::Result<Self>
     where
-        C: fmt::Debug,
+        C: Serialize,
     {
         if link.kind() == File && !path.is_empty() {
             anyhow::bail!(
@@ -49,7 +49,7 @@ impl<C> StorePath<C> {
 
     pub fn unwrap_pathless_link(self) -> anyhow::Result<Link<C>>
     where
-        C: fmt::Debug,
+        C: Serialize,
     {
         if self.path.is_empty() {
             Ok(self.link)
@@ -79,9 +79,18 @@ where
     }
 }
 
+impl<C> fmt::Debug for StorePath<C>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{self}")
+    }
+}
+
 impl<C> FromStr for StorePath<C>
 where
-    C: fmt::Debug + DeserializeOwned,
+    C: Serialize + DeserializeOwned,
 {
     type Err = anyhow::Error;
 

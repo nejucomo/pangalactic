@@ -1,5 +1,6 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, future::Future};
 
+use anyhow::Result;
 use pangalactic_cid::ContentIdentifier;
 use tokio::io::{AsyncRead, AsyncWrite};
 
@@ -11,21 +12,21 @@ pub trait Store: Sized + Debug + Send + Sync {
     type Writer: Commit<Self> + AsyncWrite + Unpin + Send + Sync;
 
     /// Callers typically use these:
-    async fn commit<T>(&mut self, object: T) -> anyhow::Result<Self::CID>
+    fn commit<T>(&mut self, object: T) -> impl Future<Output = Result<Self::CID>> + Send
     where
         T: Commit<Self> + Send,
     {
-        object.commit_into_store(self).await
+        object.commit_into_store(self)
     }
 
-    async fn load<T>(&self, cid: &Self::CID) -> anyhow::Result<T>
+    fn load<T>(&self, cid: &Self::CID) -> impl Future<Output = Result<T>> + Send
     where
         T: Load<Self>,
     {
-        T::load_from_store(self, cid).await
+        T::load_from_store(self, cid)
     }
 
     /// Implementors must provide these:
     // TODO: Move to a distinct inherited trait, eg `StoreProvider`?
-    async fn open_writer(&self) -> anyhow::Result<Self::Writer>;
+    fn open_writer(&self) -> impl Future<Output = Result<Self::Writer>> + Send;
 }

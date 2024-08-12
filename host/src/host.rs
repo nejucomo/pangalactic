@@ -1,7 +1,7 @@
-use crate::State;
-use pangalactic_dagio::Dagio;
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
+use crate::{
+    store::{HostLayer, HostLink},
+    State,
+};
 use pangalactic_store::Store;
 use wasmtime::{Engine, Linker, Module};
 
@@ -36,12 +36,12 @@ where
 
     pub async fn execute(
         &mut self,
-        dagio: Dagio<S>,
-        plan: &Link<CidMeta<S::CID>>,
-    ) -> anyhow::Result<(Dagio<S>, Link<CidMeta<S::CID>>)> {
+        store: HostLayer<S>,
+        plan: &HostLink<S::CID>,
+    ) -> anyhow::Result<(HostLayer<S>, HostLink<S::CID>)> {
         use crate::DeriveFunc;
 
-        let mut state = State::new(dagio);
+        let mut state = State::new(store);
         let execmod = load_exec_mod(&mut state, &self.engine, plan).await?;
         let derivefunc = DeriveFunc::new(&self.engine, &self.linker, state, &execmod).await?;
 
@@ -52,16 +52,16 @@ where
 async fn load_exec_mod<S>(
     state: &mut State<S>,
     engine: &Engine,
-    plan: &Link<CidMeta<S::CID>>,
+    plan: &HostLink<S::CID>,
 ) -> anyhow::Result<Module>
 where
     S: Store,
 {
     use pangalactic_schemata::Plan;
 
-    let dagio = state.dagio_mut();
-    let plan: Plan<_> = dagio.load(plan).await?;
-    let execbytes: Vec<u8> = dagio.load(&plan.exec).await?;
+    let store = state.store_mut();
+    let plan: Plan<_> = store.load(plan).await?;
+    let execbytes: Vec<u8> = store.load(&plan.exec).await?;
     let execmod = Module::new(engine, execbytes)?;
     Ok(execmod)
 }

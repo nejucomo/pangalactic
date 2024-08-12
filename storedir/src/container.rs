@@ -2,7 +2,7 @@ use crate::storedir::Inner;
 use crate::StoreDirectory;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub(crate) struct StoreDirectorySerializationContainer<C> {
     version: u64,
     inner: Inner<C>,

@@ -11,4 +11,6 @@ pangalactic-iowrappers.workspace = true
 pangalactic-path.workspace = true
 pangalactic-store.workspace = true
 pangalactic-storedir.workspace = true
+serde.workspace = true
 tokio = { workspace = true, features = [ "fs", "io-std" ] }
+tracing.workspace = true

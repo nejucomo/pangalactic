@@ -2,7 +2,7 @@ use anyhow::Result;
 use pangalactic_path::{AnyDestination, AnySource, PathLayer, StorePath};
 use pangalactic_store::Store;
 
-use crate::{transfer, TransferInto};
+use crate::TransferInto;
 
 pub trait Transferor<C> {
     async fn transfer(
@@ -22,6 +22,6 @@ where
         source: AnySource<S::CID>,
         destination: AnyDestination<S::CID>,
     ) -> Result<Option<StorePath<S::CID>>> {
-        transfer(self, source, destination).await
+        source.transfer_into(self, destination).await
     }
 }

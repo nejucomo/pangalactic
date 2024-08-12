@@ -5,17 +5,15 @@ edition.workspace = true
 license.workspace = true
 
 [features]
-dagio = [
-  "pangalactic-dagio",
-  "pangalactic-hostdir",
+store = [
   "pangalactic-store",
+  "pangalactic-storedir",
 ]
 
 [dependencies]
 anyhow.workspace = true
-pangalactic-dagio = { workspace = true, optional = true }
 pangalactic-dir.workspace = true
-pangalactic-hostdir = { workspace = true, optional = true }
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store = { workspace = true, optional = true }
+pangalactic-storedir = { workspace = true, optional = true }
