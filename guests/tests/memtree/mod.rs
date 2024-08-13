@@ -1,8 +1,5 @@
-use pangalactic_dagio::{Dagio, DagioCommit, DagioLoad};
-use pangalactic_hostdir::HostDirectory;
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_link::Link;
-use pangalactic_store::Store;
+use pangalactic_layer_storedir::StoreDirectory;
+use pangalactic_store::{Commit, Load, Store};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -29,21 +26,17 @@ impl<'a, const K: usize> From<[(&'a str, MemTree); K]> for MemTree {
     }
 }
 
-#[async_trait::async_trait]
-impl<S> DagioCommit<S> for MemTree
+impl<S> Commit<S> for MemTree
 where
     S: Store,
 {
-    async fn commit_into_dagio(
-        self,
-        dagio: &mut Dagio<S>,
-    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
+    async fn commit_into_store(self, store: &mut S) -> anyhow::Result<<S as Store>::CID> {
         use MemTree::*;
 
         match self {
             File(bytes) => dagio.commit(bytes).await,
             Dir(entries) => {
-                let mut d = HostDirectory::default();
+                let mut d = StoreDirectory::default();
                 for (n, child) in entries {
                     let link = dagio.commit(child.clone()).await?;
                     d.insert(n.to_string(), link)?;
@@ -54,22 +47,18 @@ where
     }
 }
 
-#[async_trait::async_trait]
-impl<S> DagioLoad<S> for MemTree
+impl<S> Load<S> for MemTree
 where
     S: Store,
 {
-    async fn load_from_dagio(
-        dagio: &Dagio<S>,
-        link: &Link<CidMeta<S::CID>>,
-    ) -> anyhow::Result<Self> {
+    async fn load_from_store(store: &S, cid: &<S as Store>::CID) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {
             LK::File => dagio.load(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: HostDirectory<_> = dagio.load(link).await?;
+                let d: StoreDirectory<_> = dagio.load(link).await?;
                 for (n, sublink) in d {
                     let mt: MemTree = dagio.load(&sublink).await?;
                     map.insert(n, mt);
