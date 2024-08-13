@@ -43,6 +43,8 @@ pub enum Command {
     #[command(subcommand)]
     Store(StoreCommand),
     Derive(DeriveOptions),
+    #[command(subcommand)]
+    Stdlib(StdlibCommand),
 }
 
 /// Interact directly with the store
@@ -122,6 +124,28 @@ impl Runnable for DeriveOptions {
 
             let attestation = store.derive(plan).await?;
             tracing::info!("{attestation}");
+            Ok(None)
+        })
+    }
+}
+
+/// Manage the stdlib of pgwasm guests
+#[enum_dispatch(Runnable)]
+#[derive(Debug, Subcommand)]
+pub enum StdlibCommand {
+    List(StdlibListOptions),
+}
+
+/// List the pgwasm names
+#[derive(Debug, Args)]
+pub struct StdlibListOptions {}
+
+impl Runnable for StdlibListOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        Box::pin(async {
+            for name in pangalactic_guests::iter_wasm_names() {
+                println!("{name}");
+            }
             Ok(None)
         })
     }
