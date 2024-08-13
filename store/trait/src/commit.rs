@@ -33,3 +33,12 @@ where
         store.commit(Readable(self)).await
     }
 }
+
+impl<S> Commit<S> for Vec<u8>
+where
+    S: Store,
+{
+    async fn commit_into_store(self, store: &mut S) -> Result<S::CID> {
+        store.commit(self.as_slice()).await
+    }
+}

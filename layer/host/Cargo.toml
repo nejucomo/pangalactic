@@ -10,4 +10,5 @@ pangalactic-host.workspace = true
 pangalactic-iowrappers.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-layer-path.workspace = true
+pangalactic-layer-storedir.workspace = true
 pangalactic-store.workspace = true
