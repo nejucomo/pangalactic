@@ -7,6 +7,7 @@ use pangalactic_layer_host::{
     HostAnyDestination, HostAnySource, HostLayer, HostStoreDirectory, HostStorePath,
 };
 use pangalactic_layer_path::{AnyDestination, AnySource};
+use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 
 type CliAnyDestination = HostAnyDestination<DirDbStore>;
@@ -110,24 +111,46 @@ impl Runnable for StoreXferOptions {
 /// Derive a plan
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
-    /// The plan to derive
-    pub plan: CliAnySource,
+    /// The plan to derive, or an exec file if `INPUT` is provided
+    pub plan_or_exec: CliAnySource,
+
+    /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
+    pub input: Option<CliAnySource>,
 }
 
 impl Runnable for DeriveOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        use pangalactic_schemata::Plan;
+
         Box::pin(async {
             let mut store = CliStore::default();
+
             // Transfer any source into the store to get a store path:
             // Assert: Final unwrap never fails because `AnyDestination::Store` always produces a path:
-            let plan = store
-                .transfer(self.plan, AnyDestination::Store(None))
+            let plan_or_exec = store
+                .transfer(self.plan_or_exec, AnyDestination::Store(None))
                 .await?
                 .unwrap();
 
+            let plan = if let Some(input) = self.input {
+                let input_link = store
+                    .transfer(input, AnyDestination::Store(None))
+                    .await?
+                    .unwrap();
+                store
+                    .storedir_mut()
+                    .commit(Plan {
+                        exec: plan_or_exec.unwrap_pathless_link()?,
+                        input: input_link.unwrap_pathless_link()?,
+                    })
+                    .await
+                    .map(CliStorePath::from)?
+            } else {
+                plan_or_exec
+            };
+
             let attestation = store.derive(plan).await?;
-            tracing::info!("{attestation}");
-            Ok(None)
+            Ok(Some(attestation))
         })
     }
 }
@@ -161,8 +184,6 @@ pub struct StdlibInstallOptions {}
 
 impl Runnable for StdlibInstallOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
-        use pangalactic_store::Store;
-
         Box::pin(async {
             let mut store = CliStore::default();
             let dstore = store.storedir_mut();
