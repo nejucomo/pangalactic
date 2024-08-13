@@ -9,6 +9,7 @@ anyhow.workspace = true
 clap.workspace = true
 enum_dispatch.workspace = true
 pangalactic-b64.workspace = true
+pangalactic-guests.workspace = true
 pangalactic-layer-host.workspace = true
 pangalactic-layer-path.workspace = true
 pangalactic-layer-storedir.workspace = true
@@ -16,6 +17,7 @@ pangalactic-link.workspace = true
 pangalactic-log.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-store.workspace = true
+pangalactic-schemata.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
 tracing.workspace = true

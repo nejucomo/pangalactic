@@ -3,14 +3,18 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use pangalactic_layer_host::{HostAnyDestination, HostAnySource, HostLayer, HostStorePath};
+use pangalactic_layer_host::{
+    HostAnyDestination, HostAnySource, HostLayer, HostStoreDirectory, HostStorePath,
+};
 use pangalactic_layer_path::{AnyDestination, AnySource};
+use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 
 type CliAnyDestination = HostAnyDestination<DirDbStore>;
 type CliAnySource = HostAnySource<DirDbStore>;
 type CliStore = HostLayer<DirDbStore>;
 type CliStorePath = HostStorePath<DirDbStore>;
+type CliStoreDirectory = HostStoreDirectory<DirDbStore>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -43,6 +47,8 @@ pub enum Command {
     #[command(subcommand)]
     Store(StoreCommand),
     Derive(DeriveOptions),
+    #[command(subcommand)]
+    Stdlib(StdlibCommand),
 }
 
 /// Interact directly with the store
@@ -105,24 +111,94 @@ impl Runnable for StoreXferOptions {
 /// Derive a plan
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
-    /// The plan to derive
-    pub plan: CliAnySource,
+    /// The plan to derive, or an exec file if `INPUT` is provided
+    pub plan_or_exec: CliAnySource,
+
+    /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
+    pub input: Option<CliAnySource>,
 }
 
 impl Runnable for DeriveOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        use pangalactic_schemata::Plan;
+
         Box::pin(async {
             let mut store = CliStore::default();
+
             // Transfer any source into the store to get a store path:
             // Assert: Final unwrap never fails because `AnyDestination::Store` always produces a path:
-            let plan = store
-                .transfer(self.plan, AnyDestination::Store(None))
+            let plan_or_exec = store
+                .transfer(self.plan_or_exec, AnyDestination::Store(None))
                 .await?
                 .unwrap();
 
+            let plan = if let Some(input) = self.input {
+                let input_link = store
+                    .transfer(input, AnyDestination::Store(None))
+                    .await?
+                    .unwrap();
+                store
+                    .storedir_mut()
+                    .commit(Plan {
+                        exec: plan_or_exec.unwrap_pathless_link()?,
+                        input: input_link.unwrap_pathless_link()?,
+                    })
+                    .await
+                    .map(CliStorePath::from)?
+            } else {
+                plan_or_exec
+            };
+
             let attestation = store.derive(plan).await?;
-            tracing::info!("{attestation}");
+            Ok(Some(attestation))
+        })
+    }
+}
+
+/// Manage the stdlib of pgwasm guests
+#[enum_dispatch(Runnable)]
+#[derive(Debug, Subcommand)]
+pub enum StdlibCommand {
+    List(StdlibListOptions),
+    Install(StdlibInstallOptions),
+}
+
+/// List the pgwasm names
+#[derive(Debug, Args)]
+pub struct StdlibListOptions {}
+
+impl Runnable for StdlibListOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        Box::pin(async {
+            for name in pangalactic_guests::iter_wasm_names() {
+                println!("{name}");
+            }
             Ok(None)
+        })
+    }
+}
+
+/// Install the stdlib pgwasm directory
+#[derive(Debug, Args)]
+pub struct StdlibInstallOptions {}
+
+impl Runnable for StdlibInstallOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        Box::pin(async {
+            let mut store = CliStore::default();
+            let dstore = store.storedir_mut();
+
+            let mut storedir = CliStoreDirectory::default();
+            for name in pangalactic_guests::iter_wasm_names() {
+                let bytes = pangalactic_guests::get_wasm_bytes(name)?;
+                let link = dstore.commit(bytes).await?;
+                let fname = format!("{name}.wasm");
+                tracing::debug!(?fname, ?link, "committed wasm");
+                storedir.insert(fname, link)?;
+            }
+            let link = dstore.commit(storedir).await?;
+
+            Ok(Some(CliStorePath::from(link)))
         })
     }
 }
