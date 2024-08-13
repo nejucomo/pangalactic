@@ -3,7 +3,9 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use pangalactic_layer_host::{HostAnyDestination, HostAnySource, HostLayer, HostStorePath};
+use pangalactic_layer_host::{
+    HostAnyDestination, HostAnySource, HostLayer, HostStoreDirectory, HostStorePath,
+};
 use pangalactic_layer_path::{AnyDestination, AnySource};
 use pangalactic_store_dirdb::DirDbStore;
 
@@ -11,6 +13,7 @@ type CliAnyDestination = HostAnyDestination<DirDbStore>;
 type CliAnySource = HostAnySource<DirDbStore>;
 type CliStore = HostLayer<DirDbStore>;
 type CliStorePath = HostStorePath<DirDbStore>;
+type CliStoreDirectory = HostStoreDirectory<DirDbStore>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -134,6 +137,7 @@ impl Runnable for DeriveOptions {
 #[derive(Debug, Subcommand)]
 pub enum StdlibCommand {
     List(StdlibListOptions),
+    Install(StdlibInstallOptions),
 }
 
 /// List the pgwasm names
@@ -147,6 +151,33 @@ impl Runnable for StdlibListOptions {
                 println!("{name}");
             }
             Ok(None)
+        })
+    }
+}
+
+/// Install the stdlib pgwasm directory
+#[derive(Debug, Args)]
+pub struct StdlibInstallOptions {}
+
+impl Runnable for StdlibInstallOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        use pangalactic_store::Store;
+
+        Box::pin(async {
+            let mut store = CliStore::default();
+            let dstore = store.storedir_mut();
+
+            let mut storedir = CliStoreDirectory::default();
+            for name in pangalactic_guests::iter_wasm_names() {
+                let bytes = pangalactic_guests::get_wasm_bytes(name)?;
+                let link = dstore.commit(bytes).await?;
+                let fname = format!("{name}.wasm");
+                tracing::debug!(?fname, ?link, "committed wasm");
+                storedir.insert(fname, link)?;
+            }
+            let link = dstore.commit(storedir).await?;
+
+            Ok(Some(CliStorePath::from(link)))
         })
     }
 }
