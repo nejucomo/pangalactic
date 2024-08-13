@@ -1,8 +1,6 @@
-use pangalactic_dagio::{Dagio, DagioCommit, DagioLoad};
-use pangalactic_hostdir::HostDirectory;
-use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_layer_storedir::{StoreDirectory, StoreDirectoryLayer};
 use pangalactic_link::Link;
-use pangalactic_store::Store;
+use pangalactic_store::{Commit, Load, Store};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -29,49 +27,47 @@ impl<'a, const K: usize> From<[(&'a str, MemTree); K]> for MemTree {
     }
 }
 
-#[async_trait::async_trait]
-impl<S> DagioCommit<S> for MemTree
+impl<S> Commit<StoreDirectoryLayer<S>> for MemTree
 where
     S: Store,
 {
-    async fn commit_into_dagio(
+    async fn commit_into_store(
         self,
-        dagio: &mut Dagio<S>,
-    ) -> anyhow::Result<Link<CidMeta<S::CID>>> {
+        store: &mut StoreDirectoryLayer<S>,
+    ) -> anyhow::Result<Link<S::CID>> {
         use MemTree::*;
 
         match self {
-            File(bytes) => dagio.commit(bytes).await,
+            File(bytes) => store.commit(bytes).await,
             Dir(entries) => {
-                let mut d = HostDirectory::default();
+                let mut d = StoreDirectory::default();
                 for (n, child) in entries {
-                    let link = dagio.commit(child.clone()).await?;
+                    let link = Box::pin(store.commit(child.clone())).await?;
                     d.insert(n.to_string(), link)?;
                 }
-                dagio.commit(d).await
+                store.commit(d).await
             }
         }
     }
 }
 
-#[async_trait::async_trait]
-impl<S> DagioLoad<S> for MemTree
+impl<S> Load<StoreDirectoryLayer<S>> for MemTree
 where
     S: Store,
 {
-    async fn load_from_dagio(
-        dagio: &Dagio<S>,
-        link: &Link<CidMeta<S::CID>>,
+    async fn load_from_store(
+        store: &StoreDirectoryLayer<S>,
+        link: &Link<S::CID>,
     ) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
 
         match link.kind() {
-            LK::File => dagio.load(link).await.map(File),
+            LK::File => store.load(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: HostDirectory<_> = dagio.load(link).await?;
+                let d: StoreDirectory<_> = store.load(link).await?;
                 for (n, sublink) in d {
-                    let mt: MemTree = dagio.load(&sublink).await?;
+                    let mt: MemTree = Box::pin(store.load(&sublink)).await?;
                     map.insert(n, mt);
                 }
                 Ok(Dir(map))

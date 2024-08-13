@@ -9,17 +9,16 @@ anyhow.workspace = true
 include_dir.workspace = true
 
 [dev-dependencies]
-pangalactic-dagio.workspace = true
-pangalactic-hostdir.workspace = true
-pangalactic-host.workspace = true
 pangalactic-layer-cidmeta.workspace = true
+pangalactic-layer-host.workspace = true
+pangalactic-layer-path.workspace = true
+pangalactic-layer-storedir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-log.workspace = true
 pangalactic-schemata.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true
-simple_logger.workspace = true
 tokio.workspace = true
 
 [build-dependencies]

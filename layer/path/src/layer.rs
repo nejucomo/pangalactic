@@ -37,6 +37,24 @@ where
     }
 }
 
+impl<S> AsRef<StoreDirectoryLayer<S>> for PathLayer<S>
+where
+    S: Store,
+{
+    fn as_ref(&self) -> &StoreDirectoryLayer<S> {
+        &self.0
+    }
+}
+
+impl<S> AsMut<StoreDirectoryLayer<S>> for PathLayer<S>
+where
+    S: Store,
+{
+    fn as_mut(&mut self) -> &mut StoreDirectoryLayer<S> {
+        &mut self.0
+    }
+}
+
 impl<S> Store for PathLayer<S>
 where
     S: Store,

@@ -1,5 +1,7 @@
 use anyhow::Result;
 use pangalactic_iowrappers::{Readable, Writable};
+use pangalactic_layer_cidmeta::CidMetaLayer;
+use pangalactic_layer_storedir::StoreDirectoryLayer;
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::{inner, HostAnyDestination, HostAnySource, HostStorePath};
@@ -67,7 +69,7 @@ where
     }
 
     pub async fn derive(&mut self, plan: HostStorePath<S>) -> Result<HostStorePath<S>> {
-        let inner = self.take_inner();
+        let inner = self.0.take().check_inner_invariant();
         let planlink = inner.resolve_path(&plan).await?;
         let (sdl, attlink) = pangalactic_host::derive(inner.into(), &planlink).await?;
         self.0 = Some(inner::Layer::from(sdl));
@@ -75,8 +77,12 @@ where
         Ok(attestation)
     }
 
-    fn take_inner(&mut self) -> inner::Layer<S> {
-        self.0.take().check_inner_invariant()
+    pub fn storedir_ref(&self) -> &StoreDirectoryLayer<CidMetaLayer<S>> {
+        self.inner_ref().as_ref()
+    }
+
+    pub fn storedir_mut(&mut self) -> &mut StoreDirectoryLayer<CidMetaLayer<S>> {
+        self.inner_mut().as_mut()
     }
 
     fn inner_ref(&self) -> &inner::Layer<S> {

@@ -1,5 +1,6 @@
-use pangalactic_dagio::Dagio;
 use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_layer_host::HostLayer;
+use pangalactic_layer_path::StorePath;
 use pangalactic_link::Link;
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store::Store;
@@ -26,7 +27,7 @@ async fn get_plan_outputs_plan() -> anyhow::Result<()> {
     verify_guests(
         &["get_plan"],
         b"",
-        |_dagio, _plan, attestation| async move {
+        |_store, _plan, attestation| async move {
             assert_eq!(attestation.plan, attestation.output);
             Ok(())
         },
@@ -36,7 +37,7 @@ async fn get_plan_outputs_plan() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn identity() -> anyhow::Result<()> {
-    verify_guests(&["identity"], b"", |_dagio, plan, attestation| async move {
+    verify_guests(&["identity"], b"", |_store, plan, attestation| async move {
         assert_eq!(plan.input, attestation.output);
         Ok(())
     })
@@ -61,8 +62,8 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
     verify_guests(
         &["test_output_is_hello_world"],
         b"",
-        |dagio, _, attestation| async move {
-            let output: Vec<u8> = dagio.load(&attestation.output).await?;
+        |store, _, attestation| async move {
+            let output: Vec<u8> = store.storedir_ref().load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
         },
@@ -84,8 +85,8 @@ async fn reverse_contents() -> anyhow::Result<()> {
                 ]),
             ),
         ],
-        |dagio, _, attestation| async move {
-            let output: MemTree = dagio.load(&attestation.output).await?;
+        |store, _, attestation| async move {
+            let output: MemTree = store.storedir_ref().load(&attestation.output).await?;
 
             assert_eq!(
                 output,
@@ -109,7 +110,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
 async fn verify_guests<M, F, Fut>(guests: &[&str], content: M, verify: F) -> anyhow::Result<()>
 where
     MemTree: From<M>,
-    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     pangalactic_log::test_init();
@@ -126,7 +127,7 @@ async fn verify_guests_inner<F, Fut>(
     verify: F,
 ) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     for guest in guests {
@@ -137,29 +138,33 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, content: MemTree, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(Dagio<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
-    let mut dagio = Dagio::from(MemStore::default());
+    let mut store = HostLayer::default();
 
     let plan = {
         // Set up plan:
-        let exec = dagio
+        let dstore = store.storedir_mut();
+        let exec = dstore
             .commit(pangalactic_guests::get_wasm_bytes(guest)?)
             .await?;
-        let input = dagio.commit(content).await?;
+        let input = dstore.commit(content).await?;
 
-        dagio.commit(Plan { exec, input }).await?
+        dstore.commit(Plan { exec, input }).await?
     };
 
     // Execute derive:
-    let (dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
+    let attestation = store
+        .derive(StorePath::from(plan))
+        .await?
+        .unwrap_pathless_link()?;
 
-    let att: Attestation<TestLink> = dagio.load(&attestation).await?;
-    let plan: Plan<TestLink> = dagio.load(&att.plan).await?;
+    let att: Attestation<TestLink> = store.storedir_ref().load(&attestation).await?;
+    let plan: Plan<TestLink> = store.storedir_mut().load(&att.plan).await?;
 
     // Verify
-    verify(dagio, plan, att).await?;
+    verify(store, plan, att).await?;
 
     Ok(())
 }

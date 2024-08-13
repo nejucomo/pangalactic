@@ -1,11 +1,15 @@
-pub fn init(level: log::Level) {
-    let mut logger = simple_logger::SimpleLogger::new().with_level(level.to_level_filter());
+pub fn init() -> anyhow::Result<()> {
+    use tracing::Level;
 
-    for modname in QUIET_LIST {
-        logger = logger.with_module_level(modname, log::LevelFilter::Warn);
-    }
+    tracing_subscriber::fmt()
+        .with_max_level(Level::DEBUG)
+        .with_writer(std::io::stderr)
+        .try_init()
+        .map_err(|e| anyhow::anyhow!(e))
 
-    logger.init().unwrap();
+    // for modname in QUIET_LIST {
+    //     logger = logger.with_module_level(modname, log::LevelFilter::Warn);
+    // }
 }
 
 pub fn test_init() {
@@ -13,8 +17,8 @@ pub fn test_init() {
 
     static INSTANCE: OnceCell<()> = OnceCell::new();
     INSTANCE.get_or_init(|| {
-        init(log::Level::Debug);
+        init().unwrap();
     });
 }
 
-const QUIET_LIST: &[&str] = &["cranelift_codegen", "wasmtime_cranelift"];
+// const QUIET_LIST: &[&str] = &["cranelift_codegen", "wasmtime_cranelift"];

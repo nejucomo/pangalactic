@@ -1,5 +1,6 @@
-use pangalactic_dagio::Dagio;
 use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_layer_host::HostLayer;
+use pangalactic_layer_path::StorePath;
 use pangalactic_link::Link;
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store::Store;
@@ -40,28 +41,31 @@ async fn run_round_trip<M>(exec_in: &str, exec_out: &str, input: M) -> anyhow::R
 where
     MemTree: From<M>,
 {
+    let mut store: HostLayer<MemStore> = HostLayer::default();
     let intree = MemTree::from(input);
-    let mut dagio: Dagio<MemStore> = Dagio::from(MemStore::default());
     let expected = intree.clone();
-    let link_in = dagio.commit(intree).await?;
-    let (dagio, att_in) = run_phase(dagio, exec_in, link_in).await?;
-    let (dagio, att_out) = run_phase(dagio, exec_out, att_in.output).await?;
-    let output: MemTree = dagio.load(&att_out.output).await?;
+    let link_in = store.storedir_mut().commit(intree).await?;
+    let att_in = run_phase(&mut store, exec_in, link_in).await?;
+    let att_out = run_phase(&mut store, exec_out, att_in.output).await?;
+    let output: MemTree = store.storedir_ref().load(&att_out.output).await?;
 
     assert_eq!(output, expected);
     Ok(())
 }
 
 async fn run_phase(
-    mut dagio: Dagio<MemStore>,
+    store: &mut HostLayer<MemStore>,
     execname: &str,
     input: TestLink,
-) -> anyhow::Result<(Dagio<MemStore>, Attestation<TestLink>)> {
-    let exec = dagio
-        .commit(pangalactic_guests::get_wasm_bytes(execname)?)
-        .await?;
-    let plan = dagio.commit(Plan { exec, input }).await?;
-    let (dagio, attestation) = pangalactic_host::derive(dagio, &plan).await?;
-    let att: Attestation<TestLink> = dagio.load(&attestation).await?;
-    Ok((dagio, att))
+) -> anyhow::Result<Attestation<TestLink>> {
+    let plan = StorePath::from({
+        let dstore = store.storedir_mut();
+        let exec = dstore
+            .commit(pangalactic_guests::get_wasm_bytes(execname)?)
+            .await?;
+        dstore.commit(Plan { exec, input }).await?
+    });
+    let attestation = store.derive(plan).await?.unwrap_pathless_link()?;
+    let att: Attestation<TestLink> = store.storedir_ref().load(&attestation).await?;
+    Ok(att)
 }

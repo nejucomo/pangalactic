@@ -40,17 +40,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-trait"
-version = "0.1.76"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "531b97fb4cd3dfdce92c35dedbfdc1f0b9d8091c8ca943d6dae340ef5012d514"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.41",
-]
-
-[[package]]
 name = "atomic-polyfill"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -331,6 +320,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-bindref"
+version = "0.1.0"
+
+[[package]]
 name = "pangalactic-chomper"
 version = "0.1.0"
 dependencies = [
@@ -373,13 +366,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-iowrappers"
+version = "0.1.0"
+dependencies = [
+ "pin-project",
+ "tokio",
+]
+
+[[package]]
 name = "pangalactic-layer-cidmeta"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "async-trait",
  "derive_more",
+ "pangalactic-chomper",
  "pangalactic-cid",
+ "pangalactic-iowrappers",
  "pangalactic-serialization",
  "pangalactic-store",
  "pin-project",
@@ -392,7 +394,6 @@ name = "pangalactic-link"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "async-trait",
  "pangalactic-chomper",
  "pangalactic-cid",
  "pangalactic-linkkind",
@@ -440,9 +441,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "anyhow-std",
- "async-trait",
+ "pangalactic-bindref",
  "pangalactic-chomper",
  "pangalactic-cid",
+ "pangalactic-iowrappers",
  "pangalactic-serialization",
  "pin-project",
  "serde",
