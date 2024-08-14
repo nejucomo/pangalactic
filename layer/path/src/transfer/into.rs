@@ -3,7 +3,7 @@ use std::{fmt::Debug, path::PathBuf, pin::pin};
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
 use pangalactic_iowrappers::{Readable, Writable};
-use pangalactic_layer_dir::{DirNodeReader, StoreDirectory};
+use pangalactic_layer_dir::{DirNodeReader, LinkDirectory};
 use pangalactic_store::{Commit, Store};
 use tokio::{
     fs::{File, ReadDir},
@@ -48,7 +48,7 @@ where
     S: Store,
     D: Destination,
     Readable<S::Reader>: TransferInto<S, D>,
-    StoreDirectory<S::CID>: TransferInto<S, D>,
+    LinkDirectory<S::CID>: TransferInto<S, D>,
 {
     async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID> {
         let dnr: DirNodeReader<_> = store.load(&self).await?;
@@ -59,7 +59,7 @@ where
     }
 }
 
-impl<S> TransferInto<S, AnyDestination<S::CID>> for StoreDirectory<S::CID>
+impl<S> TransferInto<S, AnyDestination<S::CID>> for LinkDirectory<S::CID>
 where
     S: Store,
 {
@@ -72,7 +72,7 @@ where
     }
 }
 
-impl<S> TransferInto<S, StoreDestination<S::CID>> for StoreDirectory<S::CID>
+impl<S> TransferInto<S, StoreDestination<S::CID>> for LinkDirectory<S::CID>
 where
     S: Store,
 {
@@ -85,7 +85,7 @@ where
     }
 }
 
-impl<S> TransferInto<S, PathBuf> for StoreDirectory<S::CID>
+impl<S> TransferInto<S, PathBuf> for LinkDirectory<S::CID>
 where
     S: Store,
 {
@@ -102,7 +102,7 @@ where
     }
 }
 
-impl<S, W> TransferInto<S, Writable<W>> for StoreDirectory<S::CID>
+impl<S, W> TransferInto<S, Writable<W>> for LinkDirectory<S::CID>
 where
     S: Store,
     W: Debug,

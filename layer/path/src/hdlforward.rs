@@ -1,4 +1,4 @@
-//! Forward implementations of [Commit] and [Load] from [StoreDirectoryLayer](pangalactic_layer_dir::StoreDirectoryLayer) for convenience (all via [ViaPath])
+//! Forward implementations of [Commit] and [Load] from [LinkDirectoryLayer](pangalactic_layer_dir::LinkDirectoryLayer) for convenience (all via [ViaPath])
 
 use pangalactic_store::{Commit, Load, Store};
 
@@ -35,8 +35,8 @@ macro_rules! forward_impl {
     };
 }
 
-forward_impl!(Commit pangalactic_layer_dir::StoreDirectory<S::CID>);
-forward_impl!(Load pangalactic_layer_dir::StoreDirectory<S::CID>);
+forward_impl!(Commit pangalactic_layer_dir::LinkDirectory<S::CID>);
+forward_impl!(Load pangalactic_layer_dir::LinkDirectory<S::CID>);
 forward_impl!(Load pangalactic_layer_dir::DirNodeReader<S>);
 forward_impl!(Commit std::path::PathBuf);
 forward_impl!(Commit & std::path::Path);

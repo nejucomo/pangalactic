@@ -63,7 +63,7 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
         &["test_output_is_hello_world"],
         b"",
         |store, _, attestation| async move {
-            let output: Vec<u8> = store.storedir_ref().load(&attestation.output).await?;
+            let output: Vec<u8> = store.linkdir_ref().load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
         },
@@ -86,7 +86,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
             ),
         ],
         |store, _, attestation| async move {
-            let output: MemTree = store.storedir_ref().load(&attestation.output).await?;
+            let output: MemTree = store.linkdir_ref().load(&attestation.output).await?;
 
             assert_eq!(
                 output,
@@ -145,13 +145,13 @@ where
 
     let plan = {
         // Set up plan:
-        let dstore = store.storedir_mut();
-        let exec = dstore
+        let linkstore = store.linkdir_mut();
+        let exec = linkstore
             .commit(pangalactic_guests::get_wasm_bytes(guest)?)
             .await?;
-        let input = dstore.commit(content).await?;
+        let input = linkstore.commit(content).await?;
 
-        dstore.commit(Plan { exec, input }).await?
+        linkstore.commit(Plan { exec, input }).await?
     };
 
     // Execute derive:
@@ -160,8 +160,8 @@ where
         .await?
         .unwrap_pathless_link()?;
 
-    let att: Attestation<TestLink> = store.storedir_ref().load(&attestation).await?;
-    let plan: Plan<TestLink> = store.storedir_mut().load(&att.plan).await?;
+    let att: Attestation<TestLink> = store.linkdir_ref().load(&attestation).await?;
+    let plan: Plan<TestLink> = store.linkdir_mut().load(&att.plan).await?;
 
     // Verify
     verify(store, plan, att).await?;

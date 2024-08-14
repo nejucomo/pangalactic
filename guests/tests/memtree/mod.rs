@@ -1,4 +1,4 @@
-use pangalactic_layer_dir::{StoreDirectory, StoreDirectoryLayer};
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 use std::collections::BTreeMap;
@@ -27,20 +27,20 @@ impl<'a, const K: usize> From<[(&'a str, MemTree); K]> for MemTree {
     }
 }
 
-impl<S> Commit<StoreDirectoryLayer<S>> for MemTree
+impl<S> Commit<LinkDirectoryLayer<S>> for MemTree
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut StoreDirectoryLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         use MemTree::*;
 
         match self {
             File(bytes) => store.commit(bytes).await,
             Dir(entries) => {
-                let mut d = StoreDirectory::default();
+                let mut d = LinkDirectory::default();
                 for (n, child) in entries {
                     let link = Box::pin(store.commit(child.clone())).await?;
                     d.insert(n.to_string(), link)?;
@@ -51,12 +51,12 @@ where
     }
 }
 
-impl<S> Load<StoreDirectoryLayer<S>> for MemTree
+impl<S> Load<LinkDirectoryLayer<S>> for MemTree
 where
     S: Store,
 {
     async fn load_from_store(
-        store: &StoreDirectoryLayer<S>,
+        store: &LinkDirectoryLayer<S>,
         link: &Link<S::CID>,
     ) -> anyhow::Result<Self> {
         use pangalactic_linkkind::LinkKind as LK;
@@ -65,7 +65,7 @@ where
             LK::File => store.load(link).await.map(File),
             LK::Dir => {
                 let mut map = BTreeMap::default();
-                let d: StoreDirectory<_> = store.load(link).await?;
+                let d: LinkDirectory<_> = store.load(link).await?;
                 for (n, sublink) in d {
                     let mt: MemTree = Box::pin(store.load(&sublink)).await?;
                     map.insert(n, mt);

@@ -4,7 +4,7 @@ use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
 use pangalactic_layer_host::{
-    HostAnyDestination, HostAnySource, HostLayer, HostStoreDirectory, HostStorePath,
+    HostAnyDestination, HostAnySource, HostLayer, HostLinkDirectory, HostStorePath,
 };
 use pangalactic_layer_path::{AnyDestination, AnySource};
 use pangalactic_store::Store;
@@ -14,7 +14,7 @@ type CliAnyDestination = HostAnyDestination<DirDbStore>;
 type CliAnySource = HostAnySource<DirDbStore>;
 type CliStore = HostLayer<DirDbStore>;
 type CliStorePath = HostStorePath<DirDbStore>;
-type CliStoreDirectory = HostStoreDirectory<DirDbStore>;
+type CliLinkDirectory = HostLinkDirectory<DirDbStore>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -138,7 +138,7 @@ impl Runnable for DeriveOptions {
                     .await?
                     .unwrap();
                 store
-                    .storedir_mut()
+                    .linkdir_mut()
                     .commit(Plan {
                         exec: plan_or_exec.unwrap_pathless_link()?,
                         input: input_link.unwrap_pathless_link()?,
@@ -186,17 +186,17 @@ impl Runnable for StdlibInstallOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
             let mut store = CliStore::default();
-            let dstore = store.storedir_mut();
+            let linkstore = store.linkdir_mut();
 
-            let mut storedir = CliStoreDirectory::default();
+            let mut linkdir = CliLinkDirectory::default();
             for name in pangalactic_guests::iter_wasm_names() {
                 let bytes = pangalactic_guests::get_wasm_bytes(name)?;
-                let link = dstore.commit(bytes).await?;
+                let link = linkstore.commit(bytes).await?;
                 let fname = format!("{name}.wasm");
                 tracing::debug!(?fname, ?link, "committed wasm");
-                storedir.insert(fname, link)?;
+                linkdir.insert(fname, link)?;
             }
-            let link = dstore.commit(storedir).await?;
+            let link = linkstore.commit(linkdir).await?;
 
             Ok(Some(CliStorePath::from(link)))
         })

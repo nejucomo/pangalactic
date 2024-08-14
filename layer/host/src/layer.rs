@@ -1,7 +1,7 @@
 use anyhow::Result;
 use pangalactic_iowrappers::{Readable, Writable};
 use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_dir::StoreDirectoryLayer;
+use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::{inner, HostAnyDestination, HostAnySource, HostStorePath};
@@ -77,11 +77,11 @@ where
         Ok(attestation)
     }
 
-    pub fn storedir_ref(&self) -> &StoreDirectoryLayer<CidMetaLayer<S>> {
+    pub fn linkdir_ref(&self) -> &LinkDirectoryLayer<CidMetaLayer<S>> {
         self.inner_ref().as_ref()
     }
 
-    pub fn storedir_mut(&mut self) -> &mut StoreDirectoryLayer<CidMetaLayer<S>> {
+    pub fn linkdir_mut(&mut self) -> &mut LinkDirectoryLayer<CidMetaLayer<S>> {
         self.inner_mut().as_mut()
     }
 

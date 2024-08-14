@@ -6,11 +6,11 @@ use pangalactic_store::{Commit, Load, Store};
 use crate::Writer;
 
 #[derive(Debug, Default, derive_more::From)]
-pub struct StoreDirectoryLayer<S>(S)
+pub struct LinkDirectoryLayer<S>(S)
 where
     S: Store;
 
-impl<S> Store for StoreDirectoryLayer<S>
+impl<S> Store for LinkDirectoryLayer<S>
 where
     S: Store,
 {
@@ -23,7 +23,7 @@ where
     }
 }
 
-impl<S> StoreDirectoryLayer<S>
+impl<S> LinkDirectoryLayer<S>
 where
     S: Store,
 {
@@ -67,12 +67,12 @@ where
     }
 }
 
-impl<S> Load<StoreDirectoryLayer<S>> for Readable<S::Reader>
+impl<S> Load<LinkDirectoryLayer<S>> for Readable<S::Reader>
 where
     S: Store,
 {
     async fn load_from_store(
-        store: &StoreDirectoryLayer<S>,
+        store: &LinkDirectoryLayer<S>,
         link: &Link<S::CID>,
     ) -> anyhow::Result<Self> {
         store.open_kind_reader(link, LinkKind::File).await
