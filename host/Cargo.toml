@@ -10,10 +10,10 @@ pangalactic-handle.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-layer-dir.workspace = true
 pangalactic-primitives.workspace = true
 pangalactic-schemata = { workspace = true, features = [ "store" ] }
 pangalactic-store.workspace = true
-pangalactic-layer-storedir.workspace = true
 pangalactic-table.workspace = true
 tokio.workspace = true
 tracing.workspace = true
