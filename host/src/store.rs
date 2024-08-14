@@ -1,5 +1,5 @@
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
-use pangalactic_layer_storedir::{StoreDirectory, StoreDirectoryLayer};
+use pangalactic_layer_dir::{StoreDirectory, StoreDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::Store;
 

@@ -1,4 +1,4 @@
-use pangalactic_layer_storedir::{StoreDirectory, StoreDirectoryLayer};
+use pangalactic_layer_dir::{StoreDirectory, StoreDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 use std::collections::BTreeMap;

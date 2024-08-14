@@ -1,7 +1,7 @@
 use anyhow::Result;
 use pangalactic_iowrappers::{Readable, Writable};
 use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_storedir::StoreDirectoryLayer;
+use pangalactic_layer_dir::StoreDirectoryLayer;
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::{inner, HostAnyDestination, HostAnySource, HostStorePath};

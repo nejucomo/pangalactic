@@ -3,7 +3,7 @@ use std::{fmt::Debug, path::PathBuf, pin::pin};
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
 use pangalactic_iowrappers::{Readable, Writable};
-use pangalactic_layer_storedir::{DirNodeReader, StoreDirectory};
+use pangalactic_layer_dir::{DirNodeReader, StoreDirectory};
 use pangalactic_store::{Commit, Store};
 use tokio::{
     fs::{File, ReadDir},
