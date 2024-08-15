@@ -1,6 +1,6 @@
 use pangalactic_layer_cidmeta::CidMeta;
+use pangalactic_layer_dir::LinkDirectoryStore;
 use pangalactic_layer_host::HostLayer;
-use pangalactic_layer_path::StorePath;
 use pangalactic_link::Link;
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store::Store;
@@ -44,10 +44,10 @@ where
     let mut store: HostLayer<MemStore> = HostLayer::default();
     let intree = MemTree::from(input);
     let expected = intree.clone();
-    let link_in = store.linkdir_mut().commit(intree).await?;
+    let link_in = store.commit_to_link(intree).await?;
     let att_in = run_phase(&mut store, exec_in, link_in).await?;
     let att_out = run_phase(&mut store, exec_out, att_in.output).await?;
-    let output: MemTree = store.linkdir_ref().load(&att_out.output).await?;
+    let output: MemTree = store.load_from_link(&att_out.output).await?;
 
     assert_eq!(output, expected);
     Ok(())
@@ -58,14 +58,11 @@ async fn run_phase(
     execname: &str,
     input: TestLink,
 ) -> anyhow::Result<Attestation<TestLink>> {
-    let plan = StorePath::from({
-        let linkstore = store.linkdir_mut();
-        let exec = linkstore
-            .commit(pangalactic_guests::get_wasm_bytes(execname)?)
-            .await?;
-        linkstore.commit(Plan { exec, input }).await?
-    });
-    let attestation = store.derive(plan).await?.unwrap_pathless_link()?;
-    let att: Attestation<TestLink> = store.linkdir_ref().load(&attestation).await?;
+    let exec = store
+        .commit_to_link(pangalactic_guests::get_wasm_bytes(execname)?)
+        .await?;
+    let plan = store.commit(Plan { exec, input }).await?;
+    let attestation = store.derive(plan).await?;
+    let att: Attestation<TestLink> = store.load(&attestation).await?;
     Ok(att)
 }

@@ -3,7 +3,7 @@ use std::{fmt::Debug, path::PathBuf, pin::pin};
 use anyhow::Result;
 use pangalactic_bindref::Bindable;
 use pangalactic_iowrappers::{Readable, Writable};
-use pangalactic_layer_dir::{DirNodeReader, LinkDirectory};
+use pangalactic_layer_dir::{DirNodeReader, LinkDirectory, LinkDirectoryLayer};
 use pangalactic_store::{Commit, Store};
 use tokio::{
     fs::{File, ReadDir},
@@ -242,7 +242,11 @@ async fn transfer_to_any_destination<T, S>(
 ) -> Result<Option<StorePath<S::CID>>>
 where
     S: Store,
-    T: TransferInto<S, Writable<Stdout>> + TransferInto<S, PathBuf> + Commit<PathLayer<S>> + Send,
+    T: TransferInto<S, Writable<Stdout>>
+        + TransferInto<S, PathBuf>
+        + Commit<PathLayer<S>>
+        + Commit<LinkDirectoryLayer<S>>
+        + Send,
 {
     match destination {
         AnyDestination::Stdout => source

@@ -1,9 +1,10 @@
+use anyhow::Result;
 use pangalactic_iowrappers::Readable;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Commit, Load, Store};
 
-use crate::Writer;
+use crate::{LinkDirectoryStore, Writer};
 
 #[derive(Debug, Default, derive_more::From)]
 pub struct LinkDirectoryLayer<S>(S)
@@ -18,8 +19,29 @@ where
     type Reader = Readable<S::Reader>;
     type Writer = Writer<S::Writer>;
 
-    async fn open_writer(&self) -> anyhow::Result<Self::Writer> {
+    async fn open_writer(&self) -> Result<Self::Writer> {
         self.open_link_writer(LinkKind::File).await
+    }
+}
+
+impl<S> LinkDirectoryStore for LinkDirectoryLayer<S>
+where
+    S: Store,
+{
+    type InnerStore = S;
+
+    async fn commit_to_link<T>(&mut self, object: T) -> Result<Link<S::CID>>
+    where
+        T: Commit<Self> + Send,
+    {
+        self.commit(object).await
+    }
+
+    async fn load_from_link<T>(&self, link: &Link<S::CID>) -> Result<T>
+    where
+        T: Load<Self> + Send,
+    {
+        self.load(link).await
     }
 }
 
@@ -31,7 +53,7 @@ where
         &mut self,
         kind: LinkKind,
         object: T,
-    ) -> anyhow::Result<Link<S::CID>>
+    ) -> Result<Link<S::CID>>
     where
         T: Commit<S> + Send,
     {
@@ -39,10 +61,7 @@ where
         Ok(Link::new(kind, cid))
     }
 
-    pub(crate) async fn open_link_writer(
-        &self,
-        kind: LinkKind,
-    ) -> anyhow::Result<Writer<S::Writer>> {
+    pub(crate) async fn open_link_writer(&self, kind: LinkKind) -> Result<Writer<S::Writer>> {
         let writer = self.0.open_writer().await?;
         Ok(Writer::new(kind, writer))
     }
@@ -51,7 +70,7 @@ where
         &self,
         link: &Link<S::CID>,
         expected: LinkKind,
-    ) -> anyhow::Result<Readable<S::Reader>> {
+    ) -> Result<Readable<S::Reader>> {
         let (kind, reader) = self.open_any_reader(link).await?;
         kind.require_kind(expected)?;
         Ok(reader)
@@ -60,7 +79,7 @@ where
     pub(crate) async fn open_any_reader(
         &self,
         link: &Link<S::CID>,
-    ) -> anyhow::Result<(LinkKind, Readable<S::Reader>)> {
+    ) -> Result<(LinkKind, Readable<S::Reader>)> {
         let kind = link.kind();
         let inner: S::Reader = self.0.load(link.peek_cid()).await?;
         Ok((kind, Readable(inner)))
@@ -71,10 +90,7 @@ impl<S> Load<LinkDirectoryLayer<S>> for Readable<S::Reader>
 where
     S: Store,
 {
-    async fn load_from_store(
-        store: &LinkDirectoryLayer<S>,
-        link: &Link<S::CID>,
-    ) -> anyhow::Result<Self> {
+    async fn load_from_store(store: &LinkDirectoryLayer<S>, link: &Link<S::CID>) -> Result<Self> {
         store.open_kind_reader(link, LinkKind::File).await
     }
 }

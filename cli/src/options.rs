@@ -3,6 +3,7 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
+use pangalactic_layer_dir::LinkDirectoryStore;
 use pangalactic_layer_host::{
     HostAnyDestination, HostAnySource, HostLayer, HostLinkDirectory, HostStorePath,
 };
@@ -133,16 +134,14 @@ impl Runnable for DeriveOptions {
                 .unwrap();
 
             let plan = if let Some(input) = self.input {
-                let input_link = store
+                let input_path = store
                     .transfer(input, AnyDestination::Store(None))
                     .await?
                     .unwrap();
+                let exec = store.resolve_path(&plan_or_exec).await?;
+                let input = store.resolve_path(&input_path).await?;
                 store
-                    .linkdir_mut()
-                    .commit(Plan {
-                        exec: plan_or_exec.unwrap_pathless_link()?,
-                        input: input_link.unwrap_pathless_link()?,
-                    })
+                    .commit(Plan { exec, input })
                     .await
                     .map(CliStorePath::from)?
             } else {
@@ -186,17 +185,16 @@ impl Runnable for StdlibInstallOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
             let mut store = CliStore::default();
-            let linkstore = store.linkdir_mut();
 
             let mut linkdir = CliLinkDirectory::default();
             for name in pangalactic_guests::iter_wasm_names() {
                 let bytes = pangalactic_guests::get_wasm_bytes(name)?;
-                let link = linkstore.commit(bytes).await?;
+                let link = store.commit_to_link(bytes).await?;
                 let fname = format!("{name}.wasm");
                 tracing::debug!(?fname, ?link, "committed wasm");
                 linkdir.insert(fname, link)?;
             }
-            let link = linkstore.commit(linkdir).await?;
+            let link = store.commit(linkdir).await?;
 
             Ok(Some(CliStorePath::from(link)))
         })

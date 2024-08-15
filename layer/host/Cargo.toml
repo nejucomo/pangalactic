@@ -11,4 +11,5 @@ pangalactic-iowrappers.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-layer-path.workspace = true
+pangalactic-link.workspace = true
 pangalactic-store.workspace = true

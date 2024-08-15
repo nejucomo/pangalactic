@@ -1,6 +1,6 @@
 use anyhow::Result;
 use pangalactic_bindref::{BindRef, Bindable};
-use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer, LinkDirectoryStore};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 
@@ -12,6 +12,40 @@ where
     S: Store;
 
 impl<S> Bindable for PathLayer<S> where S: Store {}
+
+impl<S> Store for PathLayer<S>
+where
+    S: Store,
+{
+    type CID = StorePath<S::CID>;
+    type Reader = ViaPath<<LinkDirectoryLayer<S> as Store>::Reader>;
+    type Writer = ViaPath<<LinkDirectoryLayer<S> as Store>::Writer>;
+
+    async fn open_writer(&self) -> Result<Self::Writer> {
+        self.0.open_writer().await.map(ViaPath)
+    }
+}
+
+impl<S> LinkDirectoryStore for PathLayer<S>
+where
+    S: Store,
+{
+    type InnerStore = S;
+
+    async fn commit_to_link<T>(&mut self, object: T) -> Result<Link<S::CID>>
+    where
+        T: Commit<LinkDirectoryLayer<S>> + Send,
+    {
+        self.0.commit_to_link(object).await
+    }
+
+    async fn load_from_link<T>(&self, link: &Link<S::CID>) -> Result<T>
+    where
+        T: Load<LinkDirectoryLayer<S>> + Send,
+    {
+        self.0.load_from_link(link).await
+    }
+}
 
 impl<S> PathLayer<S>
 where
@@ -34,37 +68,6 @@ where
             link = d.remove_required(name)?;
         }
         Ok(link)
-    }
-}
-
-impl<S> AsRef<LinkDirectoryLayer<S>> for PathLayer<S>
-where
-    S: Store,
-{
-    fn as_ref(&self) -> &LinkDirectoryLayer<S> {
-        &self.0
-    }
-}
-
-impl<S> AsMut<LinkDirectoryLayer<S>> for PathLayer<S>
-where
-    S: Store,
-{
-    fn as_mut(&mut self) -> &mut LinkDirectoryLayer<S> {
-        &mut self.0
-    }
-}
-
-impl<S> Store for PathLayer<S>
-where
-    S: Store,
-{
-    type CID = StorePath<S::CID>;
-    type Reader = ViaPath<<LinkDirectoryLayer<S> as Store>::Reader>;
-    type Writer = ViaPath<<LinkDirectoryLayer<S> as Store>::Writer>;
-
-    async fn open_writer(&self) -> Result<Self::Writer> {
-        self.0.open_writer().await.map(ViaPath)
     }
 }
 
@@ -94,13 +97,12 @@ where
 impl<'a, S, V> Commit<PathLayer<S>> for BindRef<'a, StoreDestination<S::CID>, V>
 where
     S: Store,
-    V: Commit<PathLayer<S>> + Send,
+    V: Commit<LinkDirectoryLayer<S>> + Send,
 {
     async fn commit_into_store(self, store: &mut PathLayer<S>) -> Result<StorePath<S::CID>> {
         let BindRef { bound, value } = self;
 
-        let valpath = store.commit(value).await?;
-        let mut link = valpath.unwrap_pathless_link()?;
+        let mut link = store.commit_to_link(value).await?;
 
         let mut dirlink = StorePath::from(bound.link().clone());
         let mut stack = vec![];
@@ -116,7 +118,7 @@ where
         d.insert(last.clone(), link)?;
 
         for (mut prevd, name) in stack.into_iter().rev() {
-            link = store.commit(d).await?.unwrap_pathless_link()?;
+            link = store.commit_to_link(d).await?;
             prevd.overwrite(name.clone(), link);
             d = prevd;
         }

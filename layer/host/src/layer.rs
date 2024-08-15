@@ -1,10 +1,11 @@
 use anyhow::Result;
 use pangalactic_iowrappers::{Readable, Writable};
-use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer, LinkDirectoryStore};
+use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 
-use crate::{inner, HostAnyDestination, HostAnySource, HostStorePath};
+use crate::{inner, HostAnyDestination, HostAnySource, HostLink, HostStorePath};
 
 #[derive(Debug)]
 pub struct HostLayer<S>(Option<inner::Layer<S>>)
@@ -33,6 +34,27 @@ where
     }
 }
 
+impl<S> LinkDirectoryStore for HostLayer<S>
+where
+    S: Store,
+{
+    type InnerStore = CidMetaLayer<S>;
+
+    async fn commit_to_link<T>(&mut self, object: T) -> Result<Link<CidMeta<S::CID>>>
+    where
+        T: Commit<LinkDirectoryLayer<Self::InnerStore>> + Send,
+    {
+        self.inner_mut().commit_to_link(object).await
+    }
+
+    async fn load_from_link<T>(&self, link: &Link<CidMeta<S::CID>>) -> Result<T>
+    where
+        T: Load<LinkDirectoryLayer<Self::InnerStore>> + Send,
+    {
+        self.inner_ref().load_from_link(link).await
+    }
+}
+
 impl<S> Commit<HostLayer<S>> for Writable<inner::Writer<S>>
 where
     S: Store,
@@ -53,6 +75,27 @@ where
         inner::Reader::<S>::load_from_store(store.inner_ref(), cid)
             .await
             .map(Readable)
+    }
+}
+
+impl<S> Commit<HostLayer<S>> for LinkDirectory<CidMeta<S::CID>>
+where
+    S: Store,
+{
+    async fn commit_into_store(
+        self,
+        store: &mut HostLayer<S>,
+    ) -> Result<<HostLayer<S> as Store>::CID> {
+        self.commit_into_store(store.inner_mut()).await
+    }
+}
+
+impl<S> Load<HostLayer<S>> for LinkDirectory<CidMeta<S::CID>>
+where
+    S: Store,
+{
+    async fn load_from_store(store: &HostLayer<S>, cid: &HostStorePath<S>) -> Result<Self> {
+        Self::load_from_store(store.inner_ref(), cid).await
     }
 }
 
@@ -77,12 +120,9 @@ where
         Ok(attestation)
     }
 
-    pub fn linkdir_ref(&self) -> &LinkDirectoryLayer<CidMetaLayer<S>> {
-        self.inner_ref().as_ref()
-    }
-
-    pub fn linkdir_mut(&mut self) -> &mut LinkDirectoryLayer<CidMetaLayer<S>> {
-        self.inner_mut().as_mut()
+    /// BUG: Can we remove this? The uses are constructing directories or schemata:
+    pub async fn resolve_path(&self, path: &HostStorePath<S>) -> Result<HostLink<S>> {
+        self.inner_ref().resolve_path(path).await
     }
 
     fn inner_ref(&self) -> &inner::Layer<S> {
