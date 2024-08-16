@@ -5,22 +5,22 @@ members = [
   "bindref",
   "chomper",
   "cid",
-  "cli",
+  # "cli",
   "dir",
-  "guest",
-  "guest-procmacro",
-  "guests",
+  # "guest",
+  # "guest-procmacro",
+  # "guests",
   "handle",
-  "host",
+  # "host",
   "init-stream",
   "iowrappers",
   "layer/cidmeta",
   "layer/dir",
-  "layer/host",
-  "layer/path",
+  # "layer/host",
   "link",
   "linkkind",
   "log",
+  "path",
   "primitives",
   "schemata",
   "serialization",
@@ -57,10 +57,10 @@ pangalactic-iowrappers      = { path = "iowrappers"      }
 pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
 pangalactic-layer-dir       = { path = "layer/dir"       }
 pangalactic-layer-host      = { path = "layer/host"      }
-pangalactic-layer-path      = { path = "layer/path"      }
 pangalactic-link            = { path = "link"            }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-log             = { path = "log"             }
+pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
