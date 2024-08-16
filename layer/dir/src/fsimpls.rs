@@ -8,15 +8,15 @@ use pangalactic_link::Link;
 use pangalactic_store::{Commit, Store};
 use tokio::fs::{self, File, ReadDir};
 
-use crate::{StoreDirectory, StoreDirectoryLayer};
+use crate::{LinkDirectory, LinkDirectoryLayer};
 
-impl<S> Commit<StoreDirectoryLayer<S>> for PathBuf
+impl<S> Commit<LinkDirectoryLayer<S>> for PathBuf
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut StoreDirectoryLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         let link = store.commit(self.as_path()).await?;
         tracing::debug!(path=?&self, ?link, "committed");
@@ -24,13 +24,13 @@ where
     }
 }
 
-impl<'a, S> Commit<StoreDirectoryLayer<S>> for &'a Path
+impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a Path
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut StoreDirectoryLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         if self.is_file() {
             let f = File::open(self).await?;
@@ -44,16 +44,16 @@ where
     }
 }
 
-impl<S> Commit<StoreDirectoryLayer<S>> for ReadDir
+impl<S> Commit<LinkDirectoryLayer<S>> for ReadDir
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut StoreDirectoryLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         let mut reader = self;
-        let mut d = StoreDirectory::default();
+        let mut d = LinkDirectory::default();
         while let Some(entry) = reader.next_entry().await? {
             let name = entry.file_name().to_str_anyhow()?.to_string();
             let link = store.commit(entry.path()).await?;
@@ -63,13 +63,13 @@ where
     }
 }
 
-impl<S> Commit<StoreDirectoryLayer<S>> for File
+impl<S> Commit<LinkDirectoryLayer<S>> for File
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut StoreDirectoryLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Link<S::CID>> {
         store.commit(Readable(self)).await
     }

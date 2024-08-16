@@ -10,9 +10,9 @@ include_dir.workspace = true
 
 [dev-dependencies]
 pangalactic-layer-cidmeta.workspace = true
+pangalactic-layer-dir.workspace = true
 pangalactic-layer-host.workspace = true
 pangalactic-layer-path.workspace = true
-pangalactic-layer-storedir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-log.workspace = true

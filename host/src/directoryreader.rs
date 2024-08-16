@@ -1,4 +1,4 @@
-use pangalactic_layer_storedir::Name;
+use pangalactic_layer_dir::Name;
 use pangalactic_store::{Load, Store};
 
 use crate::store::{HostDir, HostLayer, HostLink};
