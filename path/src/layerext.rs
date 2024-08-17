@@ -1,44 +1,13 @@
 use anyhow::Result;
+use extend::ext;
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 
 use crate::{AnyDestination, AnySource, StoreDestination, StorePath};
 
-pub trait PathLayerExt<S>
-where
-    S: Store,
-{
-    async fn transfer(
-        &mut self,
-        source: AnySource<S::CID>,
-        destination: AnyDestination<S::CID>,
-    ) -> Result<Option<StorePath<S::CID>>>;
-
-    async fn commit_into_optdest<T>(
-        &mut self,
-        value: T,
-        optdest: Option<StoreDestination<S::CID>>,
-    ) -> Result<StorePath<S::CID>>
-    where
-        T: Commit<LinkDirectoryLayer<S>> + Send;
-
-    async fn commit_into_dest<T>(
-        &mut self,
-        value: T,
-        destination: StoreDestination<S::CID>,
-    ) -> Result<StorePath<S::CID>>
-    where
-        T: Commit<LinkDirectoryLayer<S>> + Send;
-
-    async fn load_path<T>(&self, p: &StorePath<S::CID>) -> Result<T>
-    where
-        T: Load<LinkDirectoryLayer<S>>;
-
-    async fn resolve_path(&self, p: &StorePath<S::CID>) -> Result<Link<S::CID>>;
-}
-
-impl<S> PathLayerExt<S> for LinkDirectoryLayer<S>
+#[ext(name = PathLayerExt)]
+pub impl<S> LinkDirectoryLayer<S>
 where
     S: Store,
 {
