@@ -1,11 +1,12 @@
 use std::{fmt, path::PathBuf, str::FromStr};
 
 use pangalactic_iowrappers::Readable;
-use pangalactic_link::SCHEME_PREFIX;
+use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_link::{Link, SCHEME_PREFIX};
 use pangalactic_store::{Commit, Store};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::{PathLayer, StorePath};
+use crate::StorePath;
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum AnySource<C> {
@@ -54,14 +55,14 @@ where
     }
 }
 
-impl<S> Commit<PathLayer<S>> for AnySource<S::CID>
+impl<S> Commit<LinkDirectoryLayer<S>> for AnySource<S::CID>
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut PathLayer<S>,
-    ) -> anyhow::Result<StorePath<S::CID>> {
+        store: &mut LinkDirectoryLayer<S>,
+    ) -> anyhow::Result<Link<S::CID>> {
         match self {
             Stdin => store.commit(Readable(tokio::io::stdin())).await,
             Host(p) => store.commit(p).await,

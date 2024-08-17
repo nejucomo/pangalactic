@@ -5,6 +5,8 @@ use pangalactic_link::Link;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
 
+use crate::StorePath;
+
 #[derive(Clone, derive_more::Deref)]
 pub struct StoreDestination<C> {
     /// Invariant: self.link.kind() == Dir
@@ -34,6 +36,13 @@ impl<C> StoreDestination<C> {
 
     pub fn path(&self) -> &NonEmptySlice<Name> {
         self.path.as_slice()
+    }
+
+    pub(crate) fn replace_link_into_path(self, newroot: Link<C>) -> anyhow::Result<StorePath<C>>
+    where
+        C: Serialize,
+    {
+        StorePath::new(newroot, self.path.into())
     }
 }
 
