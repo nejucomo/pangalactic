@@ -1,15 +1,12 @@
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_layer_dir::LinkDirectoryStore;
-use pangalactic_layer_host::HostLayer;
-use pangalactic_link::Link;
+use pangalactic_host::HostLayerExt;
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store::Store;
-use pangalactic_store_mem::MemStore;
 
 mod memtree;
-use self::memtree::MemTree;
+mod teststore;
 
-type TestLink = Link<CidMeta<<MemStore as Store>::CID>>;
+use self::memtree::MemTree;
+use self::teststore::{TestLink, TestStore};
 
 #[tokio::test]
 async fn gzip_gunzip() -> anyhow::Result<()> {
@@ -41,28 +38,28 @@ async fn run_round_trip<M>(exec_in: &str, exec_out: &str, input: M) -> anyhow::R
 where
     MemTree: From<M>,
 {
-    let mut store: HostLayer<MemStore> = HostLayer::default();
+    let mut store: TestStore = TestStore::default();
     let intree = MemTree::from(input);
     let expected = intree.clone();
-    let link_in = store.commit_to_link(intree).await?;
-    let att_in = run_phase(&mut store, exec_in, link_in).await?;
-    let att_out = run_phase(&mut store, exec_out, att_in.output).await?;
-    let output: MemTree = store.load_from_link(&att_out.output).await?;
+    let link_in = store.commit(intree).await?;
+    let (store, att_in) = run_phase(store, exec_in, link_in).await?;
+    let (store, att_out) = run_phase(store, exec_out, att_in.output).await?;
+    let output: MemTree = store.load(&att_out.output).await?;
 
     assert_eq!(output, expected);
     Ok(())
 }
 
 async fn run_phase(
-    store: &mut HostLayer<MemStore>,
+    mut store: TestStore,
     execname: &str,
     input: TestLink,
-) -> anyhow::Result<Attestation<TestLink>> {
+) -> anyhow::Result<(TestStore, Attestation<TestLink>)> {
     let exec = store
-        .commit_to_link(pangalactic_guests::get_wasm_bytes(execname)?)
+        .commit(pangalactic_guests::get_wasm_bytes(execname)?)
         .await?;
     let plan = store.commit(Plan { exec, input }).await?;
-    let attestation = store.derive(plan).await?;
+    let (store, attestation) = store.derive(&plan).await?;
     let att: Attestation<TestLink> = store.load(&attestation).await?;
-    Ok(att)
+    Ok((store, att))
 }

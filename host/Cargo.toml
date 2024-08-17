@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+extend.workspace = true
 pangalactic-handle.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true

@@ -4,7 +4,7 @@ use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_store::{Commit, Load, Store};
 
-use crate::{LinkDirectoryStore, Writer};
+use crate::Writer;
 
 #[derive(Debug, Default, derive_more::From)]
 pub struct LinkDirectoryLayer<S>(S)
@@ -21,27 +21,6 @@ where
 
     async fn open_writer(&self) -> Result<Self::Writer> {
         self.open_link_writer(LinkKind::File).await
-    }
-}
-
-impl<S> LinkDirectoryStore for LinkDirectoryLayer<S>
-where
-    S: Store,
-{
-    type InnerStore = S;
-
-    async fn commit_to_link<T>(&mut self, object: T) -> Result<Link<S::CID>>
-    where
-        T: Commit<Self> + Send,
-    {
-        self.commit(object).await
-    }
-
-    async fn load_from_link<T>(&self, link: &Link<S::CID>) -> Result<T>
-    where
-        T: Load<Self> + Send,
-    {
-        self.load(link).await
     }
 }
 

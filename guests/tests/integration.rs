@@ -1,16 +1,13 @@
-use pangalactic_layer_cidmeta::CidMeta;
-use pangalactic_layer_dir::LinkDirectoryStore;
-use pangalactic_layer_host::HostLayer;
-use pangalactic_link::Link;
+use pangalactic_host::HostLayerExt;
 use pangalactic_schemata::{Attestation, Plan};
 use pangalactic_store::Store;
-use pangalactic_store_mem::MemStore;
 use std::future::Future;
 
 mod memtree;
-use self::memtree::MemTree;
+mod teststore;
 
-type TestLink = Link<CidMeta<<MemStore as Store>::CID>>;
+use self::memtree::MemTree;
+use self::teststore::{TestLink, TestStore};
 
 #[tokio::test]
 async fn plan_is_dir() -> anyhow::Result<()> {
@@ -63,7 +60,7 @@ async fn output_is_hello_world() -> anyhow::Result<()> {
         &["test_output_is_hello_world"],
         b"",
         |store, _, attestation| async move {
-            let output: Vec<u8> = store.load_from_link(&attestation.output).await?;
+            let output: Vec<u8> = store.load(&attestation.output).await?;
             assert_eq!(output, b"Hello World!");
             Ok(())
         },
@@ -86,7 +83,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
             ),
         ],
         |store, _, attestation| async move {
-            let output: MemTree = store.load_from_link(&attestation.output).await?;
+            let output: MemTree = store.load(&attestation.output).await?;
 
             assert_eq!(
                 output,
@@ -110,7 +107,7 @@ async fn reverse_contents() -> anyhow::Result<()> {
 async fn verify_guests<M, F, Fut>(guests: &[&str], content: M, verify: F) -> anyhow::Result<()>
 where
     MemTree: From<M>,
-    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(TestStore, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     pangalactic_log::test_init();
@@ -127,7 +124,7 @@ async fn verify_guests_inner<F, Fut>(
     verify: F,
 ) -> anyhow::Result<()>
 where
-    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(TestStore, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
     for guest in guests {
@@ -138,24 +135,24 @@ where
 
 async fn verify_guest_inner<F, Fut>(guest: &str, content: MemTree, verify: F) -> anyhow::Result<()>
 where
-    F: Fn(HostLayer<MemStore>, Plan<TestLink>, Attestation<TestLink>) -> Fut,
+    F: Fn(TestStore, Plan<TestLink>, Attestation<TestLink>) -> Fut,
     Fut: Future<Output = anyhow::Result<()>>,
 {
-    let mut store = HostLayer::default();
+    let mut store = TestStore::default();
 
     // Set up plan:
     let exec = store
-        .commit_to_link(pangalactic_guests::get_wasm_bytes(guest)?)
+        .commit(pangalactic_guests::get_wasm_bytes(guest)?)
         .await?;
-    let input = store.commit_to_link(content).await?;
+    let input = store.commit(content).await?;
 
     let plan = store.commit(Plan { exec, input }).await?;
 
     // Execute derive:
-    let attestation = store.derive(plan).await?;
+    let (store, attestation) = store.derive(&plan).await?;
 
     let att: Attestation<TestLink> = store.load(&attestation).await?;
-    let plan: Plan<TestLink> = store.load_from_link(&att.plan).await?;
+    let plan: Plan<TestLink> = store.load(&att.plan).await?;
 
     // Verify
     verify(store, plan, att).await?;

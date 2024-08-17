@@ -1,7 +1,6 @@
 use std::{fmt::Debug, path::PathBuf, pin::pin};
 
 use anyhow::Result;
-use pangalactic_bindref::Bindable;
 use pangalactic_iowrappers::{Readable, Writable};
 use pangalactic_layer_dir::{DirNodeReader, LinkDirectory, LinkDirectoryLayer};
 use pangalactic_store::{Commit, Store};
@@ -11,14 +10,18 @@ use tokio::{
 };
 
 use crate::transfer::Destination;
-use crate::{AnyDestination, AnySource, PathLayer, StoreDestination, StorePath};
+use crate::{AnyDestination, AnySource, PathLayerExt, StoreDestination, StorePath};
 
 pub trait TransferInto<S, D>
 where
     S: Store,
     D: Destination,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID>;
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: D,
+    ) -> Result<D::CID>;
 }
 
 impl<S, D> TransferInto<S, D> for AnySource<S::CID>
@@ -29,7 +32,11 @@ where
     PathBuf: TransferInto<S, D>,
     StorePath<S::CID>: TransferInto<S, D>,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID> {
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: D,
+    ) -> Result<D::CID> {
         tracing::debug!(source = ?&self, ?destination, "transferring");
         match self {
             AnySource::Stdin => {
@@ -50,8 +57,12 @@ where
     Readable<S::Reader>: TransferInto<S, D>,
     LinkDirectory<S::CID>: TransferInto<S, D>,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: D) -> Result<D::CID> {
-        let dnr: DirNodeReader<_> = store.load(&self).await?;
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: D,
+    ) -> Result<D::CID> {
+        let dnr: DirNodeReader<_> = store.load_path(&self).await?;
         match dnr {
             DirNodeReader::File(r) => r.transfer_into(store, destination).await,
             DirNodeReader::Dir(hd) => Box::pin(hd.transfer_into(store, destination)).await,
@@ -65,7 +76,7 @@ where
 {
     async fn transfer_into(
         self,
-        store: &mut PathLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
     ) -> Result<Option<StorePath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
@@ -78,10 +89,13 @@ where
 {
     async fn transfer_into(
         self,
-        store: &mut PathLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
         destination: StoreDestination<S::CID>,
     ) -> Result<StorePath<S::CID>> {
-        store.commit(destination.bind_ref(self)).await
+        store
+            .commit_into_dest(self, destination)
+            .await
+            .map(StorePath::from)
     }
 }
 
@@ -89,7 +103,11 @@ impl<S> TransferInto<S, PathBuf> for LinkDirectory<S::CID>
 where
     S: Store,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: PathBuf) -> Result<()> {
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: PathBuf,
+    ) -> Result<()> {
         tokio::fs::create_dir(&destination).await?;
 
         for (name, link) in self {
@@ -107,7 +125,7 @@ where
     S: Store,
     W: Debug,
 {
-    async fn transfer_into(self, _: &mut PathLayer<S>, _: Writable<W>) -> Result<()> {
+    async fn transfer_into(self, _: &mut LinkDirectoryLayer<S>, _: Writable<W>) -> Result<()> {
         anyhow::bail!("cannot transfer store directory into stream");
     }
 }
@@ -118,23 +136,10 @@ where
 {
     async fn transfer_into(
         self,
-        store: &mut PathLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
     ) -> Result<Option<StorePath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
-    }
-}
-
-impl<S> TransferInto<S, StoreDestination<S::CID>> for PathBuf
-where
-    S: Store,
-{
-    async fn transfer_into(
-        self,
-        store: &mut PathLayer<S>,
-        destination: StoreDestination<S::CID>,
-    ) -> Result<StorePath<S::CID>> {
-        store.commit(destination.bind_ref(self)).await
     }
 }
 
@@ -143,7 +148,11 @@ where
     S: Store,
     W: AsyncWrite + Debug,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: Writable<W>) -> Result<()> {
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: Writable<W>,
+    ) -> Result<()> {
         let f = File::open(self).await?;
         Readable(f).transfer_into(store, destination).await
     }
@@ -153,7 +162,11 @@ impl<S> TransferInto<S, PathBuf> for PathBuf
 where
     S: Store,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: PathBuf) -> Result<()> {
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: PathBuf,
+    ) -> Result<()> {
         if self.is_file() {
             let f = File::open(self).await?;
             Readable(f).transfer_into(store, destination).await
@@ -170,7 +183,11 @@ impl<S> TransferInto<S, PathBuf> for ReadDir
 where
     S: Store,
 {
-    async fn transfer_into(mut self, store: &mut PathLayer<S>, destination: PathBuf) -> Result<()> {
+    async fn transfer_into(
+        mut self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: PathBuf,
+    ) -> Result<()> {
         tokio::fs::create_dir(&destination).await?;
 
         while let Some(entry) = self.next_entry().await? {
@@ -191,24 +208,10 @@ where
 {
     async fn transfer_into(
         self,
-        store: &mut PathLayer<S>,
+        store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
     ) -> Result<Option<StorePath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
-    }
-}
-
-impl<S, R> TransferInto<S, StoreDestination<S::CID>> for Readable<R>
-where
-    S: Store,
-    R: AsyncRead + Send,
-{
-    async fn transfer_into(
-        self,
-        store: &mut PathLayer<S>,
-        destination: StoreDestination<S::CID>,
-    ) -> Result<StorePath<S::CID>> {
-        store.commit(destination.bind_ref(self)).await
     }
 }
 
@@ -217,7 +220,11 @@ where
     S: Store,
     R: AsyncRead + Send,
 {
-    async fn transfer_into(self, store: &mut PathLayer<S>, destination: PathBuf) -> Result<()> {
+    async fn transfer_into(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        destination: PathBuf,
+    ) -> Result<()> {
         let f = File::create(destination).await?;
         self.transfer_into(store, Writable(f)).await
     }
@@ -229,7 +236,11 @@ where
     W: AsyncWrite + Debug,
     R: AsyncRead + Send,
 {
-    async fn transfer_into(self, _: &mut PathLayer<S>, destination: Writable<W>) -> Result<()> {
+    async fn transfer_into(
+        self,
+        _: &mut LinkDirectoryLayer<S>,
+        destination: Writable<W>,
+    ) -> Result<()> {
         tokio::io::copy(&mut pin!(self), &mut pin!(destination)).await?;
         Ok(())
     }
@@ -237,14 +248,13 @@ where
 
 async fn transfer_to_any_destination<T, S>(
     source: T,
-    store: &mut PathLayer<S>,
+    store: &mut LinkDirectoryLayer<S>,
     destination: AnyDestination<S::CID>,
 ) -> Result<Option<StorePath<S::CID>>>
 where
     S: Store,
     T: TransferInto<S, Writable<Stdout>>
         + TransferInto<S, PathBuf>
-        + Commit<PathLayer<S>>
         + Commit<LinkDirectoryLayer<S>>
         + Send,
 {
@@ -254,7 +264,8 @@ where
             .await
             .map(|()| None),
         AnyDestination::Host(p) => source.transfer_into(store, p).await.map(|()| None),
-        AnyDestination::Store(None) => store.commit(source).await.map(Some),
-        AnyDestination::Store(Some(dest)) => store.commit(dest.bind_ref(source)).await.map(Some),
+        AnyDestination::Store(optdest) => {
+            store.commit_into_optdest(source, optdest).await.map(Some)
+        }
     }
 }

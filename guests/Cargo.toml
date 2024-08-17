@@ -9,13 +9,13 @@ anyhow.workspace = true
 include_dir.workspace = true
 
 [dev-dependencies]
+pangalactic-host.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-layer-dir.workspace = true
-pangalactic-layer-host.workspace = true
-pangalactic-layer-path.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-log.workspace = true
+pangalactic-path.workspace = true
 pangalactic-schemata.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true

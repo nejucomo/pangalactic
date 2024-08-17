@@ -3,13 +3,14 @@ use std::str::FromStr;
 
 use pangalactic_cid::ContentIdentifier;
 use pangalactic_dir::Name;
+use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use pangalactic_store::{Commit, Store};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::PathLayer;
+use crate::PathLayerExt;
 
 #[derive(Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct StorePath<C> {
@@ -88,27 +89,27 @@ where
     }
 }
 
-impl<S> Commit<PathLayer<S>> for StorePath<S::CID>
+impl<S> Commit<LinkDirectoryLayer<S>> for StorePath<S::CID>
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut PathLayer<S>,
-    ) -> anyhow::Result<StorePath<S::CID>> {
+        store: &mut LinkDirectoryLayer<S>,
+    ) -> anyhow::Result<Link<S::CID>> {
         store.commit(&self).await
     }
 }
 
-impl<'a, S> Commit<PathLayer<S>> for &'a StorePath<S::CID>
+impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a StorePath<S::CID>
 where
     S: Store,
 {
     async fn commit_into_store(
         self,
-        store: &mut PathLayer<S>,
-    ) -> anyhow::Result<StorePath<S::CID>> {
-        store.resolve_path(self).await.map(StorePath::from)
+        store: &mut LinkDirectoryLayer<S>,
+    ) -> anyhow::Result<Link<S::CID>> {
+        store.resolve_path(self).await
     }
 }
 
