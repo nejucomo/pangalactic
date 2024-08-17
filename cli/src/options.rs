@@ -3,19 +3,22 @@ use std::{future::Future, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use pangalactic_layer_dir::LinkDirectoryStore;
-use pangalactic_layer_host::{
-    HostAnyDestination, HostAnySource, HostLayer, HostLinkDirectory, HostStorePath,
-};
-use pangalactic_layer_path::{AnyDestination, AnySource};
+use pangalactic_hash::Hash;
+use pangalactic_host::HostLayerExt;
+use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
+use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 
-type CliAnyDestination = HostAnyDestination<DirDbStore>;
-type CliAnySource = HostAnySource<DirDbStore>;
-type CliStore = HostLayer<DirDbStore>;
-type CliStorePath = HostStorePath<DirDbStore>;
-type CliLinkDirectory = HostLinkDirectory<DirDbStore>;
+type CliStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
+
+type CliCid = CidMeta<Hash>;
+
+type CliAnyDestination = AnyDestination<CliCid>;
+type CliAnySource = AnySource<CliCid>;
+type CliStorePath = StorePath<CliCid>;
+type CliLinkDirectory = LinkDirectory<CliCid>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -148,8 +151,9 @@ impl Runnable for DeriveOptions {
                 plan_or_exec
             };
 
-            let attestation = store.derive(plan).await?;
-            Ok(Some(attestation))
+            let planlink = store.resolve_path(&plan).await?;
+            let (_, attestation) = store.derive(&planlink).await?;
+            Ok(Some(StorePath::from(attestation)))
         })
     }
 }
@@ -189,7 +193,7 @@ impl Runnable for StdlibInstallOptions {
             let mut linkdir = CliLinkDirectory::default();
             for name in pangalactic_guests::iter_wasm_names() {
                 let bytes = pangalactic_guests::get_wasm_bytes(name)?;
-                let link = store.commit_to_link(bytes).await?;
+                let link = store.commit(bytes).await?;
                 let fname = format!("{name}.wasm");
                 tracing::debug!(?fname, ?link, "committed wasm");
                 linkdir.insert(fname, link)?;
