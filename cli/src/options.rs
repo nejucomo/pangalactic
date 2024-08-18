@@ -48,7 +48,17 @@ impl Runnable for Options {
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    #[command(subcommand, name = "rc")]
+    #[command(flatten)]
+    RevCon(RevConCommand),
+    #[command(subcommand)]
+    Util(UtilCommand),
+}
+
+/// General Utilities
+#[enum_dispatch(Runnable)]
+#[derive(Debug, Subcommand)]
+pub enum UtilCommand {
+    #[command(subcommand, name = "revcon")]
     RevCon(RevConCommand),
     #[command(subcommand)]
     Store(StoreCommand),
@@ -78,7 +88,7 @@ impl Runnable for RevConCommitOptions {
     }
 }
 
-/// Interact directly with the store
+/// Store i/o
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
 pub enum StoreCommand {
