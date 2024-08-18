@@ -48,11 +48,34 @@ impl Runnable for Options {
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    #[command(subcommand, name = "rc")]
+    RevCon(RevConCommand),
     #[command(subcommand)]
     Store(StoreCommand),
     Derive(DeriveOptions),
     #[command(subcommand)]
     Stdlib(StdlibCommand),
+}
+
+/// Revision Control commands
+#[enum_dispatch(Runnable)]
+#[derive(Debug, Subcommand)]
+pub enum RevConCommand {
+    Commit(RevConCommitOptions),
+}
+
+/// Commit the working directory
+#[derive(Debug, Args)]
+pub struct RevConCommitOptions {}
+
+impl Runnable for RevConCommitOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        Box::pin(async {
+            // let mut store = CliStore::default();
+            // store.revcon_commit().await
+            todo!()
+        })
+    }
 }
 
 /// Interact directly with the store
