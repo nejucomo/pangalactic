@@ -110,9 +110,9 @@ pub struct RevConInfoPathOptions {}
 impl Runnable for RevConInfoPathOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            // let mut store = CliStore::default();
-            // store.revcon_commit().await
-            todo!()
+            let ctldir = pangalactic_revcon::ControlDir::find_from_current_dir()?;
+            println!("{}", ctldir.as_ref().display());
+            Ok(None)
         })
     }
 }

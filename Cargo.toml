@@ -21,6 +21,7 @@ members = [
   "log",
   "path",
   "primitives",
+  "revcon",
   "schemata",
   "serialization",
   "store/dirdb",
@@ -60,6 +61,7 @@ pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-log             = { path = "log"             }
 pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
+pangalactic-revcon          = { path = "revcon"          }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store           = { path = "store/trait"     }
