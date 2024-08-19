@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    fmt::Display,
+    path::{Path, PathBuf},
+};
 
 use anyhow::Result;
 
@@ -42,5 +45,11 @@ impl ControlDir {
 impl AsRef<Path> for ControlDir {
     fn as_ref(&self) -> &Path {
         self.0.as_ref()
+    }
+}
+
+impl Display for ControlDir {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.display().fmt(f)
     }
 }

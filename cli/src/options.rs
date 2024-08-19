@@ -1,4 +1,4 @@
-use std::{future::Future, path::PathBuf, pin::Pin};
+use std::{fmt::Display, future::Future, path::PathBuf, pin::Pin};
 
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
@@ -25,8 +25,10 @@ type CliLinkDirectory = LinkDirectory<CliCid>;
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
 pub trait Runnable {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>>;
+    fn run(self) -> RunOutcome;
 }
+
+pub type RunOutcome = Pin<Box<dyn Future<Output = Result<Option<Box<dyn Display>>>>>>;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -42,7 +44,7 @@ impl Options {
 }
 
 impl Runnable for Options {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         use Command::RevCon;
         use RevConCommand::Info;
 
@@ -90,7 +92,7 @@ pub struct RevConInfoOptions {
 }
 
 impl Runnable for RevConInfoOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         if let Some(detail) = self.detail {
             detail.run()
         } else {
@@ -111,11 +113,10 @@ pub enum RevConInfoDetail {
 pub struct RevConInfoPathOptions {}
 
 impl Runnable for RevConInfoPathOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
             let ctldir = ControlDir::find_from_current_dir()?;
-            println!("{}", ctldir.as_ref().display());
-            Ok(None)
+            ok_disp(ctldir)
         })
     }
 }
@@ -129,8 +130,11 @@ pub struct RevConInitOptions {
 }
 
 impl Runnable for RevConInitOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
-        Box::pin(ControlDir::initialize(self.workdir).map(|res| res.map(|_| None)))
+    fn run(self) -> RunOutcome {
+        Box::pin(async {
+            let ctldir = ControlDir::initialize(self.workdir).await?;
+            ok_disp(ctldir)
+        })
     }
 }
 
@@ -148,11 +152,12 @@ pub enum StoreCommand {
 pub struct StorePutOptions {}
 
 impl Runnable for StorePutOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
             store
                 .transfer(AnySource::Stdin, AnyDestination::Store(None))
+                .map(map_res_disp)
                 .await
         })
     }
@@ -166,7 +171,7 @@ pub struct StoreGetOptions {
 }
 
 impl Runnable for StoreGetOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
             store.transfer(self.source, AnyDestination::Stdout).await?;
@@ -183,10 +188,13 @@ pub struct StoreXferOptions {
 }
 
 impl Runnable for StoreXferOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            store.transfer(self.source, self.dest).await
+            store
+                .transfer(self.source, self.dest)
+                .map(map_res_disp)
+                .await
         })
     }
 }
@@ -202,7 +210,7 @@ pub struct DeriveOptions {
 }
 
 impl Runnable for DeriveOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         use pangalactic_schemata::Plan;
 
         Box::pin(async {
@@ -232,7 +240,7 @@ impl Runnable for DeriveOptions {
 
             let planlink = store.resolve_path(&plan).await?;
             let (_, attestation) = store.derive(&planlink).await?;
-            Ok(Some(StorePath::from(attestation)))
+            ok_disp(StorePath::from(attestation))
         })
     }
 }
@@ -250,12 +258,13 @@ pub enum StdlibCommand {
 pub struct StdlibListOptions {}
 
 impl Runnable for StdlibListOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
-            for name in pangalactic_guests::iter_wasm_names() {
-                println!("{name}");
-            }
-            Ok(None)
+            ok_disp(
+                pangalactic_guests::iter_wasm_names()
+                    .intersperse(", ")
+                    .collect::<String>(),
+            )
         })
     }
 }
@@ -265,7 +274,7 @@ impl Runnable for StdlibListOptions {
 pub struct StdlibInstallOptions {}
 
 impl Runnable for StdlibInstallOptions {
-    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+    fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
 
@@ -279,7 +288,28 @@ impl Runnable for StdlibInstallOptions {
             }
             let link = store.commit(linkdir).await?;
 
-            Ok(Some(CliStorePath::from(link)))
+            ok_disp(CliStorePath::from(link))
         })
     }
+}
+
+fn ok_disp<T>(value: T) -> Result<Option<Box<dyn Display>>>
+where
+    T: Display + 'static,
+{
+    Ok(Some(box_disp(value)))
+}
+
+fn map_res_disp<T>(res: Result<Option<T>>) -> Result<Option<Box<dyn Display>>>
+where
+    T: Display + 'static,
+{
+    res.map(|opt| opt.map(box_disp))
+}
+
+fn box_disp<T>(value: T) -> Box<dyn Display>
+where
+    T: Display + 'static,
+{
+    Box::new(value) as Box<dyn Display>
 }
