@@ -8,6 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 enum_dispatch.workspace = true
+futures.workspace = true
 pangalactic-b64.workspace = true
 pangalactic-guests.workspace = true
 pangalactic-hash.workspace = true

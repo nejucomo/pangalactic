@@ -1,13 +1,15 @@
-use std::{future::Future, pin::Pin};
+use std::{future::Future, path::PathBuf, pin::Pin};
 
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
+use futures::FutureExt;
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
+use pangalactic_revcon::ControlDir;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 
@@ -77,6 +79,7 @@ pub enum UtilCommand {
 #[derive(Debug, Subcommand)]
 pub enum RevConCommand {
     Info(RevConInfoOptions),
+    Init(RevConInitOptions),
 }
 
 /// RevCon info
@@ -110,10 +113,24 @@ pub struct RevConInfoPathOptions {}
 impl Runnable for RevConInfoPathOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
-            let ctldir = pangalactic_revcon::ControlDir::find_from_current_dir()?;
+            let ctldir = ControlDir::find_from_current_dir()?;
             println!("{}", ctldir.as_ref().display());
             Ok(None)
         })
+    }
+}
+
+/// Initialize revision control
+#[derive(Debug, Args)]
+pub struct RevConInitOptions {
+    /// The workdir to initialize
+    #[clap(long, short, default_value = ".")]
+    pub workdir: PathBuf,
+}
+
+impl Runnable for RevConInitOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        Box::pin(ControlDir::initialize(self.workdir).map(|res| res.map(|_| None)))
     }
 }
 

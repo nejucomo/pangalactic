@@ -29,6 +29,14 @@ impl ControlDir {
             sp.display()
         );
     }
+
+    pub async fn initialize<P>(workdir: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        dbg!(workdir.as_ref());
+        todo!()
+    }
 }
 
 impl AsRef<Path> for ControlDir {
