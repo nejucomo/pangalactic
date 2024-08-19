@@ -41,7 +41,12 @@ impl Options {
 
 impl Runnable for Options {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
-        self.command.unwrap().run()
+        use Command::RevCon;
+        use RevConCommand::Info;
+
+        self.command
+            .unwrap_or(RevCon(Info(RevConInfoOptions { detail: None })))
+            .run()
     }
 }
 
@@ -71,14 +76,38 @@ pub enum UtilCommand {
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
 pub enum RevConCommand {
-    Commit(RevConCommitOptions),
+    Info(RevConInfoOptions),
 }
 
-/// Commit the working directory
+/// RevCon info
 #[derive(Debug, Args)]
-pub struct RevConCommitOptions {}
+pub struct RevConInfoOptions {
+    #[command(subcommand)]
+    pub detail: Option<RevConInfoDetail>,
+}
 
-impl Runnable for RevConCommitOptions {
+impl Runnable for RevConInfoOptions {
+    fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
+        if let Some(detail) = self.detail {
+            detail.run()
+        } else {
+            todo!("info default")
+        }
+    }
+}
+
+/// Revision Control Info subcommands
+#[enum_dispatch(Runnable)]
+#[derive(Debug, Subcommand)]
+pub enum RevConInfoDetail {
+    Path(RevConInfoPathOptions),
+}
+
+/// Print the control directory path
+#[derive(Debug, Args)]
+pub struct RevConInfoPathOptions {}
+
+impl Runnable for RevConInfoPathOptions {
     fn run(self) -> Pin<Box<dyn Future<Output = Result<Option<CliStorePath>>>>> {
         Box::pin(async {
             // let mut store = CliStore::default();
