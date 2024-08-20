@@ -23,16 +23,16 @@ where
             let link = store.commit(bytes).await?;
 
             let (d, n, prefix) = if let Some(testname) = name.strip_prefix("test_") {
-                (&mut testdir, testname, "/libderive/test")
+                (&mut testdir, testname, "libderive/test/")
             } else {
-                (&mut d, name, "/libderive")
+                (&mut d, name, "libderive/")
             };
 
             log::trace_insert(prefix, d, n, link)?;
         }
 
         let testlink = store.commit(testdir).await?;
-        log::trace_insert("/libderive", &mut d, "test", testlink)?;
+        log::trace_insert("libderive/", &mut d, "test", testlink)?;
 
         store.commit(d).await
     }

@@ -11,6 +11,6 @@ pub(crate) fn trace_insert<C>(
 where
     C: serde::Serialize,
 {
-    tracing::debug!("committing \"{}/{}\" -> {}", prefixpath, name, &link);
+    tracing::debug!(r#"committed to {} entry "{}{}""#, &link, prefixpath, name);
     d.insert(name.to_string(), link)
 }
