@@ -7,11 +7,13 @@ use futures::FutureExt;
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
-use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
+use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
 use pangalactic_revcon::ControlDir;
+use pangalactic_seed::Seed;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_store_mem::MemStore;
 
 type CliStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
 
@@ -20,7 +22,6 @@ type CliCid = CidMeta<Hash>;
 type CliAnyDestination = AnyDestination<CliCid>;
 type CliAnySource = AnySource<CliCid>;
 type CliStorePath = StorePath<CliCid>;
-type CliLinkDirectory = LinkDirectory<CliCid>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -72,8 +73,6 @@ pub enum UtilCommand {
     #[command(subcommand)]
     Store(StoreCommand),
     Derive(DeriveOptions),
-    #[command(subcommand)]
-    Stdlib(StdlibCommand),
 }
 
 /// Revision Control commands
@@ -145,6 +144,8 @@ pub enum StoreCommand {
     Put(StorePutOptions),
     Get(StoreGetOptions),
     Xfer(StoreXferOptions),
+    #[command(subcommand)]
+    Seed(SeedCommand),
 }
 
 /// Insert the file on stdin and print its key on stdout
@@ -244,51 +245,38 @@ impl Runnable for DeriveOptions {
         })
     }
 }
-
-/// Manage the stdlib of pgwasm guests
+/// Manage the pg seed directory
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
-pub enum StdlibCommand {
-    List(StdlibListOptions),
-    Install(StdlibInstallOptions),
+pub enum SeedCommand {
+    List(SeedListOptions),
+    Install(SeedInstallOptions),
 }
 
 /// List the pgwasm names
 #[derive(Debug, Args)]
-pub struct StdlibListOptions {}
+pub struct SeedListOptions {}
 
-impl Runnable for StdlibListOptions {
+impl Runnable for SeedListOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
-            ok_disp(
-                pangalactic_seed::iter_wasm_names()
-                    .intersperse(", ")
-                    .collect::<String>(),
-            )
+            let mut store = LinkDirectoryLayer::<MemStore>::default();
+            let link = store.commit(Seed).await?;
+            todo!("display a manifest of {link:?}")
         })
     }
 }
 
 /// Install the stdlib pgwasm directory
 #[derive(Debug, Args)]
-pub struct StdlibInstallOptions {}
+pub struct SeedInstallOptions {}
 
-impl Runnable for StdlibInstallOptions {
+impl Runnable for SeedInstallOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-
-            let mut linkdir = CliLinkDirectory::default();
-            for name in pangalactic_seed::iter_wasm_names() {
-                let bytes = pangalactic_seed::get_wasm_bytes(name)?;
-                let link = store.commit(bytes).await?;
-                let fname = format!("{name}.wasm");
-                tracing::debug!(?fname, ?link, "committed wasm");
-                linkdir.insert(fname, link)?;
-            }
-            let link = store.commit(linkdir).await?;
-
-            ok_disp(CliStorePath::from(link))
+            let link = store.commit(Seed).await?;
+            ok_disp(link)
         })
     }
 }

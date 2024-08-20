@@ -21,6 +21,7 @@ pangalactic-path.workspace = true
 pangalactic-revcon.workspace = true
 pangalactic-schemata.workspace = true
 pangalactic-store-dirdb.workspace = true
+pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = [ "io-std" ] }
