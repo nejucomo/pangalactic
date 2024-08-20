@@ -261,7 +261,7 @@ impl Runnable for StdlibListOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             ok_disp(
-                pangalactic_guests::iter_wasm_names()
+                pangalactic_seed::iter_wasm_names()
                     .intersperse(", ")
                     .collect::<String>(),
             )
@@ -279,8 +279,8 @@ impl Runnable for StdlibInstallOptions {
             let mut store = CliStore::default();
 
             let mut linkdir = CliLinkDirectory::default();
-            for name in pangalactic_guests::iter_wasm_names() {
-                let bytes = pangalactic_guests::get_wasm_bytes(name)?;
+            for name in pangalactic_seed::iter_wasm_names() {
+                let bytes = pangalactic_seed::get_wasm_bytes(name)?;
                 let link = store.commit(bytes).await?;
                 let fname = format!("{name}.wasm");
                 tracing::debug!(?fname, ?link, "committed wasm");

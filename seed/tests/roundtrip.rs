@@ -56,7 +56,7 @@ async fn run_phase(
     input: TestLink,
 ) -> anyhow::Result<(TestStore, Attestation<TestLink>)> {
     let exec = store
-        .commit(pangalactic_guests::get_wasm_bytes(execname)?)
+        .commit(pangalactic_seed::get_wasm_bytes(execname)?)
         .await?;
     let plan = store.commit(Plan { exec, input }).await?;
     let (store, attestation) = store.derive(&plan).await?;

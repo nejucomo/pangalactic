@@ -9,7 +9,6 @@ members = [
   "dir",
   "guest",
   "guest-procmacro",
-  "guests",
   "handle",
   "host",
   "init-stream",
@@ -23,6 +22,7 @@ members = [
   "primitives",
   "revcon",
   "schemata",
+  "seed",
   "serialization",
   "store/dirdb",
   "store/mem",
@@ -48,7 +48,6 @@ pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
-pangalactic-guests          = { path = "guests"          }
 pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-host            = { path = "host"            }
@@ -63,6 +62,7 @@ pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-revcon          = { path = "revcon"          }
 pangalactic-schemata        = { path = "schemata"        }
+pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
