@@ -8,3 +8,4 @@ license.workspace = true
 anyhow.workspace = true
 anyhow-std.workspace = true
 derive_more.workspace = true
+tokio.workspace = true

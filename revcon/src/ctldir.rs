@@ -3,7 +3,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::Result;
+use anyhow::{Context, Result};
+
+use crate::fsutil;
 
 #[derive(Debug, derive_more::From, derive_more::Into)]
 pub struct ControlDir(PathBuf);
@@ -37,8 +39,14 @@ impl ControlDir {
     where
         P: AsRef<Path>,
     {
-        dbg!(workdir.as_ref());
-        todo!()
+        let ctldir = ControlDir(workdir.as_ref().join(".pg"));
+
+        fsutil::create_dir(&ctldir)
+            .await
+            .context("while creating revcon control dir")?;
+
+        todo!("template from store?");
+        // Ok(ctldir)
     }
 }
 
