@@ -18,6 +18,7 @@ members = [
   "link",
   "linkkind",
   "log",
+  "nested-dir",
   "path",
   "primitives",
   "revcon",
@@ -58,6 +59,7 @@ pangalactic-layer-dir       = { path = "layer/dir"       }
 pangalactic-link            = { path = "link"            }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-log             = { path = "log"             }
+pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-revcon          = { path = "revcon"          }

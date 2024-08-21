@@ -13,6 +13,16 @@ where
     fn commit_into_store(self, store: &mut S) -> impl Future<Output = Result<S::CID>> + Send;
 }
 
+impl<S, T> Commit<S> for Box<T>
+where
+    S: Store,
+    T: Commit<S> + Send,
+{
+    async fn commit_into_store(self, store: &mut S) -> Result<S::CID> {
+        store.commit(*self).await
+    }
+}
+
 impl<S, R> Commit<S> for Readable<R>
 where
     S: Store,
