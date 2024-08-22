@@ -1,5 +1,6 @@
 use anyhow::Result;
-use std::path::PathBuf;
+use serde::de::DeserializeOwned;
+use std::path::{Path, PathBuf};
 
 pub const APP_NAME: &str = "pangalactic";
 
@@ -20,6 +21,21 @@ impl PgDirs {
         });
 
         &SINGLETON
+    }
+
+    pub async fn load_config<P, C>(&self, subpath: P) -> Result<C>
+    where
+        P: AsRef<Path>,
+        C: DeserializeOwned,
+    {
+        use tokio::io::AsyncReadExt;
+
+        let path = self.config.join(subpath).with_extension("toml");
+        let mut f = tokio::fs::File::open(path).await?;
+        let mut s = String::new();
+        f.read_to_string(&mut s).await?;
+        let config = toml::from_str(&s)?;
+        Ok(config)
     }
 
     fn init() -> Result<Self> {
