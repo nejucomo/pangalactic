@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-nested-dir"
+name = "pangalactic-manifest"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,8 +7,9 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 derive_more.workspace = true
-either.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-nested-dir.workspace = true
 pangalactic-store.workspace = true

@@ -1,10 +1,11 @@
 use anyhow::Result;
-use pangalactic_dir::Directory;
+use either::Either;
+use pangalactic_dir::{Directory, Name};
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Store};
 
-use crate::NDNode;
+use crate::{DfsIter, NDNode};
 
 #[derive(
     Debug, derive_more::Deref, derive_more::DerefMut, derive_more::From, derive_more::Into,
@@ -26,6 +27,15 @@ impl<L> From<Directory<L>> for NestedDirectory<L> {
 impl<C> From<LinkDirectory<C>> for NestedDirectory<Link<C>> {
     fn from(ld: LinkDirectory<C>) -> Self {
         NestedDirectory::from(Directory::from(ld))
+    }
+}
+
+impl<L, B> IntoIterator for NestedDirectory<L, B> {
+    type Item = (Vec<Name>, Either<L, B>);
+    type IntoIter = DfsIter<L, B>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        DfsIter::from(self)
     }
 }
 
