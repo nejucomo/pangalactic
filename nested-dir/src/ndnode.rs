@@ -6,7 +6,7 @@ use pangalactic_store::{Commit, Store};
 
 use crate::{DfsIter, NDBranch};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct NDNode<N, L = ()> {
     pub data: N,
     pub branch: NDBranch<N, L>,

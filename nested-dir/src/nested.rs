@@ -7,7 +7,7 @@ use pangalactic_store::{Commit, Store};
 use crate::NDNode;
 
 #[derive(
-    Debug, derive_more::Deref, derive_more::DerefMut, derive_more::From, derive_more::Into,
+    Clone, Debug, derive_more::Deref, derive_more::DerefMut, derive_more::From, derive_more::Into,
 )]
 pub struct NestedDirectory<N, L = ()>(Directory<NDNode<N, L>>);
 

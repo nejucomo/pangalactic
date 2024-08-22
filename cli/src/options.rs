@@ -8,6 +8,7 @@ use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
 use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_manifest::FullManifest;
 use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
 use pangalactic_revcon::ControlDir;
 use pangalactic_seed::Seed;
@@ -262,7 +263,8 @@ impl Runnable for SeedListOptions {
         Box::pin(async {
             let mut store = LinkDirectoryLayer::<MemStore>::default();
             let link = store.commit(Seed).await?;
-            todo!("display a manifest of {link:?}")
+            let mani: FullManifest<_> = store.load(&link).await?;
+            ok_disp(mani)
         })
     }
 }

@@ -5,7 +5,7 @@ use pangalactic_store::{Commit, Store};
 
 use crate::NestedDirectory;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum NDBranch<N, L = ()> {
     Subdir(Box<NestedDirectory<N, L>>),
     Leaf(L),
