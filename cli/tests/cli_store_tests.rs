@@ -18,10 +18,10 @@ fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
         input.replace(' ', "_").replace('!', "_")
     ))?;
 
-    let rawlink = run_pg_ok(&testcasedir, &["store", "put"], input)?;
+    let rawlink = run_pg_store_ok(&testcasedir, &["put"], input)?;
     let link = rawlink.trim();
 
-    let output = run_pg_ok(&testcasedir, &["store", "get", link], "")?;
+    let output = run_pg_store_ok(&testcasedir, &["get", link], "")?;
     assert_eq!(input, output);
     Ok(())
 }
@@ -113,11 +113,8 @@ impl MkSource {
         let predir = populate_host_dir(testcasedir.join("presetup_dir"))?;
 
         {
-            let cidspace = run_pg_ok(
-                &testcasedir,
-                &["store", "xfer", predir.to_str_anyhow()?, "pg:"],
-                "",
-            )?;
+            let cidspace =
+                run_pg_store_ok(&testcasedir, &["xfer", predir.to_str_anyhow()?, "pg:"], "")?;
             assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
         }
 
@@ -133,9 +130,9 @@ impl MkSource {
                 populate_host_dir(testcasedir.join("srcdir"))?;
             }
             StoreCID(File) | StorePath(File) => {
-                let cidspace = run_pg_ok(
+                let cidspace = run_pg_store_ok(
                     &testcasedir,
-                    &["store", "xfer", "-", "pg:"],
+                    &["xfer", "-", "pg:"],
                     consts::STORE_FILE_CONTENTS,
                 )?;
                 assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
@@ -319,9 +316,9 @@ fn xfer(mksource: MkSource, mkdest: MkDest) -> anyhow::Result<()> {
 
     mksource.setup(&testcasedir)?;
 
-    let (status, output) = run_pg(
+    let (status, output) = run_pg_store(
         &testcasedir,
-        &["store", "xfer", &mksource.to_arg(), &mkdest.to_arg()],
+        &["xfer", &mksource.to_arg(), &mkdest.to_arg()],
         &mksource.stdin(),
     )?;
     mksource.verify_outcome(mkdest, &testcasedir, status, output)
@@ -352,17 +349,23 @@ fn get_test_case_dir(dataset: &str) -> String {
     )
 }
 
-fn run_pg_ok(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<String> {
-    let (status, output) = run_pg(testcasedir, args, stdin)?;
+fn run_pg_store_ok(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<String> {
+    let (status, output) = run_pg_store(testcasedir, args, stdin)?;
     status.exit_ok()?;
     Ok(output)
 }
 
-fn run_pg(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<(ExitStatus, String)> {
+fn run_pg_store(
+    testcasedir: &Path,
+    args: &[&str],
+    stdin: &str,
+) -> anyhow::Result<(ExitStatus, String)> {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
     let mut cmd = Command::new(env!("CARGO_BIN_EXE_pg"));
+    cmd.arg("util");
+    cmd.arg("store");
     cmd.args(args);
     cmd.env("XDG_DATA_HOME", testcasedir);
     cmd.current_dir(testcasedir);

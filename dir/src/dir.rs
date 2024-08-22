@@ -1,7 +1,10 @@
-use crate::{Name, NameRef};
+use std::collections::BTreeMap;
+
+use anyhow::Result;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+
+use crate::{Name, NameRef};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
@@ -37,7 +40,7 @@ impl<L> IntoIterator for Directory<L> {
 }
 
 impl<L> Directory<L> {
-    pub fn insert(&mut self, name: Name, link: L) -> anyhow::Result<()> {
+    pub fn insert(&mut self, name: Name, link: L) -> Result<()> {
         let errname = name.clone();
         if self.0.insert(name, link).is_none() {
             Ok(())
@@ -56,7 +59,7 @@ impl<L> Directory<L> {
         self.0.get(name)
     }
 
-    pub fn get_required(&self, name: &NameRef) -> anyhow::Result<&L> {
+    pub fn get_required(&self, name: &NameRef) -> Result<&L> {
         require(name, self.get(name))
     }
 
@@ -64,11 +67,11 @@ impl<L> Directory<L> {
         self.0.remove(name)
     }
 
-    pub fn remove_required(&mut self, name: &NameRef) -> anyhow::Result<L> {
+    pub fn remove_required(&mut self, name: &NameRef) -> Result<L> {
         require(name, self.remove(name))
     }
 
-    pub fn require_empty(self) -> anyhow::Result<()> {
+    pub fn require_empty(self) -> Result<()> {
         if self.0.is_empty() {
             Ok(())
         } else {
@@ -78,8 +81,15 @@ impl<L> Directory<L> {
             )))
         }
     }
+
+    pub fn map_values<F, M>(self, f: F) -> Directory<M>
+    where
+        F: Fn(L) -> M,
+    {
+        self.into_iter().map(|(n, l)| (n, f(l))).collect()
+    }
 }
 
-fn require<T>(name: &NameRef, opt: Option<T>) -> anyhow::Result<T> {
+fn require<T>(name: &NameRef, opt: Option<T>) -> Result<T> {
     opt.ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
 }

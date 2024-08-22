@@ -142,7 +142,7 @@ where
 
     // Set up plan:
     let exec = store
-        .commit(pangalactic_guests::get_wasm_bytes(guest)?)
+        .commit(pangalactic_seed::get_wasm_bytes(guest)?)
         .await?;
     let input = store.commit(content).await?;
 

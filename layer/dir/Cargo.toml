@@ -5,15 +5,17 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-anyhow.workspace = true
 anyhow-std.workspace = true
+anyhow.workspace = true
 derive_more.workspace = true
+include_dir.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dir = { workspace = true, features = ["serde"] }
 pangalactic-iowrappers.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-log.workspace = true
 pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true

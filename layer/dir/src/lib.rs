@@ -1,6 +1,7 @@
 mod container;
 mod dirnode;
 mod fsimpls;
+mod incdir;
 mod layer;
 mod linkdir;
 mod writer;

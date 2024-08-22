@@ -9,7 +9,6 @@ members = [
   "dir",
   "guest",
   "guest-procmacro",
-  "guests",
   "handle",
   "host",
   "init-stream",
@@ -19,9 +18,13 @@ members = [
   "link",
   "linkkind",
   "log",
+  "manifest",
+  "nested-dir",
   "path",
   "primitives",
+  "revcon",
   "schemata",
+  "seed",
   "serialization",
   "store/dirdb",
   "store/mem",
@@ -47,7 +50,6 @@ pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
-pangalactic-guests          = { path = "guests"          }
 pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-host            = { path = "host"            }
@@ -58,9 +60,13 @@ pangalactic-layer-dir       = { path = "layer/dir"       }
 pangalactic-link            = { path = "link"            }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-log             = { path = "log"             }
+pangalactic-manifest        = { path = "manifest"        }
+pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
+pangalactic-revcon          = { path = "revcon"          }
 pangalactic-schemata        = { path = "schemata"        }
+pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
@@ -76,6 +82,7 @@ blake3 = "1.3.1"
 clap = { version = "4.4.11", features = ["derive", "unstable-doc"] }
 derive_more = "0.99.17"
 dirs = "5.0.1"
+either = "1.13.0"
 enum_dispatch = "0.3.13"
 extend = "1.2.0"
 futures = "0.3.30"

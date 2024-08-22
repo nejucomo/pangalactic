@@ -1,24 +1,27 @@
 [package]
-name = "pangalactic-guests"
+name = "pangalactic-seed"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+anyhow-std.workspace = true
 include_dir.workspace = true
+pangalactic-layer-dir.workspace = true
+pangalactic-link.workspace = true
+pangalactic-store-mem.workspace = true
+pangalactic-store.workspace = true
+serde.workspace = true
+tracing.workspace = true
 
 [dev-dependencies]
 pangalactic-host.workspace = true
 pangalactic-layer-cidmeta.workspace = true
-pangalactic-layer-dir.workspace = true
-pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-log.workspace = true
 pangalactic-path.workspace = true
 pangalactic-schemata.workspace = true
-pangalactic-store-mem.workspace = true
-pangalactic-store.workspace = true
 tokio.workspace = true
 
 [build-dependencies]
