@@ -1,15 +1,24 @@
+/// The environment variable which influences the logging configuration
+pub const ENV_NAME: &str = "PG_LOG";
+
+const DEFAULT_DIRECTIVES: &str = "debug,cranelift_codegen=info,wasmtime_cranelift=info";
+
 pub fn init() -> anyhow::Result<()> {
-    use tracing::Level;
+    use tracing_subscriber::EnvFilter;
+
+    if matches!(std::env::var(ENV_NAME), Err(std::env::VarError::NotPresent)) {
+        unsafe {
+            std::env::set_var(ENV_NAME, DEFAULT_DIRECTIVES);
+        }
+    }
+
+    let filter = EnvFilter::builder().with_env_var(ENV_NAME).from_env()?;
 
     tracing_subscriber::fmt()
-        .with_max_level(Level::DEBUG)
+        .with_env_filter(filter)
         .with_writer(std::io::stderr)
         .try_init()
         .map_err(|e| anyhow::anyhow!(e))
-
-    // for modname in QUIET_LIST {
-    //     logger = logger.with_module_level(modname, log::LevelFilter::Warn);
-    // }
 }
 
 pub fn test_init() {
@@ -20,5 +29,3 @@ pub fn test_init() {
         init().unwrap();
     });
 }
-
-// const QUIET_LIST: &[&str] = &["cranelift_codegen", "wasmtime_cranelift"];
