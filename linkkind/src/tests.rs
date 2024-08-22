@@ -9,8 +9,8 @@ fn display_parse_roundtrip(input: LinkKind) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_case("file")]
-#[test_case("dir")]
+#[test_case("F")]
+#[test_case("D")]
 fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
     let val: LinkKind = input.parse()?;
     let output = val.to_string();
@@ -18,14 +18,8 @@ fn parse_display_roundtrip(input: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[test_case(
-    "f1le",
-    r#"unrecognized LinkKind "f1le", expected one of: "file", "dir""#
-)]
-#[test_case(
-    "dire",
-    r#"unrecognized LinkKind "dire", expected one of: "file", "dir""#
-)]
+#[test_case("f1le", r#"unrecognized LinkKind "f1le", expected one of: "F", "D""#)]
+#[test_case("dire", r#"unrecognized LinkKind "dire", expected one of: "F", "D""#)]
 fn parse_error(input: &str, expected_error: &str) {
     let emsg = input.parse::<LinkKind>().err().unwrap().to_string();
     assert_eq!(emsg, expected_error);

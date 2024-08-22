@@ -59,8 +59,8 @@ impl FromStr for LinkKind {
         use LinkKind::*;
 
         match s {
-            "file" => Ok(File),
-            "dir" => Ok(Dir),
+            "F" => Ok(File),
+            "D" => Ok(Dir),
             other => Err(anyhow::anyhow!(
                 "unrecognized LinkKind {other:?}, expected one of: {:?}, {:?}",
                 File.to_string(),
@@ -75,8 +75,8 @@ impl fmt::Display for LinkKind {
         use LinkKind::*;
 
         match self {
-            File => "file",
-            Dir => "dir",
+            File => "F",
+            Dir => "D",
         }
         .fmt(f)
     }
