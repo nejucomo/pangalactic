@@ -1,92 +1,80 @@
 use either::Either::{self, Left, Right};
 use pangalactic_dir::{Directory, Name};
 
+use crate::NDBranch::*;
 use crate::{NDNode, NestedDirectory};
 
 #[derive(Debug)]
-pub enum DfsIter<L, B> {
-    Complete,
-    Stack(DirIter<L, B>, Vec<StackItem<L, B>>),
-}
-use DfsIter::*;
+pub struct DfsIter<N, L>(Option<Either<(N, L), Guts<N, L>>>);
 
-type DirIter<L, B> = <Directory<NDNode<L, B>> as IntoIterator>::IntoIter;
-type StackItem<L, B> = (Name, B, DirIter<L, B>);
-
-impl<L, B> DfsIter<L, B> {
-    fn next_ctl(&mut self) -> IterCtl<L, B> {
-        match self {
-            Complete => ReturnNone,
-            Stack(first, stack) => {
-                let last = stack.last_mut().map(|(_, _, it)| it).unwrap_or(first);
-                if let Some((name, node)) = last.next() {
-                    Self::node_ctl(stack, name, node)
-                } else if let Some((name, b, _)) = stack.pop() {
-                    ReturnItem(Self::make_path(stack, name), Right(b))
-                } else {
-                    *self = Complete;
-                    Continue
-                }
-            }
-        }
-    }
-
-    fn node_ctl(stack: &mut Vec<StackItem<L, B>>, name: Name, node: NDNode<L, B>) -> IterCtl<L, B> {
-        use NDNode::*;
-
-        match node {
-            Branch(nested, b) => {
-                stack.push((name, b, Directory::from(*nested).into_iter()));
-                Continue
-            }
-            Leaf(l) => ReturnItem(Self::make_path(stack, name), Left(l)),
-        }
-    }
-
-    fn make_path(stack: &[StackItem<L, B>], name: Name) -> Vec<Name> {
-        let mut path: Vec<Name> = stack.iter().map(|(n, _, _)| n.to_string()).collect();
-        path.push(name);
-        path
+impl<N, L> From<NDNode<N, L>> for DfsIter<N, L> {
+    fn from(NDNode { data, branch }: NDNode<N, L>) -> Self {
+        DfsIter(Some(match branch {
+            Subdir(d) => Right(Guts::from((data, d))),
+            Leaf(l) => Left((data, l)),
+        }))
     }
 }
 
-impl<L, B> From<NestedDirectory<L, B>> for DfsIter<L, B> {
-    fn from(nd: NestedDirectory<L, B>) -> Self {
-        DfsIter::from(Directory::from(nd))
-    }
-}
-
-impl<L, B> From<Directory<NDNode<L, B>>> for DfsIter<L, B> {
-    fn from(d: Directory<NDNode<L, B>>) -> Self {
-        Stack(d.into_iter(), vec![])
-    }
-}
-
-impl<L, B> Iterator for DfsIter<L, B> {
-    type Item = (Vec<Name>, Either<L, B>);
+impl<N, L> Iterator for DfsIter<N, L> {
+    type Item = (Vec<Name>, N, Option<L>);
 
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            if let Some(optitem) = self.next_ctl().into() {
-                return optitem;
+        self.0.take().and_then(|ei| match ei {
+            Left((n, l)) => Some((vec![], n, Some(l))),
+            Right(mut guts) => {
+                let optitem = guts.next();
+                if optitem.is_some() {
+                    self.0 = Some(Right(guts));
+                }
+                optitem
             }
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct Guts<N, L> {
+    stack: Vec<(N, DirIter<N, L>)>,
+    path: Vec<Name>,
+}
+
+type DirIter<N, L> = <Directory<NDNode<N, L>> as IntoIterator>::IntoIter;
+
+impl<N, L> From<(N, Box<NestedDirectory<N, L>>)> for Guts<N, L> {
+    fn from((data, d): (N, Box<NestedDirectory<N, L>>)) -> Self {
+        Guts {
+            stack: vec![(data, (*d).into())],
+            path: vec![],
         }
     }
 }
 
-enum IterCtl<L, B> {
-    Continue,
-    ReturnNone,
-    ReturnItem(Vec<Name>, Either<L, B>),
-}
-use IterCtl::*;
+impl<N, L> Iterator for Guts<N, L> {
+    type Item = (Vec<Name>, N, Option<L>);
 
-impl<L, B> From<IterCtl<L, B>> for Option<Option<(Vec<Name>, Either<L, B>)>> {
-    fn from(ctl: IterCtl<L, B>) -> Self {
-        match ctl {
-            Continue => None,
-            ReturnNone => Some(None),
-            ReturnItem(p, e) => Some(Some((p, e))),
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some((data, mut it)) = self.stack.pop() {
+            if let Some((childname, child)) = it.next() {
+                self.stack.push((data, it));
+                match child.branch {
+                    Subdir(d) => {
+                        self.path.push(childname);
+                        self.stack.push((child.data, (*d).into()));
+                        continue;
+                    }
+                    Leaf(l) => {
+                        let mut path = self.path.clone();
+                        path.push(childname);
+                        return Some((path, child.data, Some(l)));
+                    }
+                }
+            } else {
+                let path = self.path.clone();
+                self.path.pop();
+                return Some((path, data, None));
+            }
         }
+        None
     }
 }

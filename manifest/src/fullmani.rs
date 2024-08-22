@@ -6,24 +6,26 @@ use pangalactic_link::Link;
 use pangalactic_nested_dir::NestedDirectory;
 use pangalactic_store::{Load, Store};
 
-use crate::DfsIter;
-
 /// A Full manifest includes all links and all directory structure
 #[derive(Debug, From, Into, Deref, DerefMut)]
-pub struct FullManifest<C>(NestedDirectory<C, C>);
+pub struct FullManifest<C>(NestedDirectory<C, ()>);
+
+impl<C> FullManifest<C> {
+    pub fn into_depth_first_iter(self) -> impl Iterator<Item = (Vec<Name>, Link<C>)> {
+        self.0.into_depth_first_iter().map(|(path, cid, optleaf)| {
+            use pangalactic_linkkind::LinkKind::*;
+
+            (
+                path,
+                Link::new(if optleaf.is_some() { File } else { Dir }, cid),
+            )
+        })
+    }
+}
 
 impl<C> Default for FullManifest<C> {
     fn default() -> Self {
         FullManifest(NestedDirectory::default())
-    }
-}
-
-impl<C> IntoIterator for FullManifest<C> {
-    type Item = (Vec<Name>, Link<C>);
-    type IntoIter = DfsIter<C>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        DfsIter::from(self.0.into_iter())
     }
 }
 
@@ -33,21 +35,23 @@ where
 {
     async fn load_from_store(store: &LinkDirectoryLayer<S>, link: &Link<S::CID>) -> Result<Self> {
         use pangalactic_linkkind::LinkKind::*;
-        use pangalactic_nested_dir::NDNode::*;
+        use pangalactic_nested_dir::{NDBranch::*, NDNode};
 
-        let mut me = FullManifest::default();
+        let mut fm = FullManifest::default();
         let ld: LinkDirectory<S::CID> = store.load(link).await?;
         for (name, link) in ld {
-            let (kind, cid) = link.unwrap();
-            let node = match kind {
-                File => Leaf(cid),
-                Dir => {
-                    let FullManifest(nd) = store.load(&Link::new(kind, cid.clone())).await?;
-                    Branch(Box::new(nd), cid)
-                }
+            let node = NDNode {
+                data: link.peek_cid().clone(),
+                branch: match link.kind() {
+                    File => Leaf(()),
+                    Dir => {
+                        let FullManifest(nd) = store.load(&link).await?;
+                        Subdir(Box::new(nd))
+                    }
+                },
             };
-            me.insert(name, node)?;
+            fm.insert(name, node)?;
         }
-        Ok(me)
+        Ok(fm)
     }
 }
