@@ -32,42 +32,40 @@ mod consts {
     pub const STORE_FILE_CONTENTS: &'static str = "I am a store file.";
     pub const STORE_FILE_CONTENTS_2: &'static str = "I am also a store file.";
 
-    pub const MKSOURCE_FILE_CID: &'static str =
-        "pg:file--GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
+    pub const MKSOURCE_FILE_CID: &'static str = "pg:F:-GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
 
     // Note: We wish we could evaluate this in const stage to remove redundancy:
     // pub const MKSOURCE_DIR_CID: &'static str = MKSOURCE_DIR_STORE_PATH.split_once('/').unwrap().0;
-    pub const MKSOURCE_DIR_CID: &'static str =
-        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
+    pub const MKSOURCE_DIR_CID: &'static str = "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
     pub const MKSOURCE_FILE_STORE_PATH: &'static str =
-        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
+        "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
     pub const MKSOURCE_DIR_STORE_PATH: &'static str =
-        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
+        "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
     pub const MKDEST_STORE_DEST: &'static str =
-        "pg:dir-xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
+        "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
 
     pub const STDIN_TO_STORE_BARE: &'static str =
-        "pg:file-QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
+        "pg:F:QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
     pub const STDIN_TO_STORE_DEST: &'static str =
-        "pg:dir-E14qcnMPIy0hrURgpxygXDv628fgKtVeJtrNQB9Z_4RX/subdir/dest";
+        "pg:D:E14qcnMPIy0hrURgpxygXDv628fgKtVeJtrNQB9Z_4RX/subdir/dest";
     pub const HOST_FILE_TO_STORE_BARE: &'static str =
-        "pg:file-VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
+        "pg:F:VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
     pub const HOST_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-2FTxXVthHGe0DZxQXkIB27wGRd20H-F9-aUHcLXtamBX/subdir/dest";
+        "pg:D:2FTxXVthHGe0DZxQXkIB27wGRd20H-F9-aUHcLXtamBX/subdir/dest";
     pub const HOST_DIR_TO_STORE_DEST: &'static str =
-        "pg:dir-GlR2nsXYF7oiQSgHAEQAb_TMBGkfQB7ZvNvwjMLSC3ZX/subdir/dest";
+        "pg:D:GlR2nsXYF7oiQSgHAEQAb_TMBGkfQB7ZvNvwjMLSC3ZX/subdir/dest";
     pub const STORE_CID_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir-AQSwJQ7qQsi58KESmz6izCd_DQDHv8-aUu3uwIxIUlRX/subdir/dest";
+        "pg:D:AQSwJQ7qQsi58KESmz6izCd_DQDHv8-aUu3uwIxIUlRX/subdir/dest";
     pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = HOST_DIR_TO_STORE_DEST;
     pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str =
-        "pg:file-9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
+        "pg:F:9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
     pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
-        "pg:dir-JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
+        "pg:D:JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
     pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
-        "pg:dir--UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX/subdir/dest";
+        "pg:D:-UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX/subdir/dest";
     pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
-        "pg:dir-Da29BWShEVjO74u6mYjxZumeuBsu_whlSxi_z1ZDNENX/subdir/dest";
+        "pg:D:Da29BWShEVjO74u6mYjxZumeuBsu_whlSxi_z1ZDNENX/subdir/dest";
 }
 
 #[derive(Copy, Clone, Debug)]

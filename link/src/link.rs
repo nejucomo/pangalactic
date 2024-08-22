@@ -56,7 +56,7 @@ impl<C> Link<C> {
         let mut chomper = Chomper::from(s);
         chomper.require_prefix(":", SCHEME)?;
 
-        let kindstr = chomper.chomp_prefix("-")?;
+        let kindstr = chomper.chomp_prefix(":")?;
         let kind = kindstr.parse()?;
         let cid = b64::deserialize(chomper)?;
 
@@ -84,7 +84,7 @@ where
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let kind = self.kind;
         let cid = b64::serialize(&self.cid).map_err(|_| fmt::Error)?;
-        write!(f, "{SCHEME}:{kind}-{cid}")
+        write!(f, "{SCHEME}:{kind}:{cid}")
     }
 }
 
