@@ -6,9 +6,13 @@ const DEFAULT_DIRECTIVES: &str = "debug,cranelift_codegen=info,wasmtime_cranelif
 pub fn init() -> anyhow::Result<()> {
     use tracing_subscriber::EnvFilter;
 
-    let filter = EnvFilter::builder()
-        .with_env_var(ENV_NAME)
-        .parse(DEFAULT_DIRECTIVES)?;
+    if matches!(std::env::var(ENV_NAME), Err(std::env::VarError::NotPresent)) {
+        unsafe {
+            std::env::set_var(ENV_NAME, DEFAULT_DIRECTIVES);
+        }
+    }
+
+    let filter = EnvFilter::builder().with_env_var(ENV_NAME).from_env()?;
 
     tracing_subscriber::fmt()
         .with_env_filter(filter)
