@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use pangalactic_config::PgDirs;
 use pangalactic_hash::Hash;
 use pangalactic_store::{Commit, Load, Store};
 
@@ -10,7 +11,7 @@ pub struct DirDbStore(PathBuf);
 
 impl Default for DirDbStore {
     fn default() -> Self {
-        let d = crate::default_path();
+        let d = PgDirs::singleton().data.join("dirdb");
         std::fs::create_dir_all(&d).unwrap();
         DirDbStore(d)
     }
