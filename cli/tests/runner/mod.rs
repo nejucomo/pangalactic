@@ -3,16 +3,19 @@ use std::{path::Path, process::ExitStatus};
 use anyhow::Result;
 
 #[derive(Debug)]
-pub struct Runner<'a, const K: usize> {
+pub struct Runner<'a> {
     pub testcasedir: &'a Path,
-    prefixargs: [&'a str; K],
+    prefixargs: Vec<&'a str>,
 }
 
-impl<'a, const K: usize> Runner<'a, K> {
-    pub fn new(testcasedir: &'a Path, prefixargs: [&'a str; K]) -> Self {
+impl<'a> Runner<'a> {
+    pub fn new<I>(testcasedir: &'a Path, prefixargs: I) -> Self
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
         Runner {
             testcasedir,
-            prefixargs,
+            prefixargs: prefixargs.into_iter().collect(),
         }
     }
 

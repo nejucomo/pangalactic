@@ -12,8 +12,6 @@ use self::runner::{Output, Runner};
 #[test_case("")]
 #[test_case("Hello World!")]
 fn put_get_round_trip(input: &str) -> Result<()> {
-    dbg!(std::process::id());
-
     let testcasedir = testdir::setup(&format!(
         "put_get_round_trip-{}",
         input.replace(' ', "_").replace('!', "_")
@@ -96,7 +94,7 @@ enum MkDest {
 }
 
 impl MkSource {
-    fn setup<'a, const K: usize>(self, runner: &Runner<'a, K>) -> Result<()> {
+    fn setup<'a>(self, runner: &Runner<'a>) -> Result<()> {
         fn populate_host_dir(p: PathBuf) -> Result<PathBuf> {
             p.create_dir_anyhow()?;
             p.join("file.txt").write_anyhow("Hello World!")?;
