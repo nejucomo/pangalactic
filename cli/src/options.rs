@@ -132,7 +132,8 @@ pub struct RevConInitOptions {
 impl Runnable for RevConInitOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
-            let ctldir = ControlDir::initialize(self.workdir).await?;
+            let mut store = CliStore::default();
+            let ctldir = ControlDir::initialize(&mut store, self.workdir).await?;
             ok_disp(ctldir)
         })
     }
@@ -277,7 +278,7 @@ impl Runnable for SeedInstallOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let link = store.commit(Seed).await?;
+            let link = Seed.install(&mut store).await?;
             ok_disp(link)
         })
     }

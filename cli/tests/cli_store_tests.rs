@@ -1,27 +1,27 @@
-#![feature(exit_status_error)]
+mod runner;
+mod testdir;
 
-use std::{
-    path::{Path, PathBuf},
-    process::ExitStatus,
-};
+use std::path::{Path, PathBuf};
 
+use anyhow::Result;
 use anyhow_std::PathAnyhow;
 use test_case::test_case;
 
+use self::runner::{Output, Runner};
+
 #[test_case("")]
 #[test_case("Hello World!")]
-fn put_get_round_trip(input: &str) -> anyhow::Result<()> {
-    dbg!(std::process::id());
-
-    let testcasedir = setup_test_case_dir(&format!(
+fn put_get_round_trip(input: &str) -> Result<()> {
+    let testcasedir = testdir::setup(&format!(
         "put_get_round_trip-{}",
         input.replace(' ', "_").replace('!', "_")
     ))?;
 
-    let rawlink = run_pg_store_ok(&testcasedir, &["put"], input)?;
+    let runner = Runner::new(&testcasedir, ["util", "store"]);
+    let rawlink = runner.pg(["put"], input)?.exit_ok()?;
     let link = rawlink.trim();
 
-    let output = run_pg_store_ok(&testcasedir, &["get", link], "")?;
+    let output = runner.pg(["get", link], "")?.exit_ok()?;
     assert_eq!(input, output);
     Ok(())
 }
@@ -94,8 +94,8 @@ enum MkDest {
 }
 
 impl MkSource {
-    fn setup(self, testcasedir: &Path) -> anyhow::Result<()> {
-        fn populate_host_dir(p: PathBuf) -> anyhow::Result<PathBuf> {
+    fn setup<'a>(self, runner: &Runner<'a>) -> Result<()> {
+        fn populate_host_dir(p: PathBuf) -> Result<PathBuf> {
             p.create_dir_anyhow()?;
             p.join("file.txt").write_anyhow("Hello World!")?;
             let subdir = p.join("subdir");
@@ -108,11 +108,12 @@ impl MkSource {
             Ok(p)
         }
 
-        let predir = populate_host_dir(testcasedir.join("presetup_dir"))?;
+        let predir = populate_host_dir(runner.testcasedir.join("presetup_dir"))?;
 
         {
-            let cidspace =
-                run_pg_store_ok(&testcasedir, &["xfer", predir.to_str_anyhow()?, "pg:"], "")?;
+            let cidspace = runner
+                .pg(["xfer", predir.to_str_anyhow()?, "pg:"], "")?
+                .exit_ok()?;
             assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
         }
 
@@ -120,19 +121,18 @@ impl MkSource {
 
         match self {
             Host(File) => {
-                testcasedir
+                runner
+                    .testcasedir
                     .join("srcfile")
                     .write_anyhow(consts::HOST_FILE_CONTENTS)?;
             }
             Host(Dir) => {
-                populate_host_dir(testcasedir.join("srcdir"))?;
+                populate_host_dir(runner.testcasedir.join("srcdir"))?;
             }
             StoreCID(File) | StorePath(File) => {
-                let cidspace = run_pg_store_ok(
-                    &testcasedir,
-                    &["xfer", "-", "pg:"],
-                    consts::STORE_FILE_CONTENTS,
-                )?;
+                let cidspace = runner
+                    .pg(["xfer", "-", "pg:"], consts::STORE_FILE_CONTENTS)?
+                    .exit_ok()?;
                 assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
             }
             _ => {}
@@ -162,23 +162,17 @@ impl MkSource {
         }
     }
 
-    fn verify_outcome(
-        self,
-        mkdest: MkDest,
-        testcasedir: &Path,
-        status: ExitStatus,
-        output: String,
-    ) -> anyhow::Result<()> {
+    fn verify_outcome(self, mkdest: MkDest, testcasedir: &Path, output: Output) -> Result<()> {
         if let Some((constname, expected)) = self.expected_output(mkdest) {
-            status.exit_ok()?;
+            let actual = output.exit_ok()?;
             assert_eq!(
-                output.trim_end(),
+                actual.trim_end(),
                 expected,
                 "mismatched const {constname:?}"
             );
             self.verify_host_dest(mkdest, testcasedir)?;
         } else {
-            assert!(!status.success());
+            assert!(!output.status.success());
         }
 
         Ok(())
@@ -239,7 +233,7 @@ impl MkSource {
         }
     }
 
-    fn verify_host_dest(self, mkdest: MkDest, testcasedir: &Path) -> anyhow::Result<()> {
+    fn verify_host_dest(self, mkdest: MkDest, testcasedir: &Path) -> Result<()> {
         if matches!(mkdest, MkDest::Host) {
             use MkSource::*;
             let destpath = testcasedir.join(mkdest.to_arg());
@@ -309,87 +303,27 @@ impl MkDest {
 #[test_case(MkSource::StorePath(Dir), MkDest::StoreBare)]
 #[test_case(MkSource::StorePath(File), MkDest::StoreDest)]
 #[test_case(MkSource::StorePath(Dir), MkDest::StoreDest)]
-fn xfer(mksource: MkSource, mkdest: MkDest) -> anyhow::Result<()> {
-    let testcasedir = setup_test_case_dir(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
+fn xfer(mksource: MkSource, mkdest: MkDest) -> Result<()> {
+    let testcasedir = testdir::setup(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
 
-    mksource.setup(&testcasedir)?;
+    let runner = Runner::new(&testcasedir, ["util", "store"]);
+    mksource.setup(&runner)?;
 
-    let (status, output) = run_pg_store(
-        &testcasedir,
-        &["xfer", &mksource.to_arg(), &mkdest.to_arg()],
+    let runout = runner.pg(
+        ["xfer", &mksource.to_arg(), &mkdest.to_arg()],
         &mksource.stdin(),
     )?;
-    mksource.verify_outcome(mkdest, &testcasedir, status, output)
+    mksource.verify_outcome(mkdest, &runner.testcasedir, runout)
 }
 
-fn setup_test_case_dir(dataset: &str) -> anyhow::Result<PathBuf> {
-    let testcasedir = PathBuf::from(get_test_case_dir(dataset));
-    dbg!(&testcasedir);
-
-    testcasedir.remove_dir_all_anyhow().or_else(|e| {
-        use std::io::ErrorKind::NotFound;
-
-        match e.downcast_ref::<std::io::Error>() {
-            Some(e) if e.kind() == NotFound => Ok(()),
-            _ => Err(e),
-        }
-    })?;
-
-    testcasedir.create_dir_all_anyhow()?;
-
-    Ok(PathBuf::from(testcasedir))
-}
-
-fn get_test_case_dir(dataset: &str) -> String {
-    format!(
-        "{}/cli_store_tests_data/{dataset}",
-        env!("CARGO_TARGET_TMPDIR")
-    )
-}
-
-fn run_pg_store_ok(testcasedir: &Path, args: &[&str], stdin: &str) -> anyhow::Result<String> {
-    let (status, output) = run_pg_store(testcasedir, args, stdin)?;
-    status.exit_ok()?;
-    Ok(output)
-}
-
-fn run_pg_store(
-    testcasedir: &Path,
-    args: &[&str],
-    stdin: &str,
-) -> anyhow::Result<(ExitStatus, String)> {
-    use std::io::Write;
-    use std::process::{Command, Stdio};
-
-    let mut cmd = Command::new(env!("CARGO_BIN_EXE_pg"));
-    cmd.arg("util");
-    cmd.arg("store");
-    cmd.args(args);
-    cmd.env("XDG_DATA_HOME", testcasedir);
-    cmd.current_dir(testcasedir);
-    cmd.stdin(Stdio::piped());
-    cmd.stdout(Stdio::piped());
-    cmd.stderr(Stdio::piped());
-
-    let child = cmd.spawn()?;
-
-    child.stdin.as_ref().unwrap().write_all(stdin.as_bytes())?;
-    let cmdout = child.wait_with_output()?;
-
-    println!("{}", String::from_utf8(cmdout.stderr)?);
-
-    let outtext = String::from_utf8(cmdout.stdout)?;
-    Ok((cmdout.status, outtext))
-}
-
-fn check_paths_equal(src: &Path, dst: &Path) -> anyhow::Result<()> {
+fn check_paths_equal(src: &Path, dst: &Path) -> Result<()> {
     use anyhow::Context;
 
     check_paths_equal_inner(src, dst)
         .with_context(|| format!("{:?} != {:?}", src.display(), dst.display()))
 }
 
-fn check_paths_equal_inner(src: &Path, dst: &Path) -> anyhow::Result<()> {
+fn check_paths_equal_inner(src: &Path, dst: &Path) -> Result<()> {
     #[derive(Debug, PartialEq)]
     enum Ftype {
         File,
@@ -397,7 +331,7 @@ fn check_paths_equal_inner(src: &Path, dst: &Path) -> anyhow::Result<()> {
     }
     use Ftype::*;
 
-    fn file_type(p: &Path) -> anyhow::Result<Ftype> {
+    fn file_type(p: &Path) -> Result<Ftype> {
         if p.is_file() {
             Ok(File)
         } else if p.is_dir() {

@@ -5,14 +5,16 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-anyhow.workspace = true
 anyhow-std.workspace = true
+anyhow.workspace = true
 include_dir.workspace = true
+pangalactic-config.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
+tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]

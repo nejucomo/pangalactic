@@ -5,7 +5,12 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-anyhow.workspace = true
 anyhow-std.workspace = true
+anyhow.workspace = true
 derive_more.workspace = true
+pangalactic-config.workspace = true
+pangalactic-layer-dir.workspace = true
+pangalactic-path.workspace = true
+pangalactic-seed.workspace = true
+pangalactic-store.workspace = true
 tokio.workspace = true
