@@ -6,7 +6,7 @@ use std::{
 use anyhow::Result;
 use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_path::{AnyDestination, AnySource, StorePath};
-use pangalactic_seed::SeedConfig;
+use pangalactic_seed::Seed;
 use pangalactic_store::Store;
 
 #[derive(Debug, derive_more::From, derive_more::Into)]
@@ -42,13 +42,12 @@ impl ControlDir {
         S: Store,
         P: AsRef<Path>,
     {
-        use pangalactic_config::Configuration;
         use pangalactic_path::PathLayerExt;
 
         let ctldir = ControlDir(workdir.as_ref().join(".pg"));
 
-        let config = SeedConfig::<S>::load().await?;
-        let template = StorePath::new(config.seed_link, vec!["controldir-template".to_string()])?;
+        let seed_link = Seed.install(store).await?;
+        let template = StorePath::new(seed_link, vec!["controldir-template".to_string()])?;
 
         store
             .transfer(

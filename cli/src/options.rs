@@ -4,7 +4,6 @@ use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
 use futures::FutureExt;
-use pangalactic_config::Configuration;
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
@@ -12,7 +11,7 @@ use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_manifest::FullManifest;
 use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
 use pangalactic_revcon::ControlDir;
-use pangalactic_seed::{Seed, SeedConfig};
+use pangalactic_seed::Seed;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
 use pangalactic_store_mem::MemStore;
@@ -279,14 +278,7 @@ impl Runnable for SeedInstallOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let link = store.commit(Seed).await?;
-
-            SeedConfig::<CidMetaLayer<DirDbStore>> {
-                seed_link: link.clone(),
-            }
-            .save()
-            .await?;
-
+            let link = Seed.install(&mut store).await?;
             ok_disp(link)
         })
     }

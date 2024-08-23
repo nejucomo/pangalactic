@@ -14,6 +14,7 @@ pangalactic-link.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
+tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
