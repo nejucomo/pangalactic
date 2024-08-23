@@ -1,10 +1,9 @@
 use std::collections::BTreeMap;
 
 use anyhow::Result;
+use pangalactic_name::{Name, NameRef};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-
-use crate::{Name, NameRef};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]

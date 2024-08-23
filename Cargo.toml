@@ -20,6 +20,7 @@ members = [
   "linkkind",
   "log",
   "manifest",
+  "name",
   "nested-dir",
   "path",
   "primitives",
@@ -63,6 +64,7 @@ pangalactic-link            = { path = "link"            }
 pangalactic-linkkind        = { path = "linkkind"        }
 pangalactic-log             = { path = "log"             }
 pangalactic-manifest        = { path = "manifest"        }
+pangalactic-name            = { path = "name"            }
 pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }

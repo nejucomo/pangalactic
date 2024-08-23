@@ -2,9 +2,9 @@ use std::fmt::Display;
 
 use anyhow::Result;
 use derive_more::{Deref, DerefMut, From, Into};
-use pangalactic_dir::Name;
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use pangalactic_nested_dir::NestedDirectory;
 use pangalactic_store::{Load, Store};
 

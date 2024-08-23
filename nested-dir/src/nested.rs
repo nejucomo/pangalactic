@@ -1,7 +1,8 @@
 use anyhow::Result;
-use pangalactic_dir::{Directory, Name};
+use pangalactic_dir::Directory;
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use pangalactic_store::{Commit, Store};
 
 use crate::NDNode;

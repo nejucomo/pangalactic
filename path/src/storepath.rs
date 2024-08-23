@@ -2,10 +2,10 @@ use std::fmt;
 use std::str::FromStr;
 
 use pangalactic_cid::ContentIdentifier;
-use pangalactic_dir::Name;
 use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
+use pangalactic_name::Name;
 use pangalactic_store::{Commit, Store};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};

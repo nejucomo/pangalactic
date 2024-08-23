@@ -1,5 +1,5 @@
-use pangalactic_dir::Name;
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use serde::de::DeserializeOwned;
 use std::collections::VecDeque;
 

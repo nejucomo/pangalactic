@@ -1,7 +1,7 @@
 use not_empty::{NonEmptySlice, NonEmptyVec};
 use pangalactic_bindref::Bindable;
-use pangalactic_dir::Name;
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
 

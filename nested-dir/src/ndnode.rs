@@ -1,7 +1,7 @@
 use anyhow::Result;
-use pangalactic_dir::Name;
 use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use pangalactic_store::{Commit, Store};
 
 use crate::{DfsIter, NDBranch};

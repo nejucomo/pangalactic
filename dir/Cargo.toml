@@ -6,4 +6,5 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+pangalactic-name.workspace = true
 serde = { workspace = true, optional = true }

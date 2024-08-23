@@ -11,5 +11,6 @@ pangalactic-dir.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-name.workspace = true
 pangalactic-nested-dir.workspace = true
 pangalactic-store.workspace = true
