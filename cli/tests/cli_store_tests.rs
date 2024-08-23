@@ -1,12 +1,12 @@
-#![feature(exit_status_error)]
-
-mod run;
+mod runner;
 
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use anyhow_std::PathAnyhow;
 use test_case::test_case;
+
+use self::runner::{Output, Runner};
 
 #[test_case("")]
 #[test_case("Hello World!")]
@@ -18,10 +18,11 @@ fn put_get_round_trip(input: &str) -> Result<()> {
         input.replace(' ', "_").replace('!', "_")
     ))?;
 
-    let rawlink = run_pg_store(&testcasedir, ["put"], input)?.exit_ok()?;
+    let runner = Runner::new(&testcasedir, ["util", "store"]);
+    let rawlink = runner.pg(["put"], input)?.exit_ok()?;
     let link = rawlink.trim();
 
-    let output = run_pg_store(&testcasedir, ["get", link], "")?.exit_ok()?;
+    let output = runner.pg(["get", link], "")?.exit_ok()?;
     assert_eq!(input, output);
     Ok(())
 }
@@ -94,7 +95,7 @@ enum MkDest {
 }
 
 impl MkSource {
-    fn setup(self, testcasedir: &Path) -> Result<()> {
+    fn setup<'a, const K: usize>(self, runner: &Runner<'a, K>) -> Result<()> {
         fn populate_host_dir(p: PathBuf) -> Result<PathBuf> {
             p.create_dir_anyhow()?;
             p.join("file.txt").write_anyhow("Hello World!")?;
@@ -108,12 +109,12 @@ impl MkSource {
             Ok(p)
         }
 
-        let predir = populate_host_dir(testcasedir.join("presetup_dir"))?;
+        let predir = populate_host_dir(runner.testcasedir.join("presetup_dir"))?;
 
         {
-            let cidspace =
-                run_pg_store(&testcasedir, ["xfer", predir.to_str_anyhow()?, "pg:"], "")?
-                    .exit_ok()?;
+            let cidspace = runner
+                .pg(["xfer", predir.to_str_anyhow()?, "pg:"], "")?
+                .exit_ok()?;
             assert_eq!(cidspace.trim_end(), StoreCID(Dir).to_arg());
         }
 
@@ -121,20 +122,18 @@ impl MkSource {
 
         match self {
             Host(File) => {
-                testcasedir
+                runner
+                    .testcasedir
                     .join("srcfile")
                     .write_anyhow(consts::HOST_FILE_CONTENTS)?;
             }
             Host(Dir) => {
-                populate_host_dir(testcasedir.join("srcdir"))?;
+                populate_host_dir(runner.testcasedir.join("srcdir"))?;
             }
             StoreCID(File) | StorePath(File) => {
-                let cidspace = run_pg_store(
-                    &testcasedir,
-                    ["xfer", "-", "pg:"],
-                    consts::STORE_FILE_CONTENTS,
-                )?
-                .exit_ok()?;
+                let cidspace = runner
+                    .pg(["xfer", "-", "pg:"], consts::STORE_FILE_CONTENTS)?
+                    .exit_ok()?;
                 assert_eq!(cidspace.trim_end(), StoreCID(File).to_arg());
             }
             _ => {}
@@ -164,7 +163,7 @@ impl MkSource {
         }
     }
 
-    fn verify_outcome(self, mkdest: MkDest, testcasedir: &Path, output: run::Output) -> Result<()> {
+    fn verify_outcome(self, mkdest: MkDest, testcasedir: &Path, output: Output) -> Result<()> {
         if let Some((constname, expected)) = self.expected_output(mkdest) {
             let actual = output.exit_ok()?;
             assert_eq!(
@@ -308,14 +307,14 @@ impl MkDest {
 fn xfer(mksource: MkSource, mkdest: MkDest) -> Result<()> {
     let testcasedir = setup_test_case_dir(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
 
-    mksource.setup(&testcasedir)?;
+    let runner = Runner::new(&testcasedir, ["util", "store"]);
+    mksource.setup(&runner)?;
 
-    let runout = run_pg_store(
-        &testcasedir,
+    let runout = runner.pg(
         ["xfer", &mksource.to_arg(), &mkdest.to_arg()],
         &mksource.stdin(),
     )?;
-    mksource.verify_outcome(mkdest, &testcasedir, runout)
+    mksource.verify_outcome(mkdest, &runner.testcasedir, runout)
 }
 
 fn setup_test_case_dir(dataset: &str) -> Result<PathBuf> {
@@ -340,17 +339,6 @@ fn get_test_case_dir(dataset: &str) -> String {
     format!(
         "{}/cli_store_tests_data/{dataset}",
         env!("CARGO_TARGET_TMPDIR")
-    )
-}
-
-fn run_pg_store<'a, I>(testcasedir: &Path, args: I, stdin: &str) -> Result<run::Output>
-where
-    I: IntoIterator<Item = &'a str>,
-{
-    run::pg(
-        testcasedir,
-        ["util", "store"].into_iter().chain(args),
-        stdin,
     )
 }
 
