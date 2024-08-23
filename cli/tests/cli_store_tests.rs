@@ -1,4 +1,5 @@
 mod runner;
+mod testdir;
 
 use std::path::{Path, PathBuf};
 
@@ -13,7 +14,7 @@ use self::runner::{Output, Runner};
 fn put_get_round_trip(input: &str) -> Result<()> {
     dbg!(std::process::id());
 
-    let testcasedir = setup_test_case_dir(&format!(
+    let testcasedir = testdir::setup(&format!(
         "put_get_round_trip-{}",
         input.replace(' ', "_").replace('!', "_")
     ))?;
@@ -305,7 +306,7 @@ impl MkDest {
 #[test_case(MkSource::StorePath(File), MkDest::StoreDest)]
 #[test_case(MkSource::StorePath(Dir), MkDest::StoreDest)]
 fn xfer(mksource: MkSource, mkdest: MkDest) -> Result<()> {
-    let testcasedir = setup_test_case_dir(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
+    let testcasedir = testdir::setup(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
 
     let runner = Runner::new(&testcasedir, ["util", "store"]);
     mksource.setup(&runner)?;
@@ -315,31 +316,6 @@ fn xfer(mksource: MkSource, mkdest: MkDest) -> Result<()> {
         &mksource.stdin(),
     )?;
     mksource.verify_outcome(mkdest, &runner.testcasedir, runout)
-}
-
-fn setup_test_case_dir(dataset: &str) -> Result<PathBuf> {
-    let testcasedir = PathBuf::from(get_test_case_dir(dataset));
-    dbg!(&testcasedir);
-
-    testcasedir.remove_dir_all_anyhow().or_else(|e| {
-        use std::io::ErrorKind::NotFound;
-
-        match e.downcast_ref::<std::io::Error>() {
-            Some(e) if e.kind() == NotFound => Ok(()),
-            _ => Err(e),
-        }
-    })?;
-
-    testcasedir.create_dir_all_anyhow()?;
-
-    Ok(PathBuf::from(testcasedir))
-}
-
-fn get_test_case_dir(dataset: &str) -> String {
-    format!(
-        "{}/cli_store_tests_data/{dataset}",
-        env!("CARGO_TARGET_TMPDIR")
-    )
 }
 
 fn check_paths_equal(src: &Path, dst: &Path) -> Result<()> {
