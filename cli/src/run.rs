@@ -6,7 +6,7 @@ pub async fn run() -> anyhow::Result<()> {
     let logargs = std::env::args().collect::<Vec<_>>();
     tracing::debug!(?logargs);
     let opts = Options::parse();
-    tracing::debug!(?opts);
+    tracing::trace!(?opts);
     if let Some(disp) = opts.run().await? {
         println!("{disp}");
     }

@@ -3,9 +3,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Context, Result};
-
-use crate::fsutil;
+use anyhow::Result;
+use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_path::{AnyDestination, AnySource, StorePath};
+use pangalactic_seed::SeedConfig;
+use pangalactic_store::Store;
 
 #[derive(Debug, derive_more::From, derive_more::Into)]
 pub struct ControlDir(PathBuf);
@@ -35,18 +37,27 @@ impl ControlDir {
         );
     }
 
-    pub async fn initialize<P>(workdir: P) -> Result<Self>
+    pub async fn initialize<S, P>(store: &mut LinkDirectoryLayer<S>, workdir: P) -> Result<Self>
     where
+        S: Store,
         P: AsRef<Path>,
     {
+        use pangalactic_config::Configuration;
+        use pangalactic_path::PathLayerExt;
+
         let ctldir = ControlDir(workdir.as_ref().join(".pg"));
 
-        fsutil::create_dir(&ctldir)
-            .await
-            .context("while creating revcon control dir")?;
+        let config = SeedConfig::<S>::load().await?;
+        let template = StorePath::new(config.seed_link, vec!["controldir-template".to_string()])?;
 
-        todo!("template from store?");
-        // Ok(ctldir)
+        store
+            .transfer(
+                AnySource::Store(template),
+                AnyDestination::Host(ctldir.0.clone()),
+            )
+            .await?;
+
+        Ok(ctldir)
     }
 }
 
