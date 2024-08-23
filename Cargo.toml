@@ -6,6 +6,7 @@ members = [
   "chomper",
   "cid",
   "cli",
+  "config",
   "dir",
   "guest",
   "guest-procmacro",
@@ -46,6 +47,7 @@ pangalactic-bindref         = { path = "bindref"         }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
+pangalactic-config          = { path = "config"          }
 pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
@@ -100,6 +102,7 @@ tempfile = "3.9.0"
 test-case = "2.2.2"
 tokio = { version = "1.24.1",  features = ["io-util", "rt", "macros"] }
 tokio-stream = "0.1.14"
+toml = "0.8.19"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 wasmtime = { version = "2.0.2", features = ["async"] }
