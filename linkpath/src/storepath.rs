@@ -13,18 +13,18 @@ use serde::{Deserialize, Serialize};
 use crate::PathLayerExt;
 
 #[derive(Clone, Eq, PartialEq, Serialize, Deserialize)]
-pub struct StorePath<C> {
+pub struct LinkPath<C> {
     link: Link<C>,
     /// Invariant: if self.link.kind() == File then path.is_empty
     path: Vec<Name>,
 }
 
-impl<C> ContentIdentifier for StorePath<C> where
+impl<C> ContentIdentifier for LinkPath<C> where
     C: Clone + fmt::Debug + Eq + PartialEq + DeserializeOwned + Serialize + Send + Sync
 {
 }
 
-impl<C> StorePath<C> {
+impl<C> LinkPath<C> {
     pub fn new(link: Link<C>, path: Vec<Name>) -> anyhow::Result<Self>
     where
         C: Serialize,
@@ -37,7 +37,7 @@ impl<C> StorePath<C> {
             );
         }
 
-        Ok(StorePath { link, path })
+        Ok(LinkPath { link, path })
     }
 
     pub fn link(&self) -> &Link<C> {
@@ -49,13 +49,13 @@ impl<C> StorePath<C> {
     }
 }
 
-impl<C> From<Link<C>> for StorePath<C> {
+impl<C> From<Link<C>> for LinkPath<C> {
     fn from(link: Link<C>) -> Self {
-        StorePath { link, path: vec![] }
+        LinkPath { link, path: vec![] }
     }
 }
 
-impl<C> fmt::Display for StorePath<C>
+impl<C> fmt::Display for LinkPath<C>
 where
     C: Serialize,
 {
@@ -68,7 +68,7 @@ where
     }
 }
 
-impl<C> fmt::Debug for StorePath<C>
+impl<C> fmt::Debug for LinkPath<C>
 where
     C: Serialize,
 {
@@ -77,7 +77,7 @@ where
     }
 }
 
-impl<C> FromStr for StorePath<C>
+impl<C> FromStr for LinkPath<C>
 where
     C: Serialize + DeserializeOwned,
 {
@@ -89,7 +89,7 @@ where
     }
 }
 
-impl<S> Commit<LinkDirectoryLayer<S>> for StorePath<S::CID>
+impl<S> Commit<LinkDirectoryLayer<S>> for LinkPath<S::CID>
 where
     S: Store,
 {
@@ -101,7 +101,7 @@ where
     }
 }
 
-impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a StorePath<S::CID>
+impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a LinkPath<S::CID>
 where
     S: Store,
 {

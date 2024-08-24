@@ -5,19 +5,19 @@ use pangalactic_name::Name;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fmt::Debug, fmt::Display, str::FromStr};
 
-use crate::StorePath;
+use crate::LinkPath;
 
 #[derive(Clone, derive_more::Deref)]
-pub struct StoreDestination<C> {
+pub struct LinkDestination<C> {
     /// Invariant: self.link.kind() == Dir
     #[deref]
     link: Link<C>,
     path: NonEmptyVec<Name>,
 }
 
-impl<C> Bindable for StoreDestination<C> {}
+impl<C> Bindable for LinkDestination<C> {}
 
-impl<C> StoreDestination<C> {
+impl<C> LinkDestination<C> {
     pub fn new<P>(link: Link<C>, path: P) -> anyhow::Result<Self>
     where
         NonEmptyVec<Name>: TryFrom<P>,
@@ -27,7 +27,7 @@ impl<C> StoreDestination<C> {
 
         link.peek_cid_kind(Dir)?;
         let path = NonEmptyVec::try_from(path)?;
-        Ok(StoreDestination { link, path })
+        Ok(LinkDestination { link, path })
     }
 
     pub fn link(&self) -> &Link<C> {
@@ -38,15 +38,15 @@ impl<C> StoreDestination<C> {
         self.path.as_slice()
     }
 
-    pub(crate) fn replace_link_into_path(self, newroot: Link<C>) -> anyhow::Result<StorePath<C>>
+    pub(crate) fn replace_link_into_path(self, newroot: Link<C>) -> anyhow::Result<LinkPath<C>>
     where
         C: Serialize,
     {
-        StorePath::new(newroot, self.path.into())
+        LinkPath::new(newroot, self.path.into())
     }
 }
 
-impl<C> Display for StoreDestination<C>
+impl<C> Display for LinkDestination<C>
 where
     C: Serialize,
 {
@@ -55,7 +55,7 @@ where
     }
 }
 
-impl<C> Debug for StoreDestination<C>
+impl<C> Debug for LinkDestination<C>
 where
     C: Serialize,
 {
@@ -64,7 +64,7 @@ where
     }
 }
 
-impl<C> FromStr for StoreDestination<C>
+impl<C> FromStr for LinkDestination<C>
 where
     C: DeserializeOwned,
 {

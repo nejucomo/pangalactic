@@ -11,5 +11,5 @@ pub mod transfer;
 pub use self::anydest::AnyDestination;
 pub use self::anysource::AnySource;
 pub use self::layerext::PathLayerExt;
-pub use self::storedest::StoreDestination;
-pub use self::storepath::StorePath;
+pub use self::storedest::LinkDestination;
+pub use self::storepath::LinkPath;

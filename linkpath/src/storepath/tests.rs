@@ -1,4 +1,4 @@
-use crate::StorePath;
+use crate::LinkPath;
 use pangalactic_link::testutil::FakeKey;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::{self, Dir, File};
@@ -12,7 +12,7 @@ use test_case::test_case;
 fn display<const K: usize>(kind: LinkKind, suffix: [&'static str; K], expected: &str) {
     let suffix: Vec<_> = suffix.into_iter().map(Name::from_static).collect();
     let link: Link<FakeKey> = Link::new(kind, FakeKey);
-    let sp = StorePath::new(link, suffix).unwrap();
+    let sp = LinkPath::new(link, suffix).unwrap();
     let actual = sp.to_string();
     assert_eq!(actual, expected);
 }
