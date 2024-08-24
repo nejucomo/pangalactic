@@ -3,13 +3,13 @@
 mod anydest;
 mod anysource;
 mod layerext;
+mod linkdest;
+mod linkpath;
 mod parser;
-mod storedest;
-mod storepath;
 pub mod transfer;
 
 pub use self::anydest::AnyDestination;
 pub use self::anysource::AnySource;
 pub use self::layerext::PathLayerExt;
-pub use self::storedest::LinkDestination;
-pub use self::storepath::LinkPath;
+pub use self::linkdest::LinkDestination;
+pub use self::linkpath::LinkPath;
