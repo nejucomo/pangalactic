@@ -61,7 +61,7 @@ where
 
         for (mut prevd, name) in stack.into_iter().rev() {
             link = self.commit(d).await?;
-            prevd.overwrite(name.to_owned(), link);
+            prevd.overwrite(name.clone(), link)?;
             d = prevd;
         }
 

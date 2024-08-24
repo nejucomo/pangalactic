@@ -1,4 +1,4 @@
-use pangalactic_guest::{define_derive, fail, log, unwrap, DirectoryWriter, Link, Plan};
+use pangalactic_guest::{define_derive, fail, log, unwrap, DirectoryWriter, Link, Name, Plan};
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -18,7 +18,7 @@ fn derive_impl(plan: Plan) -> Link {
     dt.commit()
 }
 
-struct DirTree(BTreeMap<String, Option<DTEntry>>);
+struct DirTree(BTreeMap<Name, Option<DTEntry>>);
 
 enum DTEntry {
     File(Link),
@@ -49,7 +49,8 @@ impl DirTree {
         I: Iterator<Item = &'a str>,
     {
         let comp = unwrap!( Option path.next() );
-        let slot = self.0.entry(comp.to_string()).or_insert(None);
+        let compname = unwrap!( Result comp.try_into() );
+        let slot = self.0.entry(compname).or_insert(None);
         slot_insert(slot, path, link);
     }
 

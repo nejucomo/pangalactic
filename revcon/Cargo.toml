@@ -10,6 +10,7 @@ anyhow.workspace = true
 derive_more.workspace = true
 pangalactic-config.workspace = true
 pangalactic-layer-dir.workspace = true
+pangalactic-name.workspace = true
 pangalactic-path.workspace = true
 pangalactic-seed.workspace = true
 pangalactic-store.workspace = true

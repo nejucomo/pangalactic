@@ -1,3 +1,5 @@
-// TODO: newtype String which excludes illegal names:
-pub type Name = String;
-pub type NameRef = str;
+mod error;
+mod name;
+
+pub use self::error::{InvalidName, NameError};
+pub use self::name::{Name, NameRef};

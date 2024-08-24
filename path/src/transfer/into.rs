@@ -112,7 +112,7 @@ where
 
         for (name, link) in self {
             StorePath::from(link)
-                .transfer_into(store, destination.join(name))
+                .transfer_into(store, destination.join(name.as_str()))
                 .await?;
         }
 

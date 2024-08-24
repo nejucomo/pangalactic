@@ -1,3 +1,5 @@
+use pangalactic_name::Name;
+
 use crate::{bindings, prim, ByteReader, Link};
 
 #[derive(Debug)]
@@ -8,14 +10,13 @@ impl DirectoryReader {
         DirectoryReader(handle)
     }
 
-    fn next_inner(&self) -> Option<(String, Link)> {
+    fn next_inner(&self) -> Option<(Name, Link)> {
         if unsafe { bindings::directory_reader_has_more_entries(self.0) } == prim::TRUE {
             let namereader = ByteReader::wrap_handle(
                 unsafe { bindings::directory_reader_open_name_reader(self.0) },
                 false,
             );
-            let name = String::from_utf8(namereader.read_to_vec())
-                .expect("invalid utf8 in directory entry name");
+            let name = Name::from_utf8(namereader.read_to_vec()).expect("invalid directory name");
             let link = unsafe { Link::wrap_handle(bindings::directory_reader_load_link(self.0)) };
             unsafe { bindings::directory_reader_next_entry(self.0) };
 
@@ -27,7 +28,7 @@ impl DirectoryReader {
 }
 
 impl Iterator for DirectoryReader {
-    type Item = (String, Link);
+    type Item = (Name, Link);
 
     fn next(&mut self) -> Option<Self::Item> {
         let item = self.next_inner();
