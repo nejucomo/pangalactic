@@ -22,8 +22,8 @@ tracing.workspace = true
 pangalactic-host.workspace = true
 pangalactic-layer-cidmeta.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-linkpath.workspace = true
 pangalactic-log.workspace = true
-pangalactic-path.workspace = true
 pangalactic-schemata.workspace = true
 tokio.workspace = true
 

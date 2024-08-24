@@ -5,8 +5,8 @@ use std::{
 
 use anyhow::Result;
 use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_linkpath::{AnyDestination, AnySource, StorePath};
 use pangalactic_name::Name;
-use pangalactic_path::{AnyDestination, AnySource, StorePath};
 use pangalactic_seed::Seed;
 use pangalactic_store::Store;
 
@@ -43,7 +43,7 @@ impl ControlDir {
         S: Store,
         P: AsRef<Path>,
     {
-        use pangalactic_path::PathLayerExt;
+        use pangalactic_linkpath::PathLayerExt;
 
         let ctldir = ControlDir(workdir.as_ref().join(".pg"));
 
