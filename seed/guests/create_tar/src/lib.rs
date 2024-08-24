@@ -21,7 +21,7 @@ fn append_link(builder: &mut tar::Builder<ByteWriter>, link: Link, path: &str) {
                     builder,
                     link,
                     &(if path.is_empty() {
-                        name
+                        name.take()
                     } else {
                         format!("{}/{}", path, name)
                     }),

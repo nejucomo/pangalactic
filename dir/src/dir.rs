@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use pangalactic_name::{Name, NameRef};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
-
-use crate::{Name, NameRef};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
@@ -40,45 +40,65 @@ impl<L> IntoIterator for Directory<L> {
 }
 
 impl<L> Directory<L> {
-    pub fn insert(&mut self, name: Name, link: L) -> Result<()> {
-        let errname = name.clone();
-        if self.0.insert(name, link).is_none() {
+    pub fn insert<N>(&mut self, name: N, link: L) -> Result<()>
+    where
+        Name: TryFrom<N>,
+        <Name as TryFrom<N>>::Error: StdError + Send + Sync + 'static,
+    {
+        let name = Name::try_from(name)?;
+        if self.0.insert(name.clone(), link).is_none() {
             Ok(())
         } else {
-            Err(anyhow::Error::msg(format!(
-                "duplicate entry for {errname:?}"
-            )))
+            Err(anyhow!("duplicate entry for {name:?}"))
         }
     }
 
-    pub fn overwrite(&mut self, name: Name, link: L) {
+    pub fn overwrite<N>(&mut self, name: N, link: L) -> Result<()>
+    where
+        Name: TryFrom<N>,
+        <Name as TryFrom<N>>::Error: StdError + Send + Sync + 'static,
+    {
+        let name = Name::try_from(name)?;
         self.0.insert(name, link);
+        Ok(())
     }
 
     pub fn get(&self, name: &NameRef) -> Option<&L> {
         self.0.get(name)
     }
 
-    pub fn get_required(&self, name: &NameRef) -> Result<&L> {
-        require(name, self.get(name))
+    pub fn get_required<'a, N>(&self, name: &'a N) -> Result<&L>
+    where
+        N: ?Sized,
+        &'a NameRef: TryFrom<&'a N>,
+        <&'a NameRef as TryFrom<&'a N>>::Error: StdError + Send + Sync + 'static,
+    {
+        let nref = name.try_into()?;
+        require(nref, self.get(nref))
     }
 
     pub fn remove(&mut self, name: &NameRef) -> Option<L> {
         self.0.remove(name)
     }
 
-    pub fn remove_required(&mut self, name: &NameRef) -> Result<L> {
-        require(name, self.remove(name))
+    pub fn remove_required<'a, N>(&mut self, name: &'a N) -> Result<L>
+    where
+        N: ?Sized,
+        &'a NameRef: TryFrom<&'a N>,
+        <&'a NameRef as TryFrom<&'a N>>::Error: StdError + Send + Sync + 'static,
+    {
+        let nref = name.try_into()?;
+        require(nref, self.remove(nref))
     }
 
     pub fn require_empty(self) -> Result<()> {
         if self.0.is_empty() {
             Ok(())
         } else {
-            Err(anyhow::Error::msg(format!(
+            Err(anyhow!(
                 "unexpected entries {:?}",
                 self.0.into_keys().collect::<Vec<Name>>()
-            )))
+            ))
         }
     }
 
@@ -91,5 +111,5 @@ impl<L> Directory<L> {
 }
 
 fn require<T>(name: &NameRef, opt: Option<T>) -> Result<T> {
-    opt.ok_or_else(|| anyhow::Error::msg(format!("missing required name {name:?}")))
+    opt.ok_or_else(|| anyhow!("missing required name {name:?}"))
 }

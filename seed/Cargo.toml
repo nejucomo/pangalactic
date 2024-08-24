@@ -11,6 +11,7 @@ include_dir.workspace = true
 pangalactic-config.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
+pangalactic-name.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true

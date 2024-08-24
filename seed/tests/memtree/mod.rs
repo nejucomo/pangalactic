@@ -1,13 +1,15 @@
 use anyhow::Result;
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
+use pangalactic_name::Name;
 use pangalactic_store::{Commit, Load, Store};
 use std::collections::BTreeMap;
 
+// TODO: Replace memtree with `NestedDirectory<(), Vec<u8>>`
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum MemTree {
     File(Vec<u8>),
-    Dir(BTreeMap<String, MemTree>),
+    Dir(BTreeMap<Name, MemTree>),
 }
 use MemTree::*;
 
@@ -22,7 +24,7 @@ impl<'a, const K: usize> From<[(&'a str, MemTree); K]> for MemTree {
         MemTree::Dir(
             members
                 .into_iter()
-                .map(|(s, m)| (s.to_string(), m))
+                .map(|(s, m)| (Name::try_from(s).unwrap(), m))
                 .collect(),
         )
     }

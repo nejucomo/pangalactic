@@ -1,5 +1,6 @@
 use either::Either::{self, Left, Right};
-use pangalactic_dir::{Directory, Name};
+use pangalactic_dir::Directory;
+use pangalactic_name::Name;
 
 use crate::NDBranch::*;
 use crate::{NDNode, NestedDirectory};

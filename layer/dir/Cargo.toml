@@ -16,6 +16,7 @@ pangalactic-layer-cidmeta.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
 pangalactic-log.workspace = true
+pangalactic-name.workspace = true
 pangalactic-serialization.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true

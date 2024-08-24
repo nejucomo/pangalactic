@@ -2,12 +2,13 @@ use derive_more::{Deref, DerefMut, From, Into};
 use pangalactic_dir::Directory;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
+use pangalactic_name::Name;
 use pangalactic_serialization::{deserialize, serialize};
 use pangalactic_store::{Commit, Load, Store};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use tokio::io::AsyncRead;
 
-use crate::{LinkDirectoryLayer, LinkDirectorySerializationContainer, Name};
+use crate::{LinkDirectoryLayer, LinkDirectorySerializationContainer};
 
 #[derive(Clone, Deref, DerefMut, From, Into, Deserialize, Serialize, PartialEq)]
 #[serde(

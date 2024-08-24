@@ -16,6 +16,7 @@ pangalactic-iowrappers.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkkind.workspace = true
+pangalactic-name.workspace = true
 pangalactic-store.workspace = true
 pin-project.workspace = true
 serde.workspace = true
