@@ -5,7 +5,6 @@ mod anysource;
 mod layerext;
 mod linkdest;
 mod linkpath;
-mod parser;
 pub mod transfer;
 
 pub use self::anydest::AnyDestination;

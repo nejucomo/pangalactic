@@ -38,7 +38,7 @@ where
 
 impl<C> FromStr for AnyDestination<C>
 where
-    C: DeserializeOwned,
+    C: DeserializeOwned + Serialize,
 {
     type Err = anyhow::Error;
 

@@ -48,20 +48,20 @@ where
 
         let mut dirlink = destination.link().clone();
         let mut stack = vec![];
-        let (last, intermediate) = destination.path().split_last();
+        let (intermediate, last) = destination.path().split_last();
 
-        for name in intermediate {
+        for name in intermediate.components() {
             let d: LinkDirectory<S::CID> = self.load(&dirlink).await?;
             dirlink = d.get_required(name)?.clone();
             stack.push((d, name));
         }
 
         let mut d: LinkDirectory<S::CID> = self.load(&dirlink).await?;
-        d.insert(last.clone(), link)?;
+        d.insert(last.to_owned(), link)?;
 
         for (mut prevd, name) in stack.into_iter().rev() {
             link = self.commit(d).await?;
-            prevd.overwrite(name.clone(), link)?;
+            prevd.overwrite(name.to_owned(), link)?;
             d = prevd;
         }
 
@@ -79,7 +79,7 @@ where
 
     async fn resolve_path(&self, p: &LinkPath<S::CID>) -> Result<Link<S::CID>> {
         let mut link = p.link().clone();
-        for name in p.path() {
+        for name in p.path().components() {
             let mut d: LinkDirectory<S::CID> = self.load(&link).await?;
             link = d.remove_required(name)?;
         }
