@@ -3,13 +3,13 @@ use std::{fmt, path::PathBuf, str::FromStr};
 use pangalactic_link::SCHEME_PREFIX;
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::StoreDestination;
+use crate::LinkDestination;
 
 #[derive(Clone)]
 pub enum AnyDestination<C> {
     Stdout,
     Host(PathBuf),
-    Store(Option<StoreDestination<C>>),
+    Store(Option<LinkDestination<C>>),
 }
 use AnyDestination::*;
 
@@ -38,7 +38,7 @@ where
 
 impl<C> FromStr for AnyDestination<C>
 where
-    C: DeserializeOwned,
+    C: DeserializeOwned + Serialize,
 {
     type Err = anyhow::Error;
 

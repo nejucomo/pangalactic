@@ -81,7 +81,7 @@ enum MkSource {
     Stdin,
     Host(FoD),
     StoreCID(FoD),
-    StorePath(FoD),
+    LinkPath(FoD),
 }
 
 /// I specify which `Destination` to xfer to
@@ -129,7 +129,7 @@ impl MkSource {
             Host(Dir) => {
                 populate_host_dir(runner.testcasedir.join("srcdir"))?;
             }
-            StoreCID(File) | StorePath(File) => {
+            StoreCID(File) | LinkPath(File) => {
                 let cidspace = runner
                     .pg(["xfer", "-", "pg:"], consts::STORE_FILE_CONTENTS)?
                     .exit_ok()?;
@@ -150,8 +150,8 @@ impl MkSource {
             Host(Dir) => "./srcdir",
             StoreCID(File) => consts::MKSOURCE_FILE_CID,
             StoreCID(Dir) => consts::MKSOURCE_DIR_CID,
-            StorePath(File) => consts::MKSOURCE_FILE_STORE_PATH,
-            StorePath(Dir) => consts::MKSOURCE_DIR_STORE_PATH,
+            LinkPath(File) => consts::MKSOURCE_FILE_STORE_PATH,
+            LinkPath(Dir) => consts::MKSOURCE_DIR_STORE_PATH,
         }
     }
 
@@ -190,7 +190,7 @@ impl MkSource {
             // Any dir headed to stdout is an error:
             (MkSource::Host(Dir), MkDest::Stdout)
             | (MkSource::StoreCID(Dir), MkDest::Stdout)
-            | (MkSource::StorePath(Dir), MkDest::Stdout) => None,
+            | (MkSource::LinkPath(Dir), MkDest::Stdout) => None,
 
             // Anything headed to host produces empty output without error:
             (_, MkDest::Host) => Some(("(empty)", "")),
@@ -201,7 +201,7 @@ impl MkSource {
             // cat
             (MkSource::Host(File), MkDest::Stdout) => named_const!(HOST_FILE_CONTENTS),
             (MkSource::StoreCID(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS),
-            (MkSource::StorePath(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
+            (MkSource::LinkPath(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
 
             // All writes into the store output a CID:
             (MkSource::Stdin, MkDest::StoreBare) => named_const!(STDIN_TO_STORE_BARE),
@@ -218,16 +218,16 @@ impl MkSource {
             (MkSource::StoreCID(Dir), MkDest::StoreDest) => {
                 named_const!(STORE_CID_DIR_TO_STORE_DEST)
             }
-            (MkSource::StorePath(File), MkDest::StoreBare) => {
+            (MkSource::LinkPath(File), MkDest::StoreBare) => {
                 named_const!(STORE_PATH_FILE_TO_STORE_BARE)
             }
-            (MkSource::StorePath(Dir), MkDest::StoreBare) => {
+            (MkSource::LinkPath(Dir), MkDest::StoreBare) => {
                 named_const!(STORE_PATH_DIR_TO_STORE_BARE)
             }
-            (MkSource::StorePath(File), MkDest::StoreDest) => {
+            (MkSource::LinkPath(File), MkDest::StoreDest) => {
                 named_const!(STORE_PATH_FILE_TO_STORE_DEST)
             }
-            (MkSource::StorePath(Dir), MkDest::StoreDest) => {
+            (MkSource::LinkPath(Dir), MkDest::StoreDest) => {
                 named_const!(STORE_PATH_DIR_TO_STORE_DEST)
             }
         }
@@ -241,14 +241,14 @@ impl MkSource {
             let (expectedname, optcontents) = match self {
                 Stdin => ("_stdin_for_comparison", Some(self.stdin())),
                 StoreCID(File) => ("_cidfile_for_comparison", Some(consts::STORE_FILE_CONTENTS)),
-                StorePath(File) => (
+                LinkPath(File) => (
                     "_cidpathfile_for_comparison",
                     Some(consts::STORE_FILE_CONTENTS_2),
                 ),
 
                 Host(_) => (self.to_arg(), None),
                 StoreCID(Dir) => ("presetup_dir", None),
-                StorePath(Dir) => ("presetup_dir/subdir", None),
+                LinkPath(Dir) => ("presetup_dir/subdir", None),
             };
 
             let expectedpath = testcasedir.join(expectedname);
@@ -295,14 +295,14 @@ impl MkDest {
 #[test_case(MkSource::StoreCID(Dir), MkDest::StoreBare)]
 #[test_case(MkSource::StoreCID(File), MkDest::StoreDest)]
 #[test_case(MkSource::StoreCID(Dir), MkDest::StoreDest)]
-#[test_case(MkSource::StorePath(File), MkDest::Stdout)]
-#[test_case(MkSource::StorePath(Dir), MkDest::Stdout)]
-#[test_case(MkSource::StorePath(File), MkDest::Host)]
-#[test_case(MkSource::StorePath(Dir), MkDest::Host)]
-#[test_case(MkSource::StorePath(File), MkDest::StoreBare)]
-#[test_case(MkSource::StorePath(Dir), MkDest::StoreBare)]
-#[test_case(MkSource::StorePath(File), MkDest::StoreDest)]
-#[test_case(MkSource::StorePath(Dir), MkDest::StoreDest)]
+#[test_case(MkSource::LinkPath(File), MkDest::Stdout)]
+#[test_case(MkSource::LinkPath(Dir), MkDest::Stdout)]
+#[test_case(MkSource::LinkPath(File), MkDest::Host)]
+#[test_case(MkSource::LinkPath(Dir), MkDest::Host)]
+#[test_case(MkSource::LinkPath(File), MkDest::StoreBare)]
+#[test_case(MkSource::LinkPath(Dir), MkDest::StoreBare)]
+#[test_case(MkSource::LinkPath(File), MkDest::StoreDest)]
+#[test_case(MkSource::LinkPath(Dir), MkDest::StoreDest)]
 fn xfer(mksource: MkSource, mkdest: MkDest) -> Result<()> {
     let testcasedir = testdir::setup(&format!("xfer_{mksource:?}_{mkdest:?}"))?;
 

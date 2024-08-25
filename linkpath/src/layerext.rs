@@ -4,7 +4,7 @@ use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::{Commit, Load, Store};
 
-use crate::{AnyDestination, AnySource, StoreDestination, StorePath};
+use crate::{AnyDestination, AnySource, LinkDestination, LinkPath};
 
 #[ext(name = PathLayerExt)]
 pub impl<S> LinkDirectoryLayer<S>
@@ -15,7 +15,7 @@ where
         &mut self,
         source: AnySource<S::CID>,
         destination: AnyDestination<S::CID>,
-    ) -> Result<Option<StorePath<S::CID>>> {
+    ) -> Result<Option<LinkPath<S::CID>>> {
         use crate::transfer::TransferInto;
 
         source.transfer_into(self, destination).await
@@ -24,23 +24,23 @@ where
     async fn commit_into_optdest<T>(
         &mut self,
         value: T,
-        optdest: Option<StoreDestination<<S as Store>::CID>>,
-    ) -> Result<StorePath<<S as Store>::CID>>
+        optdest: Option<LinkDestination<<S as Store>::CID>>,
+    ) -> Result<LinkPath<<S as Store>::CID>>
     where
         T: Commit<LinkDirectoryLayer<S>> + Send,
     {
         if let Some(dest) = optdest {
             self.commit_into_dest(value, dest).await
         } else {
-            self.commit(value).await.map(StorePath::from)
+            self.commit(value).await.map(LinkPath::from)
         }
     }
 
     async fn commit_into_dest<T>(
         &mut self,
         value: T,
-        destination: StoreDestination<S::CID>,
-    ) -> Result<StorePath<S::CID>>
+        destination: LinkDestination<S::CID>,
+    ) -> Result<LinkPath<S::CID>>
     where
         T: Commit<LinkDirectoryLayer<S>> + Send,
     {
@@ -48,20 +48,20 @@ where
 
         let mut dirlink = destination.link().clone();
         let mut stack = vec![];
-        let (last, intermediate) = destination.path().split_last();
+        let (intermediate, last) = destination.path().split_last();
 
-        for name in intermediate {
+        for name in intermediate.components() {
             let d: LinkDirectory<S::CID> = self.load(&dirlink).await?;
             dirlink = d.get_required(name)?.clone();
             stack.push((d, name));
         }
 
         let mut d: LinkDirectory<S::CID> = self.load(&dirlink).await?;
-        d.insert(last.clone(), link)?;
+        d.insert(last.to_owned(), link)?;
 
         for (mut prevd, name) in stack.into_iter().rev() {
             link = self.commit(d).await?;
-            prevd.overwrite(name.clone(), link)?;
+            prevd.overwrite(name.to_owned(), link)?;
             d = prevd;
         }
 
@@ -69,7 +69,7 @@ where
         destination.replace_link_into_path(newroot)
     }
 
-    async fn load_path<T>(&self, p: &StorePath<S::CID>) -> Result<T>
+    async fn load_path<T>(&self, p: &LinkPath<S::CID>) -> Result<T>
     where
         T: Load<LinkDirectoryLayer<S>>,
     {
@@ -77,9 +77,9 @@ where
         self.load(&link).await
     }
 
-    async fn resolve_path(&self, p: &StorePath<S::CID>) -> Result<Link<S::CID>> {
+    async fn resolve_path(&self, p: &LinkPath<S::CID>) -> Result<Link<S::CID>> {
         let mut link = p.link().clone();
-        for name in p.path() {
+        for name in p.path().components() {
             let mut d: LinkDirectory<S::CID> = self.load(&link).await?;
             link = d.remove_required(name)?;
         }

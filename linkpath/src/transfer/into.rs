@@ -10,7 +10,7 @@ use tokio::{
 };
 
 use crate::transfer::Destination;
-use crate::{AnyDestination, AnySource, PathLayerExt, StoreDestination, StorePath};
+use crate::{AnyDestination, AnySource, LinkDestination, LinkPath, PathLayerExt};
 
 pub trait TransferInto<S, D>
 where
@@ -30,7 +30,7 @@ where
     D: Destination,
     Readable<Stdin>: TransferInto<S, D>,
     PathBuf: TransferInto<S, D>,
-    StorePath<S::CID>: TransferInto<S, D>,
+    LinkPath<S::CID>: TransferInto<S, D>,
 {
     async fn transfer_into(
         self,
@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<S, D> TransferInto<S, D> for StorePath<S::CID>
+impl<S, D> TransferInto<S, D> for LinkPath<S::CID>
 where
     S: Store,
     D: Destination,
@@ -78,24 +78,24 @@ where
         self,
         store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
-    ) -> Result<Option<StorePath<S::CID>>> {
+    ) -> Result<Option<LinkPath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
     }
 }
 
-impl<S> TransferInto<S, StoreDestination<S::CID>> for LinkDirectory<S::CID>
+impl<S> TransferInto<S, LinkDestination<S::CID>> for LinkDirectory<S::CID>
 where
     S: Store,
 {
     async fn transfer_into(
         self,
         store: &mut LinkDirectoryLayer<S>,
-        destination: StoreDestination<S::CID>,
-    ) -> Result<StorePath<S::CID>> {
+        destination: LinkDestination<S::CID>,
+    ) -> Result<LinkPath<S::CID>> {
         store
             .commit_into_dest(self, destination)
             .await
-            .map(StorePath::from)
+            .map(LinkPath::from)
     }
 }
 
@@ -111,7 +111,7 @@ where
         tokio::fs::create_dir(&destination).await?;
 
         for (name, link) in self {
-            StorePath::from(link)
+            LinkPath::from(link)
                 .transfer_into(store, destination.join(name.as_str()))
                 .await?;
         }
@@ -138,7 +138,7 @@ where
         self,
         store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
-    ) -> Result<Option<StorePath<S::CID>>> {
+    ) -> Result<Option<LinkPath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
     }
 }
@@ -210,7 +210,7 @@ where
         self,
         store: &mut LinkDirectoryLayer<S>,
         destination: AnyDestination<S::CID>,
-    ) -> Result<Option<StorePath<S::CID>>> {
+    ) -> Result<Option<LinkPath<S::CID>>> {
         transfer_to_any_destination(self, store, destination).await
     }
 }
@@ -250,7 +250,7 @@ async fn transfer_to_any_destination<T, S>(
     source: T,
     store: &mut LinkDirectoryLayer<S>,
     destination: AnyDestination<S::CID>,
-) -> Result<Option<StorePath<S::CID>>>
+) -> Result<Option<LinkPath<S::CID>>>
 where
     S: Store,
     T: TransferInto<S, Writable<Stdout>>

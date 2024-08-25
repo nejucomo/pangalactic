@@ -1,8 +1,6 @@
 use aliri_braid::{braid, Validator};
 
-use crate::{InvalidName, NameError};
-
-pub const SEPARATOR: char = '/';
+use crate::{InvalidName, NameError, SEPARATOR};
 
 #[braid(validator, serde)]
 pub struct Name;

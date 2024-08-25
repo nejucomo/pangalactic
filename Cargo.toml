@@ -18,11 +18,11 @@ members = [
   "layer/dir",
   "link",
   "linkkind",
+  "linkpath",
   "log",
   "manifest",
   "name",
   "nested-dir",
-  "path",
   "primitives",
   "revcon",
   "schemata",
@@ -62,11 +62,11 @@ pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
 pangalactic-layer-dir       = { path = "layer/dir"       }
 pangalactic-link            = { path = "link"            }
 pangalactic-linkkind        = { path = "linkkind"        }
+pangalactic-linkpath        = { path = "linkpath"        }
 pangalactic-log             = { path = "log"             }
 pangalactic-manifest        = { path = "manifest"        }
 pangalactic-name            = { path = "name"            }
 pangalactic-nested-dir      = { path = "nested-dir"      }
-pangalactic-path            = { path = "path"            }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-revcon          = { path = "revcon"          }
 pangalactic-schemata        = { path = "schemata"        }

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use pangalactic_iowrappers::Writable;
 
-use crate::{AnyDestination, StoreDestination, StorePath};
+use crate::{AnyDestination, LinkDestination, LinkPath};
 
 pub trait Destination: std::fmt::Debug {
     type CID;
@@ -13,14 +13,14 @@ impl<C> Destination for AnyDestination<C>
 where
     C: serde::Serialize,
 {
-    type CID = Option<StorePath<C>>;
+    type CID = Option<LinkPath<C>>;
 }
 
-impl<C> Destination for StoreDestination<C>
+impl<C> Destination for LinkDestination<C>
 where
     C: serde::Serialize,
 {
-    type CID = StorePath<C>;
+    type CID = LinkPath<C>;
 }
 
 impl<W> Destination for Writable<W>

@@ -6,13 +6,13 @@ use pangalactic_link::{Link, SCHEME_PREFIX};
 use pangalactic_store::{Commit, Store};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::StorePath;
+use crate::LinkPath;
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum AnySource<C> {
     Stdin,
     Host(PathBuf),
-    Store(StorePath<C>),
+    Store(LinkPath<C>),
 }
 use AnySource::*;
 

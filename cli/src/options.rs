@@ -8,8 +8,8 @@ use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
 use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_linkpath::{AnyDestination, AnySource, LinkPath, PathLayerExt};
 use pangalactic_manifest::FullManifest;
-use pangalactic_path::{AnyDestination, AnySource, PathLayerExt, StorePath};
 use pangalactic_revcon::ControlDir;
 use pangalactic_seed::Seed;
 use pangalactic_store::Store;
@@ -22,7 +22,7 @@ type CliCid = CidMeta<Hash>;
 
 type CliAnyDestination = AnyDestination<CliCid>;
 type CliAnySource = AnySource<CliCid>;
-type CliStorePath = StorePath<CliCid>;
+type CliLinkPath = LinkPath<CliCid>;
 
 // Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
@@ -236,14 +236,14 @@ impl Runnable for DeriveOptions {
                 store
                     .commit(Plan { exec, input })
                     .await
-                    .map(CliStorePath::from)?
+                    .map(CliLinkPath::from)?
             } else {
                 plan_or_exec
             };
 
             let planlink = store.resolve_path(&plan).await?;
             let (_, attestation) = store.derive(&planlink).await?;
-            ok_disp(StorePath::from(attestation))
+            ok_disp(LinkPath::from(attestation))
         })
     }
 }
