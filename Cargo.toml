@@ -1,3 +1,8 @@
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+
 [workspace]
 resolver = "2"
 members = [
@@ -22,6 +27,7 @@ members = [
   "name",
   "nested-dir",
   "primitives",
+  "pangalactic",
   "revcon",
   "schemata",
   "seed",
@@ -32,14 +38,10 @@ members = [
   "table",
 ]
 
-[workspace.package]
-version = "0.1.0"
-edition = "2021"
-license = "MIT"
-
 [workspace.dependencies]
 
 # Local crates with paths clarified:
+pangalactic                 = { path = "pangalactic"     }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }

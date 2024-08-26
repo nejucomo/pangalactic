@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "create_tar"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
  "tar",
@@ -209,7 +209,7 @@ dependencies = [
 
 [[package]]
 name = "get_plan"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
@@ -222,7 +222,7 @@ checksum = "40ecd4077b5ae9fd2e9e169b102c6c330d0605168eb0e8bf79952b256dbefffd"
 
 [[package]]
 name = "gunzip"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "libflate",
  "pangalactic-guest",
@@ -230,7 +230,7 @@ dependencies = [
 
 [[package]]
 name = "gzip"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "libflate",
  "pangalactic-guest",
@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "identity"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
@@ -334,14 +334,14 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-b64"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "base64",
 ]
 
 [[package]]
 name = "pangalactic-chomper"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "derive_more",
@@ -349,14 +349,14 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-cid"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "pangalactic-dir"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "pangalactic-name",
@@ -364,7 +364,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-guest"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-dir",
  "pangalactic-guest-procmacro",
@@ -376,7 +376,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-guest-procmacro"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -385,7 +385,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-iowrappers"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pin-project",
  "tokio",
@@ -409,7 +409,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-link"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "pangalactic-chomper",
@@ -422,7 +422,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-linkkind"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "pangalactic-primitives",
@@ -431,7 +431,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-name"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "aliri_braid",
  "serde",
@@ -440,11 +440,11 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-primitives"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "pangalactic-schemata"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "pangalactic-dir",
@@ -454,7 +454,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-serialization"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "pangalactic-b64",
@@ -464,7 +464,7 @@ dependencies = [
 
 [[package]]
 name = "pangalactic-store"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "anyhow-std",
@@ -658,42 +658,42 @@ dependencies = [
 
 [[package]]
 name = "test_bindings_input_is_hello_world"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_bindings_plan_is_dir"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_input_is_hello_world"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_output_is_hello_world"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_plan_is_dir"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
 
 [[package]]
 name = "test_reverse_contents"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
 ]
@@ -749,7 +749,7 @@ checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 
 [[package]]
 name = "untar"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pangalactic-guest",
  "tar",
