@@ -8,7 +8,6 @@ license.workspace = true
 anyhow.workspace = true
 derive_more.workspace = true
 extend.workspace = true
-globset = "0.4.14"
 not_empty.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dag-transfer.workspace = true
