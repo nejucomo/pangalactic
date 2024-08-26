@@ -340,10 +340,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic-bindref"
-version = "0.1.0"
-
-[[package]]
 name = "pangalactic-chomper"
 version = "0.1.0"
 dependencies = [
@@ -472,7 +468,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "anyhow-std",
- "pangalactic-bindref",
  "pangalactic-chomper",
  "pangalactic-cid",
  "pangalactic-iowrappers",

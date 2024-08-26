@@ -9,7 +9,6 @@ anyhow.workspace = true
 derive_more.workspace = true
 extend.workspace = true
 not_empty.workspace = true
-pangalactic-bindref.workspace = true
 pangalactic-cid.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-iowrappers.workspace = true
