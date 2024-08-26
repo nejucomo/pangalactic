@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
   "b64",
-  "bindref",
   "chomper",
   "cid",
   "cli",
@@ -12,7 +11,6 @@ members = [
   "guest-procmacro",
   "handle",
   "host",
-  "init-stream",
   "iowrappers",
   "layer/cidmeta",
   "layer/dir",
@@ -32,7 +30,6 @@ members = [
   "store/mem",
   "store/trait",
   "table",
-  "traversal",
 ]
 
 [workspace.package]
@@ -44,19 +41,16 @@ license = "MIT"
 
 # Local crates with paths clarified:
 pangalactic-b64             = { path = "b64"             }
-pangalactic-bindref         = { path = "bindref"         }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-config          = { path = "config"          }
-pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
 pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-host            = { path = "host"            }
-pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-iowrappers      = { path = "iowrappers"      }
 pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
 pangalactic-layer-dir       = { path = "layer/dir"       }

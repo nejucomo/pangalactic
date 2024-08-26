@@ -1,4 +1,3 @@
-use pangalactic_bindref::Bindable;
 use pangalactic_link::Link;
 use pangalactic_name::{NonEmptyPath, NonEmptyPathRef, Path};
 use serde::{de::DeserializeOwned, Serialize};
@@ -13,8 +12,6 @@ pub struct LinkDestination<C> {
     link: Link<C>,
     path: NonEmptyPath,
 }
-
-impl<C> Bindable for LinkDestination<C> {}
 
 impl<C> LinkDestination<C> {
     pub fn new<P>(link: Link<C>, path: P) -> anyhow::Result<Self>
