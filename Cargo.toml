@@ -27,6 +27,7 @@ members = [
   "name",
   "nested-dir",
   "primitives",
+  "pangalactic",
   "revcon",
   "schemata",
   "seed",
@@ -40,6 +41,7 @@ members = [
 [workspace.dependencies]
 
 # Local crates with paths clarified:
+pangalactic                 = { path = "pangalactic"     }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
