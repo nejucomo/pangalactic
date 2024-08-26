@@ -12,7 +12,6 @@ members = [
   "guest-procmacro",
   "handle",
   "host",
-  "init-stream",
   "iowrappers",
   "layer/cidmeta",
   "layer/dir",
@@ -54,7 +53,6 @@ pangalactic-guest-procmacro = { path = "guest-procmacro" }
 pangalactic-handle          = { path = "handle"          }
 pangalactic-hash            = { path = "hash"            }
 pangalactic-host            = { path = "host"            }
-pangalactic-init-stream     = { path = "init-stream"     }
 pangalactic-iowrappers      = { path = "iowrappers"      }
 pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
 pangalactic-layer-dir       = { path = "layer/dir"       }
