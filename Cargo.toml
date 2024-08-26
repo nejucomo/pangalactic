@@ -32,7 +32,6 @@ members = [
   "store/mem",
   "store/trait",
   "table",
-  "traversal",
 ]
 
 [workspace.package]
@@ -49,7 +48,6 @@ pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-config          = { path = "config"          }
-pangalactic-dag-traversal   = { path = "traversal"       }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
