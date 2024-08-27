@@ -28,8 +28,8 @@ members = [
   "manifest",
   "name",
   "nested-dir",
+  "placeholder",
   "primitives",
-  "pangalactic",
   "revcon",
   "schemata",
   "seed",
@@ -43,7 +43,7 @@ members = [
 [workspace.dependencies]
 
 # Local crates with paths clarified:
-pangalactic                 = { path = "pangalactic"     }
+pangalactic                 = { path = "placeholder"     }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
