@@ -5,3 +5,9 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+anyhow-std.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-name.workspace = true
+pin-project.workspace = true
+tokio.workspace = true

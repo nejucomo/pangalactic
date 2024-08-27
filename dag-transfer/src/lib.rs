@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![feature(async_iterator)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod intosource;
+pub(crate) mod readdir;
+mod source;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use self::intosource::IntoSource;
+pub use self::source::{BranchSource, LeafOrBranchSource, LeafSource, Source};
