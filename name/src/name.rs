@@ -1,3 +1,5 @@
+use std::ffi::OsStr;
+
 use aliri_braid::{braid, Validator};
 
 use crate::{InvalidName, NameError, SEPARATOR};
@@ -21,6 +23,13 @@ impl Name {
                 reason: InvalidName::UTF8,
             }),
         }
+    }
+
+    pub fn from_os_str<S>(s: S) -> Result<Self, NameError>
+    where
+        S: AsRef<OsStr>,
+    {
+        Self::from_utf8(s.as_ref().as_encoded_bytes())
     }
 
     pub fn into_bytes(self) -> Vec<u8> {
