@@ -10,9 +10,7 @@ use tokio::{
     io::AsyncRead,
 };
 
-use crate::{
-    readdir::ReadDirAsyncIteratorAdapter, BranchSource, LeafOrBranchSource, LeafSource, Source,
-};
+use crate::{BranchSource, LeafOrBranchSource, LeafSource, Source};
 
 pub trait IntoSource {
     type Source: Source;
@@ -21,7 +19,7 @@ pub trait IntoSource {
 }
 
 impl IntoSource for PathBuf {
-    type Source = LeafOrBranchSource<File, ReadDirAsyncIteratorAdapter, PathBuf>;
+    type Source = LeafOrBranchSource<File, ReadDir, PathBuf>;
 
     async fn into_source(self) -> Result<Self::Source> {
         if self.is_file() {
@@ -37,7 +35,7 @@ impl IntoSource for PathBuf {
 }
 
 impl<'a> IntoSource for &'a Path {
-    type Source = LeafOrBranchSource<File, ReadDirAsyncIteratorAdapter, PathBuf>;
+    type Source = LeafOrBranchSource<File, ReadDir, PathBuf>;
 
     fn into_source(self) -> impl Future<Output = Result<Self::Source>> + Send {
         self.to_owned().into_source()
@@ -45,10 +43,10 @@ impl<'a> IntoSource for &'a Path {
 }
 
 impl IntoSource for ReadDir {
-    type Source = BranchSource<ReadDirAsyncIteratorAdapter, PathBuf>;
+    type Source = BranchSource<ReadDir, PathBuf>;
 
     fn into_source(self) -> impl Future<Output = Result<Self::Source>> + Send {
-        ReadDirAsyncIteratorAdapter(self).into_source()
+        std::future::ready(Ok(BranchSource(self)))
     }
 }
 
