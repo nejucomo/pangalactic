@@ -14,6 +14,7 @@ members = [
   "dag-transfer",
   "dir",
   "endpoint",
+  "globset",
   "guest",
   "guest-procmacro",
   "handle",
@@ -52,6 +53,7 @@ pangalactic-config          = { path = "config"          }
 pangalactic-dag-transfer    = { path = "dag-transfer"    }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-endpoint        = { path = "endpoint"        }
+pangalactic-globset         = { path = "globset"         }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
 pangalactic-handle          = { path = "handle"          }
