@@ -19,40 +19,37 @@ where
     R: AsyncRead + Send;
 
 #[derive(Debug)]
-pub struct BranchSource<I, T>(pub I)
-where
-    I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-    T: IntoSource;
-
-#[derive(Debug)]
-pub enum LeafOrBranchSource<R, I, T>
+pub struct BranchSource<R, I>(pub I)
 where
     R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-    T: IntoSource,
+    I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send;
+
+#[derive(Debug)]
+pub enum LeafOrBranchSource<R, I>
+where
+    R: AsyncRead + Send,
+    I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
 {
     Leaf(R),
     Branch(I),
 }
 
-impl<R, I, T> From<LeafSource<R>> for LeafOrBranchSource<R, I, T>
+impl<R, I> From<LeafSource<R>> for LeafOrBranchSource<R, I>
 where
     R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-    T: IntoSource,
+    I: IntoAsyncTryIterator<Item = (Name, Self)> + Send,
 {
     fn from(leaf: LeafSource<R>) -> Self {
         LeafOrBranchSource::Leaf(leaf.0)
     }
 }
 
-impl<R, I, T> From<BranchSource<I, T>> for LeafOrBranchSource<R, I, T>
+impl<R, I> From<BranchSource<R, I>> for LeafOrBranchSource<R, I>
 where
     R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-    T: IntoSource,
+    I: IntoAsyncTryIterator<Item = (Name, Self)> + Send,
 {
-    fn from(branch: BranchSource<I, T>) -> Self {
+    fn from(branch: BranchSource<R, I>) -> Self {
         LeafOrBranchSource::Branch(branch.0)
     }
 }
@@ -83,12 +80,12 @@ mod impls {
     mod branch_impls {
         use super::*;
 
-        impl<I, T> IntoAsyncTryIterator for BranchSource<I, T>
+        impl<R, I> IntoAsyncTryIterator for BranchSource<R, I>
         where
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            R: AsyncRead + Send,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
-            type Item = (Name, T);
+            type Item = (Name, LeafOrBranchSource<R, I>);
             type ATI = I::ATI;
 
             fn into_async_try_iter(self) -> Self::ATI {
@@ -96,24 +93,24 @@ mod impls {
             }
         }
 
-        impl<I, T> Source for BranchSource<I, T>
+        impl<R, I> Source for BranchSource<R, I>
         where
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            R: AsyncRead + Send,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
         }
 
-        impl<I, T> self::sealed::Sealed for BranchSource<I, T>
+        impl<R, I> self::sealed::Sealed for BranchSource<R, I>
         where
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            R: AsyncRead + Send,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
         }
 
-        impl<I, T> IntoSource for BranchSource<I, T>
+        impl<R, I> IntoSource for BranchSource<R, I>
         where
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            R: AsyncRead + Send,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
             type Source = Self;
 
@@ -126,27 +123,24 @@ mod impls {
     mod leaf_or_branch_impls {
         use super::*;
 
-        impl<R, I, T> Source for LeafOrBranchSource<R, I, T>
+        impl<R, I> Source for LeafOrBranchSource<R, I>
         where
             R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
         }
 
-        impl<R, I, T> self::sealed::Sealed for LeafOrBranchSource<R, I, T>
+        impl<R, I> self::sealed::Sealed for LeafOrBranchSource<R, I>
         where
             R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
         }
 
-        impl<R, I, T> IntoSource for LeafOrBranchSource<R, I, T>
+        impl<R, I> IntoSource for LeafOrBranchSource<R, I>
         where
             R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
-            T: IntoSource,
+            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
         {
             type Source = Self;
 
