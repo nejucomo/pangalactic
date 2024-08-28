@@ -12,3 +12,4 @@ pangalactic-iowrappers.workspace = true
 pangalactic-name.workspace = true
 pin-project.workspace = true
 tokio.workspace = true
+tracing.workspace = true

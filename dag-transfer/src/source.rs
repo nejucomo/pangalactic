@@ -83,6 +83,19 @@ mod impls {
     mod branch_impls {
         use super::*;
 
+        impl<I, T> IntoAsyncTryIterator for BranchSource<I, T>
+        where
+            I: IntoAsyncTryIterator<Item = (Name, T)> + Send,
+            T: IntoSource,
+        {
+            type Item = (Name, T);
+            type ATI = I::ATI;
+
+            fn into_async_try_iter(self) -> Self::ATI {
+                self.0.into_async_try_iter()
+            }
+        }
+
         impl<I, T> Source for BranchSource<I, T>
         where
             I: IntoAsyncTryIterator<Item = (Name, T)> + Send,

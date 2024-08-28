@@ -59,6 +59,13 @@ impl Validator for Name {
     }
 }
 
+impl AsRef<std::path::Path> for Name {
+    fn as_ref(&self) -> &std::path::Path {
+        let s: &str = self.as_ref();
+        s.as_ref()
+    }
+}
+
 impl NameRef {
     pub fn as_bytes(&self) -> &[u8] {
         self.as_str().as_bytes()
