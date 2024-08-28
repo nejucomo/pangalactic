@@ -6,7 +6,6 @@ license = "MIT"
 [workspace]
 resolver = "2"
 members = [
-  "asynctryiter",
   "b64",
   "chomper",
   "cid",
@@ -44,7 +43,6 @@ members = [
 
 # Local crates with paths clarified:
 pangalactic                 = { path = "pangalactic"     }
-pangalactic-asynctryiter    = { path = "asynctryiter"    }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }

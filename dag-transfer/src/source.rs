@@ -1,11 +1,9 @@
 use std::future::Future;
 
 use anyhow::Result;
-use pangalactic_asynctryiter::IntoAsyncTryIterator;
-use pangalactic_name::Name;
 use tokio::io::AsyncRead;
 
-use crate::IntoSource;
+use crate::{BranchIter, IntoSource};
 
 mod sealed {
     pub trait Sealed {}
@@ -14,42 +12,41 @@ mod sealed {
 pub trait Source: self::sealed::Sealed {}
 
 #[derive(Debug)]
-pub struct LeafSource<R>(pub R)
+pub struct LeafSource<L>(pub L)
 where
-    R: AsyncRead + Send;
+    L: AsyncRead + Send;
 
 #[derive(Debug)]
-pub struct BranchSource<R, I>(pub I)
+pub struct BranchSource<B>(pub B)
 where
-    R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send;
+    B: BranchIter;
 
 #[derive(Debug)]
-pub enum LeafOrBranchSource<R, I>
+pub enum LeafOrBranchSource<L, B>
 where
-    R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
+    L: AsyncRead + Send,
+    B: BranchIter,
 {
-    Leaf(R),
-    Branch(I),
+    Leaf(L),
+    Branch(B),
 }
 
-impl<R, I> From<LeafSource<R>> for LeafOrBranchSource<R, I>
+impl<L, B> From<LeafSource<L>> for LeafOrBranchSource<L, B>
 where
-    R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, Self)> + Send,
+    L: AsyncRead + Send,
+    B: BranchIter,
 {
-    fn from(leaf: LeafSource<R>) -> Self {
+    fn from(leaf: LeafSource<L>) -> Self {
         LeafOrBranchSource::Leaf(leaf.0)
     }
 }
 
-impl<R, I> From<BranchSource<R, I>> for LeafOrBranchSource<R, I>
+impl<L, B> From<BranchSource<B>> for LeafOrBranchSource<L, B>
 where
-    R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, Self)> + Send,
+    L: AsyncRead + Send,
+    B: BranchIter,
 {
-    fn from(branch: BranchSource<R, I>) -> Self {
+    fn from(branch: BranchSource<B>) -> Self {
         LeafOrBranchSource::Branch(branch.0)
     }
 }
@@ -62,12 +59,12 @@ mod impls {
     mod leaf_impls {
         use super::*;
 
-        impl<R> Source for LeafSource<R> where R: AsyncRead + Send {}
-        impl<R> self::sealed::Sealed for LeafSource<R> where R: AsyncRead + Send {}
+        impl<L> Source for LeafSource<L> where L: AsyncRead + Send {}
+        impl<L> self::sealed::Sealed for LeafSource<L> where L: AsyncRead + Send {}
 
-        impl<R> IntoSource for LeafSource<R>
+        impl<L> IntoSource for LeafSource<L>
         where
-            R: AsyncRead + Send,
+            L: AsyncRead + Send,
         {
             type Source = Self;
 
@@ -78,39 +75,17 @@ mod impls {
     }
 
     mod branch_impls {
+        use pangalactic_name::Name;
+
         use super::*;
 
-        impl<R, I> IntoAsyncTryIterator for BranchSource<R, I>
-        where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
-        {
-            type Item = (Name, LeafOrBranchSource<R, I>);
-            type ATI = I::ATI;
+        impl<B> Source for BranchSource<B> where B: BranchIter {}
 
-            fn into_async_try_iter(self) -> Self::ATI {
-                self.0.into_async_try_iter()
-            }
-        }
+        impl<B> self::sealed::Sealed for BranchSource<B> where B: BranchIter {}
 
-        impl<R, I> Source for BranchSource<R, I>
+        impl<B> IntoSource for BranchSource<B>
         where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
-        {
-        }
-
-        impl<R, I> self::sealed::Sealed for BranchSource<R, I>
-        where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
-        {
-        }
-
-        impl<R, I> IntoSource for BranchSource<R, I>
-        where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
+            B: BranchIter,
         {
             type Source = Self;
 
@@ -118,29 +93,42 @@ mod impls {
                 std::future::ready(Ok(self))
             }
         }
+
+        impl<B> BranchIter for BranchSource<B>
+        where
+            B: BranchIter,
+        {
+            type IntoSource = B::IntoSource;
+
+            fn next_branch_entry(
+                &mut self,
+            ) -> impl Future<Output = Result<Option<(Name, B::IntoSource)>>> + Send {
+                self.0.next_branch_entry()
+            }
+        }
     }
 
     mod leaf_or_branch_impls {
         use super::*;
 
-        impl<R, I> Source for LeafOrBranchSource<R, I>
+        impl<L, B> Source for LeafOrBranchSource<L, B>
         where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
+            L: AsyncRead + Send,
+            B: BranchIter,
         {
         }
 
-        impl<R, I> self::sealed::Sealed for LeafOrBranchSource<R, I>
+        impl<L, B> self::sealed::Sealed for LeafOrBranchSource<L, B>
         where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
+            L: AsyncRead + Send,
+            B: BranchIter,
         {
         }
 
-        impl<R, I> IntoSource for LeafOrBranchSource<R, I>
+        impl<L, B> IntoSource for LeafOrBranchSource<L, B>
         where
-            R: AsyncRead + Send,
-            I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
+            L: AsyncRead + Send,
+            B: BranchIter,
         {
             type Source = Self;
 

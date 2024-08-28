@@ -1,11 +1,9 @@
 use std::future::Future;
 
 use anyhow::Result;
-use pangalactic_asynctryiter::IntoAsyncTryIterator;
-use pangalactic_name::Name;
 use tokio::io::AsyncRead;
 
-use crate::{BranchSource, LeafOrBranchSource, LeafSource, Source};
+use crate::{BranchIter, BranchSource, LeafOrBranchSource, LeafSource, Source};
 
 pub trait Sink<S>
 where
@@ -16,15 +14,15 @@ where
     fn sink(self, source: S) -> impl Future<Output = Result<Self::CID>>;
 }
 
-impl<R, I, S> Sink<LeafOrBranchSource<R, I>> for S
+impl<L, B, S> Sink<LeafOrBranchSource<L, B>> for S
 where
-    R: AsyncRead + Send,
-    I: IntoAsyncTryIterator<Item = (Name, LeafOrBranchSource<R, I>)> + Send,
-    S: Sink<LeafSource<R>> + Sink<BranchSource<R, I>, CID = <S as Sink<LeafSource<R>>>::CID>,
+    L: AsyncRead + Send,
+    B: BranchIter,
+    S: Sink<LeafSource<L>> + Sink<BranchSource<B>, CID = <S as Sink<LeafSource<L>>>::CID>,
 {
-    type CID = <S as Sink<LeafSource<R>>>::CID;
+    type CID = <S as Sink<LeafSource<L>>>::CID;
 
-    async fn sink(self, source: LeafOrBranchSource<R, I>) -> Result<Self::CID> {
+    async fn sink(self, source: LeafOrBranchSource<L, B>) -> Result<Self::CID> {
         use LeafOrBranchSource::*;
 
         match source {
