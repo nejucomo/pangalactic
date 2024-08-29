@@ -15,7 +15,7 @@ use tokio::{
 
 use crate::{
     fsutil, BranchIter, IntoSource,
-    NSource::{self, Branch, Leaf},
+    Source::{self, Branch, Leaf},
 };
 
 pub trait Sink<L, B>: Sized + Debug + Send
@@ -25,7 +25,7 @@ where
 {
     type CID: Send;
 
-    fn sink(self, source: NSource<L, B>) -> impl Future<Output = Result<Self::CID>> + Send {
+    fn sink(self, source: Source<L, B>) -> impl Future<Output = Result<Self::CID>> + Send {
         async {
             match source {
                 Leaf(l) => self.sink_leaf(l).await,

@@ -14,14 +14,14 @@ use tokio::{
 
 use crate::{
     fsutil,
-    NSource::{self, Branch, Leaf},
+    Source::{self, Branch, Leaf},
 };
 
 pub trait IntoSource<L, B> {
     fn into_source<S>(
         self,
         store: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<L, B>>> + Send
+    ) -> impl Future<Output = Result<Source<L, B>>> + Send
     where
         S: Store;
 }
@@ -30,7 +30,7 @@ impl<'a> IntoSource<File, ReadDir> for &'a Path {
     fn into_source<S>(
         self,
         store: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<File, ReadDir>>> + Send
+    ) -> impl Future<Output = Result<Source<File, ReadDir>>> + Send
     where
         S: Store,
     {
@@ -39,7 +39,7 @@ impl<'a> IntoSource<File, ReadDir> for &'a Path {
 }
 
 impl IntoSource<File, ReadDir> for PathBuf {
-    async fn into_source<S>(self, _: &LinkDirectoryLayer<S>) -> Result<NSource<File, ReadDir>>
+    async fn into_source<S>(self, _: &LinkDirectoryLayer<S>) -> Result<Source<File, ReadDir>>
     where
         S: Store,
     {
@@ -57,7 +57,7 @@ impl IntoSource<File, ReadDir> for ReadDir {
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<File, ReadDir>>> + Send
+    ) -> impl Future<Output = Result<Source<File, ReadDir>>> + Send
     where
         S: Store,
     {
@@ -69,7 +69,7 @@ impl IntoSource<File, ReadDir> for File {
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<File, ReadDir>>> + Send
+    ) -> impl Future<Output = Result<Source<File, ReadDir>>> + Send
     where
         S: Store,
     {
@@ -85,7 +85,7 @@ where
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<R, B>>> + Send
+    ) -> impl Future<Output = Result<Source<R, B>>> + Send
     where
         S: Store,
     {

@@ -5,12 +5,12 @@ use anyhow::Result;
 use crate::IntoSource;
 
 #[derive(Debug)]
-pub enum NSource<L, B> {
+pub enum Source<L, B> {
     Leaf(L),
     Branch(B),
 }
 
-impl<L, B> IntoSource<L, B> for NSource<L, B>
+impl<L, B> IntoSource<L, B> for Source<L, B>
 where
     L: Send,
     B: Send,
@@ -18,7 +18,7 @@ where
     fn into_source<S>(
         self,
         _: &pangalactic_layer_dir::LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<NSource<L, B>>> + Send
+    ) -> impl Future<Output = Result<Source<L, B>>> + Send
     where
         S: pangalactic_store::Store,
     {
