@@ -15,6 +15,18 @@ where
         .with_context(|| format!("while creating file {:?}", path.display()))
 }
 
+pub(crate) async fn open_readable_file<P>(path: P) -> Result<File>
+where
+    P: AsRef<Path>,
+{
+    let path = path.as_ref();
+
+    tracing::debug!(?path, "opening readable file");
+    File::open(path)
+        .await
+        .with_context(|| format!("while opening readable file {:?}", path.display()))
+}
+
 pub(crate) async fn create_dir<P>(path: P) -> Result<()>
 where
     P: AsRef<Path>,
