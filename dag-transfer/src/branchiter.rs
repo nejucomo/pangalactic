@@ -2,19 +2,26 @@ use std::{future::Future, path::PathBuf};
 
 use anyhow::Result;
 use pangalactic_name::Name;
+use pangalactic_store::Store;
 use tokio::fs::ReadDir;
 
 use crate::IntoSource;
 
-pub trait BranchIter: Sized + Send {
-    type IntoSource: IntoSource;
+pub trait BranchIter<S>: Sized + Send
+where
+    S: Store,
+{
+    type IntoSource: IntoSource<S>;
 
     fn next_branch_entry(
         &mut self,
     ) -> impl Future<Output = Result<Option<(Name, Self::IntoSource)>>> + Send;
 }
 
-impl BranchIter for () {
+impl<S> BranchIter<S> for ()
+where
+    S: Store,
+{
     type IntoSource = ();
 
     async fn next_branch_entry(&mut self) -> Result<Option<(Name, Self::IntoSource)>> {
@@ -22,7 +29,10 @@ impl BranchIter for () {
     }
 }
 
-impl BranchIter for ReadDir {
+impl<S> BranchIter<S> for ReadDir
+where
+    S: Store,
+{
     type IntoSource = PathBuf;
 
     async fn next_branch_entry(&mut self) -> Result<Option<(Name, Self::IntoSource)>> {

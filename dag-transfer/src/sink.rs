@@ -18,13 +18,16 @@ use crate::{
     Source::{self, Branch, Leaf},
 };
 
-pub trait Sink: Sized + Debug + Send {
+pub trait Sink<S>: Sized + Debug + Send
+where
+    S: Store,
+{
     type CID: Send;
 
     fn sink<L, B>(self, source: Source<L, B>) -> impl Future<Output = Result<Self::CID>> + Send
     where
         L: Debug + Send + AsyncRead,
-        B: Debug + Send + BranchIter,
+        B: Debug + Send + BranchIter<S>,
     {
         async {
             match source {
@@ -43,15 +46,23 @@ pub trait Sink: Sized + Debug + Send {
 
     fn sink_branch<B>(self, branch: B) -> impl Future<Output = Result<Self::CID>> + Send
     where
-        B: Debug + Send + BranchIter,
+        B: Debug + Send + BranchIter<S>,
     {
         std::future::ready(Err(anyhow!("{self:?} cannot sink branch {branch:?}")))
     }
 }
 
+pub trait LeafSink {
+    type CID;
+
+    fn sink_only_leaf<L>(self, leaf: L) -> impl Future<Output = Result<Self::CID>> + Send
+    where
+        L: Debug + Send + AsyncRead;
+}
+
 pub type StoreWith<'s, S, T> = (&'s LinkDirectoryLayer<S>, T);
 
-impl<'s, 'a, S> Sink for StoreWith<'s, S, &'a Path>
+impl<'s, 'a, S> Sink<S> for StoreWith<'s, S, &'a Path>
 where
     S: Store,
 {
@@ -62,19 +73,19 @@ where
         L: Debug + Send + AsyncRead,
     {
         let (store, path) = self;
-        <StoreWith<'s, S, PathBuf> as Sink>::sink_leaf((store, path.to_path_buf()), leaf)
+        <StoreWith<'s, S, PathBuf> as Sink<S>>::sink_leaf((store, path.to_path_buf()), leaf)
     }
 
     fn sink_branch<B>(self, branch: B) -> impl Future<Output = Result<Self::CID>> + Send
     where
-        B: Debug + Send + BranchIter,
+        B: Debug + Send + BranchIter<S>,
     {
         let (store, path) = self;
         (store, path.to_path_buf()).sink_branch(branch)
     }
 }
 
-impl<'s, S> Sink for StoreWith<'s, S, PathBuf>
+impl<'s, S> Sink<S> for StoreWith<'s, S, PathBuf>
 where
     S: Store,
 {
@@ -86,13 +97,13 @@ where
     {
         let (_, path) = self;
         let f = fsutil::create_file(&path).await?;
-        f.sink_leaf(leaf).await?;
+        f.sink_only_leaf(leaf).await?;
         Ok(path)
     }
 
     async fn sink_branch<B>(self, mut branch: B) -> Result<Self::CID>
     where
-        B: Debug + Send + BranchIter,
+        B: Debug + Send + BranchIter<S>,
     {
         let (store, path) = self;
         fsutil::create_dir(&path).await?;
@@ -105,24 +116,24 @@ where
     }
 }
 
-impl Sink for File {
+impl LeafSink for File {
     type CID = ();
 
-    fn sink_leaf<L>(self, leaf: L) -> impl Future<Output = Result<Self::CID>> + Send
+    fn sink_only_leaf<L>(self, leaf: L) -> impl Future<Output = Result<Self::CID>> + Send
     where
         L: Debug + Send + AsyncRead,
     {
-        Writable(self).sink_leaf(leaf)
+        Writable(self).sink_only_leaf(leaf)
     }
 }
 
-impl<W> Sink for Writable<W>
+impl<W> LeafSink for Writable<W>
 where
     W: Debug + Send + AsyncWrite,
 {
     type CID = ();
 
-    async fn sink_leaf<L>(self, leaf: L) -> Result<Self::CID>
+    async fn sink_only_leaf<L>(self, leaf: L) -> Result<Self::CID>
     where
         L: Debug + Send + AsyncRead,
     {
