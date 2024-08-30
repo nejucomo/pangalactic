@@ -23,17 +23,6 @@ where
     ) -> impl Future<Output = Result<Option<(Name, Self::IntoSource)>>> + Send;
 }
 
-impl<S> BranchIter<S> for ()
-where
-    S: Store,
-{
-    type IntoSource = ();
-
-    async fn next_branch_entry(&mut self) -> Result<Option<(Name, Self::IntoSource)>> {
-        unimplemented!("a () BranchIter should never be instantiated")
-    }
-}
-
 impl<S> BranchIter<S> for ReadDir
 where
     S: Store,

@@ -5,7 +5,6 @@ use std::{
 };
 
 use anyhow::Result;
-use pangalactic_iowrappers::Readable;
 use pangalactic_layer_dir::{DirNodeReader, DirectoryIntoIter, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_store::Store;
@@ -30,21 +29,6 @@ where
         self,
         store: &LinkDirectoryLayer<S>,
     ) -> impl Future<Output = Result<Source<Self::Leaf, Self::Branch>>> + Send;
-}
-
-impl<S> IntoSource<S> for ()
-where
-    S: Store,
-{
-    type Leaf = File; // Dummy value
-    type Branch = ();
-
-    async fn into_source(
-        self,
-        _: &LinkDirectoryLayer<S>,
-    ) -> Result<Source<Self::Leaf, Self::Branch>> {
-        unimplemented!("a () IntoSource should never be instantiated")
-    }
 }
 
 impl<'a, S> IntoSource<S> for &'a Path
@@ -107,22 +91,6 @@ where
         _: &LinkDirectoryLayer<S>,
     ) -> impl Future<Output = Result<Source<File, ReadDir>>> + Send {
         ready(Ok(Leaf(self)))
-    }
-}
-
-impl<S, R> IntoSource<S> for Readable<R>
-where
-    S: Store,
-    R: Send + Debug + AsyncRead,
-{
-    type Leaf = R;
-    type Branch = ();
-
-    fn into_source(
-        self,
-        _: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<Source<R, ()>>> + Send {
-        ready(Ok(Leaf(self.0)))
     }
 }
 
