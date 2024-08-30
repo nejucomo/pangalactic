@@ -1,0 +1,18 @@
+[package]
+name = "pangalactic-dag-transfer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow-std.workspace = true
+anyhow.workspace = true
+derive_more.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-layer-dir.workspace = true
+pangalactic-link.workspace = true
+pangalactic-name.workspace = true
+pangalactic-store.workspace = true
+pin-project.workspace = true
+tokio.workspace = true
+tracing.workspace = true

@@ -11,6 +11,7 @@ members = [
   "cid",
   "cli",
   "config",
+  "dag-transfer",
   "dir",
   "guest",
   "guest-procmacro",
@@ -47,6 +48,7 @@ pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 pangalactic-cli             = { path = "cli"             }
 pangalactic-config          = { path = "config"          }
+pangalactic-dag-transfer    = { path = "dag-transfer"    }
 pangalactic-dir             = { path = "dir"             }
 pangalactic-guest           = { path = "guest"           }
 pangalactic-guest-procmacro = { path = "guest-procmacro" }
