@@ -6,7 +6,8 @@ use std::{
 
 use anyhow::Result;
 use pangalactic_iowrappers::Readable;
-use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_layer_dir::{DirNodeReader, DirectoryIntoIter, LinkDirectoryLayer};
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use tokio::{
     fs::{File, ReadDir},
@@ -122,5 +123,26 @@ where
         _: &LinkDirectoryLayer<S>,
     ) -> impl Future<Output = Result<Source<R, ()>>> + Send {
         ready(Ok(Leaf(self.0)))
+    }
+}
+
+impl<S> IntoSource<S> for Link<S::CID>
+where
+    S: Store,
+{
+    type Leaf = <LinkDirectoryLayer<S> as Store>::Reader;
+    type Branch = DirectoryIntoIter<Link<S::CID>>;
+
+    async fn into_source(
+        self,
+        store: &LinkDirectoryLayer<S>,
+    ) -> Result<Source<Self::Leaf, Self::Branch>> {
+        use DirNodeReader::*;
+
+        let dnr: DirNodeReader<_> = store.load(&self).await?;
+        Ok(match dnr {
+            File(r) => Leaf(r),
+            Dir(d) => Branch(d.into_iter()),
+        })
     }
 }

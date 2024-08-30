@@ -1,5 +1,6 @@
 use derive_more::{Deref, DerefMut, From, Into};
 use pangalactic_dir::Directory;
+pub use pangalactic_dir::DirectoryIntoIter;
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind;
 use pangalactic_name::Name;
@@ -55,7 +56,7 @@ where
 
 impl<C> IntoIterator for LinkDirectory<C> {
     type Item = (Name, Link<C>);
-    type IntoIter = <Directory<Link<C>> as IntoIterator>::IntoIter;
+    type IntoIter = DirectoryIntoIter<Link<C>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()

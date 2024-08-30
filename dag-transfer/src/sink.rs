@@ -5,8 +5,9 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use pangalactic_iowrappers::Writable;
-use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_iowrappers::{Readable, Writable};
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
+use pangalactic_link::Link;
 use pangalactic_store::Store;
 use tokio::{
     fs::File,
@@ -58,6 +59,35 @@ pub trait LeafSink {
     fn sink_only_leaf<L>(self, leaf: L) -> impl Future<Output = Result<Self::CID>> + Send
     where
         L: Debug + Send + AsyncRead;
+}
+
+impl<'s, S> Sink<S> for &'s mut LinkDirectoryLayer<S>
+where
+    S: Store,
+{
+    type CID = Link<S::CID>;
+
+    fn sink_leaf<L>(self, leaf: L) -> impl Future<Output = Result<Self::CID>> + Send
+    where
+        L: Debug + Send + AsyncRead,
+    {
+        self.commit(Readable(leaf))
+    }
+
+    async fn sink_branch<B>(self, mut branch: B) -> Result<Self::CID>
+    where
+        B: Debug + Send + BranchIter<S>,
+    {
+        let mut ld = LinkDirectory::default();
+
+        while let Some((name, intosrc)) = branch.next_branch_entry().await? {
+            let src = intosrc.into_source(self).await?;
+            let link = self.sink(src).await?;
+            ld.insert(name, link)?;
+        }
+
+        self.commit(ld).await
+    }
 }
 
 pub type StoreWith<'s, S, T> = (&'s LinkDirectoryLayer<S>, T);

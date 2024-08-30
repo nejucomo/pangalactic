@@ -30,9 +30,11 @@ where
     }
 }
 
+pub type DirectoryIntoIter<L> = std::collections::btree_map::IntoIter<Name, L>;
+
 impl<L> IntoIterator for Directory<L> {
     type Item = (Name, L);
-    type IntoIter = <BTreeMap<Name, L> as IntoIterator>::IntoIter;
+    type IntoIter = DirectoryIntoIter<L>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
