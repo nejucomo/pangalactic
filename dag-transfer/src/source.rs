@@ -1,8 +1,9 @@
-use std::future::Future;
+use std::{fmt::Debug, future::Future};
 
 use anyhow::Result;
+use tokio::io::AsyncRead;
 
-use crate::IntoSource;
+use crate::{BranchIter, IntoSource};
 
 #[derive(Debug)]
 pub enum Source<L, B> {
@@ -10,11 +11,14 @@ pub enum Source<L, B> {
     Branch(B),
 }
 
-impl<L, B> IntoSource<L, B> for Source<L, B>
+impl<L, B> IntoSource for Source<L, B>
 where
-    L: Send,
-    B: Send,
+    L: Debug + Send + AsyncRead,
+    B: Debug + Send + BranchIter,
 {
+    type Leaf = L;
+    type Branch = B;
+
     fn into_source<S>(
         self,
         _: &pangalactic_layer_dir::LinkDirectoryLayer<S>,

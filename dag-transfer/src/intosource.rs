@@ -1,4 +1,5 @@
 use std::{
+    fmt::Debug,
     future::{ready, Future},
     path::{Path, PathBuf},
 };
@@ -13,20 +14,41 @@ use tokio::{
 };
 
 use crate::{
-    fsutil,
+    fsutil, BranchIter,
     Source::{self, Branch, Leaf},
 };
 
-pub trait IntoSource<L, B> {
+pub trait IntoSource: Send {
+    type Leaf: Send + Debug + AsyncRead;
+    type Branch: Send + Debug + BranchIter;
+
     fn into_source<S>(
         self,
         store: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<Source<L, B>>> + Send
+    ) -> impl Future<Output = Result<Source<Self::Leaf, Self::Branch>>> + Send
     where
         S: Store;
 }
 
-impl<'a> IntoSource<File, ReadDir> for &'a Path {
+impl IntoSource for () {
+    type Leaf = File; // Dummy value
+    type Branch = ();
+
+    async fn into_source<S>(
+        self,
+        _: &LinkDirectoryLayer<S>,
+    ) -> Result<Source<Self::Leaf, Self::Branch>>
+    where
+        S: Store,
+    {
+        unimplemented!("a () IntoSource should never be instantiated")
+    }
+}
+
+impl<'a> IntoSource for &'a Path {
+    type Leaf = File;
+    type Branch = ReadDir;
+
     fn into_source<S>(
         self,
         store: &LinkDirectoryLayer<S>,
@@ -38,7 +60,10 @@ impl<'a> IntoSource<File, ReadDir> for &'a Path {
     }
 }
 
-impl IntoSource<File, ReadDir> for PathBuf {
+impl IntoSource for PathBuf {
+    type Leaf = File;
+    type Branch = ReadDir;
+
     async fn into_source<S>(self, _: &LinkDirectoryLayer<S>) -> Result<Source<File, ReadDir>>
     where
         S: Store,
@@ -53,7 +78,10 @@ impl IntoSource<File, ReadDir> for PathBuf {
     }
 }
 
-impl IntoSource<File, ReadDir> for ReadDir {
+impl IntoSource for ReadDir {
+    type Leaf = File;
+    type Branch = ReadDir;
+
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
@@ -65,7 +93,10 @@ impl IntoSource<File, ReadDir> for ReadDir {
     }
 }
 
-impl IntoSource<File, ReadDir> for File {
+impl IntoSource for File {
+    type Leaf = File;
+    type Branch = ReadDir;
+
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
@@ -77,15 +108,17 @@ impl IntoSource<File, ReadDir> for File {
     }
 }
 
-impl<R, B> IntoSource<R, B> for Readable<R>
+impl<R> IntoSource for Readable<R>
 where
-    R: Send + AsyncRead,
-    B: Send,
+    R: Send + Debug + AsyncRead,
 {
+    type Leaf = R;
+    type Branch = ();
+
     fn into_source<S>(
         self,
         _: &LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<Source<R, B>>> + Send
+    ) -> impl Future<Output = Result<Source<R, ()>>> + Send
     where
         S: Store,
     {
