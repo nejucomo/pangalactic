@@ -10,7 +10,7 @@ use pangalactic_link::Link;
 use pangalactic_store::Store;
 use tokio::{
     fs::{File, ReadDir},
-    io::AsyncRead,
+    io::{AsyncRead, Stdin},
 };
 
 use crate::{
@@ -90,6 +90,21 @@ where
         self,
         _: &LinkDirectoryLayer<S>,
     ) -> impl Future<Output = Result<Source<File, ReadDir>>> + Send {
+        ready(Ok(Leaf(self)))
+    }
+}
+
+impl<S> IntoSource<S> for Stdin
+where
+    S: Store,
+{
+    type Leaf = Stdin;
+    type Branch = ReadDir; // Dummy value.
+
+    fn into_source(
+        self,
+        _: &LinkDirectoryLayer<S>,
+    ) -> impl Future<Output = Result<Source<Self::Leaf, Self::Branch>>> + Send {
         ready(Ok(Leaf(self)))
     }
 }

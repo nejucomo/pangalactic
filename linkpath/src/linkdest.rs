@@ -86,6 +86,18 @@ impl<C> LinkDestination<C> {
     }
 }
 
+impl<S> Destination<S> for LinkDestination<S::CID>
+where
+    S: Store,
+{
+    async fn sink_branch<B>(self, store: &mut LinkDirectoryLayer<S>, branch: B) -> Result<Self::CID>
+    where
+        B: Debug + Send + BranchIter<S>,
+    {
+        self.commit_within(store, branch).await
+    }
+}
+
 impl<S> LeafDestination<S> for LinkDestination<S::CID>
 where
     S: Store,
@@ -97,18 +109,6 @@ where
         L: Debug + Send + AsyncRead,
     {
         self.commit_within(store, Readable(leaf)).await
-    }
-}
-
-impl<S> Destination<S> for LinkDestination<S::CID>
-where
-    S: Store,
-{
-    async fn sink_branch<B>(self, store: &mut LinkDirectoryLayer<S>, branch: B) -> Result<Self::CID>
-    where
-        B: Debug + Send + BranchIter<S>,
-    {
-        self.commit_within(store, branch).await
     }
 }
 

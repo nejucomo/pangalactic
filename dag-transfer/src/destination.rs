@@ -7,7 +7,7 @@ use pangalactic_link::Link;
 use pangalactic_store::Store;
 use tokio::{
     fs::File,
-    io::{AsyncRead, AsyncWrite},
+    io::{AsyncRead, AsyncWrite, Stdout},
 };
 
 use crate::{
@@ -140,6 +140,24 @@ where
 }
 
 impl<S> LeafDestination<S> for File
+where
+    S: Store,
+{
+    type CID = ();
+
+    fn sink_leaf<L>(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        leaf: L,
+    ) -> impl Future<Output = Result<Self::CID>> + Send
+    where
+        L: Debug + Send + AsyncRead,
+    {
+        Writable(self).sink_leaf(store, leaf)
+    }
+}
+
+impl<S> LeafDestination<S> for Stdout
 where
     S: Store,
 {
