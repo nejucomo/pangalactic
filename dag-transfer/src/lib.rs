@@ -1,12 +1,14 @@
 #![feature(async_iterator)]
 
 mod branchiter;
+mod destination;
 pub(crate) mod fsutil;
 mod intosource;
-mod sink;
+mod layer;
 mod source;
 
 pub use self::branchiter::BranchIter;
+pub use self::destination::{Destination, LeafDestination};
 pub use self::intosource::IntoSource;
-pub use self::sink::Sink;
+pub use self::layer::TransferLayerExt;
 pub use self::source::Source;
