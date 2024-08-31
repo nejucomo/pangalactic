@@ -30,7 +30,7 @@ members = [
   "nested-dir",
   "primitives",
   "pangalactic",
-#   "revcon",
+  "revcon",
   "schemata",
   "seed",
   "serialization",
@@ -68,7 +68,7 @@ pangalactic-manifest        = { path = "manifest"        }
 pangalactic-name            = { path = "name"            }
 pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-primitives      = { path = "primitives"      }
-# pangalactic-revcon          = { path = "revcon"          }
+pangalactic-revcon          = { path = "revcon"          }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }
