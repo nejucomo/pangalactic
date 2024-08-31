@@ -4,15 +4,15 @@ use std::{
 };
 
 use anyhow::Result;
-use pangalactic_layer_dir::DirectoryIntoIter;
+use pangalactic_layer_dir::{DirectoryIntoIter, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_name::Name;
-use pangalactic_store::Store;
+use pangalactic_store::{Commit, Store};
 use tokio::fs::ReadDir;
 
 use crate::IntoSource;
 
-pub trait BranchIter<S>: Sized + Send
+pub trait BranchIter<S>: Sized + Send + Commit<LinkDirectoryLayer<S>>
 where
     S: Store,
 {

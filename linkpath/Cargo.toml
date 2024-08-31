@@ -10,6 +10,7 @@ derive_more.workspace = true
 extend.workspace = true
 not_empty.workspace = true
 pangalactic-cid.workspace = true
+pangalactic-dag-transfer.workspace = true
 pangalactic-dir.workspace = true
 pangalactic-iowrappers.workspace = true
 pangalactic-layer-dir.workspace = true

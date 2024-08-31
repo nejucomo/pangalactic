@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use derive_more::{Deref, DerefMut, From, Into};
 use pangalactic_dir::Directory;
 pub use pangalactic_dir::DirectoryIntoIter;
@@ -78,6 +80,20 @@ where
         let mut w = store.open_link_writer(LinkKind::Dir).await?;
         w.write_all(&buf).await?;
         store.commit(w).await
+    }
+}
+
+// Inefficient but convenient in some cases (at least for `Destination::sink_branch`:
+impl<S> Commit<LinkDirectoryLayer<S>> for DirectoryIntoIter<Link<S::CID>>
+where
+    S: Store,
+{
+    fn commit_into_store(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+    ) -> impl Future<Output = anyhow::Result<Link<S::CID>>> + Send {
+        let ld: LinkDirectory<_> = self.collect();
+        ld.commit_into_store(store)
     }
 }
 

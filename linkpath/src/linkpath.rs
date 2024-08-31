@@ -4,15 +4,15 @@ use std::str::FromStr;
 
 use anyhow::Result;
 use pangalactic_cid::ContentIdentifier;
-use pangalactic_layer_dir::LinkDirectoryLayer;
+use pangalactic_dag_transfer::{IntoSource, Source};
+use pangalactic_dir::DirectoryIntoIter;
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
 use pangalactic_name::{Path, PathRef};
 use pangalactic_store::{Commit, Store};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-
-use crate::PathLayerExt;
 
 // TODO: Switch to enum with { DirLP(CID, Path) ; FileLP(CID) }
 #[derive(Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -49,6 +49,35 @@ impl<C> LinkPath<C> {
 
     pub fn path(&self) -> &PathRef {
         self.path.as_ref()
+    }
+
+    pub async fn resolve_with<S>(&self, store: &LinkDirectoryLayer<S>) -> Result<Link<C>>
+    where
+        C: Clone,
+        S: Store<CID = C>,
+    {
+        let mut link = self.link().clone();
+        for name in self.path().components() {
+            let mut d: LinkDirectory<S::CID> = store.load(&link).await?;
+            link = d.remove_required(name)?;
+        }
+        Ok(link)
+    }
+}
+
+impl<S> IntoSource<S> for LinkPath<S::CID>
+where
+    S: Store,
+{
+    type Leaf = <LinkDirectoryLayer<S> as Store>::Reader;
+    type Branch = DirectoryIntoIter<Link<S::CID>>;
+
+    async fn into_source(
+        self,
+        store: &LinkDirectoryLayer<S>,
+    ) -> Result<Source<Self::Leaf, Self::Branch>> {
+        let link = self.resolve_with(store).await?;
+        link.into_source(store).await
     }
 }
 
@@ -127,7 +156,7 @@ where
     S: Store,
 {
     async fn commit_into_store(self, store: &mut LinkDirectoryLayer<S>) -> Result<Link<S::CID>> {
-        store.resolve_path(self).await
+        self.resolve_with(store).await
     }
 }
 
