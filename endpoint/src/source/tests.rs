@@ -2,10 +2,10 @@ use std::path::PathBuf;
 
 use test_case::test_case;
 
-use super::AnySource::{self, Host, Stdin};
+use super::SourceEndpoint::{self, Host, Stdin};
 
 #[test_case("-" => Ok(Stdin))]
 #[test_case("." => Ok(Host(PathBuf::from("."))))]
-fn parse(input: &str) -> Result<AnySource<()>, String> {
+fn parse(input: &str) -> Result<SourceEndpoint<()>, String> {
     input.parse().map_err(|e| format!("{e}"))
 }

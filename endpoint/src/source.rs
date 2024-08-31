@@ -15,6 +15,7 @@ pub use self::branch::SourceEndpointBranch;
 pub use self::leaf::SourceEndpointLeaf;
 use self::SourceEndpoint::*;
 
+#[derive(Eq, PartialEq)]
 pub enum SourceEndpoint<C> {
     Stdin,
     Host(PathBuf),
@@ -89,3 +90,6 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

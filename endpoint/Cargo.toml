@@ -15,3 +15,6 @@ pangalactic-store.workspace = true
 pin-project.workspace = true
 serde.workspace = true
 tokio.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true
