@@ -1,7 +1,14 @@
+use std::{fmt::Debug, fmt::Display, str::FromStr};
+
+use anyhow::Result;
+use pangalactic_dag_transfer::{BranchIter, Destination, LeafDestination};
+use pangalactic_iowrappers::Readable;
+use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_name::{NonEmptyPath, NonEmptyPathRef, Path};
+use pangalactic_store::{Commit, Store};
 use serde::{de::DeserializeOwned, Serialize};
-use std::{fmt::Debug, fmt::Display, str::FromStr};
+use tokio::io::AsyncRead;
 
 use crate::LinkPath;
 
@@ -14,7 +21,7 @@ pub struct LinkDestination<C> {
 }
 
 impl<C> LinkDestination<C> {
-    pub fn new<P>(link: Link<C>, path: P) -> anyhow::Result<Self>
+    pub fn new<P>(link: Link<C>, path: P) -> Result<Self>
     where
         NonEmptyPath: TryFrom<P>,
         <NonEmptyPath as TryFrom<P>>::Error: std::error::Error + Send + Sync + 'static,
@@ -36,11 +43,72 @@ impl<C> LinkDestination<C> {
         self.path.as_ref()
     }
 
-    pub(crate) fn replace_link_into_path(self, newroot: Link<C>) -> anyhow::Result<LinkPath<C>>
+    pub async fn commit_within<S, T>(
+        self,
+        store: &mut LinkDirectoryLayer<S>,
+        value: T,
+    ) -> Result<LinkPath<C>>
+    where
+        C: Clone + Send + Serialize,
+        S: Store<CID = C>,
+        T: Commit<LinkDirectoryLayer<S>> + Send,
+    {
+        let mut link = store.commit(value).await?;
+
+        let mut dirlink = self.link().clone();
+        let mut stack = vec![];
+        let (intermediate, last) = self.path().split_last();
+
+        for name in intermediate.components() {
+            let d: LinkDirectory<S::CID> = store.load(&dirlink).await?;
+            dirlink = d.get_required(name)?.clone();
+            stack.push((d, name));
+        }
+
+        let mut d: LinkDirectory<S::CID> = store.load(&dirlink).await?;
+        d.insert(last.to_owned(), link)?;
+
+        for (mut prevd, name) in stack.into_iter().rev() {
+            link = store.commit(d).await?;
+            prevd.overwrite(name.to_owned(), link)?;
+            d = prevd;
+        }
+
+        let newroot = store.commit(d).await?;
+        self.replace_link_into_path(newroot)
+    }
+
+    pub(crate) fn replace_link_into_path(self, newroot: Link<C>) -> Result<LinkPath<C>>
     where
         C: Serialize,
     {
         LinkPath::new(newroot, Path::from(self.path))
+    }
+}
+
+impl<S> Destination<S> for LinkDestination<S::CID>
+where
+    S: Store,
+{
+    async fn sink_branch<B>(self, store: &mut LinkDirectoryLayer<S>, branch: B) -> Result<Self::CID>
+    where
+        B: Debug + Send + BranchIter<S>,
+    {
+        self.commit_within(store, branch).await
+    }
+}
+
+impl<S> LeafDestination<S> for LinkDestination<S::CID>
+where
+    S: Store,
+{
+    type CID = LinkPath<S::CID>;
+
+    async fn sink_leaf<L>(self, store: &mut LinkDirectoryLayer<S>, leaf: L) -> Result<Self::CID>
+    where
+        L: Debug + Send + AsyncRead,
+    {
+        self.commit_within(store, Readable(leaf)).await
     }
 }
 

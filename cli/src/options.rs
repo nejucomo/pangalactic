@@ -3,12 +3,12 @@ use std::{fmt::Display, future::Future, path::PathBuf, pin::Pin};
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
-use futures::FutureExt;
+use pangalactic_dag_transfer::TransferLayerExt;
+use pangalactic_endpoint::{DestinationEndpoint, SourceEndpoint};
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
 use pangalactic_layer_dir::LinkDirectoryLayer;
-use pangalactic_linkpath::{AnyDestination, AnySource, LinkPath, PathLayerExt};
 use pangalactic_manifest::FullManifest;
 use pangalactic_revcon::ControlDir;
 use pangalactic_seed::Seed;
@@ -17,20 +17,17 @@ use pangalactic_store_dirdb::DirDbStore;
 use pangalactic_store_mem::MemStore;
 
 type CliStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
-
 type CliCid = CidMeta<Hash>;
+type CliDestinationEndpoint = DestinationEndpoint<CliCid>;
+type CliSourceEndpoint = SourceEndpoint<CliCid>;
 
-type CliAnyDestination = AnyDestination<CliCid>;
-type CliAnySource = AnySource<CliCid>;
-type CliLinkPath = LinkPath<CliCid>;
-
-// Upstream Bug: `enum_dispatch` does not support `async fn` in traits. :-(
 #[enum_dispatch]
 pub trait Runnable {
     fn run(self) -> RunOutcome;
 }
 
-pub type RunOutcome = Pin<Box<dyn Future<Output = Result<Option<Box<dyn Display>>>>>>;
+// We must use `Box<Pin<_>>` to satisfy `enum_dispatch`. :-/
+pub type RunOutcome = Pin<Box<dyn Future<Output = Result<()>>>>;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -158,10 +155,8 @@ impl Runnable for StorePutOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            store
-                .transfer(AnySource::Stdin, AnyDestination::Store(None))
-                .map(map_res_disp)
-                .await
+            let link = store.transfer(SourceEndpoint::Stdin, ()).await?;
+            ok_disp(link)
         })
     }
 }
@@ -170,15 +165,17 @@ impl Runnable for StorePutOptions {
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The source to get
-    pub source: CliAnySource,
+    pub source: CliSourceEndpoint,
 }
 
 impl Runnable for StoreGetOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            store.transfer(self.source, AnyDestination::Stdout).await?;
-            Ok(None)
+            store
+                .transfer(self.source, DestinationEndpoint::Stdout)
+                .await?;
+            Ok(())
         })
     }
 }
@@ -186,18 +183,16 @@ impl Runnable for StoreGetOptions {
 /// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct StoreXferOptions {
-    pub source: CliAnySource,
-    pub dest: CliAnyDestination,
+    pub source: CliSourceEndpoint,
+    pub dest: CliDestinationEndpoint,
 }
 
 impl Runnable for StoreXferOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            store
-                .transfer(self.source, self.dest)
-                .map(map_res_disp)
-                .await
+            let receipt = store.transfer(self.source, self.dest).await?;
+            ok_disp(receipt)
         })
     }
 }
@@ -206,47 +201,36 @@ impl Runnable for StoreXferOptions {
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
     /// The plan to derive, or an exec file if `INPUT` is provided
-    pub plan_or_exec: CliAnySource,
+    pub plan_or_exec: CliSourceEndpoint,
 
     /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
-    pub input: Option<CliAnySource>,
+    pub input: Option<CliSourceEndpoint>,
 }
 
 impl Runnable for DeriveOptions {
     fn run(self) -> RunOutcome {
-        use pangalactic_schemata::Plan;
-
         Box::pin(async {
+            use pangalactic_schemata::Plan;
+
             let mut store = CliStore::default();
 
             // Transfer any source into the store to get a store path:
-            // Assert: Final unwrap never fails because `AnyDestination::Store` always produces a path:
-            let plan_or_exec = store
-                .transfer(self.plan_or_exec, AnyDestination::Store(None))
-                .await?
-                .unwrap();
+            // Assert: Final unwrap never fails because `DestinationEndpoint::Store` always produces a path:
+            let exec = store.transfer(self.plan_or_exec, ()).await?;
 
             let plan = if let Some(input) = self.input {
-                let input_path = store
-                    .transfer(input, AnyDestination::Store(None))
-                    .await?
-                    .unwrap();
-                let exec = store.resolve_path(&plan_or_exec).await?;
-                let input = store.resolve_path(&input_path).await?;
-                store
-                    .commit(Plan { exec, input })
-                    .await
-                    .map(CliLinkPath::from)?
+                let input = store.transfer(input, ()).await?;
+                store.commit(Plan { exec, input }).await?
             } else {
-                plan_or_exec
+                exec
             };
 
-            let planlink = store.resolve_path(&plan).await?;
-            let (_, attestation) = store.derive(&planlink).await?;
-            ok_disp(LinkPath::from(attestation))
+            let (_, attestation) = store.derive(&plan).await?;
+            ok_disp(attestation)
         })
     }
 }
+
 /// Manage the pg seed directory
 #[enum_dispatch(Runnable)]
 #[derive(Debug, Subcommand)]
@@ -284,23 +268,10 @@ impl Runnable for SeedInstallOptions {
     }
 }
 
-fn ok_disp<T>(value: T) -> Result<Option<Box<dyn Display>>>
+fn ok_disp<T>(value: T) -> Result<()>
 where
-    T: Display + 'static,
+    T: Display,
 {
-    Ok(Some(box_disp(value)))
-}
-
-fn map_res_disp<T>(res: Result<Option<T>>) -> Result<Option<Box<dyn Display>>>
-where
-    T: Display + 'static,
-{
-    res.map(|opt| opt.map(box_disp))
-}
-
-fn box_disp<T>(value: T) -> Box<dyn Display>
-where
-    T: Display + 'static,
-{
-    Box::new(value) as Box<dyn Display>
+    println!("{value}");
+    Ok(())
 }

@@ -42,6 +42,7 @@ mod consts {
     pub const MKSOURCE_DIR_STORE_PATH: &'static str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
+    pub const MKDEST_HOST_DEST: &'static str = "dest";
     pub const MKDEST_STORE_DEST: &'static str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
 
@@ -192,8 +193,8 @@ impl MkSource {
             | (MkSource::StoreCID(Dir), MkDest::Stdout)
             | (MkSource::LinkPath(Dir), MkDest::Stdout) => None,
 
-            // Anything headed to host produces empty output without error:
-            (_, MkDest::Host) => Some(("(empty)", "")),
+            // Any host dest outputs the host path:
+            (_, MkDest::Host) => named_const!(MKDEST_HOST_DEST),
 
             // echo
             (MkSource::Stdin, MkDest::Stdout) => named_const!(STDIN_CONTENTS),
@@ -268,7 +269,7 @@ impl MkDest {
 
         match self {
             Stdout => "-",
-            Host => "dest",
+            Host => consts::MKDEST_HOST_DEST,
             StoreBare => "pg:",
             StoreDest => consts::MKDEST_STORE_DEST,
         }

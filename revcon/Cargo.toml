@@ -9,6 +9,7 @@ anyhow-std.workspace = true
 anyhow.workspace = true
 derive_more.workspace = true
 pangalactic-config.workspace = true
+pangalactic-dag-transfer.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-linkpath.workspace = true
 pangalactic-name.workspace = true
