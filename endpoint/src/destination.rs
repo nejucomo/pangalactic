@@ -9,7 +9,7 @@ use pangalactic_store::Store;
 use serde::{de::DeserializeOwned, Serialize};
 use tokio::io::AsyncRead;
 
-use crate::SourceEndpoint;
+use crate::Receipt;
 
 use self::DestinationEndpoint::*;
 
@@ -30,17 +30,15 @@ where
     {
         match self {
             Stdout => Err(anyhow!("cannot transfer directory to stdout: {branch:?}")),
-            Host(p) => p.sink_branch(store, branch).await.map(SourceEndpoint::Host),
+            Host(p) => p.sink_branch(store, branch).await.map(Receipt::Host),
             Store(optp) => {
                 if let Some(p) = optp {
-                    p.sink_branch(store, branch)
-                        .await
-                        .map(SourceEndpoint::Store)
+                    p.sink_branch(store, branch).await.map(Receipt::Store)
                 } else {
                     ().sink_branch(store, branch)
                         .await
                         .map(LinkPath::from)
-                        .map(SourceEndpoint::Store)
+                        .map(Receipt::Store)
                 }
             }
         }
@@ -51,7 +49,7 @@ impl<S> LeafDestination<S> for DestinationEndpoint<S::CID>
 where
     S: Store,
 {
-    type CID = SourceEndpoint<S::CID>;
+    type CID = Receipt<S::CID>;
 
     async fn sink_leaf<L>(self, store: &mut LinkDirectoryLayer<S>, leaf: L) -> Result<Self::CID>
     where
@@ -61,16 +59,16 @@ where
             Stdout => tokio::io::stdout()
                 .sink_leaf(store, leaf)
                 .await
-                .map(|()| SourceEndpoint::Stdin),
-            Host(p) => p.sink_leaf(store, leaf).await.map(SourceEndpoint::Host),
+                .map(|()| Receipt::Stdout),
+            Host(p) => p.sink_leaf(store, leaf).await.map(Receipt::Host),
             Store(optp) => {
                 if let Some(p) = optp {
-                    p.sink_leaf(store, leaf).await.map(SourceEndpoint::Store)
+                    p.sink_leaf(store, leaf).await.map(Receipt::Store)
                 } else {
                     ().sink_leaf(store, leaf)
                         .await
                         .map(LinkPath::from)
-                        .map(SourceEndpoint::Store)
+                        .map(Receipt::Store)
                 }
             }
         }
