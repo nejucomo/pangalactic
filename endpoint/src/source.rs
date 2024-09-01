@@ -15,7 +15,7 @@ pub use self::branch::SourceEndpointBranch;
 pub use self::leaf::SourceEndpointLeaf;
 use self::SourceEndpoint::*;
 
-#[derive(Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub enum SourceEndpoint<C> {
     Stdin,
     Host(PathBuf),

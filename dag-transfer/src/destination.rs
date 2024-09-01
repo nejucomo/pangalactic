@@ -31,7 +31,9 @@ where
         async {
             match source {
                 Leaf(l) => self.sink_leaf(store, l).await,
-                Branch(b) => self.sink_branch(store, b).await,
+
+                // `Box::pin` impacts every `Destination` but without this there is a layout-cycle whackamole:
+                Branch(b) => Box::pin(self.sink_branch(store, b)).await,
             }
         }
     }

@@ -7,8 +7,5 @@ pub async fn run() -> anyhow::Result<()> {
     tracing::debug!(?logargs);
     let opts = Options::parse();
     tracing::trace!(?opts);
-    if let Some(disp) = opts.run().await? {
-        println!("{disp}");
-    }
-    Ok(())
+    opts.run().await
 }
