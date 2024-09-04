@@ -1,10 +1,13 @@
-use std::path::Path;
+use std::{fmt::Debug, path::Path};
 
 use anyhow::Result;
-use globset::{Glob, GlobSet as Upstream};
+pub use globset::Glob;
+use globset::GlobSet as Upstream;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+use crate::filtersource::FilterSource;
+
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(try_from = "Vec<&str>", into = "Vec<String>")]
 pub struct GlobSet {
     globs: Vec<Glob>,
@@ -12,6 +15,10 @@ pub struct GlobSet {
 }
 
 impl GlobSet {
+    pub fn filter_source<I>(&self, intosource: I) -> FilterSource<I> {
+        FilterSource::new(self, intosource)
+    }
+
     pub fn is_match<P>(&self, path: P) -> bool
     where
         P: AsRef<Path>,
@@ -57,5 +64,14 @@ impl TryFrom<Vec<Glob>> for GlobSet {
 impl From<GlobSet> for Vec<String> {
     fn from(gs: GlobSet) -> Self {
         gs.globs.into_iter().map(|g| g.glob().to_string()).collect()
+    }
+}
+
+impl Debug for GlobSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GlobSet")
+            .field("globs", &self.globs)
+            .field("matcher", &"...")
+            .finish()
     }
 }

@@ -1,6 +1,7 @@
-use std::{fmt::Debug, future::Future};
+use std::fmt::Debug;
 
 use anyhow::Result;
+use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_store::Store;
 use tokio::io::AsyncRead;
 
@@ -21,10 +22,7 @@ where
     type Leaf = L;
     type Branch = B;
 
-    fn into_source(
-        self,
-        _: &pangalactic_layer_dir::LinkDirectoryLayer<S>,
-    ) -> impl Future<Output = Result<Source<L, B>>> + Send {
-        std::future::ready(Ok(self))
+    async fn into_source(self, _: &LinkDirectoryLayer<S>) -> Result<Source<L, B>> {
+        Ok(self)
     }
 }

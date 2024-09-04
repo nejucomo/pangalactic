@@ -13,8 +13,24 @@ impl Path {
         crate::from_utf8(bytes)
     }
 
+    pub fn as_path_ref(&self) -> &PathRef {
+        self.as_ref()
+    }
+
     pub fn into_bytes(self) -> Vec<u8> {
         self.take().into_bytes()
+    }
+
+    pub fn push<N>(&mut self, name: N)
+    where
+        N: AsRef<NameRef>,
+    {
+        let name = name.as_ref();
+        self.0 += "/";
+        self.0 += name.as_ref();
+
+        // Internal safety check:
+        Path::validate(&self.0).unwrap();
     }
 
     pub fn pop_last(&mut self) -> Option<Name> {
@@ -67,7 +83,41 @@ impl PathRef {
             Some(unsafe { NonEmptyPathRef::from_str_unchecked(s) }.split_last())
         }
     }
+
+    pub fn to_path(&self) -> Path {
+        self.to_owned()
+    }
+
+    pub fn join<N>(&self, name: N) -> Path
+    where
+        N: AsRef<NameRef>,
+    {
+        let mut p = self.to_path();
+        p.push(name);
+        p
+    }
 }
+
+macro_rules! fwd_asref {
+    ( $( $t:ty => $a:ty ),+ ) => {
+        $( fwd_asref!(single $t => $a); )+
+    };
+
+    ( single $t:ty => $a:ty ) => {
+        impl AsRef<$a> for $t {
+            fn as_ref(&self) -> &$a {
+                self.0.as_ref()
+            }
+        }
+    };
+}
+
+fwd_asref!(
+    Path => std::path::Path,
+    Path => std::ffi::OsStr,
+    PathRef => std::path::Path,
+    PathRef => std::ffi::OsStr
+);
 
 impl AsRef<PathRef> for PathRef {
     fn as_ref(&self) -> &PathRef {

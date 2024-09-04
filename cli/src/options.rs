@@ -5,6 +5,7 @@ use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
 use pangalactic_dag_transfer::TransferLayerExt;
 use pangalactic_endpoint::{DestinationEndpoint, SourceEndpoint};
+use pangalactic_globset::{Glob, GlobSet};
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
@@ -183,6 +184,9 @@ impl Runnable for StoreGetOptions {
 /// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct StoreXferOptions {
+    #[clap(flatten)]
+    pub excludes: ExcludeGlobOptions,
+
     pub source: CliSourceEndpoint,
     pub dest: CliDestinationEndpoint,
 }
@@ -191,7 +195,9 @@ impl Runnable for StoreXferOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let receipt = store.transfer(self.source, self.dest).await?;
+            let globset = self.excludes.into_globset()?;
+            let source = globset.filter_source(self.source);
+            let receipt = store.transfer(source, self.dest).await?;
             ok_disp(receipt)
         })
     }
@@ -265,6 +271,19 @@ impl Runnable for SeedInstallOptions {
             let link = Seed.install(&mut store).await?;
             ok_disp(link)
         })
+    }
+}
+
+#[derive(Clone, Debug, Args)]
+pub struct ExcludeGlobOptions {
+    /// Exclude the given glob pattern (multiple repetitions allowed)
+    #[clap(long, short)]
+    exclude: Vec<Glob>,
+}
+
+impl ExcludeGlobOptions {
+    pub fn into_globset(self) -> Result<GlobSet> {
+        GlobSet::try_from(self.exclude)
     }
 }
 
