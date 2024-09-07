@@ -1,22 +1,18 @@
-use std::path::PathBuf;
-
 use pangalactic_dag_transfer::IntoSource;
 use pangalactic_linkpath::LinkPath;
 use pangalactic_store::Store;
 use pin_project::pin_project;
-use tokio::io::{AsyncRead, Stdin};
+use tokio::{
+    fs::File,
+    io::{AsyncRead, Stdin},
+};
 
 use crate::iohos::Iohos;
 
 #[pin_project]
 #[derive(Debug)]
 pub struct SourceEndpointLeaf<S>(
-    #[pin]
-    pub(crate)  Iohos<
-        <Stdin as IntoSource<S>>::Leaf,
-        <PathBuf as IntoSource<S>>::Leaf,
-        <LinkPath<S::CID> as IntoSource<S>>::Leaf,
-    >,
+    #[pin] pub(crate) Iohos<Stdin, File, <LinkPath<S::CID> as IntoSource<S>>::Leaf>,
 )
 where
     S: Store;
