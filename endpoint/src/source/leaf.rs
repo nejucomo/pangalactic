@@ -6,16 +6,20 @@ use pangalactic_store::Store;
 use pin_project::pin_project;
 use tokio::io::{AsyncRead, Stdin};
 
-#[pin_project(project = SELProjection)]
+use crate::iohos::Iohos;
+
+#[pin_project]
 #[derive(Debug)]
-pub enum SourceEndpointLeaf<S>
+pub struct SourceEndpointLeaf<S>(
+    #[pin]
+    pub(crate)  Iohos<
+        <Stdin as IntoSource<S>>::Leaf,
+        <PathBuf as IntoSource<S>>::Leaf,
+        <LinkPath<S::CID> as IntoSource<S>>::Leaf,
+    >,
+)
 where
-    S: Store,
-{
-    Stdin(#[pin] <Stdin as IntoSource<S>>::Leaf),
-    Host(#[pin] <PathBuf as IntoSource<S>>::Leaf),
-    Store(#[pin] <LinkPath<S::CID> as IntoSource<S>>::Leaf),
-}
+    S: Store;
 
 impl<S> AsyncRead for SourceEndpointLeaf<S>
 where
@@ -26,12 +30,6 @@ where
         cx: &mut std::task::Context<'_>,
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> std::task::Poll<std::io::Result<()>> {
-        use SELProjection::*;
-
-        match self.project() {
-            Stdin(x) => x.poll_read(cx, buf),
-            Host(x) => x.poll_read(cx, buf),
-            Store(x) => x.poll_read(cx, buf),
-        }
+        self.project().0.poll_read(cx, buf)
     }
 }

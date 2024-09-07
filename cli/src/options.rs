@@ -156,7 +156,7 @@ impl Runnable for StorePutOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let link = store.transfer(SourceEndpoint::Stdin, ()).await?;
+            let link = store.transfer(SourceEndpoint::mk_stdin(), ()).await?;
             ok_disp(link)
         })
     }

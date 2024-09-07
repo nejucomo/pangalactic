@@ -2,10 +2,15 @@ use std::path::PathBuf;
 
 use test_case::test_case;
 
-use super::SourceEndpoint::{self, Host, Stdin};
+use super::SourceEndpoint;
 
-#[test_case("-" => Ok(Stdin))]
-#[test_case("." => Ok(Host(PathBuf::from("."))))]
-fn parse(input: &str) -> Result<SourceEndpoint<()>, String> {
-    input.parse().map_err(|e| format!("{e}"))
+#[test_case("-", ())]
+#[test_case(".", PathBuf::from("."))]
+fn parse<T>(input: &str, expected: T)
+where
+    SourceEndpoint<()>: From<T>,
+{
+    let expected = SourceEndpoint::from(expected);
+    let actual = input.parse().unwrap();
+    assert_eq!(expected, actual);
 }
