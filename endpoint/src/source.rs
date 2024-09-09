@@ -68,7 +68,7 @@ where
         store: &LinkDirectoryLayer<S>,
     ) -> Result<Source<Self::Leaf, Self::Branch>> {
         let seps = into_source_endpoints(self, store).await?;
-        Ok(seps.map_into(
+        Ok(seps.project_into(
             |stdin| Leaf(SourceEndpointLeaf(MkStdio(stdin))),
             |hostsrc| {
                 hostsrc.map_into(
@@ -115,13 +115,7 @@ where
     C: Serialize,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0
-            .as_ref()
-            .map_io(|()| '-'.fmt(f))
-            .map_host(|pb| pb.display().fmt(f))
-            .map_store(|sp| sp.fmt(f))
-            .transpose()
-            .map(Iohos::distill)
+        self.0.fmt(f)
     }
 }
 

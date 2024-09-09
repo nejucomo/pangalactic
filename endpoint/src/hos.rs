@@ -1,11 +1,17 @@
-use std::{future::Future, path::PathBuf};
+use std::{
+    fmt::{self, Display},
+    future::Future,
+    path::PathBuf,
+};
 
 use pangalactic_dag_transfer::{BranchIter, BranchIterOutput, IntoSource, Source};
 use pangalactic_layer_dir::{DirectoryIntoIter, LinkDirectoryLayer};
 use pangalactic_link::Link;
+use pangalactic_linkpath::LinkPath;
 use pangalactic_name::Name;
 use pangalactic_store::{Commit, Store};
 use pin_project::pin_project;
+use serde::Serialize;
 use tokio::{
     fs::{File, ReadDir},
     io::AsyncRead,
@@ -21,14 +27,14 @@ pub(crate) enum Hos<H, S> {
 }
 
 impl<H, S> Hos<H, S> {
-    pub fn as_ref(&self) -> Hos<&H, &S> {
+    pub(crate) fn as_ref(&self) -> Hos<&H, &S> {
         match self {
             MkHost(x) => MkHost(x),
             MkStore(x) => MkStore(x),
         }
     }
 
-    pub fn map_host<F, H2>(self, f: F) -> Hos<H2, S>
+    pub(crate) fn map_host<F, H2>(self, f: F) -> Hos<H2, S>
     where
         F: FnOnce(H) -> H2,
     {
@@ -38,7 +44,7 @@ impl<H, S> Hos<H, S> {
         }
     }
 
-    pub fn map_store<F, S2>(self, f: F) -> Hos<H, S2>
+    pub(crate) fn map_store<F, S2>(self, f: F) -> Hos<H, S2>
     where
         F: FnOnce(S) -> S2,
     {
@@ -48,18 +54,35 @@ impl<H, S> Hos<H, S> {
         }
     }
 
-    pub fn map_into<FH, FS, T>(self, host_into: FH, store_into: FS) -> T
+    pub(crate) fn map_either_with<A, FH, RH, FS, RS>(
+        self,
+        arg: A,
+        map_host: FH,
+        map_store: FS,
+    ) -> Hos<RH, RS>
     where
-        FH: FnOnce(H) -> T,
-        FS: FnOnce(S) -> T,
+        FH: FnOnce(H, A) -> RH,
+        FS: FnOnce(S, A) -> RS,
+    {
+        self.project_into_with(
+            arg,
+            |h, a| MkHost(map_host(h, a)),
+            |s, a| MkStore(map_store(s, a)),
+        )
+    }
+
+    pub(crate) fn project_into_with<A, FH, FS, R>(self, arg: A, host_into: FH, store_into: FS) -> R
+    where
+        FH: FnOnce(H, A) -> R,
+        FS: FnOnce(S, A) -> R,
     {
         match self {
-            MkHost(h) => host_into(h),
-            MkStore(s) => store_into(s),
+            MkHost(h) => host_into(h, arg),
+            MkStore(s) => store_into(s, arg),
         }
     }
 
-    pub async fn await_futures(self) -> Hos<<H as Future>::Output, <S as Future>::Output>
+    pub(crate) async fn await_futures(self) -> Hos<<H as Future>::Output, <S as Future>::Output>
     where
         H: Future,
         S: Future,
@@ -72,7 +95,7 @@ impl<H, S> Hos<H, S> {
 }
 
 impl<T> Hos<T, T> {
-    pub fn distill(self) -> T {
+    pub(crate) fn distill(self) -> T {
         match self {
             MkHost(t) => t,
             MkStore(t) => t,
@@ -81,7 +104,7 @@ impl<T> Hos<T, T> {
 }
 
 impl<H, S, E> Hos<Result<H, E>, Result<S, E>> {
-    pub fn transpose(self) -> Result<Hos<H, S>, E> {
+    pub(crate) fn transpose(self) -> Result<Hos<H, S>, E> {
         match self {
             MkHost(h) => h.map(MkHost),
             MkStore(s) => s.map(MkStore),
@@ -162,5 +185,18 @@ where
             MkHost(x) => x.commit_into_store(store).await,
             MkStore(x) => x.commit_into_store(store).await,
         }
+    }
+}
+
+impl<C> Display for Hos<PathBuf, LinkPath<C>>
+where
+    C: Serialize,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.as_ref()
+            .map_host(|pb| pb.display().fmt(f))
+            .map_store(|sp| sp.fmt(f))
+            .transpose()
+            .map(Hos::distill)
     }
 }

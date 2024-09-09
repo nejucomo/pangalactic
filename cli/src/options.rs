@@ -174,7 +174,7 @@ impl Runnable for StoreGetOptions {
         Box::pin(async {
             let mut store = CliStore::default();
             store
-                .transfer(self.source, DestinationEndpoint::Stdout)
+                .transfer(self.source, DestinationEndpoint::for_stdout())
                 .await?;
             Ok(())
         })
@@ -198,7 +198,11 @@ impl Runnable for StoreXferOptions {
             let globset = self.excludes.into_globset()?;
             let source = globset.filter_source(self.source);
             let receipt = store.transfer(source, self.dest).await?;
-            ok_disp(receipt)
+            if receipt.is_stdout() {
+                Ok(())
+            } else {
+                ok_disp(receipt)
+            }
         })
     }
 }
