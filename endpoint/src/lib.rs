@@ -10,4 +10,4 @@ pub use self::aliases::{DestinationEndpoint, OriginEndpoint, Receipt};
 pub use self::endpoint::Endpoint;
 pub use self::hostorstore::HostOrStore;
 pub use self::hostpath::HostPath;
-pub use self::stdio::Stdio;
+pub use self::stdio::{Stdin, Stdio};

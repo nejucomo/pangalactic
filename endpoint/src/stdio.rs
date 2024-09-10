@@ -1,3 +1,5 @@
+mod stdin;
+
 use std::{
     fmt,
     future::{ready, Future},
@@ -5,27 +7,34 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use futures::FutureExt;
 use pangalactic_dag_transfer::{BranchIter, Destination, IntoSource, LeafDestination, Source};
 use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_store::Store;
 use tokio::{fs::ReadDir, io::AsyncRead};
 
+pub use self::stdin::Stdin;
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Stdio;
+
+impl Stdio {
+    pub async fn into_source_leaf(self) -> Result<Stdin> {
+        Ok(Stdin::default())
+    }
+}
 
 impl<S> IntoSource<S> for Stdio
 where
     S: Store,
 {
-    type Leaf = Self;
+    type Leaf = Stdin;
     type Branch = ReadDir;
 
     fn into_source(
         self,
         _: &LinkDirectoryLayer<S>,
     ) -> impl Future<Output = Result<Source<Self::Leaf, Self::Branch>>> + Send {
-        ready(Ok(Source::Leaf(self)))
+        ready(Ok(Source::Leaf(Stdin::default())))
     }
 }
 
@@ -51,29 +60,14 @@ impl<S> LeafDestination<S> for Stdio
 where
     S: Store,
 {
-    type CID = Self;
+    type CID = Stdio;
 
-    fn sink_leaf<L>(
-        self,
-        store: &mut LinkDirectoryLayer<S>,
-        leaf: L,
-    ) -> impl Future<Output = Result<Self::CID>> + Send
+    async fn sink_leaf<L>(self, store: &mut LinkDirectoryLayer<S>, leaf: L) -> Result<Self::CID>
     where
         L: fmt::Debug + Send + AsyncRead,
     {
-        tokio::io::stdout()
-            .sink_leaf(store, leaf)
-            .map(|res| res.map(|()| Stdio))
-    }
-}
-
-impl AsyncRead for Stdio {
-    fn poll_read(
-        self: std::pin::Pin<&mut Self>,
-        cx: &mut std::task::Context<'_>,
-        buf: &mut tokio::io::ReadBuf<'_>,
-    ) -> std::task::Poll<std::io::Result<()>> {
-        std::pin::pin!(tokio::io::stdin()).poll_read(cx, buf)
+        tokio::io::stdout().sink_leaf(store, leaf).await?;
+        Ok(Stdio)
     }
 }
 

@@ -5,7 +5,7 @@ use pangalactic_linkpath::{LinkDestination, LinkPath};
 use pangalactic_store::Store;
 use tokio::fs::{File, ReadDir};
 
-use crate::{endpoint::Endpoint, HostOrStore, HostPath, Stdio};
+use crate::{Endpoint, HostOrStore, HostPath, Stdin, Stdio};
 
 pub type OriginEndpoint<C> = Endpoint<Stdio, HostPath, LinkPath<C>>;
 pub type DestinationEndpoint<C> = Endpoint<Stdio, HostPath, LinkDestination<C>>;
@@ -14,7 +14,7 @@ pub type Receipt<C> = Endpoint<Stdio, HostPath, LinkPath<C>>;
 pub type OriginEndpointSource<S> = Source<OriginEndpointLeaf<S>, OriginEndpointBranch<S>>;
 
 pub type OriginEndpointLeaf<S> =
-    Endpoint<Stdio, File, <LinkPath<<S as Store>::CID> as IntoSource<S>>::Leaf>;
+    Endpoint<Stdin, File, <LinkPath<<S as Store>::CID> as IntoSource<S>>::Leaf>;
 
 pub type OriginEndpointBranch<S> = HostOrStore<
     <HostPath as IntoSource<S>>::Branch,
