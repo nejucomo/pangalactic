@@ -2,39 +2,39 @@ use std::{
     fmt::{self, Display},
     future::Future,
     path::PathBuf,
+    str::FromStr,
 };
 
+use anyhow::Result;
 use pangalactic_dag_transfer::{BranchIter, BranchIterOutput, IntoSource, Source};
 use pangalactic_layer_dir::{DirectoryIntoIter, LinkDirectoryLayer};
 use pangalactic_link::Link;
-use pangalactic_linkpath::LinkPath;
 use pangalactic_name::Name;
 use pangalactic_store::{Commit, Store};
 use pin_project::pin_project;
-use serde::Serialize;
 use tokio::{
     fs::{File, ReadDir},
     io::AsyncRead,
 };
 
-use self::Hos::*;
+use self::HostOrStore::*;
 
 #[pin_project(project=HosProjection)]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) enum Hos<H, S> {
+pub enum HostOrStore<H, S> {
     MkHost(#[pin] H),
     MkStore(#[pin] S),
 }
 
-impl<H, S> Hos<H, S> {
-    pub(crate) fn as_ref(&self) -> Hos<&H, &S> {
+impl<H, S> HostOrStore<H, S> {
+    pub fn as_ref(&self) -> HostOrStore<&H, &S> {
         match self {
             MkHost(x) => MkHost(x),
             MkStore(x) => MkStore(x),
         }
     }
 
-    pub(crate) fn map_host<F, H2>(self, f: F) -> Hos<H2, S>
+    pub fn map_host<F, H2>(self, f: F) -> HostOrStore<H2, S>
     where
         F: FnOnce(H) -> H2,
     {
@@ -44,7 +44,7 @@ impl<H, S> Hos<H, S> {
         }
     }
 
-    pub(crate) fn map_store<F, S2>(self, f: F) -> Hos<H, S2>
+    pub fn map_store<F, S2>(self, f: F) -> HostOrStore<H, S2>
     where
         F: FnOnce(S) -> S2,
     {
@@ -54,12 +54,12 @@ impl<H, S> Hos<H, S> {
         }
     }
 
-    pub(crate) fn map_either_with<A, FH, RH, FS, RS>(
+    pub fn map_either_with<A, FH, RH, FS, RS>(
         self,
         arg: A,
         map_host: FH,
         map_store: FS,
-    ) -> Hos<RH, RS>
+    ) -> HostOrStore<RH, RS>
     where
         FH: FnOnce(H, A) -> RH,
         FS: FnOnce(S, A) -> RS,
@@ -71,7 +71,7 @@ impl<H, S> Hos<H, S> {
         )
     }
 
-    pub(crate) fn project_into_with<A, FH, FS, R>(self, arg: A, host_into: FH, store_into: FS) -> R
+    pub fn project_into_with<A, FH, FS, R>(self, arg: A, host_into: FH, store_into: FS) -> R
     where
         FH: FnOnce(H, A) -> R,
         FS: FnOnce(S, A) -> R,
@@ -82,7 +82,7 @@ impl<H, S> Hos<H, S> {
         }
     }
 
-    pub(crate) async fn await_futures(self) -> Hos<<H as Future>::Output, <S as Future>::Output>
+    pub async fn await_futures(self) -> HostOrStore<<H as Future>::Output, <S as Future>::Output>
     where
         H: Future,
         S: Future,
@@ -94,8 +94,8 @@ impl<H, S> Hos<H, S> {
     }
 }
 
-impl<T> Hos<T, T> {
-    pub(crate) fn distill(self) -> T {
+impl<T> HostOrStore<T, T> {
+    pub fn distill(self) -> T {
         match self {
             MkHost(t) => t,
             MkStore(t) => t,
@@ -103,8 +103,8 @@ impl<T> Hos<T, T> {
     }
 }
 
-impl<H, S, E> Hos<Result<H, E>, Result<S, E>> {
-    pub(crate) fn transpose(self) -> Result<Hos<H, S>, E> {
+impl<H, S, E> HostOrStore<Result<H, E>, Result<S, E>> {
+    pub fn transpose(self) -> Result<HostOrStore<H, S>, E> {
         match self {
             MkHost(h) => h.map(MkHost),
             MkStore(s) => s.map(MkStore),
@@ -112,7 +112,7 @@ impl<H, S, E> Hos<Result<H, E>, Result<S, E>> {
     }
 }
 
-impl<H, S> AsyncRead for Hos<H, S>
+impl<H, S> AsyncRead for HostOrStore<H, S>
 where
     H: AsyncRead,
     S: AsyncRead,
@@ -131,12 +131,12 @@ where
     }
 }
 
-impl<S> IntoSource<S> for Hos<PathBuf, Link<S::CID>>
+impl<S> IntoSource<S> for HostOrStore<PathBuf, Link<S::CID>>
 where
     S: Store,
 {
-    type Leaf = Hos<File, <LinkDirectoryLayer<S> as Store>::Reader>;
-    type Branch = Hos<ReadDir, DirectoryIntoIter<Link<S::CID>>>;
+    type Leaf = HostOrStore<File, <LinkDirectoryLayer<S> as Store>::Reader>;
+    type Branch = HostOrStore<ReadDir, DirectoryIntoIter<Link<S::CID>>>;
 
     async fn into_source(
         self,
@@ -155,11 +155,11 @@ where
     }
 }
 
-impl<S> BranchIter<S> for Hos<ReadDir, DirectoryIntoIter<Link<S::CID>>>
+impl<S> BranchIter<S> for HostOrStore<ReadDir, DirectoryIntoIter<Link<S::CID>>>
 where
     S: Store,
 {
-    type IntoSource = Hos<PathBuf, Link<S::CID>>;
+    type IntoSource = HostOrStore<PathBuf, Link<S::CID>>;
 
     async fn next_branch_entry(&mut self) -> anyhow::Result<Option<(Name, Self::IntoSource)>> {
         match self {
@@ -173,7 +173,7 @@ where
     }
 }
 
-impl<S> Commit<LinkDirectoryLayer<S>> for Hos<ReadDir, DirectoryIntoIter<Link<S::CID>>>
+impl<S> Commit<LinkDirectoryLayer<S>> for HostOrStore<ReadDir, DirectoryIntoIter<Link<S::CID>>>
 where
     S: Store,
 {
@@ -188,15 +188,32 @@ where
     }
 }
 
-impl<C> Display for Hos<PathBuf, LinkPath<C>>
+impl<H, S> Display for HostOrStore<H, S>
 where
-    C: Serialize,
+    H: Display,
+    S: Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.as_ref()
-            .map_host(|pb| pb.display().fmt(f))
+            .map_host(|pb| pb.fmt(f))
             .map_store(|sp| sp.fmt(f))
             .transpose()
-            .map(Hos::distill)
+            .map(HostOrStore::distill)
+    }
+}
+
+impl<H, S> FromStr for HostOrStore<H, S>
+where
+    H: FromStr<Err = anyhow::Error>,
+    S: FromStr<Err = anyhow::Error>,
+{
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self> {
+        if s.starts_with(pangalactic_link::SCHEME_PREFIX) {
+            s.parse().map(MkStore)
+        } else {
+            s.parse().map(MkHost)
+        }
     }
 }

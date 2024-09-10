@@ -1,7 +1,13 @@
-pub mod destination;
-mod hos;
-mod iohos;
-pub mod source;
+pub mod aliases;
+mod destination;
+mod endpoint;
+mod hostorstore;
+mod hostpath;
+mod source;
+mod stdio;
 
-pub use self::destination::DestinationEndpoint;
-pub use self::source::SourceEndpoint;
+pub use self::aliases::{DestinationEndpoint, OriginEndpoint, Receipt};
+pub use self::endpoint::Endpoint;
+pub use self::hostorstore::HostOrStore;
+pub use self::hostpath::HostPath;
+pub use self::stdio::Stdio;
