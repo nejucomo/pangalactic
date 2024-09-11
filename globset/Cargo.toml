@@ -8,6 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 globset.workspace = true
 pangalactic-dag-transfer.workspace = true
+pangalactic-endpoint.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-name.workspace = true
 pangalactic-store.workspace = true

@@ -1,11 +1,13 @@
-use std::{fmt::Debug, path::Path};
+use std::fmt::Debug;
 
 use anyhow::Result;
 pub use globset::Glob;
 use globset::GlobSet as Upstream;
+use pangalactic_endpoint::OriginEndpoint;
+use pangalactic_name::PathRef;
 use serde::{Deserialize, Serialize};
 
-use crate::filtersource::FilterSource;
+use crate::FilteredOrigin;
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(try_from = "Vec<&str>", into = "Vec<String>")]
@@ -15,15 +17,19 @@ pub struct GlobSet {
 }
 
 impl GlobSet {
-    pub fn filter_source<I>(&self, intosource: I) -> FilterSource<I> {
-        FilterSource::new(self, intosource)
+    pub fn filter_source<C>(&self, origin: OriginEndpoint<C>) -> FilteredOrigin<C>
+    where
+        C: Serialize,
+    {
+        FilteredOrigin::new(self, origin)
     }
 
-    pub fn is_match<P>(&self, path: P) -> bool
-    where
-        P: AsRef<Path>,
-    {
-        self.matcher.is_match(path)
+    pub fn matches<C>(&self, origin: &OriginEndpoint<C>) -> bool {
+        if let Some(path) = origin_to_opt_path(origin) {
+            self.matcher.is_match(path)
+        } else {
+            false
+        }
     }
 }
 
@@ -74,4 +80,12 @@ impl Debug for GlobSet {
             .field("matcher", &"...")
             .finish()
     }
+}
+
+fn origin_to_opt_path<C>(origin: &OriginEndpoint<C>) -> Option<&PathRef> {
+    origin.as_ref().project_into(
+        |_| None,
+        |p| PathRef::opt_from_std_path(p.as_ref()),
+        |p| Some(p.path()),
+    )
 }

@@ -1,4 +1,9 @@
-use std::{fmt, future::Future, path::PathBuf, str::FromStr};
+use std::{
+    fmt,
+    future::Future,
+    path::{Path, PathBuf},
+    str::FromStr,
+};
 
 use anyhow::Result;
 use futures::FutureExt;
@@ -16,6 +21,13 @@ pub struct HostPath(PathBuf);
 impl HostPath {
     pub fn unwrap(self) -> PathBuf {
         self.into()
+    }
+
+    pub fn join<P>(&self, other: P) -> Self
+    where
+        P: AsRef<Path>,
+    {
+        HostPath(self.0.join(other))
     }
 }
 
@@ -65,6 +77,12 @@ where
         L: fmt::Debug + Send + AsyncRead,
     {
         self.0.sink_leaf(store, leaf).map(|res| res.map(Self))
+    }
+}
+
+impl AsRef<Path> for HostPath {
+    fn as_ref(&self) -> &Path {
+        self.0.as_ref()
     }
 }
 

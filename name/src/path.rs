@@ -63,6 +63,14 @@ impl Default for Path {
 }
 
 impl PathRef {
+    pub fn opt_from_str(s: &str) -> Option<&Self> {
+        Self::from_str(s).ok()
+    }
+
+    pub fn opt_from_std_path(p: &std::path::Path) -> Option<&Self> {
+        p.to_str().and_then(PathRef::opt_from_str)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.as_str().is_empty()
     }

@@ -9,7 +9,7 @@ use pangalactic_dir::DirectoryIntoIter;
 use pangalactic_layer_dir::{LinkDirectory, LinkDirectoryLayer};
 use pangalactic_link::Link;
 use pangalactic_linkkind::LinkKind::File;
-use pangalactic_name::{Path, PathRef};
+use pangalactic_name::{NameRef, Path, PathRef};
 use pangalactic_store::{Commit, Store};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -49,6 +49,16 @@ impl<C> LinkPath<C> {
 
     pub fn path(&self) -> &PathRef {
         self.path.as_ref()
+    }
+
+    pub fn join<P>(&self, suffix: P) -> Self
+    where
+        C: Clone,
+        P: AsRef<NameRef>,
+    {
+        let mut child = self.clone();
+        child.path.push(suffix);
+        child
     }
 
     pub async fn resolve_with<S>(&self, store: &LinkDirectoryLayer<S>) -> Result<Link<C>>
