@@ -16,6 +16,7 @@ where
     where
         B: fmt::Debug + Send + BranchIter<S>,
     {
+        tracing::debug!("committing destination {}", &self);
         self.map_any_with(
             (store, branch),
             |io, (store, branch)| io.sink_branch(store, branch),
@@ -38,6 +39,7 @@ where
     where
         L: fmt::Debug + Send + AsyncRead,
     {
+        tracing::debug!("committing destination {}", &self);
         self.map_any_with(
             (store, leaf),
             |io, (store, leaf)| io.sink_leaf(store, leaf),

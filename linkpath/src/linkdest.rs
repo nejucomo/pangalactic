@@ -14,7 +14,7 @@ use crate::LinkPath;
 
 use self::inner::Inner;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct LinkDestination<C>(Option<Inner<C>>);
 
 impl<C> LinkDestination<C> {

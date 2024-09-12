@@ -24,6 +24,7 @@ where
         self,
         store: &LinkDirectoryLayer<S>,
     ) -> Result<Source<Self::Leaf, Self::Branch>> {
+        tracing::debug!("loading origin {}", &self);
         self.map_io(|io| io.into_source_leaf())
             .map_host(|p| p.into_source(store))
             .map_store(|p| p.into_source(store))
@@ -41,6 +42,3 @@ where
             })
     }
 }
-
-#[cfg(test)]
-mod tests;

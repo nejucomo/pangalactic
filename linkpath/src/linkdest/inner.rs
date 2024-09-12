@@ -12,7 +12,7 @@ use tokio::io::AsyncRead;
 
 use crate::LinkPath;
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq)]
 pub(super) struct Inner<C> {
     /// Invariant: self.link.kind() == Dir
     link: Link<C>,

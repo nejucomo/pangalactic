@@ -1,7 +1,6 @@
 use std::{
     fmt::{self, Display},
     future::Future,
-    path::PathBuf,
     str::FromStr,
 };
 
@@ -16,6 +15,8 @@ use tokio::{
     fs::{File, ReadDir},
     io::AsyncRead,
 };
+
+use crate::HostPath;
 
 use self::HostOrStore::*;
 
@@ -131,7 +132,7 @@ where
     }
 }
 
-impl<S> IntoSource<S> for HostOrStore<PathBuf, Link<S::CID>>
+impl<S> IntoSource<S> for HostOrStore<HostPath, Link<S::CID>>
 where
     S: Store,
 {
@@ -142,6 +143,7 @@ where
         self,
         store: &LinkDirectoryLayer<S>,
     ) -> anyhow::Result<Source<Self::Leaf, Self::Branch>> {
+        tracing::debug!("loading origin {}", &self);
         match self {
             MkHost(x) => x
                 .into_source(store)
@@ -159,13 +161,13 @@ impl<S> BranchIter<S> for HostOrStore<ReadDir, DirectoryIntoIter<Link<S::CID>>>
 where
     S: Store,
 {
-    type IntoSource = HostOrStore<PathBuf, Link<S::CID>>;
+    type IntoSource = HostOrStore<HostPath, Link<S::CID>>;
 
     async fn next_branch_entry(&mut self) -> anyhow::Result<Option<(Name, Self::IntoSource)>> {
         match self {
             MkHost(x) => <ReadDir as BranchIter<S>>::next_branch_entry(x)
                 .await
-                .map_branch_item(MkHost),
+                .map_branch_item(|p| MkHost(HostPath::from(p))),
             MkStore(x) => <DirectoryIntoIter<Link<S::CID>> as BranchIter<S>>::next_branch_entry(x)
                 .await
                 .map_branch_item(MkStore),
