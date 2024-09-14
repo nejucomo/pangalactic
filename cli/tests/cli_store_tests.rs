@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use anyhow_std::PathAnyhow;
-use test_case::test_case;
+use test_case::{test_case, test_matrix};
 
 use self::runner::{Output, Runner};
 
@@ -276,62 +276,27 @@ impl MkDest {
     }
 }
 
-#[test_case(MkSource::Stdin, false, MkDest::Stdout)]
-#[test_case(MkSource::Stdin, true, MkDest::Stdout)]
-#[test_case(MkSource::Stdin, false, MkDest::Host)]
-#[test_case(MkSource::Stdin, true, MkDest::Host)]
-#[test_case(MkSource::Stdin, false, MkDest::StoreBare)]
-#[test_case(MkSource::Stdin, true, MkDest::StoreBare)]
-#[test_case(MkSource::Stdin, false, MkDest::StoreDest)]
-#[test_case(MkSource::Stdin, true, MkDest::StoreDest)]
-#[test_case(MkSource::Host(File), false, MkDest::Stdout)]
-#[test_case(MkSource::Host(File), true, MkDest::Stdout)]
-#[test_case(MkSource::Host(Dir), false, MkDest::Stdout)]
-#[test_case(MkSource::Host(Dir), true, MkDest::Stdout)]
-#[test_case(MkSource::Host(File), false, MkDest::Host)]
-#[test_case(MkSource::Host(File), true, MkDest::Host)]
-#[test_case(MkSource::Host(Dir), false, MkDest::Host)]
-#[test_case(MkSource::Host(Dir), true, MkDest::Host)]
-#[test_case(MkSource::Host(File), false, MkDest::StoreBare)]
-#[test_case(MkSource::Host(File), true, MkDest::StoreBare)]
-#[test_case(MkSource::Host(Dir), false, MkDest::StoreBare)]
-#[test_case(MkSource::Host(Dir), true, MkDest::StoreBare)]
-#[test_case(MkSource::Host(File), false, MkDest::StoreDest)]
-#[test_case(MkSource::Host(File), true, MkDest::StoreDest)]
-#[test_case(MkSource::Host(Dir), false, MkDest::StoreDest)]
-#[test_case(MkSource::Host(Dir), true, MkDest::StoreDest)]
-#[test_case(MkSource::StoreCID(File), false, MkDest::Stdout)]
-#[test_case(MkSource::StoreCID(File), true, MkDest::Stdout)]
-#[test_case(MkSource::StoreCID(Dir), false, MkDest::Stdout)]
-#[test_case(MkSource::StoreCID(Dir), true, MkDest::Stdout)]
-#[test_case(MkSource::StoreCID(File), false, MkDest::Host)]
-#[test_case(MkSource::StoreCID(File), true, MkDest::Host)]
-#[test_case(MkSource::StoreCID(Dir), false, MkDest::Host)]
-#[test_case(MkSource::StoreCID(Dir), true, MkDest::Host)]
-#[test_case(MkSource::StoreCID(File), false, MkDest::StoreBare)]
-#[test_case(MkSource::StoreCID(File), true, MkDest::StoreBare)]
-#[test_case(MkSource::StoreCID(Dir), false, MkDest::StoreBare)]
-#[test_case(MkSource::StoreCID(Dir), true, MkDest::StoreBare)]
-#[test_case(MkSource::StoreCID(File), false, MkDest::StoreDest)]
-#[test_case(MkSource::StoreCID(File), true, MkDest::StoreDest)]
-#[test_case(MkSource::StoreCID(Dir), false, MkDest::StoreDest)]
-#[test_case(MkSource::StoreCID(Dir), true, MkDest::StoreDest)]
-#[test_case(MkSource::LinkPath(File), false, MkDest::Stdout)]
-#[test_case(MkSource::LinkPath(File), true, MkDest::Stdout)]
-#[test_case(MkSource::LinkPath(Dir), false, MkDest::Stdout)]
-#[test_case(MkSource::LinkPath(Dir), true, MkDest::Stdout)]
-#[test_case(MkSource::LinkPath(File), false, MkDest::Host)]
-#[test_case(MkSource::LinkPath(File), true, MkDest::Host)]
-#[test_case(MkSource::LinkPath(Dir), false, MkDest::Host)]
-#[test_case(MkSource::LinkPath(Dir), true, MkDest::Host)]
-#[test_case(MkSource::LinkPath(File), false, MkDest::StoreBare)]
-#[test_case(MkSource::LinkPath(File), true, MkDest::StoreBare)]
-#[test_case(MkSource::LinkPath(Dir), false, MkDest::StoreBare)]
-#[test_case(MkSource::LinkPath(Dir), true, MkDest::StoreBare)]
-#[test_case(MkSource::LinkPath(File), false, MkDest::StoreDest)]
-#[test_case(MkSource::LinkPath(File), true, MkDest::StoreDest)]
-#[test_case(MkSource::LinkPath(Dir), false, MkDest::StoreDest)]
-#[test_case(MkSource::LinkPath(Dir), true, MkDest::StoreDest)]
+#[test_matrix(
+    [
+        MkSource::Host(Dir),
+        MkSource::Host(File),
+        MkSource::LinkPath(Dir),
+        MkSource::LinkPath(File),
+        MkSource::Stdin,
+        MkSource::StoreCID(Dir),
+        MkSource::StoreCID(File),
+    ],
+    [
+        false,
+        true,
+    ],
+    [
+        MkDest::Host,
+        MkDest::Stdout,
+        MkDest::StoreBare,
+        MkDest::StoreDest,
+    ]
+)]
 fn xfer(mksource: MkSource, with_exclude: bool, mkdest: MkDest) -> Result<()> {
     let testcasedir = testdir::setup(&format!("xfer_{mksource:?}_{with_exclude:?}_{mkdest:?}"))?;
 
