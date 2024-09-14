@@ -22,3 +22,4 @@ tracing.workspace = true
 [dev-dependencies]
 test-case.workspace = true
 pangalactic-hash.workspace = true
+pangalactic-linkkind.workspace = true

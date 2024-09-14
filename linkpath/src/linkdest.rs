@@ -22,7 +22,7 @@ impl<C> LinkDestination<C> {
         LinkDestination(None)
     }
 
-    pub fn new_linked_path<P>(link: Link<C>, path: P) -> Result<Self>
+    pub fn new_with_path<P>(link: Link<C>, path: P) -> Result<Self>
     where
         NonEmptyPath: TryFrom<P>,
         <NonEmptyPath as TryFrom<P>>::Error: std::error::Error + Send + Sync + 'static,
@@ -63,6 +63,15 @@ where
         } else {
             ().sink_leaf(store, leaf).await.map(LinkPath::from)
         }
+    }
+}
+
+impl<C> TryFrom<LinkPath<C>> for LinkDestination<C> {
+    type Error = anyhow::Error;
+
+    fn try_from(lp: LinkPath<C>) -> Result<Self> {
+        let (link, path) = lp.into();
+        LinkDestination::new_with_path(link, path)
     }
 }
 
