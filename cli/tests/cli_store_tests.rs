@@ -305,7 +305,7 @@ fn xfer(mksource: MkSource, with_exclude: bool, mkdest: MkDest) -> Result<()> {
 
     let mut args = vec!["xfer"];
     if with_exclude {
-        args.extend(["--exclude", "xxx"]);
+        args.extend(["--exclude", "**/b"]);
     }
     args.extend([&mksource.to_arg(), &mkdest.to_arg()]);
 
