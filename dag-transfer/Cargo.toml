@@ -8,6 +8,7 @@ license.workspace = true
 anyhow-std.workspace = true
 anyhow.workspace = true
 derive_more.workspace = true
+extend.workspace = true
 pangalactic-iowrappers.workspace = true
 pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true

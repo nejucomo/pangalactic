@@ -26,9 +26,9 @@ where
     let stdout = runner.pg(["init"], "")?.exit_ok()?;
     assert!(stdout.trim().ends_with(CONTROL_DIR_NAME));
 
-    let globspath = testcasedir.join(CONTROL_DIR_NAME).join("ignore.globs");
-    let globs = std::fs::read_to_string(globspath)?;
-    assert_eq!(globs, ".git\n");
+    let tomlpath = testcasedir.join(CONTROL_DIR_NAME).join("config.toml");
+    let toml = std::fs::read_to_string(tomlpath)?;
+    assert!(toml.find("exclude").is_some(), "{toml:?}");
 
     Ok(())
 }

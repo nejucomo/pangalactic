@@ -2,10 +2,15 @@ use std::path::PathBuf;
 
 use test_case::test_case;
 
-use super::SourceEndpoint::{self, Host, Stdin};
+use crate::{
+    Endpoint::{MkHos, MkStdio},
+    HostOrStore::MkHost,
+    HostPath, OriginEndpoint, Stdio,
+};
 
-#[test_case("-" => Ok(Stdin))]
-#[test_case("." => Ok(Host(PathBuf::from("."))))]
-fn parse(input: &str) -> Result<SourceEndpoint<()>, String> {
-    input.parse().map_err(|e| format!("{e}"))
+#[test_case("-", MkStdio(Stdio))]
+#[test_case(".", MkHos(MkHost(HostPath::from(PathBuf::from(".")))))]
+fn parse(input: &str, expected: OriginEndpoint<()>) {
+    let actual = input.parse().unwrap();
+    assert_eq!(expected, actual);
 }

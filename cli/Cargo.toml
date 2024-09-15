@@ -13,6 +13,7 @@ pangalactic-b64.workspace = true
 pangalactic-config.workspace = true
 pangalactic-dag-transfer.workspace = true
 pangalactic-endpoint.workspace = true
+pangalactic-globset.workspace = true
 pangalactic-hash.workspace = true
 pangalactic-host.workspace = true
 pangalactic-layer-cidmeta.workspace = true

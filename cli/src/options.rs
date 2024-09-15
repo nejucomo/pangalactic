@@ -4,7 +4,8 @@ use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
 use enum_dispatch::enum_dispatch;
 use pangalactic_dag_transfer::TransferLayerExt;
-use pangalactic_endpoint::{DestinationEndpoint, SourceEndpoint};
+use pangalactic_endpoint::{DestinationEndpoint, Endpoint, OriginEndpoint, Stdio};
+use pangalactic_globset::{Glob, GlobSet};
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
@@ -19,7 +20,7 @@ use pangalactic_store_mem::MemStore;
 type CliStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
 type CliCid = CidMeta<Hash>;
 type CliDestinationEndpoint = DestinationEndpoint<CliCid>;
-type CliSourceEndpoint = SourceEndpoint<CliCid>;
+type CliOriginEndpoint = OriginEndpoint<CliCid>;
 
 #[enum_dispatch]
 pub trait Runnable {
@@ -155,7 +156,7 @@ impl Runnable for StorePutOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let link = store.transfer(SourceEndpoint::Stdin, ()).await?;
+            let link = store.transfer(Stdio, ()).await?;
             ok_disp(link)
         })
     }
@@ -165,16 +166,14 @@ impl Runnable for StorePutOptions {
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The source to get
-    pub source: CliSourceEndpoint,
+    pub source: CliOriginEndpoint,
 }
 
 impl Runnable for StoreGetOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            store
-                .transfer(self.source, DestinationEndpoint::Stdout)
-                .await?;
+            store.transfer(self.source, Stdio).await?;
             Ok(())
         })
     }
@@ -183,7 +182,10 @@ impl Runnable for StoreGetOptions {
 /// Transfer from SOURCE to DEST
 #[derive(Debug, Args)]
 pub struct StoreXferOptions {
-    pub source: CliSourceEndpoint,
+    #[clap(flatten)]
+    pub excludes: ExcludeGlobOptions,
+
+    pub source: CliOriginEndpoint,
     pub dest: CliDestinationEndpoint,
 }
 
@@ -191,8 +193,13 @@ impl Runnable for StoreXferOptions {
     fn run(self) -> RunOutcome {
         Box::pin(async {
             let mut store = CliStore::default();
-            let receipt = store.transfer(self.source, self.dest).await?;
-            ok_disp(receipt)
+            let globset = self.excludes.into_globset()?;
+            let source = globset.filter_source(self.source);
+            let receipt = store.transfer(source, self.dest).await?;
+            match receipt {
+                Endpoint::MkStdio(_) => Ok(()),
+                Endpoint::MkHos(hos) => ok_disp(hos),
+            }
         })
     }
 }
@@ -201,10 +208,10 @@ impl Runnable for StoreXferOptions {
 #[derive(Debug, Args)]
 pub struct DeriveOptions {
     /// The plan to derive, or an exec file if `INPUT` is provided
-    pub plan_or_exec: CliSourceEndpoint,
+    pub plan_or_exec: CliOriginEndpoint,
 
     /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
-    pub input: Option<CliSourceEndpoint>,
+    pub input: Option<CliOriginEndpoint>,
 }
 
 impl Runnable for DeriveOptions {
@@ -265,6 +272,19 @@ impl Runnable for SeedInstallOptions {
             let link = Seed.install(&mut store).await?;
             ok_disp(link)
         })
+    }
+}
+
+#[derive(Clone, Debug, Args)]
+pub struct ExcludeGlobOptions {
+    /// Exclude the given glob pattern (multiple repetitions allowed)
+    #[clap(long, short)]
+    exclude: Vec<Glob>,
+}
+
+impl ExcludeGlobOptions {
+    pub fn into_globset(self) -> Result<GlobSet> {
+        GlobSet::try_from(self.exclude)
     }
 }
 

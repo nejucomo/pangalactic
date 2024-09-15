@@ -1,0 +1,9 @@
+narrative = "default"
+exclude = [
+  # Note: local contains secrets, so do not remove this line unless you are certain what you are doing:
+  "**/.pg/local",
+
+  # Ignore other revision control systems:
+  ".git",
+  ".hg",
+]
