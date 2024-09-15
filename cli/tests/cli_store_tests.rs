@@ -42,6 +42,9 @@ mod consts {
     pub const MKSOURCE_DIR_STORE_PATH: &'static str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
+    pub const MKSOURCE_DIR_CID_FILTERED: &'static str =
+        "pg:D:lsqyC7bCrCxWu8mkI8xVfXcfrrsgfSv1JRNPHYGS4sZW";
+
     pub const MKDEST_HOST_DEST: &'static str = "dest";
     pub const MKDEST_STORE_DEST: &'static str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
@@ -63,6 +66,8 @@ mod consts {
         "pg:F:9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
     pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
         "pg:D:JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
+    pub const STORE_PATH_DIR_TO_STORE_BARE_FILTERED: &'static str =
+        "pg:D:L_ggcFMc-uRL6JK5YTOuCpfaNIU9b_7jtByzluvuF4VK";
     pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
         "pg:D:-UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX/subdir/dest";
     pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
@@ -163,8 +168,14 @@ impl MkSource {
         }
     }
 
-    fn verify_outcome(self, mkdest: MkDest, testcasedir: &Path, output: Output) -> Result<()> {
-        if let Some((constname, expected)) = self.expected_output(mkdest) {
+    fn verify_outcome(
+        self,
+        filtered: bool,
+        mkdest: MkDest,
+        testcasedir: &Path,
+        output: Output,
+    ) -> Result<()> {
+        if let Some((constname, expected)) = self.expected_output(filtered, mkdest) {
             let actual = output.exit_ok()?;
             assert_eq!(
                 actual.trim_end(),
@@ -179,7 +190,11 @@ impl MkSource {
         Ok(())
     }
 
-    fn expected_output(self, mkdest: MkDest) -> Option<(&'static str, &'static str)> {
+    fn expected_output(
+        self,
+        filtered: bool,
+        mkdest: MkDest,
+    ) -> Option<(&'static str, &'static str)> {
         macro_rules! named_const {
             ( $constname:ident ) => {
                 Some((stringify!($constname), consts::$constname))
@@ -187,48 +202,57 @@ impl MkSource {
         }
 
         // BUG: The error logic here ignores overwrite errors:
-        match (self, mkdest) {
+        match (self, filtered, mkdest) {
             // Any dir headed to stdout is an error:
-            (MkSource::Host(Dir), MkDest::Stdout)
-            | (MkSource::StoreCID(Dir), MkDest::Stdout)
-            | (MkSource::LinkPath(Dir), MkDest::Stdout) => None,
+            (MkSource::Host(Dir), _, MkDest::Stdout)
+            | (MkSource::StoreCID(Dir), _, MkDest::Stdout)
+            | (MkSource::LinkPath(Dir), _, MkDest::Stdout) => None,
 
             // Any host dest outputs the host path:
-            (_, MkDest::Host) => named_const!(MKDEST_HOST_DEST),
+            (_, _, MkDest::Host) => named_const!(MKDEST_HOST_DEST),
 
             // echo
-            (MkSource::Stdin, MkDest::Stdout) => named_const!(STDIN_CONTENTS),
+            (MkSource::Stdin, _, MkDest::Stdout) => named_const!(STDIN_CONTENTS),
 
             // cat
-            (MkSource::Host(File), MkDest::Stdout) => named_const!(HOST_FILE_CONTENTS),
-            (MkSource::StoreCID(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS),
-            (MkSource::LinkPath(File), MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
+            (MkSource::Host(File), _, MkDest::Stdout) => named_const!(HOST_FILE_CONTENTS),
+            (MkSource::StoreCID(File), _, MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS),
+            (MkSource::LinkPath(File), _, MkDest::Stdout) => named_const!(STORE_FILE_CONTENTS_2),
 
             // All writes into the store output a CID:
-            (MkSource::Stdin, MkDest::StoreBare) => named_const!(STDIN_TO_STORE_BARE),
-            (MkSource::Stdin, MkDest::StoreDest) => named_const!(STDIN_TO_STORE_DEST),
-            (MkSource::Host(File), MkDest::StoreBare) => named_const!(HOST_FILE_TO_STORE_BARE),
-            (MkSource::Host(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
-            (MkSource::Host(File), MkDest::StoreDest) => named_const!(HOST_FILE_TO_STORE_DEST),
-            (MkSource::Host(Dir), MkDest::StoreDest) => named_const!(HOST_DIR_TO_STORE_DEST),
-            (MkSource::StoreCID(File), MkDest::StoreBare) => named_const!(MKSOURCE_FILE_CID),
-            (MkSource::StoreCID(Dir), MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
-            (MkSource::StoreCID(File), MkDest::StoreDest) => {
+            (MkSource::Stdin, _, MkDest::StoreBare) => named_const!(STDIN_TO_STORE_BARE),
+            (MkSource::Stdin, _, MkDest::StoreDest) => named_const!(STDIN_TO_STORE_DEST),
+            (MkSource::Host(File), _, MkDest::StoreBare) => named_const!(HOST_FILE_TO_STORE_BARE),
+            (MkSource::Host(Dir), false, MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
+            (MkSource::Host(Dir), true, MkDest::StoreBare) => {
+                named_const!(MKSOURCE_DIR_CID_FILTERED)
+            }
+            (MkSource::Host(File), _, MkDest::StoreDest) => named_const!(HOST_FILE_TO_STORE_DEST),
+            (MkSource::Host(Dir), _, MkDest::StoreDest) => named_const!(HOST_DIR_TO_STORE_DEST),
+            (MkSource::StoreCID(File), _, MkDest::StoreBare) => named_const!(MKSOURCE_FILE_CID),
+            (MkSource::StoreCID(Dir), false, MkDest::StoreBare) => named_const!(MKSOURCE_DIR_CID),
+            (MkSource::StoreCID(Dir), true, MkDest::StoreBare) => {
+                named_const!(MKSOURCE_DIR_CID_FILTERED)
+            }
+            (MkSource::StoreCID(File), _, MkDest::StoreDest) => {
                 named_const!(STORE_CID_FILE_TO_STORE_DEST)
             }
-            (MkSource::StoreCID(Dir), MkDest::StoreDest) => {
+            (MkSource::StoreCID(Dir), _, MkDest::StoreDest) => {
                 named_const!(STORE_CID_DIR_TO_STORE_DEST)
             }
-            (MkSource::LinkPath(File), MkDest::StoreBare) => {
+            (MkSource::LinkPath(File), _, MkDest::StoreBare) => {
                 named_const!(STORE_PATH_FILE_TO_STORE_BARE)
             }
-            (MkSource::LinkPath(Dir), MkDest::StoreBare) => {
+            (MkSource::LinkPath(Dir), false, MkDest::StoreBare) => {
                 named_const!(STORE_PATH_DIR_TO_STORE_BARE)
             }
-            (MkSource::LinkPath(File), MkDest::StoreDest) => {
+            (MkSource::LinkPath(Dir), true, MkDest::StoreBare) => {
+                named_const!(STORE_PATH_DIR_TO_STORE_BARE_FILTERED)
+            }
+            (MkSource::LinkPath(File), _, MkDest::StoreDest) => {
                 named_const!(STORE_PATH_FILE_TO_STORE_DEST)
             }
-            (MkSource::LinkPath(Dir), MkDest::StoreDest) => {
+            (MkSource::LinkPath(Dir), _, MkDest::StoreDest) => {
                 named_const!(STORE_PATH_DIR_TO_STORE_DEST)
             }
         }
@@ -310,7 +334,7 @@ fn xfer(mksource: MkSource, with_exclude: bool, mkdest: MkDest) -> Result<()> {
     args.extend([&mksource.to_arg(), &mkdest.to_arg()]);
 
     let runout = runner.pg(args, &mksource.stdin())?;
-    mksource.verify_outcome(mkdest, &runner.testcasedir, runout)
+    mksource.verify_outcome(with_exclude, mkdest, &runner.testcasedir, runout)
 }
 
 fn check_paths_equal(src: &Path, dst: &Path) -> Result<()> {
