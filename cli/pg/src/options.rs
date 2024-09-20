@@ -199,40 +199,6 @@ impl Runnable for StoreXferOptions {
     }
 }
 
-/// Derive a plan
-#[derive(Debug, Args)]
-pub struct DeriveOptions {
-    /// The plan to derive, or an exec file if `INPUT` is provided
-    pub plan_or_exec: CliOriginEndpoint,
-
-    /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
-    pub input: Option<CliOriginEndpoint>,
-}
-
-impl Runnable for DeriveOptions {
-    fn run(self) -> RunOutcome {
-        Box::pin(async {
-            use pangalactic_schemata::Plan;
-
-            let mut store = CliStore::default();
-
-            // Transfer any source into the store to get a store path:
-            // Assert: Final unwrap never fails because `DestinationEndpoint::Store` always produces a path:
-            let exec = store.transfer(self.plan_or_exec, ()).await?;
-
-            let plan = if let Some(input) = self.input {
-                let input = store.transfer(input, ()).await?;
-                store.commit(Plan { exec, input }).await?
-            } else {
-                exec
-            };
-
-            let (_, attestation) = store.derive(&plan).await?;
-            ok_disp(attestation)
-        })
-    }
-}
-
 #[derive(Clone, Debug, Args)]
 pub struct ExcludeGlobOptions {
     /// Exclude the given glob pattern (multiple repetitions allowed)
