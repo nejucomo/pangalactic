@@ -39,6 +39,7 @@ members = [
   "schemata",
   "seed",
   "serialization",
+  "std-store",
   "store/dirdb",
   "store/mem",
   "store/trait",
@@ -82,6 +83,7 @@ pangalactic-runopt          = { path = "runopt"          }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }
+pangalactic-std-store       = { path = "std-store"       }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }

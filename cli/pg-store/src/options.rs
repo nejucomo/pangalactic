@@ -1,12 +1,7 @@
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
-use pangalactic_endpoint::{DestinationEndpoint, OriginEndpoint};
 use pangalactic_globset::{Glob, GlobSet};
-use pangalactic_hash::Hash;
-use pangalactic_layer_cidmeta::CidMeta;
-
-pub type XferOrigin = OriginEndpoint<CidMeta<Hash>>;
-pub type XferDestination = DestinationEndpoint<CidMeta<Hash>>;
+use pangalactic_std_store::{StdDestination, StdOrigin};
 
 /// Store i/o
 #[derive(Debug, Parser)]
@@ -30,7 +25,7 @@ pub struct StorePutOptions {}
 #[derive(Debug, Args)]
 pub struct StoreGetOptions {
     /// The source to get
-    pub source: XferOrigin,
+    pub source: StdOrigin,
 }
 
 /// Transfer from SOURCE to DEST
@@ -39,8 +34,8 @@ pub struct StoreXferOptions {
     #[clap(flatten)]
     pub excludes: ExcludeGlobOptions,
 
-    pub source: XferOrigin,
-    pub dest: XferDestination,
+    pub source: StdOrigin,
+    pub dest: StdDestination,
 }
 
 #[derive(Clone, Debug, Args)]

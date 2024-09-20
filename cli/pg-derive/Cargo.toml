@@ -7,14 +7,8 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 clap.workspace = true
-pangalactic-dag-transfer.workspace = true
 pangalactic-endpoint.workspace = true
-pangalactic-hash.workspace = true
-pangalactic-host.workspace = true
-pangalactic-layer-cidmeta.workspace = true
-pangalactic-layer-dir.workspace = true
 pangalactic-runopt.workspace = true
 pangalactic-schemata.workspace = true
-pangalactic-store-dirdb.workspace = true
-pangalactic-store.workspace = true
+pangalactic-std-store.workspace = true
 tokio.workspace = true

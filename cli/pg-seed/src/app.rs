@@ -1,12 +1,8 @@
 use anyhow::Result;
-use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_manifest::FullManifest;
 use pangalactic_runopt::{Application, RunOptions};
 use pangalactic_seed::Seed;
-use pangalactic_store::Store;
-use pangalactic_store_dirdb::DirDbStore;
-use pangalactic_store_mem::MemStore;
+use pangalactic_std_store::{StdMemStore, StdStore};
 
 use crate::options::{Command, InstallOptions, ListOptions, Options};
 
@@ -37,7 +33,7 @@ impl RunOptions<Command> for SeedApplication {
 
 impl RunOptions<ListOptions> for SeedApplication {
     async fn run_options(&self, _: &ListOptions) -> Result<()> {
-        let mut store = LinkDirectoryLayer::<MemStore>::default();
+        let mut store = StdMemStore::default();
         let link = store.commit(Seed).await?;
         let mani: FullManifest<_> = store.load(&link).await?;
         println!("{mani}");
@@ -47,8 +43,8 @@ impl RunOptions<ListOptions> for SeedApplication {
 
 impl RunOptions<InstallOptions> for SeedApplication {
     async fn run_options(&self, _: &InstallOptions) -> Result<()> {
-        let mut store: LinkDirectoryLayer<CidMetaLayer<DirDbStore>> = Default::default();
-        let link = Seed.install(&mut store).await?;
+        let mut store = StdStore::default();
+        let link = store.commit(Seed).await?;
         println!("{link}");
         Ok(())
     }

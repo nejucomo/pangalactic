@@ -1,16 +1,12 @@
 use clap::Parser;
-use pangalactic_endpoint::OriginEndpoint;
-use pangalactic_hash::Hash;
-use pangalactic_layer_cidmeta::CidMeta;
-
-pub type DeriveOrigin = OriginEndpoint<CidMeta<Hash>>;
+use pangalactic_std_store::StdOrigin;
 
 /// Derive a plan
 #[derive(Clone, Debug, Parser)]
 pub struct DeriveOptions {
     /// The plan to derive, or an exec file if `INPUT` is provided
-    pub plan_or_exec: DeriveOrigin,
+    pub plan_or_exec: StdOrigin,
 
     /// An input to derive; if absent `PLAN_OR_EXEC` must be a plan
-    pub input: Option<DeriveOrigin>,
+    pub input: Option<StdOrigin>,
 }

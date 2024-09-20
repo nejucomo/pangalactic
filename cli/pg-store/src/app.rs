@@ -1,10 +1,7 @@
 use anyhow::Result;
-use pangalactic_dag_transfer::TransferLayerExt;
 use pangalactic_endpoint::{Endpoint, Stdio};
-use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_runopt::{Application, RunOptions};
-use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_std_store::StdStore;
 
 use crate::options::{
     StoreCommand, StoreGetOptions, StoreOptions, StorePutOptions, StoreXferOptions,
@@ -13,8 +10,6 @@ use crate::options::{
 /// The standalone `pg-seed` application
 #[derive(Debug, Default)]
 pub struct StoreApplication;
-
-type AppStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
 
 impl Application for StoreApplication {
     type Options = StoreOptions;
@@ -40,7 +35,7 @@ impl RunOptions<StoreCommand> for StoreApplication {
 
 impl RunOptions<StorePutOptions> for StoreApplication {
     async fn run_options(&self, _: &StorePutOptions) -> Result<()> {
-        let mut store = AppStore::default();
+        let mut store = StdStore::default();
         let link = store.transfer(Stdio, ()).await?;
         println!("{link}");
         Ok(())
@@ -49,7 +44,7 @@ impl RunOptions<StorePutOptions> for StoreApplication {
 
 impl RunOptions<StoreGetOptions> for StoreApplication {
     async fn run_options(&self, options: &StoreGetOptions) -> Result<()> {
-        let mut store = AppStore::default();
+        let mut store = StdStore::default();
         store.transfer(options.source.clone(), Stdio).await?;
         Ok(())
     }
@@ -63,7 +58,7 @@ impl RunOptions<StoreXferOptions> for StoreApplication {
             dest,
         } = options.clone();
 
-        let mut store = AppStore::default();
+        let mut store = StdStore::default();
         let globset = excludes.into_globset()?;
         let source = globset.filter_source(source);
         let receipt = store.transfer(source, dest).await?;

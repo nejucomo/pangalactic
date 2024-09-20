@@ -1,12 +1,7 @@
 use anyhow::Result;
-use pangalactic_dag_transfer::TransferLayerExt;
-use pangalactic_host::HostLayerExt;
-use pangalactic_layer_cidmeta::CidMetaLayer;
-use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_runopt::{Application, RunOptions};
 use pangalactic_schemata::Plan;
-use pangalactic_store::Store;
-use pangalactic_store_dirdb::DirDbStore;
+use pangalactic_std_store::StdStore;
 
 use crate::options::DeriveOptions;
 
@@ -22,7 +17,7 @@ impl RunOptions<DeriveOptions> for DeriveApplication {
     async fn run_options(&self, options: &DeriveOptions) -> Result<()> {
         let options = options.clone();
 
-        let mut store: LinkDirectoryLayer<CidMetaLayer<DirDbStore>> = Default::default();
+        let mut store = StdStore::default();
 
         // Transfer any source into the store to get a store path:
         // Assert: Final unwrap never fails because `DestinationEndpoint::Store` always produces a path:
