@@ -12,6 +12,7 @@ members = [
 #   "cli/pg",
   "cli/pg-derive",
   "cli/pg-seed",
+  "cli/pg-store",
   "config",
   "dag-transfer",
   "dir",
@@ -54,6 +55,7 @@ pangalactic-cid             = { path = "cid"             }
 # pangalactic-cli             = { path = "cli/pg"          }
 pangalactic-cli-derive      = { path = "cli/pg-derive"   }
 pangalactic-cli-seed        = { path = "cli/pg-seed"     }
+pangalactic-cli-store       = { path = "cli/pg-store"    }
 pangalactic-config          = { path = "config"          }
 pangalactic-dag-transfer    = { path = "dag-transfer"    }
 pangalactic-dir             = { path = "dir"             }
