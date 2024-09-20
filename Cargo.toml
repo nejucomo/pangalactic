@@ -9,7 +9,8 @@ members = [
   "b64",
   "chomper",
   "cid",
-  "cli",
+#   "cli/pg",
+  "cli/pg-seed",
   "config",
   "dag-transfer",
   "dir",
@@ -32,6 +33,7 @@ members = [
   "placeholder",
   "primitives",
   "revcon",
+  "runopt",
   "schemata",
   "seed",
   "serialization",
@@ -48,7 +50,8 @@ pangalactic                 = { path = "placeholder"     }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
-pangalactic-cli             = { path = "cli"             }
+# pangalactic-cli             = { path = "cli/pg"          }
+pangalactic-cli-seed        = { path = "cli/pg-seed"     }
 pangalactic-config          = { path = "config"          }
 pangalactic-dag-transfer    = { path = "dag-transfer"    }
 pangalactic-dir             = { path = "dir"             }
@@ -71,6 +74,7 @@ pangalactic-name            = { path = "name"            }
 pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-revcon          = { path = "revcon"          }
+pangalactic-runopt          = { path = "runopt"          }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }

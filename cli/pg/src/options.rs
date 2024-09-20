@@ -10,12 +10,9 @@ use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
 use pangalactic_layer_cidmeta::{CidMeta, CidMetaLayer};
 use pangalactic_layer_dir::LinkDirectoryLayer;
-use pangalactic_manifest::FullManifest;
 use pangalactic_revcon::ControlDir;
-use pangalactic_seed::Seed;
 use pangalactic_store::Store;
 use pangalactic_store_dirdb::DirDbStore;
-use pangalactic_store_mem::MemStore;
 
 type CliStore = LinkDirectoryLayer<CidMetaLayer<DirDbStore>>;
 type CliCid = CidMeta<Hash>;
@@ -144,8 +141,6 @@ pub enum StoreCommand {
     Put(StorePutOptions),
     Get(StoreGetOptions),
     Xfer(StoreXferOptions),
-    #[command(subcommand)]
-    Seed(SeedCommand),
 }
 
 /// Insert the file on stdin and print its key on stdout
@@ -234,43 +229,6 @@ impl Runnable for DeriveOptions {
 
             let (_, attestation) = store.derive(&plan).await?;
             ok_disp(attestation)
-        })
-    }
-}
-
-/// Manage the pg seed directory
-#[enum_dispatch(Runnable)]
-#[derive(Debug, Subcommand)]
-pub enum SeedCommand {
-    List(SeedListOptions),
-    Install(SeedInstallOptions),
-}
-
-/// List the pgwasm names
-#[derive(Debug, Args)]
-pub struct SeedListOptions {}
-
-impl Runnable for SeedListOptions {
-    fn run(self) -> RunOutcome {
-        Box::pin(async {
-            let mut store = LinkDirectoryLayer::<MemStore>::default();
-            let link = store.commit(Seed).await?;
-            let mani: FullManifest<_> = store.load(&link).await?;
-            ok_disp(mani)
-        })
-    }
-}
-
-/// Install the stdlib pgwasm directory
-#[derive(Debug, Args)]
-pub struct SeedInstallOptions {}
-
-impl Runnable for SeedInstallOptions {
-    fn run(self) -> RunOutcome {
-        Box::pin(async {
-            let mut store = CliStore::default();
-            let link = Seed.install(&mut store).await?;
-            ok_disp(link)
         })
     }
 }
