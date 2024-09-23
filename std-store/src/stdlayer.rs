@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 use anyhow::Result;
 use pangalactic_dag_transfer::{Destination, IntoSource};
 use pangalactic_hash::Hash;
@@ -51,5 +53,25 @@ where
         let (inner, attestation) = self.0.derive(plan).await?;
         let newself = StdLayer(inner);
         Ok((newself, attestation))
+    }
+}
+
+impl<S> Deref for StdLayer<S>
+where
+    S: Store<CID = Hash>,
+{
+    type Target = StdLayerInner<S>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<S> DerefMut for StdLayer<S>
+where
+    S: Store<CID = Hash>,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }

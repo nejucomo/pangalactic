@@ -15,13 +15,13 @@ impl Application for SeedApplication {
 }
 
 impl RunOptions<Options> for SeedApplication {
-    async fn run_options(&self, options: &Options) -> Result<()> {
-        self.run_options(&options.command).await
+    async fn run_options(&self, options: Options) -> Result<()> {
+        self.run_options(options.command).await
     }
 }
 
 impl RunOptions<Command> for SeedApplication {
-    async fn run_options(&self, command: &Command) -> Result<()> {
+    async fn run_options(&self, command: Command) -> Result<()> {
         use Command::*;
 
         match command {
@@ -32,7 +32,7 @@ impl RunOptions<Command> for SeedApplication {
 }
 
 impl RunOptions<ListOptions> for SeedApplication {
-    async fn run_options(&self, _: &ListOptions) -> Result<()> {
+    async fn run_options(&self, _: ListOptions) -> Result<()> {
         let mut store = StdMemStore::default();
         let link = store.commit(Seed).await?;
         let mani: FullManifest<_> = store.load(&link).await?;
@@ -42,7 +42,7 @@ impl RunOptions<ListOptions> for SeedApplication {
 }
 
 impl RunOptions<InstallOptions> for SeedApplication {
-    async fn run_options(&self, _: &InstallOptions) -> Result<()> {
+    async fn run_options(&self, _: InstallOptions) -> Result<()> {
         let mut store = StdStore::default();
         let link = store.commit(Seed).await?;
         println!("{link}");

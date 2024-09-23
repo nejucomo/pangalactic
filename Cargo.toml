@@ -11,6 +11,7 @@ members = [
   "cid",
 #   "cli/pg",
   "cli/pg-derive",
+  "cli/pg-revcon",
   "cli/pg-seed",
   "cli/pg-store",
   "config",
@@ -55,6 +56,7 @@ pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
 # pangalactic-cli             = { path = "cli/pg"          }
 pangalactic-cli-derive      = { path = "cli/pg-derive"   }
+pangalactic-cli-revcon      = { path = "cli/pg-revcon"   }
 pangalactic-cli-seed        = { path = "cli/pg-seed"     }
 pangalactic-cli-store       = { path = "cli/pg-store"    }
 pangalactic-config          = { path = "config"          }

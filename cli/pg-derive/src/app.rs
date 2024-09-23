@@ -14,7 +14,7 @@ impl Application for DeriveApplication {
 }
 
 impl RunOptions<DeriveOptions> for DeriveApplication {
-    async fn run_options(&self, options: &DeriveOptions) -> Result<()> {
+    async fn run_options(&self, options: DeriveOptions) -> Result<()> {
         let options = options.clone();
 
         let mut store = StdStore::default();

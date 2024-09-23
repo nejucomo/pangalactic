@@ -16,13 +16,13 @@ impl Application for StoreApplication {
 }
 
 impl RunOptions<StoreOptions> for StoreApplication {
-    async fn run_options(&self, options: &StoreOptions) -> Result<()> {
-        self.run_options(&options.command).await
+    async fn run_options(&self, options: StoreOptions) -> Result<()> {
+        self.run_options(options.command).await
     }
 }
 
 impl RunOptions<StoreCommand> for StoreApplication {
-    async fn run_options(&self, command: &StoreCommand) -> Result<()> {
+    async fn run_options(&self, command: StoreCommand) -> Result<()> {
         use StoreCommand::*;
 
         match command {
@@ -34,7 +34,7 @@ impl RunOptions<StoreCommand> for StoreApplication {
 }
 
 impl RunOptions<StorePutOptions> for StoreApplication {
-    async fn run_options(&self, _: &StorePutOptions) -> Result<()> {
+    async fn run_options(&self, _: StorePutOptions) -> Result<()> {
         let mut store = StdStore::default();
         let link = store.transfer(Stdio, ()).await?;
         println!("{link}");
@@ -43,7 +43,7 @@ impl RunOptions<StorePutOptions> for StoreApplication {
 }
 
 impl RunOptions<StoreGetOptions> for StoreApplication {
-    async fn run_options(&self, options: &StoreGetOptions) -> Result<()> {
+    async fn run_options(&self, options: StoreGetOptions) -> Result<()> {
         let mut store = StdStore::default();
         store.transfer(options.source.clone(), Stdio).await?;
         Ok(())
@@ -51,7 +51,7 @@ impl RunOptions<StoreGetOptions> for StoreApplication {
 }
 
 impl RunOptions<StoreXferOptions> for StoreApplication {
-    async fn run_options(&self, options: &StoreXferOptions) -> Result<()> {
+    async fn run_options(&self, options: StoreXferOptions) -> Result<()> {
         let StoreXferOptions {
             excludes,
             source,

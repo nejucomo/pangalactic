@@ -19,7 +19,7 @@ pub trait Application: Send + Default + RunOptions<Self::Options> {
             tracing::trace!(?opts);
 
             let app = Self::default();
-            app.run_options(&opts).await
+            app.run_options(opts).await
         })
     }
 }
