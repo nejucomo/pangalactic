@@ -3,7 +3,7 @@ use pangalactic_std_store::StdOrigin;
 
 /// Derive a plan
 #[derive(Clone, Debug, Parser)]
-pub struct DeriveOptions {
+pub struct Options {
     /// The plan to derive, or an exec file if `INPUT` is provided
     pub plan_or_exec: StdOrigin,
 

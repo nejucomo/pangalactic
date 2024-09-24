@@ -1,11 +1,9 @@
 use anyhow::Result;
 use pangalactic_revcon::ControlDir;
-use pangalactic_runopt::{Application, RunOptions};
+use pangalactic_runopt::{Application, RunApp};
 use pangalactic_std_store::StdStore;
 
-use crate::options::{
-    InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options, RevConCommand,
-};
+use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
 
 /// The standalone `pg-revcon` application
 #[derive(Debug, Default)]
@@ -15,49 +13,67 @@ impl Application for RevConApplication {
     type Options = Options;
 }
 
-impl RunOptions<Options> for RevConApplication {
-    async fn run_options(&self, options: Options) -> Result<()> {
-        self.run_options(options.command).await
+impl<A> RunApp<A> for Options
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+    InitOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        self.command.run_app(app).await
     }
 }
 
-impl RunOptions<RevConCommand> for RevConApplication {
-    async fn run_options(&self, command: RevConCommand) -> Result<()> {
-        use RevConCommand::*;
+impl<A> RunApp<A> for Command
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+    InitOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        use Command::*;
 
-        match command {
-            Info(opts) => self.run_options(opts).await,
-            Init(opts) => self.run_options(opts).await,
+        match self {
+            Info(opts) => opts.run_app(app).await,
+            Init(opts) => opts.run_app(app).await,
         }
     }
 }
 
-impl RunOptions<InfoOptions> for RevConApplication {
-    async fn run_options(&self, options: InfoOptions) -> Result<()> {
-        self.run_options(options.detail.unwrap_or_default()).await
+impl<A> RunApp<A> for InfoOptions
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        self.detail.run_app(app).await
     }
 }
 
-impl RunOptions<InfoDetail> for RevConApplication {
-    async fn run_options(&self, detail: InfoDetail) -> Result<()> {
-        match detail {
-            InfoDetail::Path(opts) => self.run_options(opts).await,
+impl<A> RunApp<A> for InfoDetail
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        match self {
+            InfoDetail::Path(opts) => opts.run_app(app).await,
         }
     }
 }
 
-impl RunOptions<InfoPathOptions> for RevConApplication {
-    async fn run_options(&self, _: InfoPathOptions) -> Result<()> {
+impl RunApp<RevConApplication> for InfoPathOptions {
+    async fn run_app(self, _: RevConApplication) -> Result<()> {
         let ctldir = ControlDir::find_from_current_dir()?;
         println!("{ctldir}");
         Ok(())
     }
 }
 
-impl RunOptions<InitOptions> for RevConApplication {
-    async fn run_options(&self, options: InitOptions) -> Result<()> {
+impl RunApp<RevConApplication> for InitOptions {
+    async fn run_app(self, _: RevConApplication) -> Result<()> {
         let mut store = StdStore::default();
-        let ctldir = ControlDir::initialize(&mut store, options.workdir).await?;
+        let ctldir = ControlDir::initialize(&mut store, self.workdir).await?;
         println!("{ctldir}");
         Ok(())
     }

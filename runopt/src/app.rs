@@ -3,10 +3,10 @@ use std::future::Future;
 use anyhow::Result;
 use clap::Parser;
 
-use crate::RunOptions;
+use crate::RunApp;
 
-pub trait Application: Send + Default + RunOptions<Self::Options> {
-    type Options: Send + std::fmt::Debug + clap::Parser;
+pub trait Application: Send + Default {
+    type Options: Send + std::fmt::Debug + clap::Parser + RunApp<Self>;
 
     fn run_main() -> impl Future<Output = Result<()>> + Send {
         Box::pin(async {
@@ -19,7 +19,7 @@ pub trait Application: Send + Default + RunOptions<Self::Options> {
             tracing::trace!(?opts);
 
             let app = Self::default();
-            app.run_options(opts).await
+            opts.run_app(app).await
         })
     }
 }

@@ -5,32 +5,33 @@ use pangalactic_std_store::{StdDestination, StdOrigin};
 
 /// Store i/o
 #[derive(Debug, Parser)]
-pub struct StoreOptions {
+pub struct Options {
     #[clap(subcommand)]
-    pub command: StoreCommand,
+    pub command: Command,
 }
 
+/// Store I/O commands
 #[derive(Debug, Subcommand)]
-pub enum StoreCommand {
-    Put(StorePutOptions),
-    Get(StoreGetOptions),
-    Xfer(StoreXferOptions),
+pub enum Command {
+    Put(PutOptions),
+    Get(GetOptions),
+    Xfer(XferOptions),
 }
 
 /// Insert the file on stdin and print its key on stdout
 #[derive(Debug, Args)]
-pub struct StorePutOptions {}
+pub struct PutOptions {}
 
 /// Send the given file to stdout
 #[derive(Debug, Args)]
-pub struct StoreGetOptions {
+pub struct GetOptions {
     /// The source to get
     pub source: StdOrigin,
 }
 
 /// Transfer from SOURCE to DEST
 #[derive(Clone, Debug, Args)]
-pub struct StoreXferOptions {
+pub struct XferOptions {
     #[clap(flatten)]
     pub excludes: ExcludeGlobOptions,
 
@@ -42,7 +43,7 @@ pub struct StoreXferOptions {
 pub struct ExcludeGlobOptions {
     /// Exclude the given glob pattern (multiple repetitions allowed)
     #[clap(long, short)]
-    exclude: Vec<Glob>,
+    pub exclude: Vec<Glob>,
 }
 
 impl ExcludeGlobOptions {

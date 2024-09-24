@@ -10,6 +10,7 @@ pub struct Options {
 
 /// Manage the pg seed directory
 #[derive(Debug, Subcommand)]
+#[command(author, version, about, long_about = None)]
 pub enum Command {
     List(ListOptions),
     Install(InstallOptions),

@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
-use pangalactic_cli_derive::options::DeriveOptions;
-use pangalactic_cli_revcon::options::RevConCommand;
-use pangalactic_cli_store::options::StoreCommand;
+use pangalactic_cli_derive::options as derive;
+use pangalactic_cli_revcon::options as revcon;
+use pangalactic_cli_store::options as store;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -13,14 +13,14 @@ pub struct PgOptions {
 #[derive(Debug, Subcommand)]
 pub enum PgCommand {
     #[command(flatten)]
-    RevCon(RevConCommand),
+    RevCon(revcon::Command),
     #[command(subcommand)]
     Util(UtilCommand),
 }
 
 impl Default for PgCommand {
     fn default() -> Self {
-        PgCommand::RevCon(RevConCommand::default())
+        PgCommand::RevCon(revcon::Command::default())
     }
 }
 
@@ -28,8 +28,8 @@ impl Default for PgCommand {
 #[derive(Debug, Subcommand)]
 pub enum UtilCommand {
     #[command(subcommand, name = "revcon")]
-    RevCon(RevConCommand),
+    RevCon(revcon::Command),
     #[command(subcommand)]
-    Store(StoreCommand),
-    Derive(DeriveOptions),
+    Store(store::Command),
+    Derive(derive::Options),
 }
