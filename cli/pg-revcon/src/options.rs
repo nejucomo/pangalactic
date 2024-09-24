@@ -6,18 +6,24 @@ use clap::{Args, Parser, Subcommand};
 #[derive(Debug, Parser)]
 pub struct Options {
     #[clap(subcommand)]
-    pub command: Command,
+    pub command: RevConCommand,
 }
 
 /// Revision Control commands
 #[derive(Debug, Subcommand)]
-pub enum Command {
+pub enum RevConCommand {
     Info(InfoOptions),
     Init(InitOptions),
 }
 
+impl Default for RevConCommand {
+    fn default() -> Self {
+        RevConCommand::Info(InfoOptions::default())
+    }
+}
+
 /// Repository info
-#[derive(Debug, Args)]
+#[derive(Default, Debug, Args)]
 pub struct InfoOptions {
     #[command(subcommand)]
     pub detail: Option<InfoDetail>,

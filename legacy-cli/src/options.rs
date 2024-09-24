@@ -27,50 +27,6 @@ pub trait Runnable {
 // We must use `Box<Pin<_>>` to satisfy `enum_dispatch`. :-/
 pub type RunOutcome = Pin<Box<dyn Future<Output = Result<()>>>>;
 
-#[derive(Debug, Parser)]
-#[command(author, version, about, long_about = None)]
-pub struct Options {
-    #[command(subcommand)]
-    pub command: Option<Command>,
-}
-
-impl Options {
-    pub fn parse() -> Self {
-        <Self as Parser>::parse()
-    }
-}
-
-impl Runnable for Options {
-    fn run(self) -> RunOutcome {
-        use Command::RevCon;
-        use RevConCommand::Info;
-
-        self.command
-            .unwrap_or(RevCon(Info(RevConInfoOptions { detail: None })))
-            .run()
-    }
-}
-
-#[enum_dispatch(Runnable)]
-#[derive(Debug, Subcommand)]
-pub enum Command {
-    #[command(flatten)]
-    RevCon(RevConCommand),
-    #[command(subcommand)]
-    Util(UtilCommand),
-}
-
-/// General Utilities
-#[enum_dispatch(Runnable)]
-#[derive(Debug, Subcommand)]
-pub enum UtilCommand {
-    #[command(subcommand, name = "revcon")]
-    RevCon(RevConCommand),
-    #[command(subcommand)]
-    Store(StoreCommand),
-    Derive(DeriveOptions),
-}
-
 fn ok_disp<T>(value: T) -> Result<()>
 where
     T: Display,

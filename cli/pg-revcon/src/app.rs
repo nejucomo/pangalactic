@@ -3,7 +3,9 @@ use pangalactic_revcon::ControlDir;
 use pangalactic_runopt::{Application, RunOptions};
 use pangalactic_std_store::StdStore;
 
-use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
+use crate::options::{
+    InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options, RevConCommand,
+};
 
 /// The standalone `pg-revcon` application
 #[derive(Debug, Default)]
@@ -19,9 +21,9 @@ impl RunOptions<Options> for RevConApplication {
     }
 }
 
-impl RunOptions<Command> for RevConApplication {
-    async fn run_options(&self, command: Command) -> Result<()> {
-        use Command::*;
+impl RunOptions<RevConCommand> for RevConApplication {
+    async fn run_options(&self, command: RevConCommand) -> Result<()> {
+        use RevConCommand::*;
 
         match command {
             Info(opts) => self.run_options(opts).await,
@@ -32,7 +34,7 @@ impl RunOptions<Command> for RevConApplication {
 
 impl RunOptions<InfoOptions> for RevConApplication {
     async fn run_options(&self, options: InfoOptions) -> Result<()> {
-        self.run_options(options.detail).await
+        self.run_options(options.detail.unwrap_or_default()).await
     }
 }
 
