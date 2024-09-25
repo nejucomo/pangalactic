@@ -46,7 +46,7 @@ impl ControlDir {
 
         let ctldir = ControlDir(workdir.as_ref().join(".pg"));
 
-        let seed_link = Seed.install(store).await?;
+        let seed_link = store.commit(Seed).await?;
         let template = LinkPath::new(seed_link, "controldir-template")?;
 
         store.transfer(template, ctldir.0.clone()).await?;

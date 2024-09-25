@@ -24,7 +24,6 @@ pangalactic-log.workspace = true
 pangalactic-manifest.workspace = true
 pangalactic-revcon.workspace = true
 pangalactic-schemata.workspace = true
-pangalactic-seed.workspace = true
 pangalactic-store-dirdb.workspace = true
 pangalactic-store-mem.workspace = true
 pangalactic-store.workspace = true

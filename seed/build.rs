@@ -14,7 +14,7 @@ fn main() -> anyhow::Result<()> {
 fn main_inner() -> anyhow::Result<()> {
     use std::process::Command;
 
-    println!("cargo:rerun-if-changed=guests");
+    produce_rerun_if_changed_directives()?;
 
     let guestworkspace = Path::new("guests");
 
@@ -51,6 +51,25 @@ fn main_inner() -> anyhow::Result<()> {
         }
     }
 
+    Ok(())
+}
+
+fn produce_rerun_if_changed_directives() -> anyhow::Result<()> {
+    use walkdir::{DirEntry, WalkDir};
+
+    let is_target = |e: &DirEntry| {
+        e.file_name()
+            .to_str()
+            .map(|n| n == "target")
+            .unwrap_or(false)
+    };
+
+    for entres in WalkDir::new("guests").into_iter().filter_entry(is_target) {
+        println!(
+            "cargo:rerun-if-changed={}",
+            entres?.file_name().to_str().unwrap()
+        );
+    }
     Ok(())
 }
 

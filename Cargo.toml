@@ -3,13 +3,20 @@ version = "0.0.1"
 edition = "2021"
 license = "MIT"
 
+[profile.release]
+lto = true
+
 [workspace]
 resolver = "2"
 members = [
   "b64",
   "chomper",
   "cid",
-  "cli",
+  "cli/pg",
+  "cli/pg-derive",
+  "cli/pg-revcon",
+  "cli/pg-seed",
+  "cli/pg-store",
   "config",
   "dag-transfer",
   "dir",
@@ -32,9 +39,11 @@ members = [
   "placeholder",
   "primitives",
   "revcon",
+  "runopt",
   "schemata",
   "seed",
   "serialization",
+  "std-store",
   "store/dirdb",
   "store/mem",
   "store/trait",
@@ -48,7 +57,11 @@ pangalactic                 = { path = "placeholder"     }
 pangalactic-b64             = { path = "b64"             }
 pangalactic-chomper         = { path = "chomper"         }
 pangalactic-cid             = { path = "cid"             }
-pangalactic-cli             = { path = "cli"             }
+pangalactic-cli             = { path = "cli/pg"          }
+pangalactic-cli-derive      = { path = "cli/pg-derive"   }
+pangalactic-cli-revcon      = { path = "cli/pg-revcon"   }
+pangalactic-cli-seed        = { path = "cli/pg-seed"     }
+pangalactic-cli-store       = { path = "cli/pg-store"    }
 pangalactic-config          = { path = "config"          }
 pangalactic-dag-transfer    = { path = "dag-transfer"    }
 pangalactic-dir             = { path = "dir"             }
@@ -71,9 +84,11 @@ pangalactic-name            = { path = "name"            }
 pangalactic-nested-dir      = { path = "nested-dir"      }
 pangalactic-primitives      = { path = "primitives"      }
 pangalactic-revcon          = { path = "revcon"          }
+pangalactic-runopt          = { path = "runopt"          }
 pangalactic-schemata        = { path = "schemata"        }
 pangalactic-seed            = { path = "seed"            }
 pangalactic-serialization   = { path = "serialization"   }
+pangalactic-std-store       = { path = "std-store"       }
 pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
@@ -112,4 +127,5 @@ tokio-stream = "0.1.14"
 toml = "0.8.19"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+walkdir = "2.5.0"
 wasmtime = { version = "2.0.2", features = ["async"] }
