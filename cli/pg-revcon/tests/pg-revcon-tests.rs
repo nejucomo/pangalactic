@@ -40,10 +40,21 @@ mod setups {
     }
 
     pub fn preseeded<'a>(testcasedir: &Path) -> Result<()> {
+        // Trigger warning: ugly hacks.
         use anyhow::Context;
 
         let rcbin = env!("CARGO_BIN_EXE_pg-revcon");
         let seedbin = format!("{}-seed", rcbin.strip_suffix("-revcon").unwrap());
+        if !Path::new(&seedbin).is_file() {
+            use pangalactic_test_runner::Output;
+            use std::process::Command;
+            dbg!("trying to build seedbin", &seedbin);
+            let baseout = Command::new("cargo")
+                .args(["build", "-p", "pangalactic-cli-seed"])
+                .output()?;
+            let output = Output::try_from(baseout)?;
+            output.exit_ok()?;
+        }
 
         Runner::new(&testcasedir, &seedbin, [])
             .pg(["install"], "")
