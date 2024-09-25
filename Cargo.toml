@@ -48,6 +48,7 @@ members = [
   "store/mem",
   "store/trait",
   "table",
+  "test/dir",
 ]
 
 [workspace.dependencies]
@@ -93,6 +94,7 @@ pangalactic-store           = { path = "store/trait"     }
 pangalactic-store-dirdb     = { path = "store/dirdb"     }
 pangalactic-store-mem       = { path = "store/mem"       }
 pangalactic-table           = { path = "table"           }
+pangalactic-test-dir        = { path = "test/dir"        }
 
 # Dependencies external to this workspace:
 # TODO: Push features into specific crates that consume them:
