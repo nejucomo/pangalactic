@@ -1,10 +1,11 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use anyhow::Result;
 use anyhow_std::PathAnyhow;
 
 pub fn setup(dataset: &str) -> Result<PathBuf> {
-    let testcasedir = Path::new("target").join("testdata").join(dataset);
+    let targetdir = find_target()?;
+    let testcasedir = targetdir.join("testdata").join(dataset);
 
     dbg!(&testcasedir);
 
@@ -20,4 +21,18 @@ pub fn setup(dataset: &str) -> Result<PathBuf> {
     testcasedir.create_dir_all_anyhow()?;
 
     Ok(testcasedir)
+}
+
+fn find_target() -> Result<PathBuf> {
+    let cwd = std::env::current_dir()?;
+    for ancestor in cwd.ancestors() {
+        let candidate = ancestor.join("target");
+        if candidate.is_dir() {
+            return Ok(candidate);
+        }
+    }
+    anyhow::bail!(
+        r#"could not find "target/" directory above {:?}"#,
+        cwd.display()
+    );
 }
