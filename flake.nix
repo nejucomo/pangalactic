@@ -23,7 +23,16 @@
         rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       in
       {
-        devShells.default = pkgs.mkShell { packages = [ rustToolchain ]; };
+        devShells.default = pkgs.mkShell {
+          packages = [ rustToolchain ];
+          shellHook = ''
+            [ -n "$XDG_CONFIG_HOME" ] || XDG_CONFIG_HOME="$HOME/.config"
+
+            NIX_DEVELOP_RC="$XDG_CONFIG_HOME/nix/develop.rc"
+
+            [ -f "$NIX_DEVELOP_RC" ] && source "$NIX_DEVELOP_RC"
+          '';
+        };
       }
     );
 }
