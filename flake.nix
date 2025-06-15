@@ -7,5 +7,5 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = inputs: import ./nix-support inputs ./rust-toolchain.toml;
+  outputs = inputs: import ./nix-support ./. inputs;
 }
