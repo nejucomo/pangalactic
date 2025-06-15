@@ -13,8 +13,5 @@ let
   rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile rust-toolchain-toml;
 in
 {
-  devShells.default = import ./dev-shell.nix {
-    inherit (pkgs) mkShell;
-    inherit rust-toolchain;
-  };
+  devShells.default = import ./dev-shell.nix { inherit pkgs rust-toolchain; };
 }
