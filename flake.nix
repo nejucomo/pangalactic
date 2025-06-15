@@ -1,5 +1,5 @@
 {
-  description = "Rust dev shell with native and wasm32-unknown-unknown support";
+  description = "Pangalactic deterministic computation on the universal directed acyclic graph";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -7,26 +7,5 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      rust-overlay,
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        overlays = [ rust-overlay.overlays.default ];
-        pkgs = import nixpkgs { inherit system overlays; };
-
-        rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-      in
-      {
-        devShells.default = import ./nix-support/devShell.nix {
-          inherit (pkgs) mkShell;
-          inherit rustToolchain;
-        };
-      }
-    );
+  outputs = inputs: import ./nix-support inputs ./rust-toolchain.toml;
 }
