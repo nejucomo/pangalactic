@@ -399,6 +399,6 @@ fn check_paths_equal_inner(src: &Path, dst: &Path) -> Result<()> {
     }
 }
 
-fn make_runner(testcasedir: &Path) -> Runner {
+fn make_runner(testcasedir: &Path) -> Runner<'_> {
     Runner::new(testcasedir, env!("CARGO_BIN_EXE_pg-store"), [])
 }

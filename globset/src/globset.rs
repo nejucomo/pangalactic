@@ -17,7 +17,7 @@ pub struct GlobSet {
 }
 
 impl GlobSet {
-    pub fn filter_source<C>(&self, origin: OriginEndpoint<C>) -> FilteredOrigin<C>
+    pub fn filter_source<C>(&self, origin: OriginEndpoint<C>) -> FilteredOrigin<'_, C>
     where
         C: Serialize,
     {
