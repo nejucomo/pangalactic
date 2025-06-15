@@ -1,0 +1,8 @@
+[book]
+authors = ["nobody"]
+language = "en"
+src = "src"
+title = "pangalactic"
+
+[build]
+build-dir = "../target/book"
