@@ -17,7 +17,17 @@ let
   dev-shell = import ./dev-shell.nix { inherit pkgs rust-toolchain; };
 in
 {
-  packages = { inherit book; };
+  packages = {
+    default = pkgs.runCommand "pangalactic-nix-pkg-todo" { } ''
+      echo 'Currently only the `...#book` output is implemented.'
+      echo
+      echo 'TO DO... implement `nix build`'
+
+      mkdir "$out"
+    '';
+
+    inherit book;
+  };
 
   devShells.default = dev-shell;
 }
