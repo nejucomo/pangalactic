@@ -6,3 +6,6 @@ title = "pangalactic"
 
 [build]
 build-dir = "../target/book"
+
+# TODO:
+# [preprocessor.admonish]
