@@ -21,6 +21,8 @@ jobs:
           # Assert we are on main:
           [ "$(git rev-parse --abbrev-ref HEAD)" = 'main' ] || exit 1
           git fetch origin gh-pages:gh-pages
+          git config user.email "ci@nowhere"
+          git config user.name "Autodeployment Bot"
           cp -r ./result/. ./docs
           rm ./result
           touch ./docs/.nojekyll
