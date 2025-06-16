@@ -1,0 +1,24 @@
+[package]
+name = "pangalactic-link"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+testutil = [
+  "pangalactic-store",
+]
+
+[dependencies]
+anyhow.workspace = true
+pangalactic-chomper.workspace = true
+pangalactic-cid.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-serialization.workspace = true
+pangalactic-store = { workspace = true, optional = true }
+serde.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+pangalactic-store.workspace = true
+test-case.workspace = true

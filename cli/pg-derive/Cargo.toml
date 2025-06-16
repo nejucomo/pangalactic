@@ -1,0 +1,14 @@
+[package]
+name = "pangalactic-cli-derive"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+pangalactic-endpoint.workspace = true
+pangalactic-runopt.workspace = true
+pangalactic-schemata.workspace = true
+pangalactic-std-store.workspace = true
+tokio.workspace = true

@@ -1,0 +1,25 @@
+[package]
+name = "pangalactic-endpoint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+derive_more.workspace = true
+futures.workspace = true
+pangalactic-dag-transfer.workspace = true
+pangalactic-layer-dir.workspace = true
+pangalactic-link.workspace = true
+pangalactic-linkpath.workspace = true
+pangalactic-name.workspace = true
+pangalactic-store.workspace = true
+pin-project.workspace = true
+serde.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true
+pangalactic-hash.workspace = true
+pangalactic-linkkind.workspace = true

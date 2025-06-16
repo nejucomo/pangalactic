@@ -1,0 +1,13 @@
+[package]
+name = "pangalactic-guest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pangalactic-dir.workspace = true
+pangalactic-guest-procmacro.workspace = true
+pangalactic-linkkind.workspace = true
+pangalactic-name.workspace = true
+pangalactic-primitives.workspace = true
+pangalactic-schemata.workspace = true

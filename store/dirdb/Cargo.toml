@@ -1,0 +1,17 @@
+[package]
+name = "pangalactic-store-dirdb"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+anyhow-std.workspace = true
+derive_more.workspace = true
+pangalactic-b64.workspace = true
+pangalactic-config.workspace = true
+pangalactic-hash.workspace = true
+pangalactic-store.workspace = true
+pin-project.workspace = true
+rand.workspace = true
+tokio = { workspace = true, features = [ "fs" ] }

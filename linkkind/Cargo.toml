@@ -1,0 +1,13 @@
+[package]
+name = "pangalactic-linkkind"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+pangalactic-primitives.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true

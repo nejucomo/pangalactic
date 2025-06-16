@@ -1,0 +1,16 @@
+[package]
+name = "pangalactic-globset"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+globset.workspace = true
+pangalactic-dag-transfer.workspace = true
+pangalactic-endpoint.workspace = true
+pangalactic-layer-dir.workspace = true
+pangalactic-name.workspace = true
+pangalactic-store.workspace = true
+serde.workspace = true
+tracing.workspace = true

@@ -1,0 +1,135 @@
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+
+[profile.release]
+lto = true
+
+[workspace]
+resolver = "2"
+members = [
+  "b64",
+  "chomper",
+  "cid",
+  "cli/pg",
+  "cli/pg-derive",
+  "cli/pg-revcon",
+  "cli/pg-seed",
+  "cli/pg-store",
+  "config",
+  "dag-transfer",
+  "dir",
+  "endpoint",
+  "globset",
+  "guest",
+  "guest-procmacro",
+  "handle",
+  "host",
+  "iowrappers",
+  "layer/cidmeta",
+  "layer/dir",
+  "link",
+  "linkkind",
+  "linkpath",
+  "log",
+  "manifest",
+  "name",
+  "nested-dir",
+  "placeholder",
+  "primitives",
+  "revcon",
+  "runopt",
+  "schemata",
+  "seed",
+  "serialization",
+  "std-store",
+  "store/dirdb",
+  "store/mem",
+  "store/trait",
+  "table",
+  "test/dir",
+  "test/runner",
+]
+
+[workspace.dependencies]
+
+# Local crates with paths clarified:
+pangalactic                 = { path = "placeholder"     }
+pangalactic-b64             = { path = "b64"             }
+pangalactic-chomper         = { path = "chomper"         }
+pangalactic-cid             = { path = "cid"             }
+pangalactic-cli             = { path = "cli/pg"          }
+pangalactic-cli-derive      = { path = "cli/pg-derive"   }
+pangalactic-cli-revcon      = { path = "cli/pg-revcon"   }
+pangalactic-cli-seed        = { path = "cli/pg-seed"     }
+pangalactic-cli-store       = { path = "cli/pg-store"    }
+pangalactic-config          = { path = "config"          }
+pangalactic-dag-transfer    = { path = "dag-transfer"    }
+pangalactic-dir             = { path = "dir"             }
+pangalactic-endpoint        = { path = "endpoint"        }
+pangalactic-globset         = { path = "globset"         }
+pangalactic-guest           = { path = "guest"           }
+pangalactic-guest-procmacro = { path = "guest-procmacro" }
+pangalactic-handle          = { path = "handle"          }
+pangalactic-hash            = { path = "hash"            }
+pangalactic-host            = { path = "host"            }
+pangalactic-iowrappers      = { path = "iowrappers"      }
+pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
+pangalactic-layer-dir       = { path = "layer/dir"       }
+pangalactic-link            = { path = "link"            }
+pangalactic-linkkind        = { path = "linkkind"        }
+pangalactic-linkpath        = { path = "linkpath"        }
+pangalactic-log             = { path = "log"             }
+pangalactic-manifest        = { path = "manifest"        }
+pangalactic-name            = { path = "name"            }
+pangalactic-nested-dir      = { path = "nested-dir"      }
+pangalactic-primitives      = { path = "primitives"      }
+pangalactic-revcon          = { path = "revcon"          }
+pangalactic-runopt          = { path = "runopt"          }
+pangalactic-schemata        = { path = "schemata"        }
+pangalactic-seed            = { path = "seed"            }
+pangalactic-serialization   = { path = "serialization"   }
+pangalactic-std-store       = { path = "std-store"       }
+pangalactic-store           = { path = "store/trait"     }
+pangalactic-store-dirdb     = { path = "store/dirdb"     }
+pangalactic-store-mem       = { path = "store/mem"       }
+pangalactic-table           = { path = "table"           }
+pangalactic-test-dir        = { path = "test/dir"        }
+pangalactic-test-runner     = { path = "test/runner"     }
+
+# Dependencies external to this workspace:
+# TODO: Push features into specific crates that consume them:
+aliri_braid = "0.4.0"
+anyhow = "1.0.66"
+anyhow-std = "0.1.4"
+base64 = "0.21.5"
+blake3 = "1.3.1"
+clap = { version = "4.4.11", features = ["derive", "unstable-doc"] }
+derive_more = "0.99.17"
+dirs = "5.0.1"
+either = "1.13.0"
+enum_dispatch = "0.3.13"
+extend = "1.2.0"
+futures = "0.3.30"
+globset = { version = "0.4.14", default-features = false }
+include_dir = "0.7.3"
+not_empty = "0.1.3"
+once_cell = "1.17.0"
+pin-project = "1.1.3"
+postcard = { version = "1.0.8", features = ["use-std"] }
+proc-macro2 = "1.0.49"
+quote = "1.0.23"
+rand = "0.8.5"
+serde = { version = "1.0.193", features = ["derive"] }
+syn = { version = "1.0.107", features = ["full", "extra-traits"] }
+tempfile = "3.9.0"
+test-case = "3.3.1"
+thiserror = "1.0.63"
+tokio = { version = "1.24.1",  features = ["io-util", "rt", "macros"] }
+tokio-stream = "0.1.14"
+toml = "0.8.19"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+walkdir = "2.5.0"
+wasmtime = { version = "2.0.2", features = ["async"] }

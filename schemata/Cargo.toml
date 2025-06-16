@@ -1,0 +1,19 @@
+[package]
+name = "pangalactic-schemata"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+store = [
+  "pangalactic-layer-dir",
+  "pangalactic-store",
+]
+
+[dependencies]
+anyhow.workspace = true
+pangalactic-dir.workspace = true
+pangalactic-layer-cidmeta.workspace = true
+pangalactic-layer-dir = { workspace = true, optional = true }
+pangalactic-link.workspace = true
+pangalactic-store = { workspace = true, optional = true }

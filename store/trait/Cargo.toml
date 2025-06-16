@@ -1,0 +1,16 @@
+[package]
+name = "pangalactic-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+anyhow-std.workspace = true
+pangalactic-chomper.workspace = true
+pangalactic-cid.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-serialization.workspace = true
+pin-project.workspace = true
+serde.workspace = true
+tokio.workspace = true

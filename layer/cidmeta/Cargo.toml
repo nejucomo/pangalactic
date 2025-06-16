@@ -1,0 +1,16 @@
+[package]
+name = "pangalactic-layer-cidmeta"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow.workspace = true
+derive_more.workspace = true
+pangalactic-chomper.workspace = true
+pangalactic-cid.workspace = true
+pangalactic-iowrappers.workspace = true
+pangalactic-serialization.workspace = true
+pangalactic-store.workspace = true
+pin-project.workspace = true
+serde.workspace = true
+tokio.workspace = true

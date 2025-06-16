@@ -1,0 +1,18 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: rustup toolchain install nightly
+      - run: rustup target add wasm32-unknown-unknown --toolchain nightly
+      - run: rustup component add rustfmt --toolchain nightly
+      - uses: actions/checkout@v2
+      - run: cargo +nightly fmt -- --check
+      - run: cargo +nightly test
+      - run: cargo +nightly build
+      - run: cargo +nightly doc
