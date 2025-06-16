@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Vision - pangalactic</title>
+        <title>Architecture - pangalactic</title>
 
 
         <!-- Custom HTML head -->
@@ -166,32 +166,39 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="vision"><a class="header" href="#vision">Vision</a></h1>
-<p><strong>TODO:</strong> Sort out terminology, especially <code>tech-concept-words</code>.</p>
-<p>Let me tell you a tale...</p>
-<p>Alice invites Bob to begin collaborating on a project, "OSSM Sauce", so she sends Bob the <code>publisher-id</code> she uses as her main collaboration nexus for the project.</p>
-<p>Bob <em>subscribes</em> to this <code>publisher-id</code> to download a copy of the source code, history, and built artifacts. He examines the <code>main</code> <code>story</code> Alice has arranged to get a feel for the development of the project. He likes the idea, and he's excited to be invited to collaborate since OSSM Sauce is not yet announced to the public and is privately shared between a small group of collaborators, even though they are all coordinating on this project and many others through the universal <code>pangalactic network</code>.</p>
-<p>Bob wants to know OSSM Sauce is safe for people to use, especially himself, so he browses the current code, looking for vulnerabilities, or even worse, anything malicious. He notices some surprising functionality and reviews the <code>main</code> <code>story</code> again to understand how that functionality arose.</p>
-<p>The <code>main</code> <code>story</code> shows months of incremental development, organized in a legible fashion, giving a feasible description for how this functionality could be developed from scratch. It reads a bit like a text book introducing the design of  a complex engineering system incrementally. It has some branching <code>substories</code> in its history, that serve a bit like parenthetical or optional chapters in the development, giving Bob the choice of digging down into specific areas of development, or to continue on with the primary sequence of events.</p>
-<p>As Bob drills down into a particular <code>substory</code>, he sees a change that introduces a novel technique he had never learned about elsewhere. The diff from earlier revisions to this point seem to produce a breakthrough result, as if by magic or pure genius.</p>
-<p>The change in question first introduces <code>functional specifications</code> for how this surprising feature should function, which is part of the standard <code>editorial policy</code> of this branch which constrains the changes in the <code>substory</code> so that they are guaranteed to pass the automated determinstic criteria of the <code>editorial policy</code>. Then after defining these specifications, the next change simply produces the working functionality all at once.</p>
-<p>Skeptical that this is how Alice actually figured this functionality out, so he switches from viewing the <code>main story</code> or <code>substories</code> to analyzing the <code>transaction ledger</code> of the project. This shows an alleged chronological sequence of operations Alice performed to add changes to stories, describe bundles of changes as a coherent unit, rewrite or modify sequences of changes to replace them with new sequences, introduce/remove/rename/re-arrange stories with respect to each other, and so on. These operations are how Alice was able to rearrange the project's history into such a clear pedagogical <code>main story</code>. By reviewing this <code>ledger</code>, Bob is able to review previously existing stories which show earlier attempts at developing the feature and defining the <code>specifications</code>. Finally with this insight, Bob has a closer understanding of how Alice had her breakthrough, and he sends her a message about what he learned from those older superceded stories.</p>
-<p>Since Bob feels pretty confident that this project is safe to use directly, Bob launches the built artifacts on his system. He decides to use the downloaded artifacts rather than rebuilding them, because pangalactic verifies the proofs of computational integrity underlying the build process for the project, so he has very high confidence that they were produced by a very precisely specified toolchain. He's also confident every change in the stories he reviewed matched the <code>editorial policy</code> for those parts of the story, which rely on the same computational proving and validation system.</p>
-<p>The artifacts launch in a popular runtime developed and built within the pangalactic system which restrains artifacts from taking actions beyond the capabilities Bob explicitly grants to them. He passes some testing / exploration capabilities and gets familiar with how OSSM Sauce operates and learns how to manipulate his exploratory capabilities to his satisfaction, so then he starts giving it more and more important capabilities influencing his broader life.</p>
-<p>As he gains familiarity with OSSM Sauce, he begins introducing his own functional specifications and stories for new functionality and sends Alice his own <code>publisher id</code>. Soon Alice and Bob decide to share OSSM Sauce to a wider group, although people outside that wider group cannot access any of OSSM Sauce's history, code, or artifacts without someone, somewhere inviting them. Bob begins collaborating with other acquiantances similar to how he collaborates with Alice, by sharing <code>publisher ids</code> to bootstrap pangalactic connections.</p>
-<p>Because they subscribe to each other this way, they are able to see updates from each other, which include suggestions for how Alice should modify her stories based on those Bob has produced, or vice versa, as well as issue tracking, annotation, and discussion systems to facilitate improving OSSM Sauce through a distributed, decentralized, web of collaborators of unknown extent.</p>
-<p>Finally, since pangalactic has become such a useful universal development collaboration system, the developers of pangalactic itself continue to improve it as humanity spreads to other stars, allowing pangalactic to truly live up to its name.</p>
-<p><strong>Plot hole:</strong> How do people afford to keep improving pangalactic?</p>
+                        <h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
+<p>The pangalactic system is composed of several "infrastructure" layers for data storage &amp; distribution, synchronization among collaborators, determistic computation. Atop this infrastructure is the flagship <code>pg</code> revision control app, although nothing prevents other applications from building on this infrastructure.</p>
+<h2 id="the-store"><a class="header" href="#the-store">The Store</a></h2>
+<p>The <em>Store</em> is a universal immutable data storage and distribution layer, spread across a network. The key primitive is hash-based indexing, along with "directory" nodes for linking together data within the Store.</p>
+<h3 id="the-local-store"><a class="header" href="#the-local-store">The Local Store</a></h3>
+<p>The <em>Local Store</em> is a user-scoped filesystem storage backend containing a subset of the complete universal <em>Store</em>.</p>
+<pre><code class="language-admonish info &quot;git comparison&quot;">Because the Local Store is user-scoped, *all* of a user's revision control storage is shared across all projects on the system. For example, if a user clones the same project into multiple different working directories, the revision control storage is deduplicated / cached for all working directories.
+
+There is no equivalent of `.git` blob storage. This means if you need to ensure the complete history of a project is copied to a new host, you must either copy the entire Local Store (which may include other projects), or use the `pg` tool to perform the transfer.
+</code></pre>
+<h3 id="distribution"><a class="header" href="#distribution">Distribution</a></h3>
+<p>The distribution of immutable data, which ensures that the data a user needs is accessible and allows them to retrieve it, is an unspecified feature area. The current code only supports a <em>Local Store</em>, and this means currently <em>projects cannot be shared across hosts</em>.</p>
+<pre><code class="language-admonish danger &quot;Incomplete Prototype Hazard&quot;">This is an example of how `pangalactic` is in a prototype maturity phase and it is not wise to rely on it solely for revision control or storage needs yet.
+</code></pre>
+<pre><code class="language-TODO unfinished design:">Relationship and terminology between store, distribution, synchronization, and pub/sub crypto:
+
+- Store: universal storage network
+- Distribution: how users get the right data (and how to ensure it's available).
+- Synchronization: how users share and learn about updates of projects they care about.
+- pub/sub: how publisher ids and subscriptions are "storage/network agnostic".
+
+Also, it's not clear yet if pub/sub is a separate layer above Store, or if Store _must_ be pub/sub aware.
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="synopsis.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="vision.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="arch.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="impl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -201,11 +208,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="synopsis.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="vision.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="arch.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="impl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

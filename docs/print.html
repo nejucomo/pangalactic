@@ -186,7 +186,40 @@
 <p>Because they subscribe to each other this way, they are able to see updates from each other, which include suggestions for how Alice should modify her stories based on those Bob has produced, or vice versa, as well as issue tracking, annotation, and discussion systems to facilitate improving OSSM Sauce through a distributed, decentralized, web of collaborators of unknown extent.</p>
 <p>Finally, since pangalactic has become such a useful universal development collaboration system, the developers of pangalactic itself continue to improve it as humanity spreads to other stars, allowing pangalactic to truly live up to its name.</p>
 <p><strong>Plot hole:</strong> How do people afford to keep improving pangalactic?</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
+<p>The pangalactic system is composed of several "infrastructure" layers for data storage &amp; distribution, synchronization among collaborators, determistic computation. Atop this infrastructure is the flagship <code>pg</code> revision control app, although nothing prevents other applications from building on this infrastructure.</p>
+<h2 id="the-store"><a class="header" href="#the-store">The Store</a></h2>
+<p>The <em>Store</em> is a universal immutable data storage and distribution layer, spread across a network. The key primitive is hash-based indexing, along with "directory" nodes for linking together data within the Store.</p>
+<h3 id="the-local-store"><a class="header" href="#the-local-store">The Local Store</a></h3>
+<p>The <em>Local Store</em> is a user-scoped filesystem storage backend containing a subset of the complete universal <em>Store</em>.</p>
+<pre><code class="language-admonish info &quot;git comparison&quot;">Because the Local Store is user-scoped, *all* of a user's revision control storage is shared across all projects on the system. For example, if a user clones the same project into multiple different working directories, the revision control storage is deduplicated / cached for all working directories.
 
+There is no equivalent of `.git` blob storage. This means if you need to ensure the complete history of a project is copied to a new host, you must either copy the entire Local Store (which may include other projects), or use the `pg` tool to perform the transfer.
+</code></pre>
+<h3 id="distribution"><a class="header" href="#distribution">Distribution</a></h3>
+<p>The distribution of immutable data, which ensures that the data a user needs is accessible and allows them to retrieve it, is an unspecified feature area. The current code only supports a <em>Local Store</em>, and this means currently <em>projects cannot be shared across hosts</em>.</p>
+<pre><code class="language-admonish danger &quot;Incomplete Prototype Hazard&quot;">This is an example of how `pangalactic` is in a prototype maturity phase and it is not wise to rely on it solely for revision control or storage needs yet.
+</code></pre>
+<pre><code class="language-TODO unfinished design:">Relationship and terminology between store, distribution, synchronization, and pub/sub crypto:
+
+- Store: universal storage network
+- Distribution: how users get the right data (and how to ensure it's available).
+- Synchronization: how users share and learn about updates of projects they care about.
+- pub/sub: how publisher ids and subscriptions are "storage/network agnostic".
+
+Also, it's not clear yet if pub/sub is a separate layer above Store, or if Store _must_ be pub/sub aware.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="implementation"><a class="header" href="#implementation">Implementation</a></h1>
+<p>There are separate commandline tools for accessing the different architectural layers of pangalactic (see <a href="/architecture.html">Architecture</a>).</p>
+<p>Pangalactic is implemented primarily with <code>rust</code>, with <code>nix</code> orchestrating the build process. Deterministic computation relies on an assumption that <code>WASM</code> is deterministic <sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>, and <code>wasmtime</code> is currently used as the execution environment. Both "host" code and "WASM guest" code is implemented in rust. Some crates are built both on the target host architecture and the WASM architecture to share data types across that boundary.</p>
+<h2 id="crate-dependencies"><a class="header" href="#crate-dependencies">Crate Dependencies</a></h2>
+<p>Here are the current crate dependencies (with redundant transitive dependencies omitted):</p>
+<p><img src="assets/generated/depgraph-ws-dedup.svg" alt="Intra-Workspace Dependencies" /></p>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>This needs careful investigation to ensure it is the case. The WASM specifications and issue trackers are not explicit about this goal. In any case, we hope to replace WASM with a system supporting concise non-interactive proofs of computational integrity. <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

@@ -1,24 +1,12 @@
-{
-  src,
-  nixpkgs,
-  rust-overlay,
-}:
-system:
+inputs: system:
 let
-  pkgs = import nixpkgs {
-    inherit system;
-    overlays = [ rust-overlay.overlays.default ];
-  };
+  lib = import ./lib (inputs // { inherit system; });
 
-  rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (src + "/rust-toolchain.toml");
-
-  book = import ./book.nix { inherit src pkgs; };
-
-  dev-shell = import ./dev-shell.nix { inherit pkgs rust-toolchain; };
+  vendordir = lib.crane.vendorCargoDeps { inherit (lib) src; };
 in
 {
   packages = {
-    default = pkgs.runCommand "pangalactic-nix-pkg-todo" { } ''
+    default = lib.run-command "pkg-todo" [ ] ''
       echo 'Currently only the `...#book` output is implemented.'
       echo
       echo 'TO DO... implement `nix build`'
@@ -26,8 +14,10 @@ in
       mkdir "$out"
     '';
 
-    inherit book;
+    inherit vendordir;
+
+    book = lib.import ./book.nix { inherit vendordir; };
   };
 
-  devShells.default = dev-shell;
+  devShells.default = lib.import ./dev-shell.nix;
 }
