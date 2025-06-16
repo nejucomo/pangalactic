@@ -31,7 +31,7 @@ jobs:
           COMMIT="$(git commit-tree "$TREE" -p refs/heads/gh-pages -p refs/heads/main -m 'auto-deploy merge from nix.yaml')"
           git update-ref 'refs/heads/gh-pages' "$COMMIT"
           git checkout 'gh-pages'
-          git log --graph --one-line --pretty=oneline -4
+          git log --graph --pretty=oneline -4
       - name: Deploy to `gh-pages`
         run: git push origin 'gh-pages'
 
