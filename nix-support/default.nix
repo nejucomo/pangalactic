@@ -1,18 +1,17 @@
 src:
 {
   self,
-  nixpkgs-flake,
-  flake-utils-flake,
-  rust-overlay-flake,
-  crane-flake,
+  nixpkgs,
+  flake-utils,
+  rust-overlay,
+  crane,
 }:
-flake-utils-flake.lib.eachDefaultSystem (
+flake-utils.lib.eachDefaultSystem (
   import ./init-system.nix {
-    inherit
-      src
-      nixpkgs-flake
-      rust-overlay-flake
-      crane-flake
-      ;
+    inherit src;
+
+    nixpkgs-flake = nixpkgs;
+    rust-overlay-flake = rust-overlay;
+    crane-flake = crane;
   }
 )
