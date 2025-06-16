@@ -1,0 +1,37 @@
+name: gh-pages deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  render-and-deploy:
+    name: Render and Deploy Book
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@main
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Render Book
+        run: nix build '.#book'
+      - name: Commit to `gh-pages`
+        run: |
+          # Assert we are on main:
+          [ "$(git rev-parse --abbrev-ref HEAD)" = 'main' ] || exit 1
+          git fetch origin gh-pages:gh-pages
+          git config user.email "ci@nowhere"
+          git config user.name "Autodeployment Bot"
+          cp -r ./result/. ./docs
+          rm ./result
+          touch ./docs/.nojekyll
+          git add ./docs
+          TREE="$(git write-tree)"
+          COMMIT="$(git commit-tree "$TREE" -p refs/heads/gh-pages -p refs/heads/main -m 'auto-deploy merge from nix.yaml')"
+          git update-ref 'refs/heads/gh-pages' "$COMMIT"
+          git checkout 'gh-pages'
+          git log --graph --pretty=oneline -4
+      - name: Deploy to `gh-pages`
+        run: git push origin 'gh-pages'
+
