@@ -1,10 +1,11 @@
 {
   self,
+  pname,
   nixpkgs,
   rust-overlay,
   crane,
-  system,
 }:
+system:
 let
   pkgs = import nixpkgs {
     inherit system;
@@ -14,7 +15,7 @@ let
   rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (self + "/rust-toolchain.toml");
 
   lib = {
-    inherit self pkgs;
+    inherit self pname pkgs;
 
     import = path: import path lib;
 
@@ -25,7 +26,7 @@ let
       let
         inherit (pkgs) runCommand;
         inherit (pkgs.lib) makeBinPath;
-        name = "pangalactic-cmd-${name-suffix}";
+        name = "${pname}-cmd-${name-suffix}";
 
         fullScript =
           ''
