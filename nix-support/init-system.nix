@@ -10,7 +10,7 @@ let
 
   src = crane.cleanCargoSource self;
   vendorDir = crane.vendorCargoDeps { inherit src; };
-  cargoArtifacts = crane.buildDepsOnly { inherit pname src; };
+  cargoArtifacts = crane.buildDepsOnly { inherit pname src vendorDir; };
   binaries = crane.buildPackage { inherit pname src; };
 in
 {
