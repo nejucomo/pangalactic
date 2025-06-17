@@ -1,24 +1,24 @@
 {
-  src,
-  nixpkgs-flake,
-  rust-overlay-flake,
-  crane-flake,
+  self,
+  nixpkgs,
+  rust-overlay,
+  crane,
   system,
 }:
 let
-  pkgs = import nixpkgs-flake {
+  pkgs = import nixpkgs {
     inherit system;
-    overlays = [ rust-overlay-flake.overlays.default ];
+    overlays = [ rust-overlay.overlays.default ];
   };
 
-  rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (src + "/rust-toolchain.toml");
+  rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (self + "/rust-toolchain.toml");
 
   lib = {
-    inherit src pkgs;
+    inherit self pkgs;
 
     import = path: import path lib;
 
-    crane = (crane-flake.mkLib pkgs).overrideToolchain rust-toolchain;
+    crane = (crane.mkLib pkgs).overrideToolchain rust-toolchain;
 
     run-command =
       name-suffix: deps: script:

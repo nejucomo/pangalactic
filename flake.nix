@@ -8,5 +8,5 @@
     crane.url = "github:ipetkov/crane";
   };
 
-  outputs = inputs: import ./nix-support ./. inputs;
+  outputs = inputs: import ./nix-support inputs;
 }

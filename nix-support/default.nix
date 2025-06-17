@@ -1,17 +1,7 @@
-src:
-{
-  self,
-  nixpkgs,
-  flake-utils,
-  rust-overlay,
-  crane,
-}:
-flake-utils.lib.eachDefaultSystem (
-  import ./init-system.nix {
-    inherit src;
+inputs@{ flake-utils, ... }:
+let
+  inherit (flake-utils.lib) eachDefaultSystem;
 
-    nixpkgs-flake = nixpkgs;
-    rust-overlay-flake = rust-overlay;
-    crane-flake = crane;
-  }
-)
+  sysInputs = removeAttrs inputs [ "flake-utils" ];
+in
+eachDefaultSystem (import ./init-system.nix sysInputs)

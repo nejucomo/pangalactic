@@ -2,7 +2,7 @@ inputs: system:
 let
   lib = import ./lib (inputs // { inherit system; });
 
-  vendordir = lib.crane.vendorCargoDeps { inherit (lib) src; };
+  vendorDir = lib.crane.vendorCargoDeps { src = lib.self; };
 in
 {
   packages = {
@@ -14,9 +14,9 @@ in
       mkdir "$out"
     '';
 
-    inherit vendordir;
+    inherit vendorDir;
 
-    book = lib.import ./book.nix { inherit vendordir; };
+    book = lib.import ./book.nix { inherit vendorDir; };
   };
 
   devShells.default = lib.import ./dev-shell.nix;
