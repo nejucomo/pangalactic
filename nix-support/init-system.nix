@@ -1,18 +1,22 @@
 inputs: system:
 let
   lib = import ./lib (inputs // { inherit system; });
+  inherit (lib) crane run-command;
 
-  vendorDir = lib.crane.vendorCargoDeps { src = lib.self; };
+  src = crane.cleanCargoSource lib.self;
+  vendorDir = crane.vendorCargoDeps { inherit src; };
+
+  todoPkg = run-command "pkg-todo" [ ] ''
+    echo 'Currently only the `...#book` output is implemented.'
+    echo
+    echo 'TO DO... implement `nix build`'
+
+    mkdir "$out"
+  '';
 in
 {
   packages = {
-    default = lib.run-command "pkg-todo" [ ] ''
-      echo 'Currently only the `...#book` output is implemented.'
-      echo
-      echo 'TO DO... implement `nix build`'
-
-      mkdir "$out"
-    '';
+    default = todoPkg;
 
     inherit vendorDir;
 
