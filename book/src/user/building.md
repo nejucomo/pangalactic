@@ -14,7 +14,7 @@ These binaries are build from a rust workspace [^1].
 
 ## Build Steps
 
-The primary build and installation approach is via [`nix`](https://nixos.org/learn/). This handles the entire build and installation process, including building binaries, building WASM components, rendering this book, generating diagrams, and so forth. It can also be used to run the full quality assurance checks performed by the Continuous Integration system.
+The primary build and installation approach is via [`nix`](https://nixos.org/learn/). This handles the entire build and installation process, including building binaries, building WASM components, rendering this book, generating diagrams, and so forth. It can also be used to run the full quality assurance checks performed by the Continuous Integration system. If you prefer not to use `nix` and to build/test the components "by hand", head over to the developer section on [Development without `nix`](../dev/without-nix.md).
 
 1. Install [`nix`](https://nixos.org/download/#download-nix) on your system.
 2. Set `export NIX_EXPERIMENTAL=flakes` in your shell to support the newer `flake` feature of `nix`. [^2]
