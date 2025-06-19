@@ -285,16 +285,16 @@ Also, it's not clear yet if pub/sub is a separate layer above Store, or if Store
 <p>None of this book covers cross-compiling specifically, but we note that a benefit of building with <code>nix</code> is much easier cross-compilation support. <a href="#fr-1-1">↩</a></p>
 </li>
 </ol><div style="break-before: page; page-break-before: always;"></div><h1 id="implementation"><a class="header" href="#implementation">Implementation</a></h1>
-<p>There are separate commandline tools for accessing the different architectural layers of pangalactic (see <a href="dev//architecture.html">Architecture</a>).</p>
+<p>There are separate commandline tools for accessing the different architectural layers of pangalactic (see <a href="dev/../design/arch.html">Architecture</a>).</p>
 <p>Pangalactic is implemented primarily with <code>rust</code>, with <code>nix</code> orchestrating the build process. Deterministic computation relies on an assumption that <code>WASM</code> is deterministic <sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>, and <code>wasmtime</code> is currently used as the execution environment. Both "host" code and "WASM guest" code is implemented in rust. Some crates are built both on the target host architecture and the WASM architecture to share data types across that boundary.</p>
-<h2 id="crate-dependencies"><a class="header" href="#crate-dependencies">Crate Dependencies</a></h2>
-<p>Here are the current crate dependencies (with redundant transitive dependencies omitted):</p>
-<p><img src="dev/assets/generated/depgraph-ws-dedup.svg" alt="Intra-Workspace Dependencies" /></p>
 <hr>
 <ol class="footnote-definition"><li id="footnote-1">
 <p>This needs careful investigation to ensure it is the case. The WASM specifications and issue trackers are not explicit about this goal. In any case, we hope to replace WASM with a system supporting concise non-interactive proofs of computational integrity. <a href="#fr-1-1">↩</a></p>
 </li>
-</ol>
+</ol><div style="break-before: page; page-break-before: always;"></div><h1 id="crate-intra-dependencies"><a class="header" href="#crate-intra-dependencies">Crate Intra-Dependencies</a></h1>
+<p>Here are the current crate dependencies within this workspace, (with redundant transitive dependencies omitted):</p>
+<p><img src="dev/../assets/generated/depgraph-ws-dedup.svg" alt="Intra-Workspace Dependencies" /></p>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
