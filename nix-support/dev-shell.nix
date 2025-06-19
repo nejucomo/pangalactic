@@ -1,5 +1,10 @@
-{ pkgs, crane, ... }:
-crane.devShell {
+{
+  self,
+  pkgs,
+  cranes,
+  ...
+}:
+cranes.dev.devShell {
   packages = [ pkgs.mdbook ];
   shellHook = ''
     [ -n "$XDG_CONFIG_HOME" ] || XDG_CONFIG_HOME="$HOME/.config"
