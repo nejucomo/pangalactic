@@ -16,3 +16,4 @@
 - [Let's Hack!](dev/lets-hack.md)
   - [Dev without `nix`](dev/without-nix.md)
 - [Implementation](dev/impl.md)
+  - [Crate Intra-Dependencies](dev/depgraph.md)
