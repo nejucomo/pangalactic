@@ -27,40 +27,47 @@ let
     crane = (crane.mkLib pkgs).overrideToolchain rust-toolchain;
 
     build-workspace =
-      wsargs@{
-        pname,
+      rawArgs@{
         src,
         cargoVendorDir,
-        relpath ? ".",
+
+        # Our own custom params:
+        pnameSuffix,
+        targetsRgx,
+        manifestDir ? ".",
         ...
       }:
       let
         inherit (lib.crane) buildDepsOnly cargoBuild;
+        inherit (lib) run-command;
 
-        commonArgs = (removeAttrs wsargs [ "relpath" ]) // {
-          cargoExtraArgs = "--offline --target-dir=target/ --manifest-path ${relpath}/Cargo.toml";
-        };
-
-        inherit (pkgs.lib) trace;
-
-        traceToString = v: trace "${v}" v;
-
-        traceAttrNames = attrs: trace (builtins.attrNames attrs) attrs;
+        commonArgs =
+          (removeAttrs rawArgs [
+            "pnameSuffix"
+            "targetsRgx"
+            "manifestDir"
+          ])
+          // {
+            pname = "${pname}-${pnameSuffix}";
+            cargoExtraArgs = "--offline --target-dir=target/ --manifest-path ${manifestDir}/Cargo.toml";
+          };
 
         cargoArtifacts = buildDepsOnly commonArgs;
-      in
-      cargoBuild (commonArgs // { inherit cargoArtifacts; });
 
-    select-targets =
-      targetsTarballDir: glob:
-      lib.run-command "select-${glob}" [ pkgs.zstd ] ''
-        echo 'Selecting "${glob}" from "${targetsTarballDir}"'
+        cargoBuilt = cargoBuild (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+            installCargoArtifactsMode = "use-symlink";
+          }
+        );
+
+      in
+      run-command "${pnameSuffix}-select-targets" [ pkgs.fd ] ''
+        targetDir='${cargoBuilt}/target'
+        echo 'Selecting "${targetsRgx}" from:' "$targetDir"
         mkdir "$out"
-        tar -xf '${targetsTarballDir}/target.tar.zst'
-        for rdir in $(find . -type d -name 'release')
-        do
-          find "$rdir" -maxdepth 1 -name '${glob}' -exec mv '{}' "$out/" ';'
-        done
+        fd '${targetsRgx}' "$targetDir" --full-path --exec ln -s '{}' "$out/"
       '';
 
     run-command =
@@ -68,20 +75,10 @@ let
       let
         inherit (pkgs) runCommand;
         inherit (pkgs.lib) makeBinPath;
-        inherit (builtins) replaceStrings;
 
-        esc-suffix = replaceStrings [ "." "*" ] [ "DOT" "STAR" ] suffix;
-
-        name = "${pname}-cmd-${esc-suffix}";
-
-        fullScript =
-          ''
-            export PATH="$PATH:${makeBinPath deps}"
-          ''
-          + "\n"
-          + script;
+        fullScript = ''export PATH="$PATH:${makeBinPath deps}"'' + "\n" + script;
       in
-      pkgs.runCommand name { } fullScript;
+      runCommand "${pname}-cmd-${suffix}" { } fullScript;
   };
 in
 lib

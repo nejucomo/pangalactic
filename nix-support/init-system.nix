@@ -18,20 +18,23 @@ let
     ];
   };
 
-  wasmArtifacts = build-workspace {
+  wasms = build-workspace {
     inherit src cargoVendorDir;
-    pname = "${pname}-wasmArtifacts";
-    relpath = "seed/guests";
+    pnameSuffix = "wasms";
+    targetsRgx = "release/[^/]+\.wasm$";
+    manifestDir = "seed/guests";
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
-  wasms = select-targets wasmArtifacts "*.wasm";
-
-  # binaries = build-workspace { inherit pname; };
+  bins = build-workspace {
+    inherit src cargoVendorDir;
+    pnameSuffix = "bins";
+    targetsRgx = "release/pg(-[a-z-]+)?$";
+  };
 in
 {
   packages = {
-    inherit cargoVendorDir wasms wasmArtifacts;
+    inherit bins cargoVendorDir wasms;
 
     book = import ./book.nix { inherit cargoVendorDir; };
   };
