@@ -53,24 +53,26 @@ let
 
     select-targets =
       targetsTarballDir: glob:
-      lib.run-command "select-targets" (with pkgs; [ zstd ]) ''
+      lib.run-command "select-${glob}" [ pkgs.zstd ] ''
         echo 'Selecting "${glob}" from "${targetsTarballDir}"'
-        ( set -x
         mkdir "$out"
         tar -xf '${targetsTarballDir}/target.tar.zst'
         for rdir in $(find . -type d -name 'release')
         do
           find "$rdir" -maxdepth 1 -name '${glob}' -exec mv '{}' "$out/" ';'
         done
-        )
       '';
 
     run-command =
-      name-suffix: deps: script:
+      suffix: deps: script:
       let
         inherit (pkgs) runCommand;
         inherit (pkgs.lib) makeBinPath;
-        name = "${pname}-cmd-${name-suffix}";
+        inherit (builtins) replaceStrings;
+
+        esc-suffix = replaceStrings [ "." "*" ] [ "DOT" "STAR" ] suffix;
+
+        name = "${pname}-cmd-${esc-suffix}";
 
         fullScript =
           ''
