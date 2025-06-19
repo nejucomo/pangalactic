@@ -1,23 +1,64 @@
 inputs: system:
 let
-  lib = import ./lib (inputs // { inherit system; });
+  inherit (builtins.import ./lib inputs system)
+    import
+    self
+    pname
+    crane
+    run-command
+    build-workspace
+    ;
 
-  vendordir = lib.crane.vendorCargoDeps { inherit (lib) src; };
+  src = crane.cleanCargoSource self;
+
+  cargoVendorDir = crane.vendorMultipleCargoDeps {
+    cargoLockList = [
+      (src + "/Cargo.lock")
+      (src + "/seed/guests/Cargo.lock")
+    ];
+  };
+
+  wasms = build-workspace {
+    inherit src cargoVendorDir;
+    pnameSuffix = "wasms";
+    targetsRgx = "release/[^/]+\.wasm$";
+    manifestDir = "seed/guests";
+    CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
+  };
+
+  bins = build-workspace {
+    inherit src cargoVendorDir;
+    pnameSuffix = "bins";
+    targetsRgx = "release/pg(-[a-z-]+)?$";
+  };
+
+  book = import ./book.nix { inherit cargoVendorDir; };
+
+  install = run-command "install" [ ] ''
+    function install-dir-link
+    {
+      local target="$1"
+      local link="$2"
+
+      mkdir -p "$(dirname "$link")"
+      ln -vs "$target" "$link"
+    }
+
+    install-dir-link '${bins}' "$out/bin"
+    install-dir-link '${wasms}' "$out/lib/${pname}/wasm"
+    install-dir-link '${book}' "$out/doc/${pname}"
+  '';
 in
 {
   packages = {
-    default = lib.run-command "pkg-todo" [ ] ''
-      echo 'Currently only the `...#book` output is implemented.'
-      echo
-      echo 'TO DO... implement `nix build`'
-
-      mkdir "$out"
-    '';
-
-    inherit vendordir;
-
-    book = lib.import ./book.nix { inherit vendordir; };
+    default = install;
+    inherit
+      bins
+      book
+      install
+      wasms
+      ;
   };
 
-  devShells.default = lib.import ./dev-shell.nix;
+  devShells.default = import ./dev-shell.nix;
 }
