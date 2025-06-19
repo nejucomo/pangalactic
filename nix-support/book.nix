@@ -32,5 +32,5 @@ in
 run-command "render-book" [ fd mdbook ] ''
   mdbook build --dest-dir "$out" '${booksrc}'
   mkdir -p "$out/assets/generated"
-  fd --glob '*.svg' '${depgraph}' --exec ln -sv '{}' "$out/assets/generated/"
+  fd --glob '*.svg' '${depgraph}' --exec cp '{}' "$out/assets/generated/"
 ''
