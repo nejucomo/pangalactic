@@ -5,8 +5,8 @@ let
     self
     pname
     crane
+    run-command
     build-workspace
-    select-targets
     ;
 
   src = crane.cleanCargoSource self;
@@ -31,12 +31,33 @@ let
     pnameSuffix = "bins";
     targetsRgx = "release/pg(-[a-z-]+)?$";
   };
+
+  book = import ./book.nix { inherit cargoVendorDir; };
+
+  install = run-command "install" [ ] ''
+    function install-dir-link
+    {
+      local target="$1"
+      local link="$2"
+
+      mkdir -p "$(dirname "$link")"
+      ln -vs "$target" "$link"
+    }
+
+    install-dir-link '${bins}' "$out/bin"
+    install-dir-link '${wasms}' "$out/lib/${pname}/wasm"
+    install-dir-link '${book}' "$out/doc/${pname}"
+  '';
 in
 {
   packages = {
-    inherit bins cargoVendorDir wasms;
-
-    book = import ./book.nix { inherit cargoVendorDir; };
+    default = install;
+    inherit
+      bins
+      book
+      install
+      wasms
+      ;
   };
 
   devShells.default = import ./dev-shell.nix;

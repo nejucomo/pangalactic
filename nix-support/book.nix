@@ -2,7 +2,7 @@ lib:
 { cargoVendorDir }:
 let
   inherit (lib) self run-command;
-  inherit (lib.pkgs) mdbook graphviz;
+  inherit (lib.pkgs) fd mdbook graphviz;
 
   depgraph =
     run-command "depgraph"
@@ -12,8 +12,6 @@ let
         graphviz
       ])
       ''
-        ( # subshell for xtrace scoping
-        set -x
         export CARGO_HOME='${cargoVendorDir}'
         export CARGO_NET_OFFLINE='true'
         mkdir "$out"
@@ -27,13 +25,12 @@ let
           | dot \
             -Tsvg \
           > "$out/depgraph-ws-dedup.svg"
-        )
       '';
 
   booksrc = self + "/book";
 in
-run-command "render-book" [ mdbook ] ''
+run-command "render-book" [ fd mdbook ] ''
   mdbook build --dest-dir "$out" '${booksrc}'
   mkdir -p "$out/assets/generated"
-  cp -rv '${depgraph}/.' "$out/assets/generated/"
+  fd --glob '*.svg' '${depgraph}' --exec ln -sv '{}' "$out/assets/generated/"
 ''
