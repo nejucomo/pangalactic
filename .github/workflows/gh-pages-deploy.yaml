@@ -23,7 +23,7 @@ jobs:
           git fetch origin gh-pages:gh-pages
           git config user.email "ci@nowhere"
           git config user.name "Autodeployment Bot"
-          cp -r ./result/. ./docs
+          cp --recursive --dereference ./result/. ./docs
           rm ./result
           touch ./docs/.nojekyll
           git add ./docs
