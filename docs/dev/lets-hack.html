@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Vision - pangalactic</title>
+        <title>Let&#x27;s Hack! - pangalactic</title>
 
 
         <!-- Custom HTML head -->
@@ -12,33 +12,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="favicon.svg">
-        <link rel="shortcut icon" href="favicon.png">
-        <link rel="stylesheet" href="css/variables.css">
-        <link rel="stylesheet" href="css/general.css">
-        <link rel="stylesheet" href="css/chrome.css">
-        <link rel="stylesheet" href="css/print.css" media="print">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "";
+            const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc.js"></script>
+        <script src="../toc.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -102,7 +102,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -137,7 +137,7 @@
                     <h1 class="menu-title">pangalactic</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
 
@@ -166,32 +166,32 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="vision"><a class="header" href="#vision">Vision</a></h1>
-<p><strong>TODO:</strong> Sort out terminology, especially <code>tech-concept-words</code>.</p>
-<p>Let me tell you a tale...</p>
-<p>Alice invites Bob to begin collaborating on a project, "OSSM Sauce", so she sends Bob the <code>publisher-id</code> she uses as her main collaboration nexus for the project.</p>
-<p>Bob <em>subscribes</em> to this <code>publisher-id</code> to download a copy of the source code, history, and built artifacts. He examines the <code>main</code> <code>story</code> Alice has arranged to get a feel for the development of the project. He likes the idea, and he's excited to be invited to collaborate since OSSM Sauce is not yet announced to the public and is privately shared between a small group of collaborators, even though they are all coordinating on this project and many others through the universal <code>pangalactic network</code>.</p>
-<p>Bob wants to know OSSM Sauce is safe for people to use, especially himself, so he browses the current code, looking for vulnerabilities, or even worse, anything malicious. He notices some surprising functionality and reviews the <code>main</code> <code>story</code> again to understand how that functionality arose.</p>
-<p>The <code>main</code> <code>story</code> shows months of incremental development, organized in a legible fashion, giving a feasible description for how this functionality could be developed from scratch. It reads a bit like a text book introducing the design of  a complex engineering system incrementally. It has some branching <code>substories</code> in its history, that serve a bit like parenthetical or optional chapters in the development, giving Bob the choice of digging down into specific areas of development, or to continue on with the primary sequence of events.</p>
-<p>As Bob drills down into a particular <code>substory</code>, he sees a change that introduces a novel technique he had never learned about elsewhere. The diff from earlier revisions to this point seem to produce a breakthrough result, as if by magic or pure genius.</p>
-<p>The change in question first introduces <code>functional specifications</code> for how this surprising feature should function, which is part of the standard <code>editorial policy</code> of this branch which constrains the changes in the <code>substory</code> so that they are guaranteed to pass the automated determinstic criteria of the <code>editorial policy</code>. Then after defining these specifications, the next change simply produces the working functionality all at once.</p>
-<p>Skeptical that this is how Alice actually figured this functionality out, so he switches from viewing the <code>main story</code> or <code>substories</code> to analyzing the <code>transaction ledger</code> of the project. This shows an alleged chronological sequence of operations Alice performed to add changes to stories, describe bundles of changes as a coherent unit, rewrite or modify sequences of changes to replace them with new sequences, introduce/remove/rename/re-arrange stories with respect to each other, and so on. These operations are how Alice was able to rearrange the project's history into such a clear pedagogical <code>main story</code>. By reviewing this <code>ledger</code>, Bob is able to review previously existing stories which show earlier attempts at developing the feature and defining the <code>specifications</code>. Finally with this insight, Bob has a closer understanding of how Alice had her breakthrough, and he sends her a message about what he learned from those older superceded stories.</p>
-<p>Since Bob feels pretty confident that this project is safe to use directly, Bob launches the built artifacts on his system. He decides to use the downloaded artifacts rather than rebuilding them, because pangalactic verifies the proofs of computational integrity underlying the build process for the project, so he has very high confidence that they were produced by a very precisely specified toolchain. He's also confident every change in the stories he reviewed matched the <code>editorial policy</code> for those parts of the story, which rely on the same computational proving and validation system.</p>
-<p>The artifacts launch in a popular runtime developed and built within the pangalactic system which restrains artifacts from taking actions beyond the capabilities Bob explicitly grants to them. He passes some testing / exploration capabilities and gets familiar with how OSSM Sauce operates and learns how to manipulate his exploratory capabilities to his satisfaction, so then he starts giving it more and more important capabilities influencing his broader life.</p>
-<p>As he gains familiarity with OSSM Sauce, he begins introducing his own functional specifications and stories for new functionality and sends Alice his own <code>publisher id</code>. Soon Alice and Bob decide to share OSSM Sauce to a wider group, although people outside that wider group cannot access any of OSSM Sauce's history, code, or artifacts without someone, somewhere inviting them. Bob begins collaborating with other acquiantances similar to how he collaborates with Alice, by sharing <code>publisher ids</code> to bootstrap pangalactic connections.</p>
-<p>Because they subscribe to each other this way, they are able to see updates from each other, which include suggestions for how Alice should modify her stories based on those Bob has produced, or vice versa, as well as issue tracking, annotation, and discussion systems to facilitate improving OSSM Sauce through a distributed, decentralized, web of collaborators of unknown extent.</p>
-<p>Finally, since pangalactic has become such a useful universal development collaboration system, the developers of pangalactic itself continue to improve it as humanity spreads to other stars, allowing pangalactic to truly live up to its name.</p>
-<p><strong>Plot hole:</strong> How do people afford to keep improving pangalactic?</p>
-
+                        <h1 id="lets-hack-pangalactic"><a class="header" href="#lets-hack-pangalactic">Let's Hack Pangalactic!</a></h1>
+<p>So you wanna hack on pangalactic, eh?</p>
+<p>The first step is quick and easy, take the <em>Pangalactic Oath</em>:</p>
+<blockquote>
+<p>I dedicate some of my time toward improving pangalactic as I see fit in service of our glorious mission to explore all of the Milky Way.</p>
+</blockquote>
+<p>Don't fret about such an audacious Oath; we may fail, but it's worth a shot.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<p>You'll benefit from some familiarity with the User Guide (such as <a href="../user/building.html">Building</a>) and Design (especially the <a href="../design/vision.html">Vision</a>).</p>
+<p>With that in mind, check out the <a href="./impl.html">Implementation</a> overview to get a feel for how it's currently implemented.</p>
+<h2 id="the-journey-continues"><a class="header" href="#the-journey-continues">The Journey Continues</a></h2>
+<p>... and if you've made it this far, best of luck. You've attained True Englightenment™️ <sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup>!</p>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>-at least in so far as these incomplete docs about a work-in-progress software project can help one attain True Englightenment™️. <a href="#fr-1-1">↩</a></p>
+</li>
+</ol>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="synopsis.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../design/arch.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="arch.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../dev/without-nix.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -201,11 +201,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="synopsis.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../design/arch.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="arch.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../dev/without-nix.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -220,13 +220,13 @@
         </script>
 
 
-        <script src="elasticlunr.min.js"></script>
-        <script src="mark.min.js"></script>
-        <script src="searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="clipboard.min.js"></script>
-        <script src="highlight.js"></script>
-        <script src="book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
 

@@ -1,40 +1,84 @@
 {
-  src,
-  nixpkgs-flake,
-  rust-overlay-flake,
-  crane-flake,
-  system,
+  self,
+  pname,
+  nixpkgs,
+  rust-overlay,
+  crane,
 }:
+system:
 let
-  pkgs = import nixpkgs-flake {
+  pkgs = import nixpkgs {
     inherit system;
-    overlays = [ rust-overlay-flake.overlays.default ];
+    overlays = [ rust-overlay.overlays.default ];
   };
 
-  rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (src + "/rust-toolchain.toml");
+  rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile (self + "/rust-toolchain.toml");
 
   lib = {
-    inherit src pkgs;
+    inherit
+      self
+      pname
+      pkgs
+      rust-toolchain
+      ;
 
     import = path: import path lib;
 
-    crane = (crane-flake.mkLib pkgs).overrideToolchain rust-toolchain;
+    crane = (crane.mkLib pkgs).overrideToolchain rust-toolchain;
+
+    build-workspace =
+      rawArgs@{
+        src,
+        cargoVendorDir,
+
+        # Our own custom params:
+        pnameSuffix,
+        targetsRgx,
+        manifestDir ? ".",
+        ...
+      }:
+      let
+        inherit (lib.crane) buildDepsOnly cargoBuild;
+        inherit (lib) run-command;
+
+        commonArgs =
+          (removeAttrs rawArgs [
+            "pnameSuffix"
+            "targetsRgx"
+            "manifestDir"
+          ])
+          // {
+            pname = "${pname}-${pnameSuffix}";
+            cargoExtraArgs = "--offline --target-dir=target/ --manifest-path ${manifestDir}/Cargo.toml";
+          };
+
+        cargoArtifacts = buildDepsOnly commonArgs;
+
+        cargoBuilt = cargoBuild (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+            installCargoArtifactsMode = "use-symlink";
+          }
+        );
+
+      in
+      run-command "${pnameSuffix}-select-targets" [ pkgs.fd ] ''
+        targetDir='${cargoBuilt}/target'
+        echo 'Selecting "${targetsRgx}" from:' "$targetDir"
+        mkdir "$out"
+        fd '${targetsRgx}' "$targetDir" --full-path --exec ln -s '{}' "$out/"
+      '';
 
     run-command =
-      name-suffix: deps: script:
+      suffix: deps: script:
       let
         inherit (pkgs) runCommand;
         inherit (pkgs.lib) makeBinPath;
-        name = "pangalactic-cmd-${name-suffix}";
 
-        fullScript =
-          ''
-            export PATH="$PATH:${makeBinPath deps}"
-          ''
-          + "\n"
-          + script;
+        fullScript = ''export PATH="$PATH:${makeBinPath deps}"'' + "\n" + script;
       in
-      pkgs.runCommand name { } fullScript;
+      runCommand "${pname}-cmd-${suffix}" { } fullScript;
   };
 in
 lib

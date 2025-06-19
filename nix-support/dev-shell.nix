@@ -1,9 +1,6 @@
-{ pkgs, rust-toolchain }:
-pkgs.mkShell {
-  packages = [
-    rust-toolchain
-    pkgs.mdbook
-  ];
+{ pkgs, crane, ... }:
+crane.devShell {
+  packages = [ pkgs.mdbook ];
   shellHook = ''
     [ -n "$XDG_CONFIG_HOME" ] || XDG_CONFIG_HOME="$HOME/.config"
 
