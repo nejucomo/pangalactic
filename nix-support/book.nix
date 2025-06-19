@@ -1,5 +1,5 @@
 lib:
-{ vendorDir }:
+{ cargoVendorDir }:
 let
   inherit (lib) self run-command;
   inherit (lib.pkgs) mdbook graphviz;
@@ -14,7 +14,7 @@ let
       ''
         ( # subshell for xtrace scoping
         set -x
-        export CARGO_HOME='${vendorDir}'
+        export CARGO_HOME='${cargoVendorDir}'
         export CARGO_NET_OFFLINE='true'
         mkdir "$out"
         cd "${self}"

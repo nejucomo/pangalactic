@@ -5,21 +5,35 @@ let
     self
     pname
     crane
-    run-command
+    build-workspace
+    select-targets
     ;
 
   src = crane.cleanCargoSource self;
-  vendorDir = crane.vendorCargoDeps { inherit src; };
-  cargoArtifacts = crane.buildDepsOnly { inherit pname src vendorDir; };
-  binaries = crane.buildPackage { inherit pname src; };
+
+  cargoVendorDir = crane.vendorMultipleCargoDeps {
+    cargoLockList = [
+      (src + "/Cargo.lock")
+      (src + "/seed/guests/Cargo.lock")
+    ];
+  };
+
+  wasmArtifacts = build-workspace {
+    inherit src cargoVendorDir;
+    pname = "${pname}-wasmArtifacts";
+    relpath = "seed/guests";
+    CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
+  };
+
+  wasms = select-targets wasmArtifacts "*.wasm";
+
+  # binaries = build-workspace { inherit pname; };
 in
 {
   packages = {
-    default = binaries;
+    inherit cargoVendorDir wasms wasmArtifacts;
 
-    inherit binaries cargoArtifacts vendorDir;
-
-    book = import ./book.nix { inherit vendorDir; };
+    book = import ./book.nix { inherit cargoVendorDir; };
   };
 
   devShells.default = import ./dev-shell.nix;
