@@ -1,4 +1,5 @@
 {
+  pname,
   pkgs,
   cranes,
   run-command,
