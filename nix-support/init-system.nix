@@ -4,10 +4,12 @@ let
     import
     self
     pname
-    crane
+    cranes
     run-command
     build-workspace
     ;
+
+  crane = cranes.release;
 
   src = crane.cleanCargoSource self;
 
