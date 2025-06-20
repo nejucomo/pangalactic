@@ -4,9 +4,11 @@ let
     import
     self
     pname
+    pkgs
     cranes
     run-command
     build-workspace
+    combine-derivations
     ;
 
   crane = cranes.release;
@@ -20,17 +22,17 @@ let
     ];
   };
 
-  wasms = build-workspace {
+  wasm = build-workspace {
     inherit src cargoVendorDir;
-    pnameSuffix = "wasms";
+    pnameSuffix = "wasm";
     targetsRgx = "release/[^/]+\.wasm$";
     manifestDir = "seed/guests";
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
-  bins = build-workspace {
+  bin = build-workspace {
     inherit src cargoVendorDir;
-    pnameSuffix = "bins";
+    pnameSuffix = "bin";
     targetsRgx = "release/pg(-[a-z-]+)?$";
   };
 
@@ -46,20 +48,30 @@ let
       ln -vs "$target" "$link"
     }
 
-    install-dir-link '${bins}' "$out/bin"
-    install-dir-link '${wasms}' "$out/lib/${pname}/wasm"
+    install-dir-link '${bin.outputs}' "$out/bin"
+    install-dir-link '${wasm.outputs}' "$out/lib/${pname}/wasm"
     install-dir-link '${book}' "$out/doc/${pname}"
   '';
+
+  # All output packages _except_ default and all:
+  base-packages = {
+    bin-cargo-artifacts = bin.cargo.artifacts;
+    bin-cargo-build = bin.cargo.build;
+    bin = bin.outputs;
+
+    wasm-cargo-artifacts = wasm.cargo.artifacts;
+    wasm-cargo-build = wasm.cargo.build;
+    wasm = wasm.outputs;
+
+    inherit book install;
+  };
+
+  all = combine-derivations base-packages;
 in
 {
-  packages = {
+  packages = base-packages // {
+    inherit all;
     default = install;
-    inherit
-      bins
-      book
-      install
-      wasms
-      ;
   };
 
   devShells.default = import ./dev-shell.nix;

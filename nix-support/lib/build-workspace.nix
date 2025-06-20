@@ -39,10 +39,17 @@ let
     }
   );
 
+  outputs = run-command "${pnameSuffix}-select-targets" [ pkgs.fd ] ''
+    targetDir='${cargoBuilt}/target'
+    echo 'Selecting "${targetsRgx}" from:' "$targetDir"
+    mkdir "$out"
+    fd '${targetsRgx}' "$targetDir" --full-path --exec ln -s '{}' "$out/"
+  '';
 in
-run-command "${pnameSuffix}-select-targets" [ pkgs.fd ] ''
-  targetDir='${cargoBuilt}/target'
-  echo 'Selecting "${targetsRgx}" from:' "$targetDir"
-  mkdir "$out"
-  fd '${targetsRgx}' "$targetDir" --full-path --exec ln -s '{}' "$out/"
-''
+{
+  cargo = {
+    artifacts = cargoArtifacts;
+    build = cargoBuilt;
+  };
+  inherit outputs;
+}
