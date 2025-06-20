@@ -1,11 +1,15 @@
-name: CI
+name: PRCI
 
 on:
   pull_request:
     types: [opened, synchronize]
 
+  # Temporarily enable this to test without PR merges each cycle:
+  push:
+    branches: [ci-caching]
+
 jobs:
-  build-and-test:
+  build-and-test-no-nix:
     runs-on: ubuntu-latest
     steps:
       - run: rustup toolchain install nightly
@@ -16,3 +20,15 @@ jobs:
       - run: cargo +nightly test
       - run: cargo +nightly build
       - run: cargo +nightly doc
+
+  nix-build:
+    name: Build Nix targets
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@main
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Build default package
+        run: nix build
