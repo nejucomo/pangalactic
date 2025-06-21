@@ -38,7 +38,7 @@ jobs:
           if ! [ "$(nix eval --raw .#bin-cargo-artifacts)" = "${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}" ]
           then
             echo 'Dependencies have changed; refreshing cache...'
-            mv /tmp/gh-nix-cache /tmp/old-gh-nix-cache
+            [ -d /tmp/gh-nix-cache ] && mv -v /tmp/gh-nix-cache /tmp/old-gh-nix-cache
             nix copy --to file:///tmp/gh-nix-cache .#bin-cargo-artifacts
           fi
 
