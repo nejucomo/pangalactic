@@ -16,9 +16,8 @@ jobs:
         id: compute-nix-cache-hash
         run: |
           nix eval --raw .#bin-cargo-artifacts \
-            | sha256sum \
-            | sed 's/ .*$//; s/^/nix_cache_hash=/' \
-            | tee -a GITHUB_OUTPUT
+            | sed 's/^/nix_cache_hash=/' \
+            | tee -a "$GITHUB_OUTPUT"
 
       - name: Cache nix prerequisite derivations
         id: cache-nix-bin-cargo-artifacts
