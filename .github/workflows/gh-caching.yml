@@ -27,18 +27,5 @@ jobs:
         with:
           path: /tmp/gh-nix-cache/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}
-
-      - if: ${{ steps.cache-nix-bin-cargo-artifacts.outputs.cache-hit == 'true' }}
-        name: Restore nix nar cache
-        run: nix copy --all --no-check-sigs --from file:///tmp/gh-nix-cache/
-
       - name: Checking for Cache Refresh
-        run: |
-          set -x
-          if ! [ -d /tmp/gh-nix-cache/ ] || [ "$(nix eval --raw .#bin-cargo-artifacts)" '!=' "${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}" ]
-          then
-            echo 'Refreshing cache...'
-            [ -d /tmp/gh-nix-cache ] && mv -v /tmp/gh-nix-cache /tmp/old-gh-nix-cache
-            nix copy --to file:///tmp/gh-nix-cache .#bin-cargo-artifacts
-          fi
-
+        run: ./util/nix-cache-restore-or-build.sh bin-cargo-artifacts /tmp/gh-nix-cache
