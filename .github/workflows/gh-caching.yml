@@ -34,9 +34,10 @@ jobs:
 
       - name: Checking for Cache Refresh
         run: |
-          if ! [ "$(nix eval --raw .#bin-cargo-artifacts)" = "${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}" ]
+          set -x
+          if ! [ -d /tmp/gh-nix-cache/ ] || [ "$(nix eval --raw .#bin-cargo-artifacts)" '!=' "${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}" ]
           then
-            echo 'Dependencies have changed; refreshing cache...'
+            echo 'Refreshing cache...'
             [ -d /tmp/gh-nix-cache ] && mv -v /tmp/gh-nix-cache /tmp/old-gh-nix-cache
             nix copy --to file:///tmp/gh-nix-cache .#bin-cargo-artifacts
           fi
