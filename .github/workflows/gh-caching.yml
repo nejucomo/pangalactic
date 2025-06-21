@@ -30,7 +30,7 @@ jobs:
 
       - if: ${{ steps.cache-nix-bin-cargo-artifacts.outputs.cache-hit == 'true' }}
         name: Restore nix nar cache
-        run: nix copy --all --from file:///tmp/gh-nix-cache/
+        run: nix copy --all --no-check-sigs --from file:///tmp/gh-nix-cache/
 
       - name: Checking for Cache Refresh
         run: |
