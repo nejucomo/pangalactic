@@ -1,4 +1,4 @@
-name: GH `nix copy` Caching
+name: nix caching
 on:
   push:
     branches: [main, ci-caching]
