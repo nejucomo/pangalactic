@@ -5,8 +5,8 @@ on:
     types: [opened, synchronize]
 
   # NO MERGE: Temporarily enable this to test without PR merges each cycle:
-  # push:
-  #   branches: [ci-caching]
+  push:
+    branches: [ci-caching]
 
 jobs:
   # NO MERGE: Temporarily disabled for pre-PR testing (save resources):
