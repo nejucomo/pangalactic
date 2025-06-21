@@ -34,6 +34,15 @@ let
     inherit src cargoVendorDir;
     pnameSuffix = "bin";
     targetsRgx = "release/pg(-[a-z-]+)?$";
+
+    preBuild = ''
+      if [ -z "$CRANE_BUILD_DEPS_ONLY" ]
+      then
+        echo 'Using prebuilt guests: ${wasm.cargo.build}'
+        cp -r '${wasm.cargo.build}/target' ./seed/guests/target
+        chmod -R u+w ./seed/guests/target
+      fi
+    '';
   };
 
   book = import ./book.nix { inherit cargoVendorDir; };
