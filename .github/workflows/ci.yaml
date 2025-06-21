@@ -31,5 +31,19 @@ jobs:
         uses: DeterminateSystems/flake-checker-action@main
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Cache nix prerequisite derivations
+        id: cache-nix-bin-cargo-artifacts
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-nix-bin-cargo-artifacts
+        with:
+          path: /tmp/gh-nix-cache/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}
+
+      - if: ${{ steps.cache-nix-bin-cargo-artifacts.outputs.cache-hit == 'true' }}
+        name: Restore nix nar cache
+        run: nix copy --all --from file:///tmp/gh-nix-cache/
+
       - name: Build default package
         run: nix build .#all

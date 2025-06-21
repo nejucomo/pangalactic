@@ -1,0 +1,44 @@
+name: GH `nix copy` Caching
+on:
+  push:
+    branches: [main, ci-caching]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Generate nix caching key
+        id: compute-nix-cache-hash
+        run: |
+          nix eval --raw .#bin-cargo-artifacts \
+            | sha256sum \
+            | sed 's/ .*$//; s/^/nix_cache_hash=/' \
+            | tee -a GITHUB_OUTPUT
+
+      - name: Cache nix prerequisite derivations
+        id: cache-nix-bin-cargo-artifacts
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-nix-bin-cargo-artifacts
+        with:
+          path: /tmp/gh-nix-cache/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}
+
+      - if: ${{ steps.cache-nix-bin-cargo-artifacts.outputs.cache-hit == 'true' }}
+        name: Restore nix nar cache
+        run: nix copy --all --from file:///tmp/gh-nix-cache/
+
+      - name: Checking for Cache Refresh
+        run: |
+          if ! [ "$(nix eval --raw .#bin-cargo-artifacts)" = "${{ steps.compute-nix-cache-hash.outputs.nix_cache_hash }}" ]
+          then
+            echo 'Dependencies have changed; refreshing cache...'
+            mv /tmp/gh-nix-cache /tmp/old-gh-nix-cache
+            nix copy --to file:///tmp/gh-nix-cache .#bin-cargo-artifacts
+          fi
+
