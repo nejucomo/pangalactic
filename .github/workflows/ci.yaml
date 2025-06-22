@@ -1,18 +1,57 @@
-name: CI
+name: Quality Assurance
 
 on:
   pull_request:
     types: [opened, synchronize]
 
+  # NO MERGE: Temporarily enable this to test without PR merges each cycle:
+  push:
+    branches: [ci-caching]
+
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  # NO MERGE: Temporarily disabled for pre-PR testing (save resources):
+  # build-and-test-no-nix:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - run: rustup toolchain install nightly
+  #     - run: rustup target add wasm32-unknown-unknown --toolchain nightly
+  #     - run: rustup component add rustfmt --toolchain nightly
+  #     - uses: actions/checkout@v2
+  #     - run: cargo +nightly fmt -- --check
+  #     - run: cargo +nightly test
+  #     - run: cargo +nightly build
+  #     - run: cargo +nightly doc
+
+  nix-build:
+    name: Build Nix targets
+    runs-on: ubuntu-22.04
+    env:
+      NIX_CACHE_ATTR: bin-cargo-artifacts
+      NIX_CACHE_DIR: /tmp/gh-nix-cache
     steps:
-      - run: rustup toolchain install nightly
-      - run: rustup target add wasm32-unknown-unknown --toolchain nightly
-      - run: rustup component add rustfmt --toolchain nightly
-      - uses: actions/checkout@v2
-      - run: cargo +nightly fmt -- --check
-      - run: cargo +nightly test
-      - run: cargo +nightly build
-      - run: cargo +nightly doc
+      - uses: actions/checkout@v3
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@main
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Generate nix caching key
+        id: compute-nix-cache-hash
+        run: |
+          ./util/nix-cache.sh outpath "$NIX_CACHE_ATTR" \
+            | sed 's/^/NIX_CACHE_HASH=/' \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache nix prerequisite derivations
+        id: cache-nix-bin-cargo-artifacts
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-nix-bin-cargo-artifacts
+        with:
+          path: ${{ env.NIX_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.NIX_CACHE_HASH }}
+
+      - name: Restore nix cache
+        run: ./util/nix-cache.sh restore "$NIX_CACHE_ATTR" "$NIX_CACHE_DIR"
+
+      - run: nix build

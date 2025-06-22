@@ -1,3 +1,4 @@
 /target
 /seed/guests/target
 /result
+cachix-auth-token.sh

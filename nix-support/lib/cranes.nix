@@ -29,7 +29,7 @@ let
   baseCrane = crane.mkLib pkgs;
 
   overrideCrane = flip pipe [
-    pkgs.lib.traceValSeq
+    # pkgs.lib.traceValSeq
     pkgs.rust-bin.fromRustupToolchain
     baseCrane.overrideToolchain
   ];

@@ -1,0 +1,45 @@
+name: nix caching
+on:
+  push:
+    branches: [main, ci-caching]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NIX_CACHE_ATTR: bin-cargo-artifacts
+      NIX_CACHE_DIR: /tmp/gh-nix-cache
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+
+      - name: Generate nix caching key
+        id: compute-nix-cache-hash
+        run: |
+          ./util/nix-cache.sh outpath "$NIX_CACHE_ATTR" \
+            | sed 's/^/NIX_CACHE_HASH=/' \
+            | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache nix prerequisite derivations
+        id: cache-nix-bin-cargo-artifacts
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-nix-bin-cargo-artifacts
+        with:
+          path: ${{ env.NIX_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.NIX_CACHE_HASH }}
+
+      - name: Restore nix cache
+        run: ./util/nix-cache.sh restore "$NIX_CACHE_ATTR" "$NIX_CACHE_DIR"
+
+      - name: Nix build
+        run: nix build ".#${NIX_CACHE_ATTR}"
+
+      - name: Refresh nix cache
+        run: |
+          ./util/nix-cache.sh refresh \
+            "$NIX_CACHE_ATTR" \
+            "$NIX_CACHE_DIR" \
+            "${{ steps.compute-nix-cache-hash.outputs.NIX_CACHE_HASH }}"

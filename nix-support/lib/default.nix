@@ -28,6 +28,8 @@ let
 
     build-workspace = lib.import ./build-workspace.nix;
 
+    combine-derivations = lib.import ./combine-derivations.nix;
+
     run-command =
       suffix: deps: script:
       let
