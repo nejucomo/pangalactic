@@ -70,8 +70,10 @@ function restore
     if nix copy --no-check-sigs --from "file://${cache_dir}" "$out_path"; then
       echo "✅ Successfully restored .#${flake_name} from cache."
     else
-      echo "🟢 Cache miss..."
+      echo '🟢 Cache miss...'
     fi
+  else
+      echo "🟡 No cache directory, new build: ${cache_dir}"
   fi
 
   exec nix build ".#${flake_name}"
@@ -90,7 +92,7 @@ function refresh
     nix build ".#${flake_name}"
 
     mkdir -p "$cache_dir"
-    nix copy --to "$cache_dir" "$out_path"
+    nix copy --to "file://${cache_dir}" ".#${flake_name}"
   else
     echo '✅ Cache up-to-date.'
   fi
@@ -108,7 +110,7 @@ function needs-refresh
     return 0
   else
     local actual_outpath="$(outpath "$flake_name")"
-    if ! [ "$(outpath "$flake_name")" = "$expected_outpath" ]
+    if ! [ "$actual_outpath" = "$expected_outpath" ]
     then
       echo "Stale cache at: $cache_dir"
       echo "-expected derivation path: $expected_outpath"
