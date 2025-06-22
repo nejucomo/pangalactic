@@ -63,3 +63,5 @@ jobs:
           EOF
 
       - run: nix build
+
+      - run: ./util/ghci-tool.sh run-exit-hooks
