@@ -51,7 +51,15 @@ jobs:
           path: ${{ env.NIX_CACHE_DIR }}
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ steps.compute-nix-cache-hash.outputs.NIX_CACHE_HASH }}
 
-      - name: Restore nix cache
-        run: ./util/nix-cache.sh restore "$NIX_CACHE_ATTR" "$NIX_CACHE_DIR"
+      - name: Restore/Refresh nix cache
+        run: |
+          ./util/nix-cache.sh restore "$NIX_CACHE_ATTR" "$NIX_CACHE_DIR"
+          sed 's/^ *//' | ./util/ghci-tool.sh push-exit-hook <<EOF
+            #!/usr/bin/env bash
+            ./util/nix-cache.sh refresh \
+              "$NIX_CACHE_ATTR" \
+              "$NIX_CACHE_DIR" \
+              "${{ steps.compute-nix-cache-hash.outputs.NIX_CACHE_HASH }}"
+          EOF
 
       - run: nix build
