@@ -6,7 +6,7 @@ on:
 
   # NO MERGE: Temporarily enable this to test without PR merges each cycle:
   push:
-    branches: [ci-caching]
+    branches: [ci-caching-cleanup]
 
 jobs:
   # NO MERGE: Temporarily disabled for pre-PR testing (save resources):
