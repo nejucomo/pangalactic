@@ -6,12 +6,12 @@ HOOKS_DIR="./ghci-tool-hooks"
 
 function main
 {
-  case "$*" in
-    push-exit-hook|run-exit-hooks)
+  case "$1" in
+    run-exit-hooks | push-exit-hook)
       eval "$@"
       ;;
     *)
-      echo "Unexpected args: $*"
+      echo "Unknown command: $1"
       exit 1
   esac
 }
@@ -19,17 +19,24 @@ function main
 # Push stdin into an exit hook script
 function push-exit-hook
 {
-  cat > "$(alloc-exit-hook)"
+  local hook="$(alloc-exit-hook)"
+  echo "Pushing $hook: $*"
+  echo "$*" > "$hook"
 }
 
 function run-exit-hooks
 {
+  if [ $# -gt 0 ]
+  then
+    echo "Unexpected args: $*"
+    exit 1
+  fi
+
   for ix in $(ls "$HOOKS_DIR" | sort -rn)
   do
     local hook="$HOOKS_DIR/$ix"
-    chmod u+x hook
-    echo "Executing cleanup hook: $hook"
-    eval "$hook"
+    echo "Executing cleanup hook $hook: $(cat "$hook")"
+    bash "$hook"
   done
 }
 
