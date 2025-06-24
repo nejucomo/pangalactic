@@ -1,6 +1,7 @@
 # Summary
 
 - [Synopsis](synopsis.md)
+- [The Roadmap](roadmap.md)
 
 # User Guide
 
@@ -10,6 +11,7 @@
   
 - [Vision](design/vision.md)
 - [Architecture](design/arch.md)
+- [Revision Control](design/revcon.md)
 
 # Hacking on Pangalactic
 
