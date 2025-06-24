@@ -170,6 +170,27 @@
                         <h1 id="synopsis"><a class="header" href="#synopsis">Synopsis</a></h1>
 <p>Pangalactic aspires to become a decentralized data network tailored towards using deterministic computation for revision control and build systems. The flagship application built on this network is <code>pg</code>, a decentralized revision control tool, similar to git, monotone, mercurial, fossil, and so forth.</p>
 <p>Pangalactic is <em>very much</em> an incomplete work in progress. The existing functionality is spotty, as well as the documentation in this book.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h1>
+<ul>
+<li><code>derive</code> hostapi call.
+<ul>
+<li>introduce <code>sequence</code> std guest.</li>
+</ul>
+</li>
+<li>attestation caching</li>
+<li>planset concurrency support</li>
+<li>ipfs store</li>
+<li>pub/sub</li>
+<li>rebrand</li>
+<li>API docs</li>
+<li>revision control tool MVP</li>
+<li>hostenv</li>
+<li>content encryption</li>
+<li>garbage collection?</li>
+<li>self-hosted revision control</li>
+<li>self-hosted compiler</li>
+<li>expand across the galaxy</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="building-pangalactic"><a class="header" href="#building-pangalactic">Building Pangalactic</a></h1>
 <p>Users interact with pangalactic through a set of <em>binaries</em>:</p>
 <ul>
@@ -219,27 +240,171 @@
 <p><strong>Plot hole:</strong> How do people afford to keep improving pangalactic?</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
 <p>The pangalactic system is composed of several "infrastructure" layers for data storage &amp; distribution, synchronization among collaborators, determistic computation. Atop this infrastructure is the flagship <code>pg</code> revision control app, although nothing prevents other applications from building on this infrastructure.</p>
+<p><strong>Warning:</strong> The text here is not fully reconciled with the code, including command examples!</p>
+<h2 id="concepts"><a class="header" href="#concepts">Concepts</a></h2>
+<p>Before describing the pangalactic architecture, we introduce a few important concepts that help clarify the architectural design:</p>
+<h3 id="signing-and-verifying"><a class="header" href="#signing-and-verifying">Signing and Verifying</a></h3>
+<p>Pangalactic makes heavy use of cryptographic signature schemes. However, it's important to dispel two persistent confusions about these schemes:</p>
+<ul>
+<li>Signing and verification keys are not identified with people or connected to human "identity". Instead, they are "mere components" of the system. Code that relies on verifying signatures does this so the user can rely on beliefs about how the associated signing keys are controlled. Humans and/or code may control and manage any number of signing keys (via software) in pangalactic.</li>
+<li>Signing and verification keys are cryptographic values used to sign data and verify signatures, and nothing about them is <em>inherently</em> public or private. A verification key may be broadcast widely, or it may be controlled in a small private extent. Likewise with signing keys.</li>
+</ul>
+<h3 id="validity-and-attestations"><a class="header" href="#validity-and-attestations">Validity and Attestations</a></h3>
+<p>Below we often describe various kinds of data and their relation to each other. It is often the case that relationship between data items "should be" something described here. What happens when it is not?</p>
+<p>Since pangalactic is designed to encompass a universal network of collaborators sharing a universal data set, and any kind of participants may collaborate, we want to protect a user from the malicious usage of other collaborators in the network.</p>
+<p>Pangalactic software uses three methods to protect users:</p>
+<ul>
+<li>
+<p><em>zero-knowledge proofs of computational integrity</em> aka ZKPs: when possible, metadata representing a relationship between two data items proves that the relationship correctly holds by include a third item which is a ZKP for the relationship predicate.</p>
+</li>
+<li>
+<p><em>signed attestations</em>: where ZKPs are not-yet-implemented or impossible (because a relation is not mathematically provable), we rely on signatures to <em>attest</em> to the validity of a relationship. An example of where this when a publisher publishes a new update, that update may be arbitrary (and not a provable derivation of previous updates) so the signature serves to indicate the publisher authorized the update. (Recall that the signature scheme does not <em>identify</em> any human participant.</p>
+</li>
+<li>
+<p><em>sandboxing</em>: where feasible, pangalactic sandboxes computations so that maliciously authored computations, or buggy ones, cannot cause harm beyond the sandbox.</p>
+</li>
+</ul>
+<p>With this section in mind, the rest of this chapter describes how data "should be" related to each other descriptively, without using qualifiers like "should".</p>
+<h3 id="capabilities"><a class="header" href="#capabilities">Capabilities</a></h3>
+<p>We use the term <em>capability</em> inspired by the capabilities security mindset. To say "X is a <em>capability</em> to Y" indicates that (if the network is properly available) knowing X is both sufficient and necessary to accomplish Y.</p>
+<h3 id="verification-can-be-outsourced"><a class="header" href="#verification-can-be-outsourced">Verification can be Outsourced</a></h3>
+<p>By relying on signatures, encryption, and ZKPs (especially the <em>zero-knowledge</em> property) we can often oursource verification so that a third party service can verify a data relation is valid and available without the capability to read that data! This outsourcing relationship can be expressed with <em>verification capabilities</em>.<sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup></p>
+<h3 id="authorization--distribution-layering"><a class="header" href="#authorization--distribution-layering">Authorization / Distribution Layering</a></h3>
+<p>Pangalactic separates <em>authorization</em> decisions (such as which components can authorize updates to data or which may read data) from <em>distribution</em> of data across the network.</p>
+<p>Authorization <em>never</em> relies on third party authorities, including within the network such as routing, naming, or remote host access control mechanisms. It relies only on capabilities, ZKPs, and attestations.</p>
+<p>However, authorization and distribution are not entirely orthogonal because a good distribution design ensures that data flows to where it can be read rather than to areas where it cannot be read, and also that updates reach interested parties efficiently.</p>
+<p><strong>TODO:</strong> This chapter currently <em>ignores</em> most of the distribution design. This part of the design is underdeveloped at present.</p>
+<h2 id="revision-control"><a class="header" href="#revision-control">Revision Control</a></h2>
+<p>The flagship application of pangalactic, <code>pg</code> is a revision control tool.</p>
+<h3 id="filesystem-structure"><a class="header" href="#filesystem-structure">Filesystem Structure</a></h3>
+<p>A user Alice can create a new <em>workspace</em> which consists of a local filesystem working directory and revision control <em>book-keeping</em>.</p>
+<p>The book-keeping is stored within the <code>.pg</code> subdirectory of the working directory. It is further split into <em>tracked</em> and <em>untracked</em> state. <code>.pg/UNTRACKED</code> directory contains untracked state and every other child of <code>.pg</code> is tracked. The book-keeping metadata consists of small <em>links</em> into <em>the Store</em>, which are both described below in <a href="design/arch.html#the-store">The Store</a> section.</p>
+<p>A <em>workspace</em> is always associated with a <em>publisher</em> which is a means of controlling how users can <em>subscribe</em> to the changes of the workspace via a <em>pubid</em> identifier.</p>
+<p>The <em>untracked book-keeping</em> contains at least:</p>
+<ul>
+<li>The <em>publisher's key</em>, which is a publication capability for producing new records of changes.<sup class="footnote-reference" id="fr-2-1"><a href="#footnote-2">2</a></sup></li>
+</ul>
+<p>The <em>tracked book-keeping</em> contains at least the most recent <em>record</em> of the changes in the revision history: <code>.pg/tip.pgl</code>.</p>
+<h3 id="creating-records"><a class="header" href="#creating-records">Creating Records</a></h3>
+<p>A user <em>saves</em> changes in their working directory to create a new <em>record</em>. This follows the following process:</p>
+<ol>
+<li>The working directory, excluding <code>.pg/UNTRACKED</code> and any path configured to be ignored within <code>.pg/config.toml</code>, is inserted into the Store to produce a <em>CID</em> (described in <a href="design/arch.html#the-store">The Store</a> section).</li>
+<li>If <code>.pg/policy.pgx</code> file exists, it is used to derive a <em>revision</em> (described below). If it is not present a hardcoded <em>no-op policy</em> is used instead.</li>
+<li>A new directory is stored is inserted in the Store with two links:</li>
+</ol>
+<ul>
+<li><code>prev</code>: a link to the previous record (which comes from <code>.pg/tip.pgl</code> in the no-op policy.</li>
+<li><code>rev</code>: a link to the <em>revision</em> from step 2.</li>
+</ul>
+<ol start="4">
+<li>A <em>record</em> is created with the contents of <code>3</code>, signed by the publisher.</li>
+<li>That record is used to overwrite <code>.pg/tip.pgl</code>.</li>
+<li>The as-of-yet-unspecified "distribution system" ensures subscribers to this workspace receive the new record.</li>
+</ol>
+<h3 id="store-space-vs-filesystem-space"><a class="header" href="#store-space-vs-filesystem-space">Store-Space vs Filesystem-Space</a></h3>
+<p><a href="design/arch.html#the-store">The Store</a> (described below) provides a directory &amp; file abstraction. The complete revision history at any point is always "just" a directory structure in the Store. We refer to the layout and contents of this structure as <em>Store-space</em> to distinguish that it is the layout within the <em>Store</em>.</p>
+<p>Meanwhile, the actual files and directories on a users computer that make up a workspace have a different but related layout and contents, and we distinguish this as the Filesystem-space, or often we'll just say "on the fs" for short.</p>
+<p>The no-op policy converts the fs-space layout from step 1 into a <em>revision</em>, where the layout of <em>revision</em> isn't well specified yet...</p>
+<p>Some things a revision needs to do:</p>
+<ul>
+<li>Specify the revision.</li>
+<li>Track public peer subscriptions?</li>
+<li>Contain a snapshot of the working directory contents.</li>
+</ul>
+<h3 id="the-conventional-policy"><a class="header" href="#the-conventional-policy">The Conventional Policy</a></h3>
+<p>By default, when a user creates a new workspace with <code>pg init</code>, a record is immediately published, implicitly, that installs <em>the Conventional Policy</em> (aka <em>the CoPo</em>) as the policy for that record, which is permitted by the no-op policy.</p>
+<p>The CoPo, among other things, provides new revision control features atop the lower host-platform-coded layer, in contrast the the CoPo which is at the sandboxed deterministic computation layer of derivations.</p>
+<h4 id="transactions"><a class="header" href="#transactions">Transactions</a></h4>
+<p>CoPo requires every change to a repository to be a <em>transaction</em>. Transactions are high-level user-facing concepts that map well to the UX, such as "save the current working directory state", "annotate a recent revision with this descriptive log message", and "if the given revision passes language and application-specific deterministic checks, then append a new record attesting to that fact, else do nothing."</p>
+<p>CoPo guarantees that the saved working directory state is the deterministic outcome of applying the associated transaction to the previous history. In this way, users can explore either snapshots of working directories or high-level transaction logs to understand the revision history, content with the knowledge that the relationship between these is preserved by the policy.</p>
+<h3 id="narratives-and-releases"><a class="header" href="#narratives-and-releases">Narratives and Releases</a></h3>
+<p>Since a workspace is associated with a single publisher, and a publisher distributes a <em>linear sequence</em> of <em>records</em>, the revision control history produced by a given workspace is a linear history.</p>
+<p>CoPo introduces <em>narratives</em> to facilitate common revision control management techniques. A narrative is a name referring to a "managed" history of changes which can be modified semi-arbitrarily. CoPo revisions store a mapping of the narrative names to "narrative revisions" within the top-level revision.</p>
+<p>When users need a complete auditable record of changes (for example while investigating the insertion of a backdoor), including changes to narrative histories, they can review the log of top-level records. OTOH, when they need to review managed, curated, or pedagogical histories, they can rely on narratives.</p>
+<p>Narratives are vaguely akin to <code>git</code> branches, that is, mutable names referring to different semi-related sub-histories of the complete revision history. However, with CoPo there are many important differences:</p>
+<ul>
+<li>Narratives are revision controlled, whereas git branches are local mutable state.</li>
+<li>Narratives can be semi-arbitrarily modified to "ret-con" the presented sequence of changes (similar to <code>git</code> branch modifications like squashing, rebasing, etc...). Unlike <code>git</code>, the sequence of changes to narratives themselves are tracked in the linear revision history. This strikes a balance between the needs for revision history to either provide a complete auditable record versus a well-edited pedagogical narrative of how the latest revision could ideally / should have been developed.</li>
+<li>Narratives are published to all subscribers of a workspace. (<strong>TODO:</strong> We <em>could</em> have a "local narrative" feature where they are stored in the untracked book-keeping area.)</li>
+</ul>
+<p><em>Releases</em> are narratives that live under the <code>/release/...</code> namespace and are more constrained by CoPo so that they cannot be overwritten and follow a constrained versioning format. (<strong>TODO:</strong> Should we allow overwrites of releases for "hot-fixes" or retractions?)</p>
+<h2 id="pubsub"><a class="header" href="#pubsub">Pub/Sub</a></h2>
+<p>A core primitive of pangalactic is the <em>Pub/Sub</em> system, which has an authorization layer and (one or more) outer distribution layers.</p>
+<p>Note: while there is low-level commandline access to direct pub/sub features via <code>pg uth pubsub</code>, all of the examples describe using the higher level revision control use case which manages pub/sub usage under the hood.</p>
+<h3 id="the-pubsub-capabilities-model"><a class="header" href="#the-pubsub-capabilities-model">The Pub/Sub Capabilities Model</a></h3>
+<p>The <em>Pub/Sub Capabilities Model</em> or PSCM is the authoritzation layer of pub/sub: a network/IO-agnostic cryptographic data format which defines how users can <em>publish</em> and <em>subscribe</em> to update <em>records</em>.</p>
+<h4 id="publishers"><a class="header" href="#publishers">Publishers</a></h4>
+<p>Any time Alice wishes to share a sequence of related update <em>records</em> to Bob and Charlie, she generates a new <em>publisher</em>. This typically occurs under the hood when using <code>pg</code> for revision control when a user runs <code>pg init</code>.</p>
+<p>A <em>publisher</em> is entirely controlled by a cryptographic signing key, which Alice typically stores privately. Again, when using <code>pg</code> for revision control, this is managed under the hood. With that in place, Alice then shares her <em>publisher ID</em> aka <em>pubid</em> with Bob and Charlie. The pubid for a revision control <em>workspace</em> is available with the <code>pg info</code> command.</p>
+<h4 id="subscriptions"><a class="header" href="#subscriptions">Subscriptions</a></h4>
+<p>Bob and Charlie then take Alice's pubid and <em>subscribe</em> to it. Suppose the publisher Alice created is for a revision control workspace and Bob wants to acquire a new local copy, then he uses the <code>pg fork</code> command to create a new local workspace and subscribe to Alice's pubid. Meanwhile, let's suppose the workspace Alice is hacking on is part of a project that Charlie is also hacking on, but the two haven't yet directly collaborated. In that case Charlie uses <code>pg peer</code> in his workspace to subscribe to Alice's workspace updates.</p>
+<h4 id="records"><a class="header" href="#records">Records</a></h4>
+<p>Now that Bob and Charlie are subscribed to Alice's pubid, they can receive <em>records</em> from it. A publisher always produces a <em>linear sequence of records</em>. Records contain a <em>sequence number</em> which starts at 0 and increments each time Alice <em>publishes</em> a record with her publisher. Additionally it contains a <em>previouis CID</em> and a <em>current CID</em>. (CIDs are described soon in <a href="design/arch.html#the-store">The Store</a> section).</p>
+<p>A record provides the pubid which produced it (either because it is literally stored in the record or it is derivable given the signature scheme and signature).</p>
+<h4 id="pscm-confidentiality"><a class="header" href="#pscm-confidentiality">PSCM Confidentiality</a></h4>
+<p>An important feature of the pub/sub PSCM is that an arbitary third party, Mal, <em>cannot</em> track updates from Alice's workspace <em>without</em> subscribing to the pubid for it. If Alice is working on a private project she could ensure she sends the pubid to Bob and Charlie privately, and rely on them not to share the pubid elsewhere without checking with her first.</p>
+<p>In other words a pubid is a capability for two actions: <em>retrieving</em> and <em>reading</em> records from the publisher.</p>
 <h2 id="the-store"><a class="header" href="#the-store">The Store</a></h2>
-<p>The <em>Store</em> is a universal immutable data storage and distribution layer, spread across a network. The key primitive is hash-based indexing, along with "directory" nodes for linking together data within the Store.</p>
+<p>The <em>Store</em> is a universal immutable data storage and distribution layer, spread across a network. The term "the Store" refers to both the Authorization / Distribution distinction, but in this section we describe only the <em>Store Capabilities Model</em>.</p>
+<p>The key primitive is hash-based indexing, along with "directory" nodes for linking together data within the Store.</p>
+<p><em>Content Identifiers</em>, or <em>CIDs</em> for short, are (relatively) short self-authenticating immutable data references. At an elementary level, the data they refer to is an arbitrary sequence of bytes, called a <em>blob</em>. CIDs provide the following properties:</p>
+<ul>
+<li><em>Compactness</em>: CIDs are relatively short with a capped length (~32 or ~64 bytes).</li>
+<li><em>Determinism</em>: any two devices compute the same CID given the same blobs as inputs.</li>
+<li><em>Collision Resistance</em>: no two distinct blobs result in the same CID value.</li>
+<li><em>Read Capability</em>: a blob <em>cannot</em> be retrieved and read from any source without the corresponding CID. (<strong>TODO:</strong> Introduce immutable <em>VerifyCap</em> vs <em>ReadCap</em> terminology and semantics.)</li>
+</ul>
+<p><strong>Rust Crate:</strong> <code>pangalactic-cid</code></p>
+<p><em>Directories</em> are blobs which contain a pangalactic-specific serialization of a directory structure which contains a set of child <em>links</em>.</p>
+<p>Each child link contains a <em>link name</em> which is unique within a given directory. It also includes a <em>link kind</em> which claims the referent blob is either a directory or a <em>file</em>. Finally it contains a <em>link reference</em>.</p>
+<p><strong>Rust Crates:</strong> <code>pangalactic-dir</code>, <code>pangalactic-linkkind</code>, <code>pangalactic-link</code></p>
+<p>A <em>link reference</em> is either just a bare CID <em>or</em> it is a <code>(record, path)</code> tuple. A link reference can be resolved to a "direct CID" which is either just the bare CID in the first case, or the result of traversing the <code>path</code> from the <code>current CID</code> of the <code>record</code>. When a link reference is a bare CID, it's called a <em>hard link</em> and when it is a <code>(record, path)</code> it is called a <em>splice link</em> or <em>splice</em> for short. The <code>path</code> selects a subpath within the <code>record</code> which can be used to splice to previous history, specific narratives (especially releases), etc...</p>
+<p><strong>Note:</strong> Splices are not yet implemented.</p>
+<p><em>Splices</em> are designed to support several important <code>pg</code> use cases:</p>
+<ul>
+<li>
+<p><em>Unified Subscriptions &amp; Locking</em>: An important property is that splices provide a <em>subscription</em> to receive future updates and simultaneously <em>locking</em>. Locking (also called <em>pinning</em>) is a common feature of dependency management systems to ensure a particular revision of software is tied to specific revisions of all of its dependencies. Transitive pinning is necessary to ensure any two hosts that build the software are building with the same inputs. One of <code>pg</code>'s target use cases is deterministic builds, so making pinning a first-class feature meets this goal.</p>
+</li>
+<li>
+<p>Maintaining <em>peer subscriptions</em> of a workspace. These are subscriptions to peer workspaces which enable users to share code patches with each other. This is somewhat akin to the <code>git</code> revision control tool's <code>.git/refs/remotes</code> tracking, except that every peer is a signed record (and revision controlled).</p>
+</li>
+<li>
+<p>Maintaining "embedded workspaces" in a workspace. Embedded workspaces allow a user to embed the source code of other projects into their source code via a slice, which enables explicit version control across the containing and embedded projects. For example, a rust project could splice many dependencies into a "cargo vendor" directory structure so that cargo will build the primary (containing) workspace without needing network access. Meanwhile, the containing workspace also is guaranteed to have pinned subscriptions to the dependencies and so dependency management is explicitly controlled by the containing workspace author. Avoiding network access is an important requirement for deterministic builds.<sup class="footnote-reference" id="fr-3-1"><a href="#footnote-3">3</a></sup></p>
+</li>
+</ul>
+<p>Finally, because splices are first class in the PSCM, "lock updates" are also a first class feature via the <code>pg update</code> command. This can be used to discover and pin newer updates to dependencies, peer repositories, or embedded workspaces. Those changes, of course, will be part of the revision history of the workspace.</p>
 <h3 id="the-local-store"><a class="header" href="#the-local-store">The Local Store</a></h3>
 <p>The <em>Local Store</em> is a user-scoped filesystem storage backend containing a subset of the complete universal <em>Store</em>.</p>
-<pre><code class="language-admonish info &quot;git comparison&quot;">Because the Local Store is user-scoped, *all* of a user's revision control storage is shared across all projects on the system. For example, if a user clones the same project into multiple different working directories, the revision control storage is deduplicated / cached for all working directories.
-
-There is no equivalent of `.git` blob storage. This means if you need to ensure the complete history of a project is copied to a new host, you must either copy the entire Local Store (which may include other projects), or use the `pg` tool to perform the transfer.
-</code></pre>
-<h3 id="distribution"><a class="header" href="#distribution">Distribution</a></h3>
-<p>The distribution of immutable data, which ensures that the data a user needs is accessible and allows them to retrieve it, is an unspecified feature area. The current code only supports a <em>Local Store</em>, and this means currently <em>projects cannot be shared across hosts</em>.</p>
-<pre><code class="language-admonish danger &quot;Incomplete Prototype Hazard&quot;">This is an example of how `pangalactic` is in a prototype maturity phase and it is not wise to rely on it solely for revision control or storage needs yet.
-</code></pre>
-<pre><code class="language-TODO unfinished design:">Relationship and terminology between store, distribution, synchronization, and pub/sub crypto:
-
-- Store: universal storage network
-- Distribution: how users get the right data (and how to ensure it's available).
-- Synchronization: how users share and learn about updates of projects they care about.
-- pub/sub: how publisher ids and subscriptions are "storage/network agnostic".
-
-Also, it's not clear yet if pub/sub is a separate layer above Store, or if Store _must_ be pub/sub aware.
-</code></pre>
+<p><strong>Note:</strong> Because the Local Store is user-scoped, <em>all</em> of a user's revision control storage is shared across all projects on the system. For example, if a user clones the same project into multiple different working directories, the revision control storage is deduplicated / cached for all working directories.</p>
+<p><strong>Note:</strong> There is no equivalent of <code>.git</code> blob storage. This means if you need to ensure the complete history of a project is copied to a new host, you must either copy the entire Local Store (which may include other projects), or use the <code>pg</code> tool to perform the transfer.</p>
+<h2 id="derivation"><a class="header" href="#derivation">Derivation</a></h2>
+<p>The pangalactic derivation system is a first-class deterministic computation system. Purpose-built code directs how to construct new files and directories in the Store given existing files and directories as the sole input.</p>
+<p>The current implementation is build on WASM (via <code>wasmtime</code>) with a special-purpose binary "host call API".</p>
+<p>A <em>plan</em> is a directory that specifies both the executable and inputs. A host can <em>derive</em> an <em>attestation</em> from a plan. An <em>attestation</em> contains the originating plan, the generated output (or deterministic error), a log, and supporting evidence that this is the correct attestation for the plan.</p>
+<p>The supporting evidence should eventually be a ZKP, but in the short term we will implement signature-based attestation. (<strong>Note</strong>: When Alice derives outputs as part of the standard revision control process, the resulting attestations are implicitly signed by Alice's publisher.)</p>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>This possibility, as well as most of the authorization architecture of pangalactic is directly inspired by the <a href="https://www.tahoe-lafs.org/">Tahoe-LAFS</a> project. <a href="#fr-1-1">↩</a></p>
+</li>
+<li id="footnote-2">
+<p>A hypothesized hazard is that users will relatively frequently <code>cp -r</code> their workspace, then continue revision control in both locations. This will create colliding records. This should be detected and the user could be guided to convert one of the copies to a <em>fork</em>. <a href="#fr-2-1">↩</a></p>
+</li>
+<li id="footnote-3">
+<p>This enables <code>pg</code> repositories meet the use cases of <code>git subtree</code> and/or <code>git submodules</code> except as a single first class feature that behaves the same as other uses of splice links. <a href="#fr-3-1">↩</a></p>
+</li>
+</ol><div style="break-before: page; page-break-before: always;"></div><h1 id="revision-control-1"><a class="header" href="#revision-control-1">Revision Control</a></h1>
+<p>Revision control is the "flagship app" built atop the pangalactic infrastructure, primarily accessible throught the <code>pg</code> end-user tool.</p>
+<p>In addition to the top-level pangalactic <a href="design/./arch.html">architecture</a>, this chapter assumes you are familiar with decentralized revision control tools, such as git, hg, monotone, darcs, etc...</p>
+<h2 id="concepts-1"><a class="header" href="#concepts-1">Concepts</a></h2>
+<h3 id="publications-and-subscriptions"><a class="header" href="#publications-and-subscriptions">Publications and Subscriptions</a></h3>
+<p>A <em>publication</em> refers to a self-authenticated revision control history.</p>
+<h3 id="workspaces"><a class="header" href="#workspaces">Workspaces</a></h3>
+<p>When a user initializes a new project with <code>pg init</code> they convert a host directory into a newly created <em>workspace</em> with these components:</p>
+<ul>
+<li><code>&lt;workdir&gt;</code> - the <em>working directory</em> is the directory which was passed in the <code>--workdir</code> option to <code>pg init</code> (which defaults to the current directory) and we will refer to it as <em>workdir</em> for short.</li>
+<li><code>&lt;workdir&gt;/.pg</code> - the <em>book-keeping directory</em> contains revision control metadata. This is the <em>only</em> subdirectory within the workdir which <code>pg</code> treats specially. (<strong>TODO:</strong> Review this claim as the design evolves.)</li>
+<li><code>&lt;workdir&gt;/.pg/prev.pglink</code> - the <em>previous transaction link</em> is present for every</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="lets-hack-pangalactic"><a class="header" href="#lets-hack-pangalactic">Let's Hack Pangalactic!</a></h1>
 <p>So you wanna hack on pangalactic, eh?</p>
 <p>The first step is quick and easy, take the <em>Pangalactic Oath</em>:</p>
