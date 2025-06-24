@@ -1,4 +1,3 @@
 /target
-/seed/guests/target
+/crates/seed/guests/target
 /result
-cachix-auth-token.sh

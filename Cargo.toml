@@ -9,94 +9,94 @@ lto = true
 [workspace]
 resolver = "2"
 members = [
-  "b64",
-  "chomper",
-  "cid",
-  "cli/pg",
-  "cli/pg-derive",
-  "cli/pg-revcon",
-  "cli/pg-seed",
-  "cli/pg-store",
-  "config",
-  "dag-transfer",
-  "dir",
-  "endpoint",
-  "globset",
-  "guest",
-  "guest-procmacro",
-  "handle",
-  "host",
-  "iowrappers",
-  "layer/cidmeta",
-  "layer/dir",
-  "link",
-  "linkkind",
-  "linkpath",
-  "log",
-  "manifest",
-  "name",
-  "nested-dir",
-  "placeholder",
-  "primitives",
-  "revcon",
-  "runopt",
-  "schemata",
-  "seed",
-  "serialization",
-  "std-store",
-  "store/dirdb",
-  "store/mem",
-  "store/trait",
-  "table",
-  "test/dir",
-  "test/runner",
+  "crates/b64",
+  "crates/chomper",
+  "crates/cid",
+  "crates/cli/pg",
+  "crates/cli/pg-derive",
+  "crates/cli/pg-revcon",
+  "crates/cli/pg-seed",
+  "crates/cli/pg-store",
+  "crates/config",
+  "crates/dag-transfer",
+  "crates/dir",
+  "crates/endpoint",
+  "crates/globset",
+  "crates/guest",
+  "crates/guest-procmacro",
+  "crates/handle",
+  "crates/host",
+  "crates/iowrappers",
+  "crates/layer/cidmeta",
+  "crates/layer/dir",
+  "crates/link",
+  "crates/linkkind",
+  "crates/linkpath",
+  "crates/log",
+  "crates/manifest",
+  "crates/name",
+  "crates/nested-dir",
+  "crates/placeholder",
+  "crates/primitives",
+  "crates/revcon",
+  "crates/runopt",
+  "crates/schemata",
+  "crates/seed",
+  "crates/serialization",
+  "crates/std-store",
+  "crates/store/dirdb",
+  "crates/store/mem",
+  "crates/store/trait",
+  "crates/table",
+  "crates/test/dir",
+  "crates/test/runner",
 ]
 
 [workspace.dependencies]
 
 # Local crates with paths clarified:
-pangalactic                 = { path = "placeholder"     }
-pangalactic-b64             = { path = "b64"             }
-pangalactic-chomper         = { path = "chomper"         }
-pangalactic-cid             = { path = "cid"             }
-pangalactic-cli             = { path = "cli/pg"          }
-pangalactic-cli-derive      = { path = "cli/pg-derive"   }
-pangalactic-cli-revcon      = { path = "cli/pg-revcon"   }
-pangalactic-cli-seed        = { path = "cli/pg-seed"     }
-pangalactic-cli-store       = { path = "cli/pg-store"    }
-pangalactic-config          = { path = "config"          }
-pangalactic-dag-transfer    = { path = "dag-transfer"    }
-pangalactic-dir             = { path = "dir"             }
-pangalactic-endpoint        = { path = "endpoint"        }
-pangalactic-globset         = { path = "globset"         }
-pangalactic-guest           = { path = "guest"           }
-pangalactic-guest-procmacro = { path = "guest-procmacro" }
-pangalactic-handle          = { path = "handle"          }
-pangalactic-hash            = { path = "hash"            }
-pangalactic-host            = { path = "host"            }
-pangalactic-iowrappers      = { path = "iowrappers"      }
-pangalactic-layer-cidmeta   = { path = "layer/cidmeta"   }
-pangalactic-layer-dir       = { path = "layer/dir"       }
-pangalactic-link            = { path = "link"            }
-pangalactic-linkkind        = { path = "linkkind"        }
-pangalactic-linkpath        = { path = "linkpath"        }
-pangalactic-log             = { path = "log"             }
-pangalactic-manifest        = { path = "manifest"        }
-pangalactic-name            = { path = "name"            }
-pangalactic-nested-dir      = { path = "nested-dir"      }
-pangalactic-primitives      = { path = "primitives"      }
-pangalactic-revcon          = { path = "revcon"          }
-pangalactic-runopt          = { path = "runopt"          }
-pangalactic-schemata        = { path = "schemata"        }
-pangalactic-seed            = { path = "seed"            }
-pangalactic-serialization   = { path = "serialization"   }
-pangalactic-std-store       = { path = "std-store"       }
-pangalactic-store           = { path = "store/trait"     }
-pangalactic-store-dirdb     = { path = "store/dirdb"     }
-pangalactic-store-mem       = { path = "store/mem"       }
-pangalactic-table           = { path = "table"           }
-pangalactic-test-dir        = { path = "test/dir"        }
-pangalactic-test-runner     = { path = "test/runner"     }
+pangalactic                 = { path = "crates/placeholder"     }
+pangalactic-b64             = { path = "crates/b64"             }
+pangalactic-chomper         = { path = "crates/chomper"         }
+pangalactic-cid             = { path = "crates/cid"             }
+pangalactic-cli             = { path = "crates/cli/pg"          }
+pangalactic-cli-derive      = { path = "crates/cli/pg-derive"   }
+pangalactic-cli-revcon      = { path = "crates/cli/pg-revcon"   }
+pangalactic-cli-seed        = { path = "crates/cli/pg-seed"     }
+pangalactic-cli-store       = { path = "crates/cli/pg-store"    }
+pangalactic-config          = { path = "crates/config"          }
+pangalactic-dag-transfer    = { path = "crates/dag-transfer"    }
+pangalactic-dir             = { path = "crates/dir"             }
+pangalactic-endpoint        = { path = "crates/endpoint"        }
+pangalactic-globset         = { path = "crates/globset"         }
+pangalactic-guest           = { path = "crates/guest"           }
+pangalactic-guest-procmacro = { path = "crates/guest-procmacro" }
+pangalactic-handle          = { path = "crates/handle"          }
+pangalactic-hash            = { path = "crates/hash"            }
+pangalactic-host            = { path = "crates/host"            }
+pangalactic-iowrappers      = { path = "crates/iowrappers"      }
+pangalactic-layer-cidmeta   = { path = "crates/layer/cidmeta"   }
+pangalactic-layer-dir       = { path = "crates/layer/dir"       }
+pangalactic-link            = { path = "crates/link"            }
+pangalactic-linkkind        = { path = "crates/linkkind"        }
+pangalactic-linkpath        = { path = "crates/linkpath"        }
+pangalactic-log             = { path = "crates/log"             }
+pangalactic-manifest        = { path = "crates/manifest"        }
+pangalactic-name            = { path = "crates/name"            }
+pangalactic-nested-dir      = { path = "crates/nested-dir"      }
+pangalactic-primitives      = { path = "crates/primitives"      }
+pangalactic-revcon          = { path = "crates/revcon"          }
+pangalactic-runopt          = { path = "crates/runopt"          }
+pangalactic-schemata        = { path = "crates/schemata"        }
+pangalactic-seed            = { path = "crates/seed"            }
+pangalactic-serialization   = { path = "crates/serialization"   }
+pangalactic-std-store       = { path = "crates/std-store"       }
+pangalactic-store           = { path = "crates/store/trait"     }
+pangalactic-store-dirdb     = { path = "crates/store/dirdb"     }
+pangalactic-store-mem       = { path = "crates/store/mem"       }
+pangalactic-table           = { path = "crates/table"           }
+pangalactic-test-dir        = { path = "crates/test/dir"        }
+pangalactic-test-runner     = { path = "crates/test/runner"     }
 
 # Dependencies external to this workspace:
 # TODO: Push features into specific crates that consume them:
