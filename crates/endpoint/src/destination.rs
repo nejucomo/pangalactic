@@ -48,7 +48,5 @@ where
         )
         .await_futures()
         .await
-        .transpose()
-        .map(Receipt::from)
-    }
+        .transpose()}
 }

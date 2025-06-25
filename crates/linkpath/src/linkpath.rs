@@ -161,7 +161,7 @@ where
     }
 }
 
-impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a LinkPath<S::CID>
+impl<S> Commit<LinkDirectoryLayer<S>> for &LinkPath<S::CID>
 where
     S: Store,
 {

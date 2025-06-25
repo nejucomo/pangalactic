@@ -35,7 +35,7 @@ where
     }
 }
 
-impl<'a, S> Commit<S> for &'a [u8]
+impl<S> Commit<S> for &[u8]
 where
     S: Store,
 {

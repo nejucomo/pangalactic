@@ -11,7 +11,7 @@ use test_case::{test_case, test_matrix};
 fn put_get_round_trip(input: &str) -> Result<()> {
     let testcasedir = testdir::setup(&format!(
         "put_get_round_trip-{}",
-        input.replace(' ', "_").replace('!', "_")
+        input.replace([' ', '!'], "_")
     ))?;
 
     let runner = make_runner(&testcasedir);
@@ -24,50 +24,50 @@ fn put_get_round_trip(input: &str) -> Result<()> {
 }
 
 mod consts {
-    pub const STDIN_CONTENTS: &'static str = "I am a stdin file.";
-    pub const HOST_FILE_CONTENTS: &'static str = "I am a host file.";
-    pub const STORE_FILE_CONTENTS: &'static str = "I am a store file.";
-    pub const STORE_FILE_CONTENTS_2: &'static str = "I am also a store file.";
+    pub const STDIN_CONTENTS: &str = "I am a stdin file.";
+    pub const HOST_FILE_CONTENTS: &str = "I am a host file.";
+    pub const STORE_FILE_CONTENTS: &str = "I am a store file.";
+    pub const STORE_FILE_CONTENTS_2: &str = "I am also a store file.";
 
-    pub const MKSOURCE_FILE_CID: &'static str = "pg:F:-GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
+    pub const MKSOURCE_FILE_CID: &str = "pg:F:-GvvRcHHjkJrbg4eN1NJ3Q0bsCEjhXsKS5DzmVprckAS";
 
     // Note: We wish we could evaluate this in const stage to remove redundancy:
     // pub const MKSOURCE_DIR_CID: &'static str = MKSOURCE_DIR_STORE_PATH.split_once('/').unwrap().0;
-    pub const MKSOURCE_DIR_CID: &'static str = "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
-    pub const MKSOURCE_FILE_STORE_PATH: &'static str =
+    pub const MKSOURCE_DIR_CID: &str = "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW";
+    pub const MKSOURCE_FILE_STORE_PATH: &str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/c";
-    pub const MKSOURCE_DIR_STORE_PATH: &'static str =
+    pub const MKSOURCE_DIR_STORE_PATH: &str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir";
 
-    pub const MKSOURCE_DIR_CID_FILTERED: &'static str =
+    pub const MKSOURCE_DIR_CID_FILTERED: &str =
         "pg:D:lsqyC7bCrCxWu8mkI8xVfXcfrrsgfSv1JRNPHYGS4sZW";
 
-    pub const MKDEST_HOST_DEST: &'static str = "dest";
-    pub const MKDEST_STORE_DEST: &'static str =
+    pub const MKDEST_HOST_DEST: &str = "dest";
+    pub const MKDEST_STORE_DEST: &str =
         "pg:D:xB2_Y8LhYxhm1J0xd8kMWmKJ6x14_214vIXZlRAU3xdW/subdir/dest";
 
-    pub const STDIN_TO_STORE_BARE: &'static str =
+    pub const STDIN_TO_STORE_BARE: &str =
         "pg:F:QtBvYWotoTIPRBUkniYjLhNjgt65hkYUzj91Ax3yyyES";
-    pub const STDIN_TO_STORE_DEST: &'static str =
+    pub const STDIN_TO_STORE_DEST: &str =
         "pg:D:E14qcnMPIy0hrURgpxygXDv628fgKtVeJtrNQB9Z_4RX/subdir/dest";
-    pub const HOST_FILE_TO_STORE_BARE: &'static str =
+    pub const HOST_FILE_TO_STORE_BARE: &str =
         "pg:F:VIs1dAsBTGIiYh92Nqk2Eeq0C6WaJfrhvPQi9tnYTacR";
-    pub const HOST_FILE_TO_STORE_DEST: &'static str =
+    pub const HOST_FILE_TO_STORE_DEST: &str =
         "pg:D:2FTxXVthHGe0DZxQXkIB27wGRd20H-F9-aUHcLXtamBX/subdir/dest";
-    pub const HOST_DIR_TO_STORE_DEST: &'static str =
+    pub const HOST_DIR_TO_STORE_DEST: &str =
         "pg:D:GlR2nsXYF7oiQSgHAEQAb_TMBGkfQB7ZvNvwjMLSC3ZX/subdir/dest";
-    pub const STORE_CID_FILE_TO_STORE_DEST: &'static str =
+    pub const STORE_CID_FILE_TO_STORE_DEST: &str =
         "pg:D:AQSwJQ7qQsi58KESmz6izCd_DQDHv8-aUu3uwIxIUlRX/subdir/dest";
-    pub const STORE_CID_DIR_TO_STORE_DEST: &'static str = HOST_DIR_TO_STORE_DEST;
-    pub const STORE_PATH_FILE_TO_STORE_BARE: &'static str =
+    pub const STORE_CID_DIR_TO_STORE_DEST: &str = HOST_DIR_TO_STORE_DEST;
+    pub const STORE_PATH_FILE_TO_STORE_BARE: &str =
         "pg:F:9haKuYOiSb5F0GTpXwoLbu2zqM2OfR9b8z48R3vXiCwX";
-    pub const STORE_PATH_DIR_TO_STORE_BARE: &'static str =
+    pub const STORE_PATH_DIR_TO_STORE_BARE: &str =
         "pg:D:JS-NoYzJP2xBPG-H4TEQuOyxOrsU4yUze5bV-9A2sHJu";
-    pub const STORE_PATH_DIR_TO_STORE_BARE_FILTERED: &'static str =
+    pub const STORE_PATH_DIR_TO_STORE_BARE_FILTERED: &str =
         "pg:D:L_ggcFMc-uRL6JK5YTOuCpfaNIU9b_7jtByzluvuF4VK";
-    pub const STORE_PATH_FILE_TO_STORE_DEST: &'static str =
+    pub const STORE_PATH_FILE_TO_STORE_DEST: &str =
         "pg:D:-UFyHlmmfl0BJLb__TznvYDCiOk2Fiad0Oo4cet5PUpX/subdir/dest";
-    pub const STORE_PATH_DIR_TO_STORE_DEST: &'static str =
+    pub const STORE_PATH_DIR_TO_STORE_DEST: &str =
         "pg:D:Da29BWShEVjO74u6mYjxZumeuBsu_whlSxi_z1ZDNENX/subdir/dest";
 }
 
@@ -330,8 +330,8 @@ fn xfer(mksource: MkSource, with_exclude: bool, mkdest: MkDest) -> Result<()> {
     }
     args.extend([&mksource.to_arg(), &mkdest.to_arg()]);
 
-    let runout = runner.pg(args, &mksource.stdin())?;
-    mksource.verify_outcome(with_exclude, mkdest, &runner.testcasedir, runout)
+    let runout = runner.pg(args, mksource.stdin())?;
+    mksource.verify_outcome(with_exclude, mkdest, runner.testcasedir, runout)
 }
 
 fn check_paths_equal(src: &Path, dst: &Path) -> Result<()> {

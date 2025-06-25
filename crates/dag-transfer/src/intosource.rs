@@ -31,7 +31,7 @@ where
     ) -> impl Future<Output = Result<Source<Self::Leaf, Self::Branch>>> + Send;
 }
 
-impl<'a, S> IntoSource<S> for &'a Path
+impl<S> IntoSource<S> for &Path
 where
     S: Store,
 {

@@ -24,7 +24,7 @@ where
     }
 }
 
-impl<'a, S> Commit<LinkDirectoryLayer<S>> for &'a Path
+impl<S> Commit<LinkDirectoryLayer<S>> for &Path
 where
     S: Store,
 {

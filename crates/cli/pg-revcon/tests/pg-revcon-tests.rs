@@ -27,7 +27,7 @@ where
 
     let tomlpath = testcasedir.join(CONTROL_DIR_NAME).join("config.toml");
     let toml = std::fs::read_to_string(tomlpath)?;
-    assert!(toml.find("exclude").is_some(), "{toml:?}");
+    assert!(toml.contains("exclude"), "{toml:?}");
 
     Ok(())
 }
@@ -35,11 +35,11 @@ where
 mod setups {
     use super::{Path, Result, Runner};
 
-    pub fn noop<'a>(_: &Path) -> Result<()> {
+    pub fn noop(_: &Path) -> Result<()> {
         Ok(())
     }
 
-    pub fn preseeded<'a>(testcasedir: &Path) -> Result<()> {
+    pub fn preseeded(testcasedir: &Path) -> Result<()> {
         // Trigger warning: ugly hacks.
         use anyhow::Context;
 
@@ -56,7 +56,7 @@ mod setups {
             output.exit_ok()?;
         }
 
-        Runner::new(&testcasedir, &seedbin, [])
+        Runner::new(testcasedir, &seedbin, [])
             .pg(["install"], "")
             .with_context(|| format!("pg-seed expected in {seedbin}"))?
             .exit_ok()?;

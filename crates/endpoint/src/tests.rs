@@ -72,7 +72,7 @@ impl IntoOrigin for Stdio {
     }
 }
 
-impl<'a> IntoOrigin for &'a str {
+impl IntoOrigin for &str {
     fn into_origin(self) -> TestOrigin {
         MkHost(self.parse().unwrap()).into_origin()
     }
@@ -106,7 +106,7 @@ impl IntoDestination for Stdio {
     }
 }
 
-impl<'a> IntoDestination for &'a str {
+impl IntoDestination for &str {
     fn into_destination(self) -> TestDestination {
         MkHost(self.parse().unwrap()).into_destination()
     }

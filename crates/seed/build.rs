@@ -18,7 +18,7 @@ fn main_inner() -> anyhow::Result<()> {
     let guestworkspace = Path::new("../../seed-crates");
     assert!(guestworkspace.is_dir(), "{:?}", guestworkspace.display());
 
-    produce_rerun_if_changed_directives(&guestworkspace)?;
+    produce_rerun_if_changed_directives(guestworkspace)?;
 
     let mut cmd = Command::new(env!("CARGO"));
     cmd.arg("build");
