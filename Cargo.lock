@@ -1214,7 +1214,6 @@ dependencies = [
  "either",
  "pangalactic-cli-derive",
  "pangalactic-cli-revcon",
- "pangalactic-cli-seed",
  "pangalactic-cli-store",
  "pangalactic-runopt",
  "tokio",
@@ -1239,7 +1238,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "clap",
- "pangalactic-cli-seed",
  "pangalactic-revcon",
  "pangalactic-runopt",
  "pangalactic-std-store",
@@ -1250,31 +1248,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic-cli-seed"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "clap",
- "pangalactic-manifest",
- "pangalactic-runopt",
- "pangalactic-seed",
- "pangalactic-std-store",
- "tokio",
-]
-
-[[package]]
 name = "pangalactic-cli-store"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "anyhow-std",
  "clap",
- "pangalactic-cli-seed",
  "pangalactic-endpoint",
  "pangalactic-globset",
  "pangalactic-manifest",
  "pangalactic-runopt",
- "pangalactic-seed",
  "pangalactic-std-store",
  "pangalactic-test-dir",
  "pangalactic-test-runner",
@@ -1583,7 +1566,6 @@ dependencies = [
  "pangalactic-link",
  "pangalactic-linkpath",
  "pangalactic-name",
- "pangalactic-seed",
  "pangalactic-store",
  "serde",
  "tokio",
@@ -1609,31 +1591,6 @@ dependencies = [
  "pangalactic-layer-dir",
  "pangalactic-link",
  "pangalactic-store",
-]
-
-[[package]]
-name = "pangalactic-seed"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "anyhow-std",
- "include_dir",
- "pangalactic-config",
- "pangalactic-host",
- "pangalactic-layer-cidmeta",
- "pangalactic-layer-dir",
- "pangalactic-link",
- "pangalactic-linkkind",
- "pangalactic-linkpath",
- "pangalactic-log",
- "pangalactic-name",
- "pangalactic-schemata",
- "pangalactic-store",
- "pangalactic-store-mem",
- "serde",
- "tokio",
- "tracing",
- "walkdir",
 ]
 
 [[package]]
@@ -1996,15 +1953,6 @@ dependencies = [
  "libc",
  "linux-raw-sys 0.9.4",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "same-file"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
-dependencies = [
- "winapi-util",
 ]
 
 [[package]]
@@ -2412,16 +2360,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "walkdir"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
-dependencies = [
- "same-file",
- "winapi-util",
-]
 
 [[package]]
 name = "wasi"

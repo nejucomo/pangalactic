@@ -15,7 +15,6 @@ members = [
   "crates/cli/pg",
   "crates/cli/pg-derive",
   "crates/cli/pg-revcon",
-  "crates/cli/pg-seed",
   "crates/cli/pg-store",
   "crates/config",
   "crates/dag-transfer",
@@ -41,7 +40,6 @@ members = [
   "crates/revcon",
   "crates/runopt",
   "crates/schemata",
-  "crates/seed",
   "crates/serialization",
   "crates/std-store",
   "crates/store/dirdb",
@@ -62,7 +60,6 @@ pangalactic-cid             = { path = "crates/cid"             }
 pangalactic-cli             = { path = "crates/cli/pg"          }
 pangalactic-cli-derive      = { path = "crates/cli/pg-derive"   }
 pangalactic-cli-revcon      = { path = "crates/cli/pg-revcon"   }
-pangalactic-cli-seed        = { path = "crates/cli/pg-seed"     }
 pangalactic-cli-store       = { path = "crates/cli/pg-store"    }
 pangalactic-config          = { path = "crates/config"          }
 pangalactic-dag-transfer    = { path = "crates/dag-transfer"    }
@@ -88,7 +85,6 @@ pangalactic-primitives      = { path = "crates/primitives"      }
 pangalactic-revcon          = { path = "crates/revcon"          }
 pangalactic-runopt          = { path = "crates/runopt"          }
 pangalactic-schemata        = { path = "crates/schemata"        }
-pangalactic-seed            = { path = "crates/seed"            }
 pangalactic-serialization   = { path = "crates/serialization"   }
 pangalactic-std-store       = { path = "crates/std-store"       }
 pangalactic-store           = { path = "crates/store/trait"     }

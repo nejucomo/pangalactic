@@ -10,7 +10,6 @@ clap.workspace = true
 either.workspace = true
 pangalactic-cli-derive.workspace = true
 pangalactic-cli-revcon.workspace = true
-pangalactic-cli-seed.workspace = true
 pangalactic-cli-store.workspace = true
 pangalactic-runopt.workspace = true
 tokio = { workspace = true, features = ["process"] }

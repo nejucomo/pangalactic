@@ -14,6 +14,5 @@ tokio.workspace = true
 
 [dev-dependencies]
 test-case.workspace = true
-pangalactic-cli-seed.workspace = true
 pangalactic-test-dir.workspace = true
 pangalactic-test-runner.workspace = true
