@@ -4,23 +4,31 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use serde::{de::DeserializeOwned, Serialize};
 
-pub const APP_NAME: &str = "pangalactic";
+pub(crate) const APP_NAME: &str = "pangalactic";
 
+/// Manages the config and data directoriesi
+///
+/// These are named `pangalactic` and located in standardized locations.
 #[derive(Debug)]
-pub struct PgDirs {
-    pub data: PathBuf,
-    pub config: PathBuf,
+pub(crate) struct PgDirs {
+    pub(crate) data: PathBuf,
+    pub(crate) config: PathBuf,
 }
 
 impl PgDirs {
-    pub fn singleton() -> &'static Self {
+    /// Access the singleton instance
+    ///
+    /// # Panics
+    ///
+    /// This will panic when first called on systems for which the `dirs` crate does not define standard paths.
+    pub(crate) fn singleton() -> &'static Self {
         use once_cell::sync::Lazy;
 
         static SINGLETON: Lazy<PgDirs> = Lazy::new(|| PgDirs::init().unwrap());
         &SINGLETON
     }
 
-    pub async fn load_config<P, C>(&self, subpath: P) -> Result<C>
+    pub(crate) async fn load_config<P, C>(&self, subpath: P) -> Result<C>
     where
         P: AsRef<Path>,
         C: DeserializeOwned + Debug,
@@ -36,7 +44,7 @@ impl PgDirs {
         Ok(config)
     }
 
-    pub async fn write_config<P, C>(&self, subpath: P, config: &C) -> Result<()>
+    pub(crate) async fn write_config<P, C>(&self, subpath: P, config: &C) -> Result<()>
     where
         P: AsRef<Path>,
         C: Serialize + Debug,

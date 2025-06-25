@@ -48,5 +48,6 @@ where
         )
         .await_futures()
         .await
-        .transpose()}
+        .transpose()
+    }
 }
