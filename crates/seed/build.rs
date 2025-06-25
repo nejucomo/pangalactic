@@ -1,6 +1,7 @@
 #![feature(exit_status_error)]
 
 use anyhow::Context;
+use anyhow_std::PathAnyhow as _;
 use std::path::Path;
 
 fn main() -> anyhow::Result<()> {
@@ -14,16 +15,17 @@ fn main() -> anyhow::Result<()> {
 fn main_inner() -> anyhow::Result<()> {
     use std::process::Command;
 
-    produce_rerun_if_changed_directives()?;
+    let guestworkspace = Path::new("../../seed-crates");
+    assert!(guestworkspace.is_dir(), "{:?}", guestworkspace.display());
 
-    let guestworkspace = Path::new("guests");
+    produce_rerun_if_changed_directives(&guestworkspace)?;
 
     let mut cmd = Command::new(env!("CARGO"));
     cmd.arg("build");
     cmd.current_dir(guestworkspace);
 
     let status = cmd.status().with_context(|| format!("{:?}", &cmd))?;
-    status.exit_ok()?;
+    status.exit_ok().with_context(|| format!("{:?}", &cmd))?;
 
     let guesttarget = guestworkspace.join("target");
     let wasmdir = guesttarget.join("wasms");
@@ -54,7 +56,7 @@ fn main_inner() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn produce_rerun_if_changed_directives() -> anyhow::Result<()> {
+fn produce_rerun_if_changed_directives(seedcrates: &Path) -> anyhow::Result<()> {
     use walkdir::{DirEntry, WalkDir};
 
     let is_target = |e: &DirEntry| {
@@ -64,7 +66,7 @@ fn produce_rerun_if_changed_directives() -> anyhow::Result<()> {
             .unwrap_or(false)
     };
 
-    for entres in WalkDir::new("guests").into_iter().filter_entry(is_target) {
+    for entres in WalkDir::new(seedcrates).into_iter().filter_entry(is_target) {
         println!(
             "cargo:rerun-if-changed={}",
             entres?.file_name().to_str().unwrap()
@@ -74,19 +76,19 @@ fn produce_rerun_if_changed_directives() -> anyhow::Result<()> {
 }
 
 fn recreate_dir(dir: &Path) -> anyhow::Result<()> {
-    std::fs::remove_dir_all(dir)
-        .or_else(|e| {
-            use std::io::ErrorKind::NotFound;
+    dir.remove_dir_all_anyhow().or_else(|anyerr| {
+        use std::io::ErrorKind::NotFound;
 
+        if let Some(e) = anyerr.downcast_ref::<std::io::Error>() {
             if e.kind() == NotFound {
-                Ok(())
-            } else {
-                Err(e)
+                return Ok(());
             }
-        })
-        .with_context(|| format!("{:?}", dir.display()))?;
+        }
 
-    std::fs::create_dir(dir).with_context(|| format!("{:?}", dir.display()))?;
+        Err(anyerr)
+    })?;
+
+    dir.create_dir_anyhow()?;
 
     Ok(())
 }

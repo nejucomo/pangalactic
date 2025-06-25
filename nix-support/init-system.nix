@@ -12,13 +12,13 @@ let
     ;
 
   crane = cranes.release;
-
   src = crane.cleanCargoSource self;
+  seed-crates = "seed-crates";
 
   cargoVendorDir = crane.vendorMultipleCargoDeps {
     cargoLockList = [
       (src + "/Cargo.lock")
-      (src + "/crates/seed/guests/Cargo.lock")
+      (src + "/${seed-crates}/Cargo.lock")
     ];
   };
 
@@ -26,7 +26,7 @@ let
     inherit src cargoVendorDir;
     pnameSuffix = "wasm";
     targetsRgx = "release/[^/]+\.wasm$";
-    manifestDir = "crates/seed/guests";
+    manifestDir = "./${seed-crates}";
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
@@ -39,8 +39,8 @@ let
       if [ -z "$CRANE_BUILD_DEPS_ONLY" ]
       then
         echo 'Using prebuilt guests: ${wasm.cargo.build}'
-        cp -r '${wasm.cargo.build}/target' ./crates/seed/guests/target
-        chmod -R u+w ./crates/seed/guests/target
+        cp -r '${wasm.cargo.build}/target' ./${seed-crates}/target
+        chmod -R u+w ./${seed-crates}/target
       fi
     '';
   };

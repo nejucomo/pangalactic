@@ -23,4 +23,4 @@ members = [
 [workspace.dependencies]
 libflate = "1.2.0"
 tar = "0.4.38"
-pangalactic-guest = { path = "../../guest" }
+pangalactic-guest = { path = "../crates/guest" }

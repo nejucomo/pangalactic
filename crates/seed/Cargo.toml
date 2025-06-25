@@ -29,4 +29,5 @@ tokio.workspace = true
 
 [build-dependencies]
 anyhow.workspace = true
+anyhow-std.workspace = true
 walkdir.workspace = true

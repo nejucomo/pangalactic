@@ -38,7 +38,7 @@ where
     }
 }
 
-static WASM_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/guests/target/wasms");
+static WASM_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/../../seed-crates/target/wasms");
 
 pub fn iter_wasm_names() -> impl Iterator<Item = &'static str> {
     WASM_DIR.files().map(|f| {
