@@ -30,20 +30,31 @@ let
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
-  bin = build-workspace {
-    inherit src cargoVendorDir;
-    pnameSuffix = "bin";
-    targetsRgx = "release/pg(-[a-z-]+)?$";
+  bin = (
+    build-workspace {
+      inherit src cargoVendorDir;
+      pnameSuffix = "bin";
+      targetsRgx = "release/pg(-[a-z-]+)?$";
 
-    preBuild = ''
-      if [ -z "$CRANE_BUILD_DEPS_ONLY" ]
-      then
-        echo 'Using prebuilt guests: ${wasm.cargo.build}'
-        cp -r '${wasm.cargo.build}/target' ./${seed-crates}/target
-        chmod -R u+w ./${seed-crates}/target
-      fi
-    '';
-  };
+      preBuild = ''
+        if [ -z "$CRANE_BUILD_DEPS_ONLY" ]
+        then
+          echo 'Using prebuilt guests: ${wasm.cargo.build}'
+          cp -r '${wasm.cargo.build}/target' ./${seed-crates}/target
+          chmod -R u+w ./${seed-crates}/target
+        fi
+      '';
+
+      postBuild = ''
+        cargo doc --workspace
+      '';
+    }
+    // {
+      apidocs = run-command "bin-apidocs" [ ] ''
+        ln -sv '${bin.cargo.build}/target/doc' "$out"
+      '';
+    }
+  );
 
   book = import ./book.nix { inherit cargoVendorDir; };
 
@@ -59,7 +70,8 @@ let
 
     install-dir-link '${bin.outputs}' "$out/bin"
     install-dir-link '${wasm.outputs}' "$out/lib/${pname}/wasm"
-    install-dir-link '${book}' "$out/doc/${pname}"
+    install-dir-link '${book}' "$out/doc/${pname}/book"
+    install-dir-link '${bin.apidocs}' "$out/doc/${pname}/api"
   '';
 
   # All output packages _except_ default and all:
