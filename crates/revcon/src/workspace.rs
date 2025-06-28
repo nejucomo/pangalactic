@@ -66,7 +66,7 @@ where
         let mut ws = Workspace::new(store, workdir.as_ref().join(BOOKKEEPING_DIR_NAME));
         let template: LinkPath<S::CID> = format!(
             "{}/controldir-template",
-            include_str!(env!("PANGALACTIC_SEED_LINK")),
+            include_str!(env!("PANGALACTIC_SEED_LINK")).trim_end(),
         )
         .parse()?;
         ws.store.transfer(template, ws.path().to_path_buf()).await?;
