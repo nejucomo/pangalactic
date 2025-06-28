@@ -1,55 +1,68 @@
-use std::os::unix::process::CommandExt;
-use std::process::Command;
-
 use anyhow::Result;
+use pangalactic_revcon::Workspace;
 use pangalactic_runopt::{Application, RunApp};
+use pangalactic_std_store::{StdLayerInner, StdStore};
+use pangalactic_store_dirdb::DirDbStore;
 
-use crate::{
-    intosubargs::IntoSubArgs,
-    options::{PgCommand, PgOptions, UtilCommand},
-};
+use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
 
-impl PgOptions {
-    async fn run_subcommand<A>(self, bin: &str, args: A) -> Result<()>
-    where
-        A: IntoSubArgs,
-    {
-        let error = Command::new(bin).args(args.into_args()).exec();
-        Err(anyhow::Error::from(error))
+impl Application for Options {
+    async fn run(self) -> anyhow::Result<()> {
+        let sli: StdLayerInner<DirDbStore> = StdStore::from(self.dirdb).into();
+        self.command.run_app(sli).await
     }
 }
 
-impl Application for PgOptions {
-    async fn run(self) -> Result<()> {
-        todo!()
-    }
-}
-
-impl RunApp<PgOptions> for PgOptions {
-    async fn run_app(self, app: PgOptions) -> Result<()> {
-        self.command.run_app(app).await
-    }
-}
-
-impl RunApp<PgOptions> for PgCommand {
-    async fn run_app(self, app: PgOptions) -> Result<()> {
-        use PgCommand::*;
+impl<A> RunApp<A> for Command
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+    InitOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        use Command::*;
 
         match self {
-            RevCon(opts) => app.run_subcommand("pg-revcon", opts).await,
-            Util(opts) => opts.run_app(app).await,
+            Info(opts) => opts.run_app(app).await,
+            Init(opts) => opts.run_app(app).await,
         }
     }
 }
 
-impl RunApp<PgOptions> for UtilCommand {
-    async fn run_app(self, app: PgOptions) -> Result<()> {
-        use UtilCommand::*;
+impl<A> RunApp<A> for InfoOptions
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
+        self.detail.run_app(app).await
+    }
+}
 
+impl<A> RunApp<A> for InfoDetail
+where
+    A: Send,
+    InfoPathOptions: RunApp<A>,
+{
+    async fn run_app(self, app: A) -> Result<()> {
         match self {
-            RevCon(opts) => app.run_subcommand("pg-revcon", opts).await,
-            Store(opts) => app.run_subcommand("pg-store", opts).await,
-            Derive(opts) => app.run_subcommand("pg-derive", opts).await,
+            InfoDetail::Path(opts) => opts.run_app(app).await,
         }
+    }
+}
+
+impl RunApp<StdLayerInner<DirDbStore>> for InfoPathOptions {
+    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
+        let ws = Workspace::find_from_current_dir(store).await?;
+        println!("{ws}");
+        Ok(())
+    }
+}
+
+impl RunApp<StdLayerInner<DirDbStore>> for InitOptions {
+    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
+        let ctldir = Workspace::initialize(store, self.workdir).await?;
+        println!("{ctldir}");
+        Ok(())
     }
 }

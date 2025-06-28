@@ -1,40 +1,59 @@
-use clap::{Parser, Subcommand};
-use pangalactic_cli_derive as pgderive;
-use pangalactic_cli_revcon::options as revcon;
-use pangalactic_cli_store::options as store;
+use std::path::PathBuf;
+
+use clap::{Args, Parser, Subcommand};
 use pangalactic_store_dirdb::DirDbStore;
 
+/// pg revision control
 #[derive(Debug, Parser)]
-#[clap(author, version, about, long_about = None)]
-pub struct PgOptions {
+pub struct Options {
     /// The path to the dirdb store directory
     #[clap(short, long, default_value_t)]
     pub dirdb: DirDbStore,
 
     #[clap(subcommand)]
-    pub command: Option<PgCommand>,
+    pub command: Command,
 }
 
+/// Revision Control commands
 #[derive(Debug, Subcommand)]
-pub enum PgCommand {
-    #[clap(flatten)]
-    RevCon(revcon::Command),
-    #[clap(subcommand)]
-    Util(UtilCommand),
+pub enum Command {
+    Info(InfoOptions),
+    Init(InitOptions),
 }
 
-impl Default for PgCommand {
+impl Default for Command {
     fn default() -> Self {
-        PgCommand::RevCon(revcon::Command::default())
+        Command::Info(InfoOptions::default())
     }
 }
 
-/// General Utilities
+/// Repository info
+#[derive(Default, Debug, Args)]
+pub struct InfoOptions {
+    #[command(subcommand)]
+    pub detail: Option<InfoDetail>,
+}
+
+/// Revision Control Info subcommands
 #[derive(Debug, Subcommand)]
-pub enum UtilCommand {
-    #[clap(subcommand, name = "revcon")]
-    RevCon(revcon::Command),
-    #[clap(subcommand)]
-    Store(store::Command),
-    Derive(pgderive::Options),
+pub enum InfoDetail {
+    Path(InfoPathOptions),
+}
+
+impl Default for InfoDetail {
+    fn default() -> Self {
+        InfoDetail::Path(InfoPathOptions::default())
+    }
+}
+
+/// Print the control directory path
+#[derive(Default, Debug, Args)]
+pub struct InfoPathOptions {}
+
+/// Initialize revision control
+#[derive(Debug, Args)]
+pub struct InitOptions {
+    /// The workdir to initialize
+    #[clap(long, short, default_value = ".")]
+    pub workdir: PathBuf,
 }

@@ -1,5 +1,5 @@
 [package]
-name = "pangalactic-cli"
+name = "pangalactic-cli-revcon"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,10 +7,13 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 clap.workspace = true
-either.workspace = true
-pangalactic-cli-derive.workspace = true
-pangalactic-cli-revcon.workspace = true
-pangalactic-cli-store.workspace = true
+pangalactic-revcon.workspace = true
 pangalactic-runopt.workspace = true
+pangalactic-std-store.workspace = true
 pangalactic-store-dirdb.workspace = true
-tokio = { workspace = true, features = ["process"] }
+tokio.workspace = true
+
+[dev-dependencies]
+test-case.workspace = true
+pangalactic-test-dir.workspace = true
+pangalactic-test-runner.workspace = true
