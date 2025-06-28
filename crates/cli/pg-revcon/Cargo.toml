@@ -10,6 +10,7 @@ clap.workspace = true
 pangalactic-revcon.workspace = true
 pangalactic-runopt.workspace = true
 pangalactic-std-store.workspace = true
+pangalactic-store-dirdb.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]

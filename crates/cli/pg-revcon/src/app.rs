@@ -1,7 +1,8 @@
 use anyhow::Result;
-use pangalactic_revcon::ControlDir;
+use pangalactic_revcon::Workspace;
 use pangalactic_runopt::{Application, RunApp};
 use pangalactic_std_store::StdStore;
+use pangalactic_store_dirdb::DirDbStore;
 
 use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
 
@@ -64,8 +65,8 @@ where
 
 impl RunApp<RevConApplication> for InfoPathOptions {
     async fn run_app(self, _: RevConApplication) -> Result<()> {
-        let ctldir = ControlDir::find_from_current_dir()?;
-        println!("{ctldir}");
+        let ws = Workspace::<DirDbStore>::find_from_current_dir().await?;
+        println!("{ws}");
         Ok(())
     }
 }
@@ -73,7 +74,7 @@ impl RunApp<RevConApplication> for InfoPathOptions {
 impl RunApp<RevConApplication> for InitOptions {
     async fn run_app(self, _: RevConApplication) -> Result<()> {
         let mut store = StdStore::default();
-        let ctldir = ControlDir::initialize(&mut store, self.workdir).await?;
+        let ctldir = Workspace::initialize(&mut store, self.workdir).await?;
         println!("{ctldir}");
         Ok(())
     }

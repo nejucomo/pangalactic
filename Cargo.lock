@@ -1241,6 +1241,7 @@ dependencies = [
  "pangalactic-revcon",
  "pangalactic-runopt",
  "pangalactic-std-store",
+ "pangalactic-store-dirdb",
  "pangalactic-test-dir",
  "pangalactic-test-runner",
  "test-case",

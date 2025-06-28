@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
-use pangalactic_revcon::CONTROL_DIR_NAME;
+use pangalactic_revcon::BOOKKEEPING_DIR_NAME;
 use pangalactic_test_dir as testdir;
 use pangalactic_test_runner::Runner;
 use test_case::test_case;
@@ -23,9 +23,9 @@ where
     let runner = Runner::new(&testcasedir, env!("CARGO_BIN_EXE_pg-revcon"), []);
 
     let stdout = runner.pg(["init"], "")?.exit_ok()?;
-    assert!(stdout.trim().ends_with(CONTROL_DIR_NAME));
+    assert!(stdout.trim().ends_with(BOOKKEEPING_DIR_NAME));
 
-    let tomlpath = testcasedir.join(CONTROL_DIR_NAME).join("config.toml");
+    let tomlpath = testcasedir.join(BOOKKEEPING_DIR_NAME).join("config.toml");
     let toml = std::fs::read_to_string(tomlpath)?;
     assert!(toml.contains("exclude"), "{toml:?}");
 
