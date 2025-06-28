@@ -1,5 +1,5 @@
 use either::Either::{self, Left, Right};
-use pangalactic_cli_derive::options as derive;
+use pangalactic_cli_derive as derive;
 use pangalactic_cli_revcon::options as revcon;
 use pangalactic_cli_store::options as store;
 

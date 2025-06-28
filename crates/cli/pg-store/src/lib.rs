@@ -1,4 +1,4 @@
 mod app;
 pub mod options;
 
-pub use self::app::StoreApplication;
+pub use self::options::Options;

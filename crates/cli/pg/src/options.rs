@@ -1,20 +1,25 @@
 use clap::{Parser, Subcommand};
-use pangalactic_cli_derive::options as derive;
+use pangalactic_cli_derive as pgderive;
 use pangalactic_cli_revcon::options as revcon;
 use pangalactic_cli_store::options as store;
+use pangalactic_store_dirdb::DirDbStore;
 
 #[derive(Debug, Parser)]
-#[command(author, version, about, long_about = None)]
+#[clap(author, version, about, long_about = None)]
 pub struct PgOptions {
-    #[command(subcommand)]
+    /// The path to the dirdb store directory
+    #[clap(short, long, default_value_t)]
+    pub dirdb: DirDbStore,
+
+    #[clap(subcommand)]
     pub command: Option<PgCommand>,
 }
 
 #[derive(Debug, Subcommand)]
 pub enum PgCommand {
-    #[command(flatten)]
+    #[clap(flatten)]
     RevCon(revcon::Command),
-    #[command(subcommand)]
+    #[clap(subcommand)]
     Util(UtilCommand),
 }
 
@@ -27,9 +32,9 @@ impl Default for PgCommand {
 /// General Utilities
 #[derive(Debug, Subcommand)]
 pub enum UtilCommand {
-    #[command(subcommand, name = "revcon")]
+    #[clap(subcommand, name = "revcon")]
     RevCon(revcon::Command),
-    #[command(subcommand)]
+    #[clap(subcommand)]
     Store(store::Command),
-    Derive(derive::Options),
+    Derive(pgderive::Options),
 }

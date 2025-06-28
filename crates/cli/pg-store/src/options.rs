@@ -1,11 +1,17 @@
 use anyhow::Result;
 use clap::{Args, Parser, Subcommand};
+use derive_more::{From, Into};
 use pangalactic_globset::{Glob, GlobSet};
 use pangalactic_std_store::{StdDestination, StdOrigin};
+use pangalactic_store_dirdb::DirDbStore;
 
 /// Store i/o
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser, From, Into)]
 pub struct Options {
+    /// The path to the dirdb store directory
+    #[clap(short, long, default_value_t)]
+    pub dirdb: DirDbStore,
+
     #[clap(subcommand)]
     pub command: Command,
 }

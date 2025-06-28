@@ -1216,6 +1216,7 @@ dependencies = [
  "pangalactic-cli-revcon",
  "pangalactic-cli-store",
  "pangalactic-runopt",
+ "pangalactic-store-dirdb",
  "tokio",
 ]
 
@@ -1225,10 +1226,12 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "clap",
+ "derive_more",
  "pangalactic-endpoint",
  "pangalactic-runopt",
  "pangalactic-schemata",
  "pangalactic-std-store",
+ "pangalactic-store-dirdb",
  "tokio",
 ]
 
@@ -1255,11 +1258,13 @@ dependencies = [
  "anyhow",
  "anyhow-std",
  "clap",
+ "derive_more",
  "pangalactic-endpoint",
  "pangalactic-globset",
  "pangalactic-manifest",
  "pangalactic-runopt",
  "pangalactic-std-store",
+ "pangalactic-store-dirdb",
  "pangalactic-test-dir",
  "pangalactic-test-runner",
  "test-case",
@@ -1609,6 +1614,7 @@ name = "pangalactic-std-store"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "derive_more",
  "pangalactic-dag-transfer",
  "pangalactic-endpoint",
  "pangalactic-hash",

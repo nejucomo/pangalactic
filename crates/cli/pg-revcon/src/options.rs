@@ -1,10 +1,15 @@
 use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand};
+use pangalactic_store_dirdb::DirDbStore;
 
 /// pg revision control
 #[derive(Debug, Parser)]
 pub struct Options {
+    /// The path to the dirdb store directory
+    #[clap(short, long, default_value_t)]
+    pub dirdb: DirDbStore,
+
     #[clap(subcommand)]
     pub command: Command,
 }

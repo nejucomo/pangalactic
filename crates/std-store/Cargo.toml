@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+derive_more.workspace = true
 pangalactic-dag-transfer.workspace = true
 pangalactic-endpoint.workspace = true
 pangalactic-hash.workspace = true

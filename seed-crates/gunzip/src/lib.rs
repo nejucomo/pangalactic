@@ -1,5 +1,5 @@
-use pangalactic_guest::{define_derive, log, unwrap, ByteWriter, Link, Plan};
 use libflate::gzip::Decoder;
+use pangalactic_guest::{define_derive, log, unwrap, ByteWriter, Link, Plan};
 
 #[define_derive]
 fn derive_impl(plan: Plan) -> Link {

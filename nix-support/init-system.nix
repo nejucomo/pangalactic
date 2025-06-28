@@ -30,20 +30,31 @@ let
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
+  pg-store-build = build-workspace {
+    inherit src cargoVendorDir;
+    pnameSuffix = "bin-pg-store";
+    targetsRgx = "release/pg-store$";
+    cargoPackage = "pangalactic-cli-store";
+  };
+
+  store-seed = run-command "${pname}-store-seed" [ ] ''
+    ( set -x
+    seedDir="$out/seed-dirdb"
+    mkdir -p "$out"
+    '${pg-store-build.outputs}/pg-store' \
+      --dirdb "$out/seed-dirdb" \
+      xfer '${wasm.outputs}' pg: \
+      | tee "$out/seed.pgl"
+    )
+  '';
+
   bin = (
     build-workspace {
       inherit src cargoVendorDir;
       pnameSuffix = "bin";
       targetsRgx = "release/pg(-[a-z-]+)?$";
 
-      preBuild = ''
-        if [ -z "$CRANE_BUILD_DEPS_ONLY" ]
-        then
-          echo 'Using prebuilt guests: ${wasm.cargo.build}'
-          cp -r '${wasm.cargo.build}/target' ./${seed-crates}/target
-          chmod -R u+w ./${seed-crates}/target
-        fi
-      '';
+      PANGALACTIC_SEED_LINK = store-seed + "/seed.pgl";
 
       postBuild = ''
         cargo doc --workspace
@@ -80,11 +91,13 @@ let
     bin-cargo-build = bin.cargo.build;
     bin = bin.outputs;
 
+    pg-store = pg-store-build.outputs;
+
     wasm-cargo-artifacts = wasm.cargo.artifacts;
     wasm-cargo-build = wasm.cargo.build;
     wasm = wasm.outputs;
 
-    inherit book install;
+    inherit book install store-seed;
   };
 
   all = combine-derivations base-packages;

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
+use anyhow_std::PathAnyhow as _;
 use pangalactic_hash::{Hash, HashWriter};
 use pin_project::pin_project;
 use tokio::io::AsyncWrite;
@@ -16,6 +17,7 @@ pub struct Writer {
 
 impl Writer {
     pub(crate) async fn init(dir: &Path) -> anyhow::Result<Self> {
+        dir.create_dir_all_anyhow()?;
         let spoolpath = dir.join(get_spool_name());
         let f = tokio::fs::File::create(&spoolpath).await?;
         let downstream = HashWriter::from(f);

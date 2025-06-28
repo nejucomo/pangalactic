@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use anyhow::Result;
+use derive_more::{From, Into};
 use pangalactic_dag_transfer::{Destination, IntoSource};
 use pangalactic_hash::Hash;
 use pangalactic_host::HostLayerExt;
@@ -15,10 +16,19 @@ use crate::StdLink;
 pub type StdStore = StdLayer<DirDbStore>;
 pub type StdMemStore = StdLayer<MemStore>;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, From, Into)]
 pub struct StdLayer<S>(StdLayerInner<S>)
 where
     S: Store<CID = Hash>;
+
+impl<S> From<S> for StdLayer<S>
+where
+    S: Store<CID = Hash>,
+{
+    fn from(store: S) -> Self {
+        StdLayer(LinkDirectoryLayer::from(CidMetaLayer::from(store)))
+    }
+}
 
 pub type StdLayerInner<S> = LinkDirectoryLayer<CidMetaLayer<S>>;
 

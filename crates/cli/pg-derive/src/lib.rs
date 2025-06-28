@@ -1,4 +1,3 @@
-mod app;
-pub mod options;
+mod options;
 
-pub use self::app::DeriveApplication;
+pub use self::options::Options;

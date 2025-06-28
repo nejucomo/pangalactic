@@ -1,13 +1,11 @@
+use std::fmt::Debug;
 use std::future::Future;
 
 use anyhow::Result;
-use clap::Parser;
 
 use crate::RunApp;
 
-pub trait Application: Send + Default {
-    type Options: Send + std::fmt::Debug + clap::Parser + RunApp<Self>;
-
+pub trait Application: Send + Debug + clap::Parser {
     fn run_main() -> impl Future<Output = Result<()>> + Send {
         Box::pin(async {
             pangalactic_log::init()?;
@@ -15,11 +13,19 @@ pub trait Application: Send + Default {
             let logargs = std::env::args().collect::<Vec<_>>();
             tracing::debug!(?logargs);
 
-            let opts: Self::Options = Self::Options::parse();
-            tracing::trace!(?opts);
+            let appopts = Self::parse();
+            tracing::trace!(?appopts);
 
-            let app = Self::default();
-            opts.run_app(app).await
+            appopts.run().await
         })
+    }
+
+    fn run(self) -> impl Future<Output = Result<()>> + Send;
+
+    fn run_command<C>(self, command: C) -> impl Future<Output = Result<()>> + Send
+    where
+        C: RunApp<Self>,
+    {
+        command.run_app(self)
     }
 }

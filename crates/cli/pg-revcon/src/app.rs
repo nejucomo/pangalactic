@@ -1,27 +1,15 @@
 use anyhow::Result;
 use pangalactic_revcon::Workspace;
 use pangalactic_runopt::{Application, RunApp};
-use pangalactic_std_store::StdStore;
+use pangalactic_std_store::{StdLayerInner, StdStore};
 use pangalactic_store_dirdb::DirDbStore;
 
 use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
 
-/// The standalone `pg-revcon` application
-#[derive(Debug, Default)]
-pub struct RevConApplication;
-
-impl Application for RevConApplication {
-    type Options = Options;
-}
-
-impl<A> RunApp<A> for Options
-where
-    A: Send,
-    InfoPathOptions: RunApp<A>,
-    InitOptions: RunApp<A>,
-{
-    async fn run_app(self, app: A) -> Result<()> {
-        self.command.run_app(app).await
+impl Application for Options {
+    async fn run(self) -> anyhow::Result<()> {
+        let sli: StdLayerInner<DirDbStore> = StdStore::from(self.dirdb).into();
+        self.command.run_app(sli).await
     }
 }
 
@@ -63,18 +51,17 @@ where
     }
 }
 
-impl RunApp<RevConApplication> for InfoPathOptions {
-    async fn run_app(self, _: RevConApplication) -> Result<()> {
-        let ws = Workspace::<DirDbStore>::find_from_current_dir().await?;
+impl RunApp<StdLayerInner<DirDbStore>> for InfoPathOptions {
+    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
+        let ws = Workspace::find_from_current_dir(store).await?;
         println!("{ws}");
         Ok(())
     }
 }
 
-impl RunApp<RevConApplication> for InitOptions {
-    async fn run_app(self, _: RevConApplication) -> Result<()> {
-        let mut store = StdStore::default();
-        let ctldir = Workspace::initialize(&mut store, self.workdir).await?;
+impl RunApp<StdLayerInner<DirDbStore>> for InitOptions {
+    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
+        let ctldir = Workspace::initialize(store, self.workdir).await?;
         println!("{ctldir}");
         Ok(())
     }

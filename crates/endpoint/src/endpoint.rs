@@ -18,7 +18,7 @@ pub enum Endpoint<IO, H, S> {
 impl<IO, H, S> Endpoint<IO, H, S> {
     pub fn as_ref(&self) -> Endpoint<&IO, &H, &S> {
         match self {
-            MkStdio(ref io) => MkStdio(io),
+            MkStdio(io) => MkStdio(io),
             MkHos(hos) => MkHos(hos.as_ref()),
         }
     }

@@ -5,7 +5,7 @@ use pangalactic_hash::Hash;
 use pangalactic_layer_cidmeta::CidMeta;
 use pangalactic_link::Link;
 
-pub use self::stdlayer::{StdLayer, StdMemStore, StdStore};
+pub use self::stdlayer::{StdLayer, StdLayerInner, StdMemStore, StdStore};
 
 pub type StdLink = Link<StdCid>;
 pub type StdCid = CidMeta<Hash>;

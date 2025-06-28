@@ -9,11 +9,7 @@ use crate::{
     options::{PgCommand, PgOptions, UtilCommand},
 };
 
-/// pangalactic deterministic revision control
-#[derive(Debug, Default)]
-pub struct PgApplication;
-
-impl PgApplication {
+impl PgOptions {
     async fn run_subcommand<A>(self, bin: &str, args: A) -> Result<()>
     where
         A: IntoSubArgs,
@@ -23,18 +19,20 @@ impl PgApplication {
     }
 }
 
-impl Application for PgApplication {
-    type Options = PgOptions;
+impl Application for PgOptions {
+    async fn run(self) -> Result<()> {
+        todo!()
+    }
 }
 
-impl RunApp<PgApplication> for PgOptions {
-    async fn run_app(self, app: PgApplication) -> Result<()> {
+impl RunApp<PgOptions> for PgOptions {
+    async fn run_app(self, app: PgOptions) -> Result<()> {
         self.command.run_app(app).await
     }
 }
 
-impl RunApp<PgApplication> for PgCommand {
-    async fn run_app(self, app: PgApplication) -> Result<()> {
+impl RunApp<PgOptions> for PgCommand {
+    async fn run_app(self, app: PgOptions) -> Result<()> {
         use PgCommand::*;
 
         match self {
@@ -44,8 +42,8 @@ impl RunApp<PgApplication> for PgCommand {
     }
 }
 
-impl RunApp<PgApplication> for UtilCommand {
-    async fn run_app(self, app: PgApplication) -> Result<()> {
+impl RunApp<PgOptions> for UtilCommand {
+    async fn run_app(self, app: PgOptions) -> Result<()> {
         use UtilCommand::*;
 
         match self {
