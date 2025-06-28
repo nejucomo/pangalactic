@@ -2,6 +2,7 @@ use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
 
+use anyhow::Context;
 use pangalactic_config::datapath;
 use pangalactic_hash::Hash;
 use pangalactic_store::{Commit, Load, Store};
@@ -30,8 +31,10 @@ impl Store for DirDbStore {
 
 impl Load<DirDbStore> for tokio::fs::File {
     async fn load_from_store(store: &DirDbStore, cid: &Hash) -> anyhow::Result<Self> {
-        let path = store.0.join(cid.to_string());
-        let f = tokio::fs::File::open(path).await?;
+        let path = &store.0.join(cid.to_string());
+        let f = tokio::fs::File::open(path)
+            .await
+            .with_context(|| format!("-for store path: {:?}", path.display()))?;
         Ok(f)
     }
 }

@@ -11,6 +11,9 @@ use pangalactic_layer_dir::LinkDirectoryLayer;
 use pangalactic_linkpath::LinkPath;
 use pangalactic_store::Store;
 
+const SEED_LINK: &str = include_str!(env!("PANGALACTIC_SEED_LINK_PATH"));
+const BOOKKEEPING_TEMPLATE_NAME: &str = "bookkeeping-template";
+
 /// A workspace is a working directory with bookkeeping metadata which can record revisions
 #[derive(Debug, Constructor)]
 pub struct Workspace<S>
@@ -64,11 +67,8 @@ where
         P: AsRef<Path>,
     {
         let mut ws = Workspace::new(store, workdir.as_ref().join(BOOKKEEPING_DIR_NAME));
-        let template: LinkPath<S::CID> = format!(
-            "{}/controldir-template",
-            include_str!(env!("PANGALACTIC_SEED_LINK")).trim_end(),
-        )
-        .parse()?;
+        let template: LinkPath<S::CID> =
+            format!("{}/{BOOKKEEPING_TEMPLATE_NAME}", SEED_LINK.trim_end()).parse()?;
         ws.store.transfer(template, ws.path().to_path_buf()).await?;
 
         Ok(ws)

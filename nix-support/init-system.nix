@@ -54,7 +54,7 @@ let
       pnameSuffix = "bin";
       targetsRgx = "release/pg(-[a-z-]+)?$";
 
-      PANGALACTIC_SEED_LINK = store-seed + "/seed.pgl";
+      PANGALACTIC_SEED_LINK_PATH = store-seed + "/seed.pgl";
 
       postBuild = ''
         cargo doc --workspace
@@ -80,7 +80,7 @@ let
     }
 
     install-dir-link '${bin.outputs}' "$out/bin"
-    install-dir-link '${wasm.outputs}' "$out/lib/${pname}/wasm"
+    install-dir-link '${store-seed}' "$out/lib/${pname}/seed"
     install-dir-link '${book}' "$out/doc/${pname}/book"
     install-dir-link '${bin.apidocs}' "$out/doc/${pname}/api"
   '';
