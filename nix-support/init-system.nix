@@ -132,12 +132,15 @@ let
   };
 
   all = combine-derivations base-packages;
-in
-{
+
   packages = base-packages // {
     inherit all;
     default = install;
   };
+in
+{
+  inherit packages;
 
   devShells.default = import ./dev-shell.nix;
+  checks = import ./checks packages;
 }
