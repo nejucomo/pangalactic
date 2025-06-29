@@ -8,11 +8,9 @@ use anyhow_std::PathAnyhow as _;
 use derive_more::Constructor;
 use pangalactic_dag_transfer::TransferLayerExt as _;
 use pangalactic_layer_dir::LinkDirectoryLayer;
-use pangalactic_linkpath::LinkPath;
 use pangalactic_store::Store;
 
-const SEED_LINK: &str = include_str!(env!("PANGALACTIC_SEED_LINK_PATH"));
-const BOOKKEEPING_TEMPLATE_NAME: &str = "bookkeeping-template";
+use crate::RevConConfig;
 
 /// A workspace is a working directory with bookkeeping metadata which can record revisions
 #[derive(Debug, Constructor)]
@@ -20,6 +18,9 @@ pub struct Workspace<S>
 where
     S: Store,
 {
+    /// App config:
+    appconfig: RevConConfig<S>,
+
     /// The store
     store: LinkDirectoryLayer<S>,
 
@@ -40,13 +41,20 @@ where
     }
 
     /// Equivalent to [Workspace::find_from_path] with the current directory
-    pub async fn find_from_current_dir(store: LinkDirectoryLayer<S>) -> Result<Self> {
+    pub async fn find_from_current_dir(
+        appconfig: RevConConfig<S>,
+        store: LinkDirectoryLayer<S>,
+    ) -> Result<Self> {
         let cwd = std::env::current_dir()?;
-        Self::find_from_path(store, cwd).await
+        Self::find_from_path(appconfig, store, cwd).await
     }
 
     /// If the given path is within a [Workspace], return that workspace; otherwise [Err]
-    pub async fn find_from_path<P>(store: LinkDirectoryLayer<S>, startpath: P) -> Result<Self>
+    pub async fn find_from_path<P>(
+        appconfig: RevConConfig<S>,
+        store: LinkDirectoryLayer<S>,
+        startpath: P,
+    ) -> Result<Self>
     where
         P: AsRef<Path>,
     {
@@ -54,22 +62,32 @@ where
         for p in sp.ancestors() {
             let candidate = p.join(BOOKKEEPING_DIR_NAME);
             if candidate.is_dir() {
-                return Ok(Workspace::new(store, candidate));
+                return Ok(Workspace::new(appconfig, store, candidate));
             }
         }
         anyhow::bail!("pg workspace root not found above {:?}", sp.display());
     }
 
     /// Initialize a path as a new [Workspace]
-    pub async fn initialize<P>(store: LinkDirectoryLayer<S>, workdir: P) -> Result<Self>
+    pub async fn initialize<P>(
+        appconfig: RevConConfig<S>,
+        store: LinkDirectoryLayer<S>,
+        workdir: P,
+    ) -> Result<Self>
     where
         S: Store,
         P: AsRef<Path>,
     {
-        let mut ws = Workspace::new(store, workdir.as_ref().join(BOOKKEEPING_DIR_NAME));
-        let template: LinkPath<S::CID> =
-            format!("{}/{BOOKKEEPING_TEMPLATE_NAME}", SEED_LINK.trim_end()).parse()?;
-        ws.store.transfer(template, ws.path().to_path_buf()).await?;
+        let mut ws = Workspace::new(
+            appconfig,
+            store,
+            workdir.as_ref().join(BOOKKEEPING_DIR_NAME),
+        );
+        ws.bkdir.create_dir_anyhow()?;
+
+        if let Some(template) = ws.appconfig.template.clone() {
+            ws.store.transfer(template, ws.path().to_path_buf()).await?;
+        }
 
         Ok(ws)
     }

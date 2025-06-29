@@ -7,6 +7,8 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 clap.workspace = true
+pangalactic-config.workspace = true
+pangalactic-layer-cidmeta.workspace = true
 pangalactic-revcon.workspace = true
 pangalactic-runopt.workspace = true
 pangalactic-std-store.workspace = true

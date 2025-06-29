@@ -1,7 +1,8 @@
-use std::{fmt, future::Future, str::FromStr};
+use std::{fmt::Display, future::Future, str::FromStr};
 
 use anyhow::Result;
 use pin_project::pin_project;
+use serde::{Deserialize, Serialize};
 use tokio::io::AsyncRead;
 
 use crate::hostorstore::HostOrStore;
@@ -9,7 +10,15 @@ use crate::hostorstore::HostOrStore;
 use self::Endpoint::*;
 
 #[pin_project(project = EndpointProjection)]
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(
+    try_from = "String",
+    into = "String",
+    bound(
+        serialize = "IO: Clone + Display, H: Clone + Display, S: Clone + Display",
+        deserialize = "IO: FromStr<Err = anyhow::Error>, H: FromStr<Err = anyhow::Error>, S: FromStr<Err = anyhow::Error>"
+    )
+)]
 pub enum Endpoint<IO, H, S> {
     MkStdio(#[pin] IO),
     MkHos(#[pin] HostOrStore<H, S>),
@@ -165,13 +174,13 @@ impl<IO, H, S> From<HostOrStore<H, S>> for Endpoint<IO, H, S> {
     }
 }
 
-impl<IO, H, S> fmt::Display for Endpoint<IO, H, S>
+impl<IO, H, S> Display for Endpoint<IO, H, S>
 where
-    IO: fmt::Display,
-    H: fmt::Display,
-    S: fmt::Display,
+    IO: Display,
+    H: Display,
+    S: Display,
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.as_ref()
             .map_io(|io| io.fmt(f))
             .map_host(|h| h.fmt(f))
@@ -197,5 +206,29 @@ where
         } else {
             s.parse().map(MkHos)
         }
+    }
+}
+
+impl<IO, H, S> From<Endpoint<IO, H, S>> for String
+where
+    IO: Display,
+    H: Display,
+    S: Display,
+{
+    fn from(ep: Endpoint<IO, H, S>) -> Self {
+        ep.to_string()
+    }
+}
+
+impl<IO, H, S> TryFrom<String> for Endpoint<IO, H, S>
+where
+    IO: FromStr<Err = anyhow::Error>,
+    H: FromStr<Err = anyhow::Error>,
+    S: FromStr<Err = anyhow::Error>,
+{
+    type Error = anyhow::Error;
+
+    fn try_from(s: String) -> anyhow::Result<Self> {
+        s.parse()
     }
 }

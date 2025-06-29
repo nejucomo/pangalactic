@@ -22,39 +22,11 @@ let
     ];
   };
 
-  wasm = build-workspace {
-    inherit src cargoVendorDir;
-    pnameSuffix = "wasm";
-    targetsRgx = "release/[^/]+\.wasm$";
-    manifestDir = "./${seed-crates}";
-    CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
-  };
-
-  pg-store-build = build-workspace {
-    inherit src cargoVendorDir;
-    pnameSuffix = "bin-pg-store";
-    targetsRgx = "release/pg-store$";
-    cargoPackage = "pangalactic-cli-store";
-  };
-
-  store-seed = run-command "${pname}-store-seed" [ ] ''
-    ( set -x
-    seedDir="$out/seed-dirdb"
-    mkdir -p "$out"
-    '${pg-store-build.outputs}/pg-store' \
-      --dirdb "$out/seed-dirdb" \
-      xfer '${wasm.outputs}' pg: \
-      | tee "$out/seed.pgl"
-    )
-  '';
-
   bin = (
     build-workspace {
       inherit src cargoVendorDir;
       pnameSuffix = "bin";
       targetsRgx = "release/pg(-[a-z-]+)?$";
-
-      PANGALACTIC_SEED_LINK_PATH = store-seed + "/seed.pgl";
 
       postBuild = ''
         cargo doc --workspace
@@ -66,6 +38,25 @@ let
       '';
     }
   );
+
+  wasm = build-workspace {
+    inherit src cargoVendorDir;
+    pnameSuffix = "wasm";
+    targetsRgx = "release/[^/]+\.wasm$";
+    manifestDir = "./${seed-crates}";
+    CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
+  };
+
+  seed-dir = run-command "seed-dir" [ ] ''
+    outbin="$out/bin"
+    outbintest="$out/bin/test"
+    mkdir -p "$outbintest"
+    for wasm in '${wasm.outputs}'/*
+    do
+      outrel="$(basename "$wasm" | sed 's|\.wasm$||; s|^test_|test/|')"
+      ln -sv "$wasm" "$outbin/$outrel"
+    done
+  '';
 
   book = import ./book.nix { inherit cargoVendorDir; };
 
@@ -80,24 +71,22 @@ let
     }
 
     install-dir-link '${bin.outputs}' "$out/bin"
-    install-dir-link '${store-seed}' "$out/lib/${pname}/seed"
+    install-dir-link '${seed-dir}' "$out/lib/${pname}/seed"
     install-dir-link '${book}' "$out/doc/${pname}/book"
     install-dir-link '${bin.apidocs}' "$out/doc/${pname}/api"
   '';
 
   # All output packages _except_ default and all:
   base-packages = {
+    inherit book install seed-dir;
+
     bin-cargo-artifacts = bin.cargo.artifacts;
     bin-cargo-build = bin.cargo.build;
     bin = bin.outputs;
 
-    pg-store = pg-store-build.outputs;
-
     wasm-cargo-artifacts = wasm.cargo.artifacts;
     wasm-cargo-build = wasm.cargo.build;
     wasm = wasm.outputs;
-
-    inherit book install store-seed;
   };
 
   all = combine-derivations base-packages;

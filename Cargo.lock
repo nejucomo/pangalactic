@@ -1215,6 +1215,8 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "clap",
+ "pangalactic-config",
+ "pangalactic-layer-cidmeta",
  "pangalactic-revcon",
  "pangalactic-runopt",
  "pangalactic-std-store",
@@ -1541,6 +1543,7 @@ dependencies = [
  "derive_more",
  "pangalactic-config",
  "pangalactic-dag-transfer",
+ "pangalactic-endpoint",
  "pangalactic-globset",
  "pangalactic-layer-dir",
  "pangalactic-link",

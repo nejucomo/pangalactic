@@ -1,15 +1,24 @@
 use anyhow::Result;
-use pangalactic_revcon::Workspace;
+use pangalactic_config::Configuration as _;
+use pangalactic_layer_cidmeta::CidMetaLayer;
+use pangalactic_revcon::{RevConConfig, Workspace};
 use pangalactic_runopt::{Application, RunApp};
 use pangalactic_std_store::{StdLayerInner, StdStore};
 use pangalactic_store_dirdb::DirDbStore;
 
 use crate::options::{Command, InfoDetail, InfoOptions, InfoPathOptions, InitOptions, Options};
 
+#[derive(Debug)]
+struct AppState {
+    rcconf: RevConConfig<CidMetaLayer<DirDbStore>>,
+    store: StdLayerInner<DirDbStore>,
+}
+
 impl Application for Options {
     async fn run(self) -> anyhow::Result<()> {
-        let sli: StdLayerInner<DirDbStore> = StdStore::from(self.dirdb).into();
-        self.command.run_app(sli).await
+        let rcconf = RevConConfig::load().await?;
+        let store: StdLayerInner<DirDbStore> = StdStore::from(self.dirdb).into();
+        self.command.run_app(AppState { rcconf, store }).await
     }
 }
 
@@ -51,17 +60,19 @@ where
     }
 }
 
-impl RunApp<StdLayerInner<DirDbStore>> for InfoPathOptions {
-    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
-        let ws = Workspace::find_from_current_dir(store).await?;
+impl RunApp<AppState> for InfoPathOptions {
+    async fn run_app(self, appstate: AppState) -> Result<()> {
+        let AppState { rcconf, store } = appstate;
+        let ws = Workspace::find_from_current_dir(rcconf, store).await?;
         println!("{ws}");
         Ok(())
     }
 }
 
-impl RunApp<StdLayerInner<DirDbStore>> for InitOptions {
-    async fn run_app(self, store: StdLayerInner<DirDbStore>) -> Result<()> {
-        let ctldir = Workspace::initialize(store, self.workdir).await?;
+impl RunApp<AppState> for InitOptions {
+    async fn run_app(self, appstate: AppState) -> Result<()> {
+        let AppState { rcconf, store } = appstate;
+        let ctldir = Workspace::initialize(rcconf, store, self.workdir).await?;
         println!("{ctldir}");
         Ok(())
     }
