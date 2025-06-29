@@ -93,6 +93,12 @@ let
     )
   '';
 
+  merged-bin = run-command "merged-bin" [ ] ''
+    mkdir "$out"
+    ln -sv '${bin.outputs}'/* "$out/"
+    ln -sv '${pg-install-seed}' "$out/pg-install-seed"
+  '';
+
   book = import ./book.nix { inherit cargoVendorDir; };
 
   install = run-command "install" [ ] ''
@@ -105,10 +111,9 @@ let
       ln -vs "$target" "$link"
     }
 
-    install-dir-link '${bin.outputs}' "$out/bin"
+    install-dir-link '${merged-bin}' "$out/bin"
     install-dir-link '${seed-config}' "$out/etc/${pname}/seed.toml"
     install-dir-link '${seed-dir}' "$out/lib/${pname}/seed"
-    install-dir-link '${pg-install-seed}' "$out/lib/${pname}/pg-install-seed"
     install-dir-link '${book}' "$out/doc/${pname}/book"
     install-dir-link '${bin.apidocs}' "$out/doc/${pname}/api"
   '';
