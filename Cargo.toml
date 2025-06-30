@@ -36,6 +36,7 @@ members = [
   "crates/nested-dir",
   "crates/placeholder",
   "crates/primitives",
+  "crates/pubsub",
   "crates/revcon",
   "crates/runopt",
   "crates/schemata",
@@ -80,6 +81,7 @@ pangalactic-manifest        = { path = "crates/manifest"        }
 pangalactic-name            = { path = "crates/name"            }
 pangalactic-nested-dir      = { path = "crates/nested-dir"      }
 pangalactic-primitives      = { path = "crates/primitives"      }
+pangalactic-pubsub          = { path = "crates/pubsub"          }
 pangalactic-revcon          = { path = "crates/revcon"          }
 pangalactic-runopt          = { path = "crates/runopt"          }
 pangalactic-schemata        = { path = "crates/schemata"        }

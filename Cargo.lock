@@ -1536,6 +1536,10 @@ name = "pangalactic-primitives"
 version = "0.0.1"
 
 [[package]]
+name = "pangalactic-pubsub"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-revcon"
 version = "0.0.1"
 dependencies = [
