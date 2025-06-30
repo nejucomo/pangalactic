@@ -1252,6 +1252,7 @@ name = "pangalactic-config"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "anyhow-std",
  "dirs",
  "once_cell",
  "serde",
@@ -1552,6 +1553,7 @@ dependencies = [
  "pangalactic-store",
  "serde",
  "tokio",
+ "tracing",
 ]
 
 [[package]]

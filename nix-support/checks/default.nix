@@ -6,20 +6,22 @@ let
   inherit (pkgs.lib.strings) hasSuffix removeSuffix;
   inherit (pkgs.lib.trivial) pipe;
 
-  filterShellScripts = filterAttrs (n: k: k == "regular" && hasSuffix ".sh" n);
+  filterShellScripts = filterAttrs (n: k: k == "regular" && n != "framework.sh" && hasSuffix ".sh" n);
 
-  readScripts = mapAttrs (n: _: readFile (./. + "/${n}"));
+  mapAttrsToPaths = mapAttrs (n: _: ./. + "/${n}");
 
   buildChecks = mapAttrs' (
     fname: script: rec {
       name = removeSuffix ".sh" fname;
-      value = run-command "check-${name}" [ packages.install ] script;
+      value = run-command "check-${name}" [ packages.install ] ''
+        exec '${./framework.sh}' '${script}'
+      '';
     }
   );
 in
 pipe ./. [
   readDir
   filterShellScripts
-  readScripts
+  mapAttrsToPaths
   buildChecks
 ]

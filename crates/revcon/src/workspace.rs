@@ -78,18 +78,23 @@ where
         S: Store,
         P: AsRef<Path>,
     {
-        let mut ws = Workspace::new(
+        let mut workspace = Workspace::new(
             appconfig,
             store,
             workdir.as_ref().join(BOOKKEEPING_DIR_NAME),
         );
-        ws.bkdir.create_dir_anyhow()?;
+        tracing::debug!(?workspace, "initializing");
+        workspace.bkdir.create_dir_anyhow()?;
 
-        if let Some(template) = ws.appconfig.template.clone() {
-            ws.store.transfer(template, ws.path().to_path_buf()).await?;
+        if let Some(template) = workspace.appconfig.template.clone() {
+            tracing::debug!(?template);
+            workspace
+                .store
+                .transfer(template, workspace.bkdir.clone())
+                .await?;
         }
 
-        Ok(ws)
+        Ok(workspace)
     }
 }
 

@@ -18,6 +18,16 @@ where
     pub template: Option<OriginEndpoint<S::CID>>,
 }
 
+impl<S> Default for RevConConfig<S>
+where
+    S: Store,
+    OriginEndpoint<S::CID>: Display + FromStr<Err = anyhow::Error>,
+{
+    fn default() -> Self {
+        RevConConfig { template: None }
+    }
+}
+
 impl<S> Configuration for RevConConfig<S>
 where
     S: Store,

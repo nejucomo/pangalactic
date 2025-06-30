@@ -19,3 +19,4 @@ pangalactic-name.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
 tokio.workspace = true
+tracing.workspace = true

@@ -6,7 +6,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::pgdirs::PgDirs;
 
 /// A configuration state mapped directly to a config file
-pub trait Configuration: Debug + DeserializeOwned + Serialize {
+pub trait Configuration: Default + Debug + DeserializeOwned + Serialize {
     /// The configuration file is named `<NAME>.toml` inside the [PgDirs] config dir
     const NAME: &str;
 
