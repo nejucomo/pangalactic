@@ -1,2 +1,2 @@
 log-run pg --dirdb ./dirdb init
-[ -d .pg ] || exit 1
+check-test -d .pg
