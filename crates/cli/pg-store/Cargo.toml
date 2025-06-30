@@ -1,0 +1,23 @@
+[package]
+name = "pangalactic-cli-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+derive_more.workspace = true
+pangalactic-endpoint.workspace = true
+pangalactic-globset.workspace = true
+pangalactic-manifest.workspace = true
+pangalactic-runopt.workspace = true
+pangalactic-std-store.workspace = true
+pangalactic-store-dirdb.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+anyhow-std.workspace = true
+test-case.workspace = true
+pangalactic-test-dir.workspace = true
+pangalactic-test-runner.workspace = true

@@ -11,6 +11,7 @@ rawArgs@{
 
   # Our own custom params:
   pnameSuffix,
+  cargoPackage ? null, # If present a package name to build
   targetsRgx,
   manifestDir ? ".",
   ...
@@ -18,24 +19,39 @@ rawArgs@{
 let
   inherit (cranes.release) buildDepsOnly cargoBuild;
 
+  pnameSuffixDepsOnly = (
+    let
+      inherit (pkgs.lib.strings) splitString;
+      inherit (pkgs.lib.lists) head;
+    in
+    head (splitString "-" pnameSuffix)
+  );
+
   commonArgs =
     (removeAttrs rawArgs [
       "pnameSuffix"
+      "cargoPackage"
       "targetsRgx"
       "manifestDir"
     ])
     // {
-      pname = "${pname}-${pnameSuffix}";
       cargoExtraArgs = "--offline --target-dir=target/ --manifest-path ${manifestDir}/Cargo.toml";
     };
 
-  cargoArtifacts = buildDepsOnly commonArgs;
+  cargoArtifacts = buildDepsOnly (commonArgs // { pname = "${pname}-${pnameSuffixDepsOnly}"; });
 
   cargoBuilt = cargoBuild (
     commonArgs
     // {
+      pname = "${pname}-${pnameSuffix}";
       inherit cargoArtifacts;
       installCargoArtifactsMode = "use-symlink";
+      cargoExtraArgs = (
+        let
+          pkgArgs = if isNull cargoPackage then "" else "--package ${cargoPackage}";
+        in
+        "${commonArgs.cargoExtraArgs} ${pkgArgs}"
+      );
     }
   );
 
