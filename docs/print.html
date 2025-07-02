@@ -457,8 +457,17 @@
 <p>This needs careful investigation to ensure it is the case. The WASM specifications and issue trackers are not explicit about this goal. In any case, we hope to replace WASM with a system supporting concise non-interactive proofs of computational integrity. <a href="#fr-1-1">↩</a></p>
 </li>
 </ol><div style="break-before: page; page-break-before: always;"></div><h1 id="crate-intra-dependencies"><a class="header" href="#crate-intra-dependencies">Crate Intra-Dependencies</a></h1>
-<p>Here are the current crate dependencies within this workspace, (with redundant transitive dependencies omitted):</p>
-<p><img src="dev/../assets/generated/depgraph-ws-dedup.svg" alt="Intra-Workspace Dependencies" /></p>
+<p>These are several helpful different views of the intra-workspace crate dependencies. The following were generated with <code>cargo-depgraph</code> and <code>graphviz</code> and all charts use <code>--workspace-only --dedup-transitive-deps</code>.</p>
+<p>Crates which appear in both the host and guest charts are build for both host native and WASM targets.</p>
+<h2 id="host-crates"><a class="header" href="#host-crates">Host Crates</a></h2>
+<p>The host crates are those that implement the cli tools.</p>
+<p><img src="dev/../assets/generated/depgraph-host.svg" alt="Intra-Workspace Host Dependencies" /></p>
+<h2 id="guest-crates"><a class="header" href="#guest-crates">Guest Crates</a></h2>
+<p>The guest crates are those that implement <code>pangalactic-guest</code>, the WASM API for derivations.</p>
+<p><img src="dev/../assets/generated/depgraph-guest.svg" alt="Intra-Workspace Guest Dependencies" /></p>
+<h2 id="all-crates"><a class="header" href="#all-crates">All Crates</a></h2>
+<p>Here are all of the crates, including dev/build crates and dependencies:</p>
+<p><img src="dev/../assets/generated/depgraph-all-deps.svg" alt="Intra-Workspace All Dependencies" /></p>
 
                     </main>
 
