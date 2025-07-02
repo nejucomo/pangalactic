@@ -47,55 +47,44 @@ let
     CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
   };
 
-  seed-dir = run-command "seed-dir" [ ] ''
-    outbin="$out/bin"
-    outbintest="$out/bin/test"
-    mkdir -p "$outbintest"
-    for wasm in '${wasm.outputs}'/*
-    do
-      outrel="$(basename "$wasm" | sed 's|\.wasm$||; s|^test_|test/|')"
-      ln -sv "$wasm" "$outbin/$outrel"
-    done
-  '';
-
+  seed-dir = import ./seed-dir.nix { inherit wasm; };
   pg-install-seed = import ./pg-install-seed.nix { inherit bin seed-dir; };
 
   seed-config = run-command "seed-toml" [ ] ''
     ( set -x
     cat | tee "$out" <<EOF
-    seed = "$('${pg-install-seed}' --dirdb './dirdb')"
+    seed = "$('${pg-install-seed}/pg-install-seed' --dirdb './dirdb')"
     EOF
     )
   '';
 
-  merged-bin = run-command "merged-bin" [ ] ''
-    mkdir "$out"
-    ln -sv '${bin.outputs}'/* "$out/"
-    ln -sv '${pg-install-seed}' "$out/pg-install-seed"
-  '';
+  merged-bin = pkgs.buildEnv {
+    name = "merged-bin";
+    paths = [
+      bin.outputs
+      pg-install-seed
+    ];
+  };
 
   book = import ./book.nix { inherit cargoVendorDir; };
 
-  install = run-command "install" [ ] ''
-    function install-dir-link
-    {
-      local target="$1"
-      local link="$2"
-
-      mkdir -p "$(dirname "$link")"
-      ln -vs "$target" "$link"
-    }
-
-    install-dir-link '${merged-bin}' "$out/bin"
-    install-dir-link '${seed-config}' "$out/etc/${pname}/seed.toml"
-    install-dir-link '${seed-dir}' "$out/lib/${pname}/seed"
-    install-dir-link '${book}' "$out/doc/${pname}/book"
-    install-dir-link '${bin.apidocs}' "$out/doc/${pname}/api"
-  '';
+  install = combine-derivations "install" {
+    "bin" = merged-bin;
+    "etc/${pname}/seed.toml" = seed-config;
+    "lib/${pname}/seed" = seed-dir;
+    "doc/${pname}/book" = book;
+    "doc/${pname}/api" = bin.apidocs;
+  };
 
   # All output packages _except_ default and all:
   base-packages = {
-    inherit book install seed-dir;
+    inherit
+      book
+      install
+      seed-dir
+      seed-config
+      merged-bin
+      ;
 
     bin-cargo-artifacts = bin.cargo.artifacts;
     bin-cargo-build = bin.cargo.build;
@@ -106,7 +95,7 @@ let
     wasm = wasm.outputs;
   };
 
-  all = combine-derivations base-packages;
+  all = combine-derivations "base-packages" base-packages;
 
   packages = base-packages // {
     inherit all;

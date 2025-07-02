@@ -1,29 +1,38 @@
 { pkgs, ... }:
 { bin, seed-dir }:
 
-pkgs.writeShellScript "pg-install-seed" ''
-  function usage {
-    cat <<__EOF
-    error: $*
+let
+  name = "pg-install-seed";
+in
+pkgs.writeTextFile {
+  inherit name;
 
-    usage: $0 [ --dirdb <dirdb> ]
+  executable = true;
+  destination = "/${name}";
+  text = ''
+    function usage {
+      cat <<__EOF
+      error: $*
 
-      Install the seed into the store; print its link on stdout.
-  __EOF
+      usage: $0 [ --dirdb <dirdb> ]
 
-    exit 1
-  }
+        Install the seed into the store; print its link on stdout.
+    __EOF
 
-  if [ $# -eq 0 ]
-  then
-    dirdbOpts=""
-  else
-    [ "$1" = '--dirdb' ] || usage "unknown option: $1"
-    [ $# -gt 1 ] || usage 'missing `--dirdb <dirdb>` argument'
-    [ $# -eq 2 ] || usage "unexpected arguments: $*"
+      exit 1
+    }
 
-    dirdbOpts="--dirdb $2"
-  fi
+    if [ $# -eq 0 ]
+    then
+      dirdbOpts=""
+    else
+      [ "$1" = '--dirdb' ] || usage "unknown option: $1"
+      [ $# -gt 1 ] || usage 'missing `--dirdb <dirdb>` argument'
+      [ $# -eq 2 ] || usage "unexpected arguments: $*"
 
-  '${bin.outputs}/pg-store' $dirdbOpts xfer '${seed-dir}' 'pg:'
-''
+      dirdbOpts="--dirdb $2"
+    fi
+
+    '${bin.outputs}/pg-store' $dirdbOpts xfer '${seed-dir}' 'pg:'
+  '';
+}
