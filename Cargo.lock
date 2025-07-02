@@ -1648,6 +1648,8 @@ name = "pangalactic-pubsub"
 version = "0.0.1"
 dependencies = [
  "ed25519-dalek",
+ "rand 0.9.1",
+ "rand_core 0.9.3",
 ]
 
 [[package]]
