@@ -1,12 +1,17 @@
-lib:
+{
+  pname,
+  self,
+  run-command,
+  pkgs,
+  ...
+}:
 { cargoVendorDir }:
 let
-  inherit (lib) self run-command;
-  inherit (lib.pkgs) fd mdbook graphviz;
+  inherit (pkgs) fd mdbook graphviz;
 
   depgraph =
     run-command "depgraph"
-      (with lib.pkgs; [
+      (with pkgs; [
         cargo
         cargo-depgraph
         graphviz
@@ -14,17 +19,35 @@ let
       ''
         export CARGO_HOME='${cargoVendorDir}'
         export CARGO_NET_OFFLINE='true'
+
+        function depgraph {
+          local suffix="$1"
+          shift
+
+          cargo depgraph \
+            --frozen \
+            --workspace-only \
+            --dedup-transitive-deps \
+            "$@" \
+            | dot \
+              -Tsvg \
+            > "$out/depgraph-$suffix.svg"
+        }
+
         mkdir "$out"
         cd "${self}"
-        cargo depgraph \
-          --frozen \
-          --offline \
-          --locked \
-          --workspace-only \
-          --dedup-transitive-deps \
-          | dot \
-            -Tsvg \
-          > "$out/depgraph-ws-dedup.svg"
+
+        depgraph 'host' \
+          --exclude '${pname}' \
+          --exclude '${pname}-guest' \
+          --exclude '${pname}-test-runner' \
+          --exclude '${pname}-test-dir'
+
+        depgraph 'guest' \
+          --root '${pname}-guest'
+
+        depgraph 'all-deps' \
+          --all-deps
       '';
 
   booksrc = self + "/book";

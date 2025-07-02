@@ -1,5 +1,5 @@
 { pkgs, run-command, ... }:
-derivs:
+name: derivs:
 let
   inherit (pkgs.lib.attrsets) mapAttrsToList;
   inherit (pkgs.lib.strings) concatStringsSep;
@@ -10,12 +10,13 @@ let
     (concatStringsSep " ")
   ];
 in
-run-command "combine-derivations" [ pkgs.sd ] ''
+run-command "combine-derivations-${name}" [ pkgs.sd ] ''
   mkdir "$out"
-  for nv in ${derivstr}
+  for item in ${derivstr}
   do
-    n="$(echo "$nv" | sd ':.*$' ''')"
-    v="$(echo "$nv" | sd '^.*:' ''')"
-    ln -sv "$v" "$out/$n"
+    link="$(echo "$item" | sd ':.*$' ''')"
+    target="$(echo "$item" | sd '^.*:' ''')"
+    mkdir -p "$(dirname "$out/$link")"
+    ln -sv "$target" "$out/$link"
   done
 ''
