@@ -1,13 +1,13 @@
 use ed25519_dalek::SigningKey;
 
-use crate::Subscription;
+use crate::SubscribeCap;
 
 #[derive(Debug)]
-pub struct Publisher {
+pub struct PublishCap {
     sk: SigningKey,
 }
 
-impl Publisher {
+impl PublishCap {
     pub fn generate<R>(mut r: R) -> Self
     where
         R: rand_core::CryptoRng,
@@ -17,12 +17,12 @@ impl Publisher {
         let mut sk: SecretKey = [0; SECRET_KEY_LENGTH];
         r.fill_bytes(&mut sk);
 
-        Publisher {
+        PublishCap {
             sk: SigningKey::from_bytes(&sk),
         }
     }
 
-    pub fn subscription(&self) -> Subscription {
-        Subscription::from_vk(self.sk.verifying_key())
+    pub fn subscribe_cap(&self) -> SubscribeCap {
+        SubscribeCap::from_vk(self.sk.verifying_key())
     }
 }

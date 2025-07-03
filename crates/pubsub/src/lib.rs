@@ -1,5 +1,5 @@
-mod publisher;
-mod subscription;
+mod pubcap;
+mod subcap;
 
-pub use self::publisher::Publisher;
-pub use self::subscription::Subscription;
+pub use self::pubcap::PublishCap;
+pub use self::subcap::SubscribeCap;
