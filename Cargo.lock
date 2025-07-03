@@ -1674,6 +1674,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-revision"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-runopt"
 version = "0.0.1"
 dependencies = [
