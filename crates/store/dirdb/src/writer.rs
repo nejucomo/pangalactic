@@ -76,11 +76,11 @@ impl AsyncWrite for Writer {
 }
 
 fn get_spool_name() -> String {
-    use rand::distributions::Standard;
+    use rand::distr::StandardUniform;
     use rand::Rng;
 
-    let mut rng = rand::thread_rng();
-    let r: [u8; 32] = rng.sample(Standard);
+    let mut rng = rand::rng();
+    let r: [u8; 32] = rng.sample(StandardUniform);
     let mut spoolname = "incoming.".to_string();
     pangalactic_b64::encode_to_string(r, &mut spoolname);
 
