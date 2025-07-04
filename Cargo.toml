@@ -14,6 +14,7 @@ members = [
   "crates/cid",
   "crates/cli/pg",
   "crates/cli/pg-derive",
+  "crates/cli/pg-pubsub",
   "crates/cli/pg-store",
   "crates/config",
   "crates/dag-transfer",
@@ -60,6 +61,7 @@ pangalactic-chomper         = { path = "crates/chomper"         }
 pangalactic-cid             = { path = "crates/cid"             }
 pangalactic-cli             = { path = "crates/cli/pg"          }
 pangalactic-cli-derive      = { path = "crates/cli/pg-derive"   }
+pangalactic-cli-pubsub      = { path = "crates/cli/pg-pubsub"   }
 pangalactic-cli-store       = { path = "crates/cli/pg-store"    }
 pangalactic-config          = { path = "crates/config"          }
 pangalactic-dag-transfer    = { path = "crates/dag-transfer"    }

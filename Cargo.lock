@@ -1318,6 +1318,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-cli-pubsub"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-cli-revcon"
 version = "0.0.1"
 dependencies = [
