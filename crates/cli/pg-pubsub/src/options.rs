@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand};
 
-/// Derive a plan
+/// low-level pubsub operations
 #[derive(Clone, Debug, Parser)]
 pub struct Options {
     #[clap(subcommand)]
