@@ -5,3 +5,17 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+anyhow-std.workspace = true
+clap.workspace = true
+derive_more.workspace = true
+pangalactic-endpoint.workspace = true
+pangalactic-pubsub.workspace = true
+pangalactic-revision.workspace = true
+pangalactic-runopt.workspace = true
+pangalactic-schemata.workspace = true
+pangalactic-serialization.workspace = true
+pangalactic-std-store.workspace = true
+pangalactic-store-dirdb.workspace = true
+rand.workspace = true
+tokio.workspace = true

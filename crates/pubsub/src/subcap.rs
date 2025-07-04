@@ -1,6 +1,7 @@
 use ed25519_dalek::VerifyingKey;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SubscribeCap {
     #[allow(dead_code)]
     vk: VerifyingKey,

@@ -1,8 +1,9 @@
 use ed25519_dalek::SigningKey;
+use serde::{Deserialize, Serialize};
 
 use crate::SubscribeCap;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PublishCap {
     sk: SigningKey,
 }
@@ -10,7 +11,7 @@ pub struct PublishCap {
 impl PublishCap {
     pub fn generate<R>(mut r: R) -> Self
     where
-        R: rand_core::CryptoRng,
+        R: rand::CryptoRng,
     {
         use ed25519_dalek::{SecretKey, SECRET_KEY_LENGTH};
 

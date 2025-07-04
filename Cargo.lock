@@ -657,6 +657,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "115531babc129696a58c64a4fef0a8bf9e9698629fb97e9e40767d235cfbcd53"
 dependencies = [
  "pkcs8",
+ "serde",
  "signature",
 ]
 
@@ -1320,6 +1321,22 @@ dependencies = [
 [[package]]
 name = "pangalactic-cli-pubsub"
 version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "anyhow-std",
+ "clap",
+ "derive_more",
+ "pangalactic-endpoint",
+ "pangalactic-pubsub",
+ "pangalactic-revision",
+ "pangalactic-runopt",
+ "pangalactic-schemata",
+ "pangalactic-serialization",
+ "pangalactic-std-store",
+ "pangalactic-store-dirdb",
+ "rand 0.9.1",
+ "tokio",
+]
 
 [[package]]
 name = "pangalactic-cli-revcon"
@@ -1653,7 +1670,7 @@ version = "0.0.1"
 dependencies = [
  "ed25519-dalek",
  "rand 0.9.1",
- "rand_core 0.9.3",
+ "serde",
 ]
 
 [[package]]
