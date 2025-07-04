@@ -1676,6 +1676,14 @@ dependencies = [
 [[package]]
 name = "pangalactic-revision"
 version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "pangalactic-dir",
+ "pangalactic-layer-dir",
+ "pangalactic-link",
+ "pangalactic-name",
+ "pangalactic-store",
+]
 
 [[package]]
 name = "pangalactic-runopt"
