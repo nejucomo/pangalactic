@@ -1328,7 +1328,6 @@ dependencies = [
  "derive_more",
  "pangalactic-endpoint",
  "pangalactic-pubsub",
- "pangalactic-revision",
  "pangalactic-runopt",
  "pangalactic-schemata",
  "pangalactic-serialization",
@@ -1668,7 +1667,9 @@ version = "0.0.1"
 name = "pangalactic-pubsub"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "ed25519-dalek",
+ "pangalactic-serialization",
  "rand 0.9.1",
  "serde",
 ]
@@ -1688,22 +1689,11 @@ dependencies = [
  "pangalactic-link",
  "pangalactic-linkpath",
  "pangalactic-name",
+ "pangalactic-pubsub",
  "pangalactic-store",
  "serde",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "pangalactic-revision"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "pangalactic-dir",
- "pangalactic-layer-dir",
- "pangalactic-link",
- "pangalactic-name",
- "pangalactic-store",
 ]
 
 [[package]]

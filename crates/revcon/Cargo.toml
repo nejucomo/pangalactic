@@ -16,6 +16,7 @@ pangalactic-layer-dir.workspace = true
 pangalactic-link.workspace = true
 pangalactic-linkpath.workspace = true
 pangalactic-name.workspace = true
+pangalactic-pubsub.workspace = true
 pangalactic-store.workspace = true
 serde.workspace = true
 tokio.workspace = true
