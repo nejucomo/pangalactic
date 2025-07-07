@@ -66,7 +66,8 @@ let
     ];
   };
 
-  book = import ./book.nix { inherit cargoVendorDir; };
+  depgraphs = import ./depgraphs.nix { inherit cargoVendorDir; };
+  book = import ./book.nix { inherit depgraphs; };
 
   install = combine-derivations "install" {
     "bin" = merged-bin;
@@ -80,10 +81,11 @@ let
   base-packages = {
     inherit
       book
+      depgraphs
       install
-      seed-dir
-      seed-config
       merged-bin
+      seed-config
+      seed-dir
       ;
 
     bin-cargo-artifacts = bin.cargo.artifacts;
