@@ -8,6 +8,12 @@ where
     Ok(buf)
 }
 
+/// Deserialize bytes from the pangalactic binary format to `T`
+///
+/// # TODO
+///
+/// - Require strict versioning. *Correctness / Future Proofing*
+/// - Change from [DeserializeOwned] to [serde::Deserialize] to reduce buffer copies. `buf` needs to have an explicit lifetime passed to [serde]. (Example `../../pubsub/src/envelope.rs`.) *Performance / API Ergonomics*
 pub fn deserialize<B, T>(buf: B) -> anyhow::Result<T>
 where
     B: AsRef<[u8]>,
