@@ -1729,6 +1729,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-splice"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-std-store"
 version = "0.0.1"
 dependencies = [

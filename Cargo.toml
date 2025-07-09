@@ -42,6 +42,7 @@ members = [
   "crates/runopt",
   "crates/schemata",
   "crates/serialization",
+  "crates/splice",
   "crates/std-store",
   "crates/store/dirdb",
   "crates/store/mem",
@@ -88,6 +89,7 @@ pangalactic-revcon          = { path = "crates/revcon"          }
 pangalactic-runopt          = { path = "crates/runopt"          }
 pangalactic-schemata        = { path = "crates/schemata"        }
 pangalactic-serialization   = { path = "crates/serialization"   }
+pangalactic-splice          = { path = "crates/splice"          }
 pangalactic-std-store       = { path = "crates/std-store"       }
 pangalactic-store           = { path = "crates/store/trait"     }
 pangalactic-store-dirdb     = { path = "crates/store/dirdb"     }
