@@ -36,6 +36,12 @@ let
     ])
     // {
       cargoExtraArgs = "--offline --target-dir=target/ --manifest-path ${manifestDir}/Cargo.toml";
+
+      # Deny warnings:
+      env = {
+        RUSTFLAGS = "-D warnings";
+        RUSTDOCFLAGS = "-D warnings";
+      };
     };
 
   cargoArtifacts = buildDepsOnly (commonArgs // { pname = "${pname}-${pnameSuffixDepsOnly}"; });
