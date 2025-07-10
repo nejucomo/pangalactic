@@ -11,6 +11,7 @@ impl SubscribeCap {
         SubscribeCap { vk }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn verify(&self, payload: &[u8], sig: &Signature) -> anyhow::Result<()> {
         self.vk.verify(payload, sig)?;
         Ok(())

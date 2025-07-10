@@ -1,4 +1,3 @@
-mod envelope;
 mod history;
 mod pubcap;
 mod subcap;
