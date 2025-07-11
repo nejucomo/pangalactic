@@ -1,10 +1,15 @@
 use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand};
+use pangalactic_node::NodeOptions;
 
 /// low-level pubsub operations
 #[derive(Clone, Debug, Parser)]
 pub struct Options {
+    /// Node options
+    #[clap(flatten)]
+    pub nodeopts: NodeOptions,
+
     /// A subcommand
     #[clap(subcommand)]
     pub command: Command,

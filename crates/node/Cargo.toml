@@ -5,3 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+clap.workspace = true
+derive_more.workspace = true
+pangalactic-store-dirdb.workspace = true
+pangalactic-std-store.workspace = true

@@ -1330,6 +1330,7 @@ dependencies = [
  "clap",
  "derive_more",
  "pangalactic-endpoint",
+ "pangalactic-node",
  "pangalactic-pubsub",
  "pangalactic-runopt",
  "pangalactic-schemata",
@@ -1338,6 +1339,7 @@ dependencies = [
  "pangalactic-store-dirdb",
  "rand 0.9.1",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -1669,6 +1671,12 @@ dependencies = [
 [[package]]
 name = "pangalactic-node"
 version = "0.0.1"
+dependencies = [
+ "clap",
+ "derive_more",
+ "pangalactic-std-store",
+ "pangalactic-store-dirdb",
+]
 
 [[package]]
 name = "pangalactic-primitives"
