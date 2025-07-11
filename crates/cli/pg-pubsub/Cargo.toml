@@ -10,6 +10,7 @@ anyhow-std.workspace = true
 clap.workspace = true
 derive_more.workspace = true
 pangalactic-endpoint.workspace = true
+pangalactic-log.workspace = true
 pangalactic-node.workspace = true
 pangalactic-pubsub.workspace = true
 pangalactic-runopt.workspace = true

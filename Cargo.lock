@@ -1330,6 +1330,7 @@ dependencies = [
  "clap",
  "derive_more",
  "pangalactic-endpoint",
+ "pangalactic-log",
  "pangalactic-node",
  "pangalactic-pubsub",
  "pangalactic-runopt",

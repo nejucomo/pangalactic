@@ -28,7 +28,7 @@ impl PubCapNodeApp {
         let pubcap = PublishCap::generate(rand::rng());
         let subcapstr = pubcap.subscribe_cap().to_string();
 
-        let pcpath = self.pubcap_dir.join(format!("pubcap.key.{}", &subcapstr));
+        let pcpath = self.pubcap_dir.join(format!("{}.PUBLISH-CAP", &subcapstr));
 
         let pcbytes = b64::serialize(&pubcap)?;
         pcpath.write_anyhow(pcbytes)?;
