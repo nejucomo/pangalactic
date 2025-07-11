@@ -1439,6 +1439,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-from-options"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-globset"
 version = "0.0.1"
 dependencies = [

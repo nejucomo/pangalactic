@@ -20,6 +20,7 @@ members = [
   "crates/dag-transfer",
   "crates/dir",
   "crates/endpoint",
+  "crates/from-options",
   "crates/globset",
   "crates/guest",
   "crates/guest-procmacro",
@@ -66,6 +67,7 @@ pangalactic-config          = { path = "crates/config"          }
 pangalactic-dag-transfer    = { path = "crates/dag-transfer"    }
 pangalactic-dir             = { path = "crates/dir"             }
 pangalactic-endpoint        = { path = "crates/endpoint"        }
+pangalactic-from-options    = { path = "crates/from-options"    }
 pangalactic-globset         = { path = "crates/globset"         }
 pangalactic-guest           = { path = "crates/guest"           }
 pangalactic-guest-procmacro = { path = "crates/guest-procmacro" }
