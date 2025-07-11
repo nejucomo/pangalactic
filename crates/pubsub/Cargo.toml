@@ -8,5 +8,8 @@ license.workspace = true
 anyhow.workspace = true
 ed25519-dalek = { workspace = true, features = [ "serde" ] }
 pangalactic-serialization.workspace = true
+pangalactic-link.workspace = true
+pangalactic-store.workspace = true
+pangalactic-layer-dir.workspace = true
 rand.workspace = true
 serde.workspace = true

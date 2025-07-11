@@ -1669,7 +1669,10 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "ed25519-dalek",
+ "pangalactic-layer-dir",
+ "pangalactic-link",
  "pangalactic-serialization",
+ "pangalactic-store",
  "rand 0.9.1",
  "serde",
 ]

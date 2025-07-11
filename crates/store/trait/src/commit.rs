@@ -52,3 +52,21 @@ where
         store.commit(self.as_slice()).await
     }
 }
+
+impl<S> Commit<S> for &str
+where
+    S: Store,
+{
+    async fn commit_into_store(self, store: &mut S) -> Result<S::CID> {
+        store.commit(self.as_bytes()).await
+    }
+}
+
+impl<S> Commit<S> for String
+where
+    S: Store,
+{
+    async fn commit_into_store(self, store: &mut S) -> Result<S::CID> {
+        store.commit(self.as_str()).await
+    }
+}

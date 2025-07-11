@@ -26,3 +26,14 @@ where
         }
     }
 }
+
+impl<S> Load<S> for String
+where
+    S: Store,
+{
+    async fn load_from_store(store: &S, cid: &S::CID) -> Result<Self> {
+        let bytes: Vec<u8> = store.load(cid).await?;
+        let string = String::try_from(bytes)?;
+        Ok(string)
+    }
+}
