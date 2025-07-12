@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -ex
-cargo check --offline
+cargo check
 git add Cargo.lock
 nix build --print-build-logs .#all
 exec nix flake check
