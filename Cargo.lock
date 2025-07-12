@@ -1680,6 +1680,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pangalactic-nodedb"
+version = "0.0.1"
+
+[[package]]
 name = "pangalactic-primitives"
 version = "0.0.1"
 
