@@ -37,7 +37,6 @@ members = [
   "crates/name",
   "crates/nested-dir",
   "crates/node",
-  "crates/nodedb",
   "crates/placeholder",
   "crates/primitives",
   "crates/pubsub",
@@ -49,6 +48,7 @@ members = [
   "crates/store/dirdb",
   "crates/store/mem",
   "crates/store/trait",
+  "crates/subsdb",
   "crates/table",
   "crates/test/dir",
   "crates/test/runner",
@@ -87,7 +87,6 @@ pangalactic-manifest        = { path = "crates/manifest"        }
 pangalactic-name            = { path = "crates/name"            }
 pangalactic-nested-dir      = { path = "crates/nested-dir"      }
 pangalactic-node            = { path = "crates/node"            }
-pangalactic-nodedb          = { path = "crates/nodedb"          }
 pangalactic-primitives      = { path = "crates/primitives"      }
 pangalactic-pubsub          = { path = "crates/pubsub"          }
 pangalactic-revcon          = { path = "crates/revcon"          }
@@ -98,6 +97,7 @@ pangalactic-std-store       = { path = "crates/std-store"       }
 pangalactic-store           = { path = "crates/store/trait"     }
 pangalactic-store-dirdb     = { path = "crates/store/dirdb"     }
 pangalactic-store-mem       = { path = "crates/store/mem"       }
+pangalactic-subsdb          = { path = "crates/subsdb"          }
 pangalactic-table           = { path = "crates/table"           }
 pangalactic-test-dir        = { path = "crates/test/dir"        }
 pangalactic-test-runner     = { path = "crates/test/runner"     }

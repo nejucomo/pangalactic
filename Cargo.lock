@@ -1680,10 +1680,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pangalactic-nodedb"
-version = "0.0.1"
-
-[[package]]
 name = "pangalactic-primitives"
 version = "0.0.1"
 
@@ -1813,6 +1809,10 @@ dependencies = [
  "pangalactic-store",
  "tokio",
 ]
+
+[[package]]
+name = "pangalactic-subsdb"
+version = "0.0.1"
 
 [[package]]
 name = "pangalactic-table"
