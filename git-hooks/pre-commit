@@ -2,7 +2,5 @@
 set -ex
 cargo check --offline
 git add Cargo.lock
-
-# Temporarily disabled because it requires net access.
-#nix build .#all
-#exec nix flake check
+nix build --print-build-logs .#all
+exec nix flake check
