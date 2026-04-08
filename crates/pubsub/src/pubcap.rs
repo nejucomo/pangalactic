@@ -1,7 +1,8 @@
 use ed25519_dalek::SigningKey;
 use serde::{Deserialize, Serialize};
 
-use crate::SubscribeCap;
+use crate::envelope::Envelope;
+use crate::{History, SubscribeCap};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PublishCap {
@@ -25,5 +26,13 @@ impl PublishCap {
 
     pub fn subscribe_cap(&self) -> SubscribeCap {
         SubscribeCap::from_vk(self.sk.verifying_key())
+    }
+
+    /// Sign `history` and produce a verifiable [Envelope] for subscribers
+    pub fn publish<L>(&self, history: History<L>) -> anyhow::Result<Envelope>
+    where
+        L: Serialize,
+    {
+        Envelope::sign(&self.sk, self.subscribe_cap(), history)
     }
 }

@@ -15,4 +15,9 @@ impl SubscribeCap {
         self.vk.verify(payload, sig)?;
         Ok(())
     }
+
+    /// The raw bytes of the underlying verifying key, for equality checks
+    pub fn verifying_key_bytes(&self) -> [u8; 32] {
+        self.vk.to_bytes()
+    }
 }
