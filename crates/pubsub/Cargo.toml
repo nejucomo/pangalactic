@@ -1,0 +1,12 @@
+[package]
+name = "pangalactic-pubsub"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+ed25519-dalek = { workspace = true, features = [ "serde" ] }
+pangalactic-serialization.workspace = true
+rand.workspace = true
+serde.workspace = true
