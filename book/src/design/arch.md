@@ -61,7 +61,7 @@ A user Alice can create a new *workspace* which consists of a local filesystem w
 
 The book-keeping is stored within the `.pg` subdirectory of the working directory. It is further split into *tracked* and *untracked* state. `.pg/UNTRACKED` directory contains untracked state and every other child of `.pg` is tracked. The book-keeping metadata consists of small *links* into *the Store*, which are both described below in [The Store](#the-store) section.
 
-A *workspace* is always associated with a *publisher* which is a means of controlling how users can *subscribe* to the changes of the workspace via a *pubid* identifier.
+A *workspace* is always associated with a *PublishCap* (enabling Alice to publish changes) and an associated *SubscribeCap* (enabling others to subscribe to those changes).
 
 The *untracked book-keeping* contains at least:
 
@@ -136,27 +136,27 @@ Note: while there is low-level commandline access to direct pub/sub features via
 
 The *Pub/Sub Capabilities Model* or PSCM is the authoritzation layer of pub/sub: a network/IO-agnostic cryptographic data format which defines how users can *publish* and *subscribe* to update *records*.
 
-#### Publishers
+#### PublishCap and SubscribeCap
 
-Any time Alice wishes to share a sequence of related update *records* to Bob and Charlie, she generates a new *publisher*. This typically occurs under the hood when using `pg` for revision control when a user runs `pg init`.
+Any time Alice wishes to share a sequence of related update *records* to Bob and Charlie, she generates a new *PublishCap* and its associated *SubscribeCap*. This typically occurs under the hood when using `pg` for revision control when a user runs `pg init`.
 
-A *publisher* is entirely controlled by a cryptographic signing key, which Alice typically stores privately. Again, when using `pg` for revision control, this is managed under the hood. With that in place, Alice then shares her *publisher ID* aka *pubid* with Bob and Charlie. The pubid for a revision control *workspace* is available with the `pg info` command.
+A *PublishCap* is a cryptographic signing key, which Alice stores privately; possessing it is both necessary and sufficient to append new records to the publication stream. The *SubscribeCap* is what Alice shares with Bob and Charlie; possessing it is both necessary and sufficient to retrieve and read records from the stream. The *SubscribeCap* for a revision control *workspace* is available with the `pg info` command.
 
 #### Subscriptions
 
-Bob and Charlie then take Alice's pubid and *subscribe* to it. Suppose the publisher Alice created is for a revision control workspace and Bob wants to acquire a new local copy, then he uses the `pg fork` command to create a new local workspace and subscribe to Alice's pubid. Meanwhile, let's suppose the workspace Alice is hacking on is part of a project that Charlie is also hacking on, but the two haven't yet directly collaborated. In that case Charlie uses `pg peer` in his workspace to subscribe to Alice's workspace updates.
+Bob and Charlie then take Alice's *SubscribeCap* and *subscribe* to it. Suppose the publisher Alice created is for a revision control workspace and Bob wants to acquire a new local copy, then he uses the `pg fork` command to create a new local workspace and subscribe to Alice's *SubscribeCap*. Meanwhile, let's suppose the workspace Alice is hacking on is part of a project that Charlie is also hacking on, but the two haven't yet directly collaborated. In that case Charlie uses `pg peer` in his workspace to subscribe to Alice's workspace updates.
 
 #### Records
 
-Now that Bob and Charlie are subscribed to Alice's pubid, they can receive *records* from it. A publisher always produces a *linear sequence of records*. Records contain a *sequence number* which starts at 0 and increments each time Alice *publishes* a record with her publisher. Additionally it contains a *previouis CID* and a *current CID*. (CIDs are described soon in [The Store](#the-store) section).
+Now that Bob and Charlie are subscribed to Alice's *SubscribeCap*, they can receive *records* from it. A publication stream always produces a *linear sequence of records*. Records contain a *sequence number* which starts at 0 and increments each time Alice *publishes* a record. Additionally it contains a *previous CID* and a *current CID*. (CIDs are described soon in [The Store](#the-store) section).
 
-A record provides the pubid which produced it (either because it is literally stored in the record or it is derivable given the signature scheme and signature).
+A record is associated with the *SubscribeCap* that produced it (either because it is literally stored in the record, or it is derivable given the signature scheme and signature).
 
 #### PSCM Confidentiality
 
-An important feature of the pub/sub PSCM is that an arbitary third party, Mal, *cannot* track updates from Alice's workspace *without* subscribing to the pubid for it. If Alice is working on a private project she could ensure she sends the pubid to Bob and Charlie privately, and rely on them not to share the pubid elsewhere without checking with her first.
+An important feature of the pub/sub PSCM is that an arbitrary third party, Mal, *cannot* track updates from Alice's workspace *without* possessing Alice's *SubscribeCap*. If Alice is working on a private project she could ensure she sends the *SubscribeCap* to Bob and Charlie privately, and rely on them not to share the *SubscribeCap* elsewhere without checking with her first.
 
-In other words a pubid is a capability for two actions: *retrieving* and *reading* records from the publisher.
+In other words, the *SubscribeCap* is a capability for two actions: *retrieving* and *reading* records from the publication stream.
 
 ## The Store
 
@@ -211,5 +211,5 @@ The current implementation is build on WASM (via `wasmtime`) with a special-purp
 
 A *plan* is a directory that specifies both the executable and inputs. A host can *derive* an *attestation* from a plan. An *attestation* contains the originating plan, the generated output (or deterministic error), a log, and supporting evidence that this is the correct attestation for the plan.
 
-The supporting evidence should eventually be a ZKP, but in the short term we will implement signature-based attestation. (**Note**: When Alice derives outputs as part of the standard revision control process, the resulting attestations are implicitly signed by Alice's publisher.)
+The supporting evidence should eventually be a ZKP, but in the short term we will implement signature-based attestation. (**Note**: When Alice derives outputs as part of the standard revision control process, the resulting attestations are implicitly signed using Alice's *PublishCap*.)
 

@@ -9,6 +9,7 @@
 
 # Pangalactic Design
   
+- [Capabilities Security](design/caps.md)
 - [Vision](design/vision.md)
 - [Architecture](design/arch.md)
 - [Revision Control](design/revcon.md)
