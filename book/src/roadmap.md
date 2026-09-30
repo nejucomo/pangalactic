@@ -9,6 +9,8 @@
 - ipfs store
 - pub/sub
 - rebrand
+  - rename `Store`/`store` -> `Vault`/`vault` (see branches `rename-store-to-vault`, `rename-store-to-vault.retry`)
+- CI caching cleanup: consolidate `ci.yaml`+`gh-caching.yml`+`nix-cache.sh` into a single `qaci.yaml`-driven flow w/ `ghci-tool.sh` for LIFO hook cleanup (see branch `ci-caching-cleanup`)
 - API docs
 - revision control tool MVP
 - hostenv
